@@ -1,59 +1,49 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-// Material Design stuff
+// Material Design imports
 import RaisedButton from 'material-ui/RaisedButton';
-import Dialog from 'material-ui/Dialog';
-import {deepOrange500} from 'material-ui/styles/colors';
-import FlatButton from 'material-ui/FlatButton';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
-/*
-  Browse
-  Let's us make <Browse/> elements
-*/
 // My component imports
 import Header from './Header';
 
 var Browse = React.createClass({
-
+  getInitialState : function() {
+    return {}
+  },
   render : function() {
-    var muiTheme = getMuiTheme({
-      palette: {
-        accent1Color: deepOrange500,
-      },
-    });
-
-    var standardActions = (
-      <FlatButton
-        label="Ok"
-        primary={true}
-        onTouchTap={this.handleRequestClose}
-      />
-    );
-
     var styles = {
       container: {
         textAlign: 'center',
-        paddingTop: 200,
-      },
+        paddingTop: 125,
+        width: '70%',
+        margin: '0 auto',
+        maxWidth: '420px'
+      }
     };
     return (
       <div>
-      <MuiThemeProvider muiTheme={muiTheme}>
         <Header/>
         <div style={styles.container}>
-          <h1>Browse Page</h1>
-          <Link to='/explore'>
-            <p>Explore?</p>
-          </Link>
+          <h2>Browse Existing Discoveries!</h2>
+          <MuiThemeProvider>
+            <div>
+              <Link to='/'>
+                <RaisedButton label="Welcome" primary={true}/>
+              </Link>
+              <Link to='/explore'>
+                <RaisedButton label="Explore Data" primary={true}/>
+              </Link>
+              <Link to='/dataset/new'>
+                <RaisedButton label="Contribute Dataset" primary={true}/>
+              </Link>
+            </div>
+          </MuiThemeProvider>
         </div>
-      </MuiThemeProvider>
       </div>
     )
   }
-
 });
 
 export default Browse;
