@@ -1,1 +1,1 @@
-Metaseq is a data discovery and analysis tool for genome sequencing data. Providing a rich front-end for exploration of metadata across a wide set of data repositories, use Metaseq to find the right aggregation of sequences for your analysis, and then access the raw sequencing data.
+MetaSEQ is a data discovery and analysis tool for genome sequencing data. Providing a rich front-end for exploration of metadata across a wide set of data repositories, use MetaSEQ to find the right aggregation of sequences for your analysis, and then access the raw sequencing data.
