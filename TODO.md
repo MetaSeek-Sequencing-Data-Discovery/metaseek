@@ -18,8 +18,9 @@
 * TODO
 ** Clean up default pages / page Routes
 ** Clear out unneeded COTD components
-** Remove unused styles
+** ~~Remove unused styles~~
 ** Sitemap it
+** Play with Material UI a bit
 ** Load all of Adrienne's sample records into the DB
 ** Build a dumb "look at all records" page
 ** Build a dumb filter / ruleset component
