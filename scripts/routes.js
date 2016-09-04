@@ -15,7 +15,7 @@ import Welcome from './components/Welcome';
 import Browse from './components/Browse';
 import Explore from './components/Explore';
 import MyAccount from './components/MyAccount';
-//import AddDataset from './components/AddDataset';
+import AddDataset from './components/AddDataset';
 //import DiscoveryDetail from './components/DiscoveryDetail';
 //import DatasetDetail from './components/DatasetDetail';
 
@@ -23,9 +23,10 @@ import MyAccount from './components/MyAccount';
   Routes
 */
 
-/* <Route path="/dataset/new" component={AddDataset}/>
+/*
 <Route path="/dataset/:id" component={DatasetDetail}/>
-<Route path="/discovery/:id" component={DiscoveryDetail}/> */
+<Route path="/discovery/:id" component={DiscoveryDetail}/>
+*/
 
 var routes = (
   <Router history={createBrowserHistory()}>
@@ -33,6 +34,7 @@ var routes = (
     <Route path="/browse" component={Browse}/>
     <Route path="/explore" component={Explore}/>
     <Route path="/myaccount" component={MyAccount}/>
+    <Route path="/dataset/new" component={AddDataset}/>
     <Route path="*" component={NotFound}/>
   </Router>
 );
