@@ -5,29 +5,12 @@
 header.top
   text-align center
   h1
-    font-size 14.4rem
-    line-height 0.7 // this font has a wacky baseline
+    font-size 8.4rem
     display flex
     justify-content: center;
-
-    // This is a bunch of goofy CSS to make the logo look decent
-    .ofThe
-      display flex
-      font-size 3rem
-      color orange
-      justify-content: center;
-      align-items: center;
-      background url('images/anchor.svg') center no-repeat;
-      background-size cover
-      padding 0 1rem
-      .of
-        padding-right 2rem
-        position relative
-        right -0.5rem
   h3
     margin 0
     font-size 2rem
-    color orange
     position relative
     display inline-block
     span
@@ -36,72 +19,6 @@ header.top
       z-index 2
       padding-left 1rem
       padding-right 1rem
-    &:before, &:after
-      display block
-      z-index 1
-      background black
-      position absolute
-      width 130%
-      height 1px
-      content ''
-      top 5px
-      margin-left -15%
-    &:after
-      top auto
-      bottom 7px
-
-
-.catch-of-the-day
-  display flex
-  height 90vh
-  max-width:1500px
-  margin 0 auto
-  margin-top 5vh
-  perspective: 1000;
-  transform-style preserve-3d
-  & > *
-    flex 1 4 auto
-    padding 2rem
-    border 1rem double lighten(black,10%)
-    position relative
-    background white
-    transition all 0.3s
-    box-shadow 0px 5px 5px rgba(0,0,0,0.1)
-    overflow scroll
-    &:first-child
-      flex-shrink 1 // take 4x the extra room
-      flex-basis 50%
-    &:nth-child(2)
-      border-left 0
-      border-right 0
-      min-width 300px
-    &:last-child
-      flex-shrink 1 // take 4x the extra room
-      flex-basis 50%
-
-// Folding Transforms
-// Take off folding when not checked
-input#fold:not(:checked) ~ #main
-  .catch-of-the-day > *
-      transform none
-
-label[for="fold"]
-  position absolute
-  top 1rem
-  left 1rem
-  text-transform uppercase
-  font-size 1.3rem
-  background black
-  color white
-  border 2px solid black
-  cursor pointer
-  padding 0.5rem 1rem
-
-input#fold
-  display none
-  &:checked + label
-    background white
-    color black
 
 ul
   list-style none
