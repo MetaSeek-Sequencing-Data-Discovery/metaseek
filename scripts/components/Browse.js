@@ -13,6 +13,8 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
   Browse
   Let's us make <Browse/> elements
 */
+// My component imports
+import Header from './Header';
 
 var Browse = React.createClass({
 
@@ -40,6 +42,7 @@ var Browse = React.createClass({
     return (
       <div>
       <MuiThemeProvider muiTheme={muiTheme}>
+        <Header/>
         <div style={styles.container}>
           <h1>Browse Page</h1>
           <Link to='/explore'>

@@ -9,6 +9,7 @@ var firebaseRoot = new Firebase(firebaseEndpoint);
 
 // Component imports
 import AddDatasetForm from './AddDatasetForm';
+import Header from './Header';
 
 /*
   AddDataset
@@ -47,10 +48,13 @@ var AddDataset = React.createClass({
 
     render: function() {
         return (
-          <div >
+          <div>
+            <Header/>
+            <div >
             <h2>Dataset</h2>
             <AddDatasetForm addDataset={this.addDataset} datasetId={this.state.datasetId}/>
             </div>
+          </div>
         )
     }
 });

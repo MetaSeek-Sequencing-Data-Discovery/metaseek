@@ -13,6 +13,8 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
   Welcome
   Let's us make <Welcome/> elements
 */
+// My component imports
+import Header from './Header';
 
 var Welcome = React.createClass({
   getInitialState : function() {
@@ -77,6 +79,7 @@ var Welcome = React.createClass({
           </Link>
         </div>
       </MuiThemeProvider>
+        <Header/>
       </div>
     )
   }

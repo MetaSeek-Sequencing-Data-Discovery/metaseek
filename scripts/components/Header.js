@@ -1,4 +1,6 @@
 import React from 'react';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import AppBar from 'material-ui/AppBar';
 
 /*
   Header
@@ -8,10 +10,9 @@ import React from 'react';
 var Header = React.createClass({
   render : function() {
     return (
-      <header>
-        <h1>MetaSEQ</h1>
-        <h3><span>Blah blah blah</span></h3>
-      </header>
+      <MuiThemeProvider>
+       <AppBar title="MetaSEQ" />
+     </MuiThemeProvider>
     )
   }
 });
