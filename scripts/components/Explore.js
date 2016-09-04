@@ -363,7 +363,7 @@ var Explore = React.createClass({
           <h2>Explore Data</h2>
           <MuiThemeProvider>
             <div>
-                <Table bodyStyle={{overflowX: undefined, width:'2000px' }} height='600px' fixedHeader={false} fixedFooter={false} selectable={false} style={{}}>
+                <Table bodyStyle={{overflowX: undefined, width:'2000px' }} height='600px' fixedHeader={false} fixedFooter={false} selectable={false}>
                   <TableHeader adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
                     <TableRow selectable={false}>
                       <TableHeaderColumn tooltip="id">id</TableHeaderColumn>
