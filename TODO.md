@@ -4,7 +4,7 @@
 ** build script
 ** live browser-sync
 ** talk to a datastore (firebase)
-** auth w/ Google
+** auth w/ Google - TODO
 ** Material Design UI kit
 
 * How do we get there?
@@ -12,5 +12,5 @@
 ** Remove unneeded content
 ** Swap out Firebase backend to new datastore
 ** Swap out auth to new auth
-** Confirm I'm ok using gulp / browserify
-** Add in Material Design UI kit (use browserify / Gulp example - https://github.com/callemall/material-ui-browserify-gulp-example/tree/f893414ed2f48864f909a9d537b9f332c65488d8)
+** ~~Confirm I'm ok using gulp / browserify~~
+** ~~Add in Material Design UI kit (use browserify / Gulp example - https://github.com/callemall/material-ui-browserify-gulp-example/tree/f893414ed2f48864f909a9d537b9f332c65488d8)~~

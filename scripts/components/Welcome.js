@@ -1,6 +1,5 @@
 import React from 'react';
-import { History } from 'react-router';
-import helpers from '../helpers.js';
+import { Link } from 'react-router';
 
 // Material Design stuff
 import RaisedButton from 'material-ui/RaisedButton';
@@ -10,30 +9,16 @@ import FlatButton from 'material-ui/FlatButton';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
-import injectTapEventPlugin from 'react-tap-event-plugin';
-// Needed for onTouchTap
-// http://stackoverflow.com/a/34015469/988941
-injectTapEventPlugin();
-
 /*
-  BasicLogin
-  Let's us make <BasicLogin/> elements
+  Welcome
+  Let's us make <Welcome/> elements
 */
 
-var BasicLogin = React.createClass({
-  mixins : [History],
-
+var Welcome = React.createClass({
   getInitialState : function() {
-    this.handleRequestClose = this.handleRequestClose.bind(this);
-    this.handleTouchTap = this.handleTouchTap.bind(this);
     return {
         open: false,
     }
-  },
-  goToStore : function(e) {
-    e.preventDefault();
-    var storeId = this.refs.storeId.value;
-    this.history.pushState(null, '/store/' + storeId);
   },
 
   handleRequestClose : function() {
@@ -69,15 +54,8 @@ var BasicLogin = React.createClass({
         paddingTop: 200,
       },
     };
-
-    var name = "Nick";
     return (
       <div>
-      <form className="store-selector" onSubmit={this.goToStore}>
-        <h2>Please Enter a Store {name}</h2>
-        <input type="text" ref="storeId" required defaultValue={helpers.getFunName()}/>
-        <input type="Submit" defaultValue="Submit"/>
-      </form>
       <MuiThemeProvider muiTheme={muiTheme}>
         <div style={styles.container}>
           <Dialog
@@ -90,11 +68,13 @@ var BasicLogin = React.createClass({
           </Dialog>
           <h1>Material-UI</h1>
           <h2>example project</h2>
-          <RaisedButton
+          <Link to='/browse'>
+            <RaisedButton
             label="Super Secret Password"
             secondary={true}
             onTouchTap={this.handleTouchTap}
-          />
+            />
+          </Link>
         </div>
       </MuiThemeProvider>
       </div>
@@ -103,4 +83,4 @@ var BasicLogin = React.createClass({
 
 });
 
-export default BasicLogin;
+export default Welcome;
