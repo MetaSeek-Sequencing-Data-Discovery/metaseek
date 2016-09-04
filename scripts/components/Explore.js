@@ -359,6 +359,7 @@ var Explore = React.createClass({
 }];
     return (
       <div>
+        <Header history={this.props.history}/>
           <h2>Explore Data</h2>
           <MuiThemeProvider>
             <div>

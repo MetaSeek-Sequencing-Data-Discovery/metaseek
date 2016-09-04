@@ -24,7 +24,7 @@ var Welcome = React.createClass({
     };
     return (
       <div>
-        <Header/>
+        <Header history={this.props.history}/>
         <MuiThemeProvider>
           <div style={styles.container}>
             <h1>Material-UI</h1>

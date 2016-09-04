@@ -24,7 +24,7 @@ var Browse = React.createClass({
     };
     return (
       <div>
-        <Header/>
+        <Header history={this.props.history}/>
         <div style={styles.container}>
           <h2>Browse Existing Discoveries!</h2>
           <MuiThemeProvider>
