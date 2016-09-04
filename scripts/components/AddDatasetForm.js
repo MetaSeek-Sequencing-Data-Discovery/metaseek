@@ -16,7 +16,6 @@ var AddDatasetForm = React.createClass({
         sourceDatabase:this.refs.sourceDatabase.value
       };
       this.props.addDataset(dataset);
-      this.refs.datasetForm.reset();
     },
 
   render : function() {
@@ -30,7 +29,7 @@ var AddDatasetForm = React.createClass({
           <option value="edi">EDI</option>
         </select>
         <textarea type="text" ref="desc" placeholder="Description"></textarea>
-        <button type="submit">+ Add Item</button>
+        <button type="submit">+ Add Dataset</button>
       </form>
     )
   }

@@ -17,33 +17,39 @@ import AddDatasetForm from './AddDatasetForm';
 
 var AddDataset = React.createClass({
     getInitialState: function() {
+        var datasetId = (new Date()).getTime();
         return {
           'dataset':{
             'owner': 'nb',
             'fields': {}
-          }
+          },
+          'datasetId':datasetId
         }
     },
 
     componentWillMount: function() {
-        var timestamp = (new Date()).getTime();
-        base.syncState('/datasets/' + timestamp, {
+        this.ref = base.syncState('/datasets/' + this.state.datasetId, {
             context: this,
             state: 'dataset'
         });
+    },
+
+    componentWillUnmount: function() {
+      base.removeBinding(this.ref);
     },
 
     addDataset : function(dataset) {
       this.state.dataset.fields = dataset;
       this.state.dataset.owner = 'nb';
       this.setState({ 'dataset' : this.state.dataset});
+      this.props.history.push('/dataset/' + this.state.datasetId);
     },
 
     render: function() {
         return (
           <div >
             <h2>Dataset</h2>
-            <AddDatasetForm addDataset={this.addDataset}/>
+            <AddDatasetForm addDataset={this.addDataset} datasetId={this.state.datasetId}/>
             </div>
         )
     }

@@ -1,8 +1,7 @@
 import React from 'react';
 
 // Routing
-import {Router, Route} from 'react-router';
-var createBrowserHistory = require('history/lib/createBrowserHistory');
+import {Router, Route, browserHistory} from 'react-router';
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
 // Needed for onTouchTap
@@ -28,7 +27,7 @@ import DatasetDetail from './components/DatasetDetail';
 */
 
 var routes = (
-  <Router history={createBrowserHistory()}>
+  <Router history={browserHistory}>
     <Route path="/" component={Welcome}/>
     <Route path="/browse" component={Browse}/>
     <Route path="/explore" component={Explore}/>

@@ -24,10 +24,14 @@ var DatasetDetail = React.createClass({
 
     componentWillMount: function() {
 
-        base.syncState('/datasets/' + this.props.params.id, {
+      this.ref = base.syncState('/datasets/' + this.props.params.id, {
             context: this,
             state: 'dataset'
         });
+    },
+
+    componentWillUnmount: function() {
+      base.removeBinding(this.ref);
     },
 
     addDataset : function(dataset) {
