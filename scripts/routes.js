@@ -6,7 +6,7 @@ var createBrowserHistory = require('history/lib/createBrowserHistory');
 
 // My Imported Components
 import NotFound from './components/NotFound';
-import StorePicker from './components/StorePicker';
+import BasicLogin from './components/BasicLogin';
 import App from './components/App';
 
 /*
@@ -15,7 +15,7 @@ import App from './components/App';
 
 var routes = (
   <Router history={createBrowserHistory()}>
-    <Route path="/" component={StorePicker}/>
+    <Route path="/" component={BasicLogin}/>
     <Route path="/store/:storeName" component={App}/>
     <Route path="*" component={NotFound}/>
   </Router>

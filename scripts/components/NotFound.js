@@ -9,7 +9,7 @@ var NotFound = React.createClass({
 
   render : function() {
     return (
-      <h1>Sorry, Not Found</h1>
+      <h2>Sorry, Not Found</h2>
     )
   }
 });

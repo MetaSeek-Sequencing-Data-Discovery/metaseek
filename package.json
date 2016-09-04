@@ -1,13 +1,13 @@
 {
-  "name": "catch-of-the-day",
-  "version": "1.0.0",
-  "description": "",
+  "name": "boilerplate",
+  "version": "0.0.1",
+  "description": "My boilerplate React app with some goodies",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Nick Brown",
+  "license": "MIT",
   "devDependencies": {
     "autobind-decorator": "1.3.2",
     "babel": "5.8.23",

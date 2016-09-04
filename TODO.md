@@ -8,7 +8,7 @@
 ** Material Design UI kit
 
 * How do we get there?
-** Start with a template I know works
+** ~~Start with a template I know works~~
 ** Remove unneeded content
 ** Swap out Firebase backend to new datastore
 ** Swap out auth to new auth
