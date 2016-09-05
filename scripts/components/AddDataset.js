@@ -29,7 +29,7 @@ var AddDataset = React.createClass({
     componentWillMount: function() {
         var datasetId = (new Date()).getTime();
         this.state.datasetId = datasetId;
-        this.ref = base.syncState('/datasets/' + this.state.datasetId, {
+        this.ref = base.syncState('/dataset/' + this.state.datasetId, {
             context: this,
             state: 'dataset'
         });

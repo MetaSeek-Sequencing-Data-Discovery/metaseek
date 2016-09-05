@@ -28,7 +28,7 @@ var DatasetDetail = React.createClass({
       }
   },
   componentWillMount: function() {
-    this.ref = base.syncState('/datasets/' + this.props.params.id, {
+    this.ref = base.syncState('/dataset/' + this.props.params.id, {
           context: this,
           state: 'dataset'
       });
