@@ -9,20 +9,20 @@
 
 * How do we get there?
 ** ~~Start with a template I know works~~
-** Remove unneeded content
+** ~~Remove unneeded content~~
 ** ~~Swap out Firebase backend to new datastore (not doing)~~
-** Swap out auth to new auth
 ** ~~Confirm I'm ok using gulp / browserify~~
 ** ~~Add in Material Design UI kit (use browserify / Gulp example - https://github.com/callemall/material-ui-browserify-gulp-example/tree/f893414ed2f48864f909a9d537b9f332c65488d8)~~
+** Swap out auth to new auth
 
 * TODO
-** Clean up default pages / page Routes
-** Clear out unneeded COTD components
+** ~~Clean up default pages / page Routes~~
+** ~~Clear out unneeded COTD components~~
 ** ~~Remove unused styles~~
-** Sitemap it
-** Play with Material UI a bit
+** ~~Sitemap it~~
+** ~~Play with Material UI a bit~~
+** ~~Build a dumb "look at all records" page~~
 ** Load all of Adrienne's sample records into the DB
-** Build a dumb "look at all records" page
 ** Build a dumb filter / ruleset component
 ** Save ruleset to database (as a "discovery" record)
 ** Build a "discovery detail" page
