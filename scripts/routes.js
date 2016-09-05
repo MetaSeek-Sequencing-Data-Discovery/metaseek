@@ -16,14 +16,13 @@ import Explore from './components/Explore';
 import MyAccount from './components/MyAccount';
 import AddDataset from './components/AddDataset';
 import DatasetDetail from './components/DatasetDetail';
-//import DiscoveryDetail from './components/DiscoveryDetail';
+import DiscoveryDetail from './components/DiscoveryDetail';
 
 /*
   Routes
 */
 
 /*
-<Route path="/discovery/:id" component={DiscoveryDetail}/>
 */
 
 var routes = (
@@ -34,6 +33,8 @@ var routes = (
     <Route path="/myaccount" component={MyAccount}/>
     <Route path="/dataset/new" component={AddDataset}/>
     <Route path="/dataset/:id" component={DatasetDetail}/>
+    <Route path="/discovery/new" component={Explore}/>
+    <Route path="/discovery/:id" component={DiscoveryDetail}/>
     <Route path="*" component={NotFound}/>
   </Router>
 );
