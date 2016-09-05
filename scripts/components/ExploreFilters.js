@@ -52,7 +52,7 @@ var ExploreFilters = React.createClass({
     return (
       <div>
         <MuiThemeProvider>
-          <div style={{'marginLeft':80}}>
+          <div>
             <h4>Choose Database</h4>
             <SelectField value={this.state.database} onChange={this.handleChange.bind(this,'database')}>
               <MenuItem value={0} primaryText="All" />

@@ -1,12 +1,23 @@
 import React from 'react';
 
+// Firebase imports / setup
+import Rebase from 're-base';
+import Firebase from 'firebase';
+
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import Paper from 'material-ui/Paper';
+import RaisedButton from 'material-ui/RaisedButton';
 
 // My component imports
 import Header from './Header';
 import ExploreFilters from './ExploreFilters';
 import ExploreTable from './ExploreTable';
+
+// Firebase setup
+var firebaseEndpoint = 'https://metaseq-6b779.firebaseio.com/';
+var base = Rebase.createClass(firebaseEndpoint);
+var firebaseRoot = new Firebase(firebaseEndpoint);
 
 var Explore = React.createClass({
   getInitialState : function() {
@@ -332,13 +343,17 @@ var Explore = React.createClass({
         	"env_package": "sediment",
         	"seq_meth": "not provided"
         }],
-      'rules':[]
+      'rules':[],
+      'discoverId':null
     }
   },
 
   componentWillMount : function() {
     this.state.activeData = this.state.fullData;
     this.setState({ 'activeData' : this.state.activeData});
+  },
+  componentWillUnmount : function() {
+    base.removeBinding(this.ref);
   },
 
   applyRules : function(rules) {
@@ -355,11 +370,26 @@ var Explore = React.createClass({
         });
       }
       this.state.activeData = tableData;
-      this.setState({ 'activeData' : this.state.activeData});
+      this.state.rules = rules;
+      this.setState(this.state);
     }
     else {
       this.setState({ 'activeData' : this.state.fullData});
     }
+  },
+
+  submitDiscovery : function() {
+    var discoveryId = (new Date()).getTime();
+    this.state.discoveryId = discoveryId;
+    this.ref = base.syncState('/discovery/' + this.state.discoveryId, {
+        context: this,
+        state: 'rules'
+    });
+    this.setState(this.state);
+  },
+
+  openDiscovery : function() {
+    this.props.history.push('/discovery/' + this.state.discoveryId);
   },
 
   render : function() {
@@ -367,8 +397,29 @@ var Explore = React.createClass({
       <div>
         <Header history={this.props.history}/>
           <h2>Explore Data</h2>
-          <ExploreFilters applyRules={this.applyRules}/>
-          <ExploreTable activeData={this.state.activeData}/>
+          <MuiThemeProvider>
+            <div>
+              <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
+                <ExploreFilters applyRules={this.applyRules}/>
+                <RaisedButton
+                  style={{'margin':'12px 12px 0 12px'}}
+                  onClick={this.submitDiscovery}
+                  primary={true}
+                  label="Save Discovery"
+                />
+                <RaisedButton
+                  style={{'margin':'12px 12px 0 12px'}}
+                  onClick={this.openDiscovery}
+                  primary={true}
+                  disabled={this.state.discoveryId ? false : true}
+                  label="Open Discovery"
+                />
+              </Paper>
+              <Paper style={{'width':'80%','margin':'25px auto','padding':0}}>
+                <ExploreTable activeData={this.state.activeData}/>
+              </Paper>
+            </div>
+          </MuiThemeProvider>
       </div>
     )
   }
