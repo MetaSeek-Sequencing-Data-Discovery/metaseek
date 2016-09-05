@@ -344,7 +344,7 @@ var Explore = React.createClass({
         	"seq_meth": "not provided"
         }],
       'rules':[],
-      'discoverId':null
+      'discoveryId':null
     }
   },
 

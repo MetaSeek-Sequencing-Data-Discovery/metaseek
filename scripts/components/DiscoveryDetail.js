@@ -341,7 +341,7 @@ var DiscoveryDetail = React.createClass({
             "seq_meth": "not provided"
           }],
         'rules':[],
-        'discoverId':this.props.params.id
+        'discoveryId':this.props.params.id
       }
   },
   componentWillMount: function() {
