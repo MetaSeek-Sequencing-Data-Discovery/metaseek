@@ -56,113 +56,111 @@ var AddDatasetForm = React.createClass({
     };
 
     return (
-      <div>
-        <MuiThemeProvider>
-          <Paper style={styles.paperStyle}>
-            <Formsy.Form
-             onValid={this.enableButton}
-             onInvalid={this.disableButton}
-             onValidSubmit={this.submitDataset}
-             onInvalidSubmit={this.notifyFormError}
-            >
-            <Tabs>
-              <Tab label="Required" >
-                 <FormsyText
-                   name="lat"
-                   validations="isNumeric"
-                   validationError={errorMessages.numericError}
-                   required
-                   hintText="Latitude of sample?"
-                   floatingLabelText="Latitude"
-                 />
-                 <FormsyText
-                   name="long"
-                   validations="isNumeric"
-                   validationError={errorMessages.numericError}
-                   required
-                   hintText="Longitude of sample?"
-                   floatingLabelText="Longitude"
-                 />
-                 <FormsyText
-                 name="url"
-                 validations="isUrl"
-                 validationError={errorMessages.urlError}
+      <MuiThemeProvider>
+        <Paper style={styles.paperStyle} zDepth={2}>
+          <Formsy.Form
+           onValid={this.enableButton}
+           onInvalid={this.disableButton}
+           onValidSubmit={this.submitDataset}
+           onInvalidSubmit={this.notifyFormError}
+          >
+          <Tabs>
+            <Tab label="Required" >
+               <FormsyText
+                 name="lat"
+                 validations="isNumeric"
+                 validationError={errorMessages.numericError}
                  required
-                 hintText="http://www.example.com"
-                 floatingLabelText="URL"
-                 />
+                 hintText="Latitude of sample?"
+                 floatingLabelText="Latitude"
+               />
+               <FormsyText
+                 name="long"
+                 validations="isNumeric"
+                 validationError={errorMessages.numericError}
+                 required
+                 hintText="Longitude of sample?"
+                 floatingLabelText="Longitude"
+               />
+               <FormsyText
+               name="url"
+               validations="isUrl"
+               validationError={errorMessages.urlError}
+               required
+               hintText="http://www.example.com"
+               floatingLabelText="URL"
+               />
 
-                 <FormsyDate
-                   name="date"
-                   floatingLabelText="Date"
+               <FormsyDate
+                 name="date"
+                 floatingLabelText="Date"
+               />
+               <FormsySelect
+                 name="database"
+                 required
+                 floatingLabelText="Database?"
+                 hintText="Database of sample?"
+                 menuItems={this.selectFieldItems}
+               >
+                 <MenuItem value={'genbank'} primaryText="Genbank" />
+                 <MenuItem value={'edi'} primaryText="EDI" />
+                 <MenuItem value={'other'} primaryText="Other" />
+               </FormsySelect>
+               <FormsyText
+                 style={{'display':'block'}}
+                 name="description"
+                 validations="isWords"
+                 validationError={errorMessages.wordsError}
+                 hintText="Anything to add?"
+                 floatingLabelText="Description"
+                 multiLine={true}
+                 rows={4}
+               />
+               {/*<FormsyRadioGroup name="shipSpeed" defaultSelected="not_light">
+                 <FormsyRadio
+                   value="light"
+                   label="prepare for light speed"
+                   style={styles.switchStyle}
                  />
-                 <FormsySelect
-                   name="database"
-                   required
-                   floatingLabelText="Database?"
-                   hintText="Database of sample?"
-                   menuItems={this.selectFieldItems}
-                 >
-                   <MenuItem value={'genbank'} primaryText="Genbank" />
-                   <MenuItem value={'edi'} primaryText="EDI" />
-                   <MenuItem value={'other'} primaryText="Other" />
-                 </FormsySelect>
-                 <FormsyText
-                   style={{'display':'block'}}
-                   name="description"
-                   validations="isWords"
-                   validationError={errorMessages.wordsError}
-                   hintText="Anything to add?"
-                   floatingLabelText="Description"
-                   multiLine={true}
-                   rows={4}
+                 <FormsyRadio
+                   value="not_light"
+                   label="light speed too slow"
+                   style={styles.switchStyle}
                  />
-                 {/*<FormsyRadioGroup name="shipSpeed" defaultSelected="not_light">
-                   <FormsyRadio
-                     value="light"
-                     label="prepare for light speed"
-                     style={styles.switchStyle}
-                   />
-                   <FormsyRadio
-                     value="not_light"
-                     label="light speed too slow"
-                     style={styles.switchStyle}
-                   />
-                   <FormsyRadio
-                     value="ludicrous"
-                     label="go to ludicrous speed"
-                     style={styles.switchStyle}
-                     disabled={true}
-                   />
-                 </FormsyRadioGroup>*/}
-                </Tab>
-                <Tab label="Optional" >
-                  <div>
-                    <h2>Optional Metadata</h2>
-                    <p>
-                      This is another example tab.
-                    </p>
-                  </div>
-                </Tab>
-                <Tab label="Super Optional">
-                  <div>
-                    <h2>Extremely Optional Metadata</h2>
-                    <p>
-                      Who would ever even come here?
-                    </p>
-                  </div>
-                </Tab>
-              </Tabs>
-              <RaisedButton
-                style={styles.submitStyle}
-                type="submit"
-                label="Submit Dataset"
-                disabled={!this.state.canSubmit}
-              />
-            </Formsy.Form>
-          </Paper>
-        </MuiThemeProvider>
-      </div>
+                 <FormsyRadio
+                   value="ludicrous"
+                   label="go to ludicrous speed"
+                   style={styles.switchStyle}
+                   disabled={true}
+                 />
+               </FormsyRadioGroup>*/}
+              </Tab>
+              <Tab label="Optional" >
+                <div>
+                  <h2>Optional Metadata</h2>
+                  <p>
+                    This is another example tab.
+                  </p>
+                </div>
+              </Tab>
+              <Tab label="Super Optional">
+                <div>
+                  <h2>Extremely Optional Metadata</h2>
+                  <p>
+                    Who would ever even come here?
+                  </p>
+                </div>
+              </Tab>
+            </Tabs>
+            <RaisedButton
+              style={styles.submitStyle}
+              type="submit"
+              label="Submit Dataset"
+              disabled={!this.state.canSubmit}
+            />
+          </Formsy.Form>
+        </Paper>
+      </MuiThemeProvider>
     )
   }
 });
