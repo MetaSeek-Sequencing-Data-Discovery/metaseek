@@ -19,7 +19,7 @@ var Header = React.createClass({
     return (
     <MuiThemeProvider>
        <AppBar
-        title={<span style={{'cursor':'pointer'}}>MetaSEQ</span>}
+        title={<span style={{'cursor':'pointer'}}>MetaSeek</span>}
         onTitleTouchTap={this.handleTitleTouch}
         iconElementLeft={<div></div>}
         iconElementRight={
