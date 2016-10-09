@@ -39,5 +39,8 @@
     "react-tap-event-plugin": "^1.0.0",
     "formsy-material-ui": "^0.5.0",
     "formsy-react": "^0.18.1"
+  },
+  "dependencies": {
+    "react-d3-map": "^0.8.3"
   }
 }
