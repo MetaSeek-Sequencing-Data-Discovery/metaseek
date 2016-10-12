@@ -6,6 +6,7 @@ import Firebase from 'firebase';
 import RaisedButton from 'material-ui/RaisedButton';
 import Header from './Header';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import Paper from 'material-ui/Paper';
 
 /*
   MyAccount
@@ -63,21 +64,34 @@ var MyAccount = React.createClass({
     var styles = {
       container: {
         textAlign: 'center',
-        paddingTop: 200,
+        paddingTop: 20,
       },
     };
 
     var headline = "You're not logged in. Want to log in?";
     if (this.state.uid) {
-      var headline = "Hey, you're logged in as " + this.state.name;
+      var headline = "Hey, you're logged in as " + this.state.user.displayName;
+    }
+
+    var getHeadshot = function(user) {
+      if (user) {
+        var headshot = "<img style={{'width':'200px','height':'200px'}} src='" + this.state.user.photoURL + "'/>";
+        return headshot;
+      } else {
+        return "";
+      }
     }
 
     return (
       <div>
         <Header history={this.props.history}/>
         <MuiThemeProvider>
+          <Paper style={{'width':'60%','margin':'25px auto'}} zDepth={2}>
           <div style={styles.container}>
             <h1>{headline}</h1>
+            <div>
+               {getHeadshot(this.state.user)}
+            </div>
             <RaisedButton style={{'margin':'20px 20px 20px 20px'}}
               label="Log In"
               onClick={this.triggerLogin}
@@ -89,6 +103,7 @@ var MyAccount = React.createClass({
               primary={true}
             />
           </div>
+          </Paper>
         </MuiThemeProvider>
       </div>
     )
