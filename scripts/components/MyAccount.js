@@ -17,7 +17,8 @@ var MyAccount = React.createClass({
   getInitialState: function() {
       return {
         'uid':null,
-        'name':null
+        'name':null,
+        'photo':null
       }
   },
 
@@ -26,6 +27,7 @@ var MyAccount = React.createClass({
     if (user) {
       this.state.name = user.displayName;
       this.state.uid = user.uid;
+      this.state.photo = user.photoURL;
       this.setState(this.state);
     }
   },
@@ -47,6 +49,7 @@ var MyAccount = React.createClass({
     var auth = Firebase.auth().signOut().then(function() {
       accountComponent.state.name = null;
       accountComponent.state.uid = null;
+      accountComponent.state.photo = null;
       accountComponent.setState(accountComponent.state);
     }, function(error) {
       console.log("couldn't log out for some reason");
@@ -57,6 +60,7 @@ var MyAccount = React.createClass({
   successfulLogin : function(user) {
     this.state.name = user.displayName;
     this.state.uid = user.uid;
+    this.state.photo = user.photoURL;
     this.setState(this.state);
   },
 
@@ -70,16 +74,7 @@ var MyAccount = React.createClass({
 
     var headline = "You're not logged in. Want to log in?";
     if (this.state.uid) {
-      var headline = "Hey, you're logged in as " + this.state.user.displayName;
-    }
-
-    var getHeadshot = function(user) {
-      if (user) {
-        var headshot = "<img style={{'width':'200px','height':'200px'}} src='" + this.state.user.photoURL + "'/>";
-        return headshot;
-      } else {
-        return "";
-      }
+      var headline = "Hey, you're logged in as " + this.state.name;
     }
 
     return (
@@ -90,7 +85,7 @@ var MyAccount = React.createClass({
           <div style={styles.container}>
             <h1>{headline}</h1>
             <div>
-               {getHeadshot(this.state.user)}
+               <img style={{'width':'150px','height':'150px','display':this.state.uid ? 'inline' : 'none'}} src={this.state.photo}/>
             </div>
             <RaisedButton style={{'margin':'20px 20px 20px 20px'}}
               label="Log In"
