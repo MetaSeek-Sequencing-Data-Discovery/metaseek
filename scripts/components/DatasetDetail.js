@@ -2,7 +2,6 @@ import React from 'react';
 
 // Firebase imports / setup
 import Rebase from 're-base';
-import Firebase from 'firebase';
 
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -15,7 +14,6 @@ import Header from './Header';
 // Firebase setup
 var firebaseEndpoint = 'https://metaseq-6b779.firebaseio.com/';
 var base = Rebase.createClass(firebaseEndpoint);
-var firebaseRoot = new Firebase(firebaseEndpoint);
 
 var DatasetDetail = React.createClass({
   getInitialState: function() {
