@@ -1,4 +1,7 @@
 import React from 'react';
+
+import { Link } from 'react-router';
+
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
@@ -30,8 +33,9 @@ var Header = React.createClass({
             targetOrigin={{horizontal: 'right', vertical: 'top'}}
             anchorOrigin={{horizontal: 'right', vertical: 'top'}}
           >
-            <MenuItem primaryText="Help" />
-            <MenuItem primaryText="Sign out" />
+            <Link style={{'text-decoration':'none'}} to='/myaccount'>
+              <MenuItem primaryText="My Account" />
+            </Link>
           </IconMenu>
         }
       />
