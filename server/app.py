@@ -216,6 +216,37 @@ class GetDatasetSummary(Resource):
         averageLongitude = db.session.query(func.avg(Dataset.longitude)).first()[0]
         return {"summary":{"totalDatasets":int(total),"averageLatitude":averageLatitude,"averageLongitude":averageLongitude}}
 
+class SearchDatasets(Resource):
+    @marshal_with({
+        'latitude':fields.Float,
+        'longitude':fields.Float,
+        'URL':fields.String,
+        'date':fields.DateTime,
+        'uri': fields.Url('getdataset', absolute=True)
+    }, envelope='datasets')
+    def post(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('filter_params', type=str)
+            args = parser.parse_args()
+
+            filter_params = json.loads(args['filter_params'])
+            rules = filter_params['rules']
+
+            queryObject = Dataset.query
+
+            for rule in rules:
+                field = rule['field']
+                ruletype = rule['type']
+                value = rule['value']
+                queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+
+            matchingDatasets = queryObject.all()
+            return matchingDatasets
+
+        except Exception as e:
+            return {'error': str(e)}
+
 # /discovery routes
 class GetDiscovery(Resource):
     @marshal_with({
@@ -296,7 +327,7 @@ api.add_resource(CreateDataset,     '/api/dataset/create')
 api.add_resource(GetDataset,        '/api/dataset/<int:id>')
 api.add_resource(GetAllDatasets,    '/api/datasets')
 api.add_resource(GetDatasetSummary, '/api/datasets/summary')
-#api.add_resource(SearchDatasets,    '/api/datasets/search')
+api.add_resource(SearchDatasets,    '/api/datasets/search')
 
 api.add_resource(CreateDiscovery,   '/api/discovery/create')
 api.add_resource(GetDiscovery,      '/api/discovery/<int:id>')
