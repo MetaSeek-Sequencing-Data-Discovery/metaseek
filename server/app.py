@@ -1,5 +1,5 @@
 # Webapp framework
-from flask import Flask
+from flask import Flask, url_for
 
 # Database setup and ORM
 from flask_sqlalchemy import SQLAlchemy
@@ -9,6 +9,7 @@ from flask_restful import Resource, Api, reqparse, fields, marshal_with
 
 # Utilities
 from datetime import datetime
+from dateutil import parser as dateparser
 import random
 import json
 
@@ -86,17 +87,13 @@ db.create_all()
 # End Model definitions and create any new tables in the DB
 
 # Declare route functions
-
 class CreateUser(Resource):
     def post(self):
         try:
             parser = reqparse.RequestParser()
-
             parser.add_argument('firebase_id', type=str, help='Email address to create user')
             parser.add_argument('admin', type=int)
-
             args = parser.parse_args()
-            print args
 
             existingUser = User.query.filter_by(firebase_id=args['firebase_id']).first()
 
@@ -107,6 +104,25 @@ class CreateUser(Resource):
                 db.session.add(newUser)
                 db.session.commit()
                 return {'firebase_id': args['firebase_id'], 'admin': args['admin'], 'id': newUser.id}
+
+        except Exception as e:
+            return {'error': str(e)}
+
+class CreateDataset(Resource):
+    def post(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('latitude', type=float, help='Email address to create user')
+            parser.add_argument('longitude', type=float)
+            parser.add_argument('URL')
+            parser.add_argument('date', type=str)
+            args = parser.parse_args()
+            datetimeguess = dateparser.parse(args['date'])
+
+            newDataset = Dataset(args['latitude'],args['longitude'],args['URL'],datetimeguess)
+            db.session.add(newDataset)
+            db.session.commit()
+            return url_for('getdataset',id=newDataset.id,_external=True)
 
         except Exception as e:
             return {'error': str(e)}
@@ -129,6 +145,25 @@ class GetDataset(Resource):
     def get(self, id):
         return Dataset.query.get(id)
 
+class GetAllDatasets(Resource):
+    @marshal_with({
+        'latitude':fields.Float,
+        'longitude':fields.Float,
+        'id':fields.Integer
+    }, envelope='datasets')
+    def get(self):
+        return Dataset.query.all()
+
+class GetAllDiscoveries(Resource):
+    @marshal_with({
+        'filter_params':fields.String,
+        'timestamp':fields.DateTime(dt_format='rfc822'),
+        'uri': fields.Url('getdiscovery', absolute=True),
+        'owner_id':fields.Integer
+    }, envelope='discoveries')
+    def get(self):
+        return Discovery.query.all()
+
 class GetUserDiscoveries(Resource):
     @marshal_with({
         'filter_params':fields.String,
@@ -147,24 +182,27 @@ class GetDiscovery(Resource):
             'latitude':fields.Float,
             'longitude':fields.Float,
             'id':fields.Integer
-        })
+        }),
+        'owner':fields.Url('getuser',absolute=True)
     })
     def get(self, id):
         return Discovery.query.get(id)
 
 # End route functions
+
 # Declare routing
 api.add_resource(CreateUser,        '/api/user/create')
 api.add_resource(GetUser,           '/api/user/<int:id>')
 api.add_resource(GetUserDiscoveries,'/api/user/<int:id>/discoveries')
 
-#api.add_resource(CreateDataset,     '/api/dataset/create')
+api.add_resource(CreateDataset,     '/api/dataset/create')
 api.add_resource(GetDataset,        '/api/dataset/<int:id>')
-#api.add_resource(GetAllDatasets,    '/api/datasets')
-#api.add_resource(GetDatasetSummary, '/api/datasets')
+api.add_resource(GetAllDatasets,    '/api/datasets')
+#api.add_resource(GetDatasetSummary, '/api/datasets/summary')
 #api.add_resource(SearchDatasets,    '/api/datasets/search')
 
 api.add_resource(GetDiscovery,      '/api/discovery/<int:id>')
+api.add_resource(GetAllDiscoveries, '/api/discoveries')
 #api.add_resource(CreateDiscovery,   '/api/dataset/create')
 
 # Start the app!
