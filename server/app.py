@@ -247,6 +247,30 @@ class SearchDatasets(Resource):
         except Exception as e:
             return {'error': str(e)}
 
+class SearchDatasetsSummary(Resource):
+    def post(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('filter_params', type=str)
+            args = parser.parse_args()
+
+            filter_params = json.loads(args['filter_params'])
+            rules = filter_params['rules']
+
+            queryObject = Dataset.query
+
+            for rule in rules:
+                field = rule['field']
+                ruletype = rule['type']
+                value = rule['value']
+                queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+
+            matchCount = queryObject.count()
+            return matchCount
+
+        except Exception as e:
+            return {'error': str(e)}
+
 # /discovery routes
 class GetDiscovery(Resource):
     @marshal_with({
@@ -320,20 +344,21 @@ class CreateDiscovery(Resource):
 # End route functions
 
 # Declare routing
-api.add_resource(CreateUser,        '/api/user/create')
-api.add_resource(GetUser,           '/api/user/<int:id>')
-api.add_resource(GetAllUsers,       '/api/users')
-api.add_resource(GetUserDiscoveries,'/api/user/<int:id>/discoveries')
+api.add_resource(CreateUser,            '/api/user/create')
+api.add_resource(GetUser,               '/api/user/<int:id>')
+api.add_resource(GetAllUsers,           '/api/users')
+api.add_resource(GetUserDiscoveries,    '/api/user/<int:id>/discoveries')
 
-api.add_resource(CreateDataset,     '/api/dataset/create')
-api.add_resource(GetDataset,        '/api/dataset/<int:id>')
-api.add_resource(GetAllDatasets,    '/api/datasets')
-api.add_resource(GetDatasetSummary, '/api/datasets/summary')
-api.add_resource(SearchDatasets,    '/api/datasets/search')
+api.add_resource(CreateDataset,         '/api/dataset/create')
+api.add_resource(GetDataset,            '/api/dataset/<int:id>')
+api.add_resource(GetAllDatasets,        '/api/datasets')
+api.add_resource(GetDatasetSummary,     '/api/datasets/summary')
+api.add_resource(SearchDatasets,        '/api/datasets/search')
+api.add_resource(SearchDatasetsSummary, '/api/datasets/search/summary')
 
-api.add_resource(CreateDiscovery,   '/api/discovery/create')
-api.add_resource(GetDiscovery,      '/api/discovery/<int:id>')
-api.add_resource(GetAllDiscoveries, '/api/discoveries')
+api.add_resource(CreateDiscovery,       '/api/discovery/create')
+api.add_resource(GetDiscovery,          '/api/discovery/<int:id>')
+api.add_resource(GetAllDiscoveries,     '/api/discoveries')
 
 # Start the app!
 if __name__ == '__main__':
