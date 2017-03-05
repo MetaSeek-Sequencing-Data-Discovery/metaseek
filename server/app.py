@@ -3,6 +3,7 @@ from flask import Flask, url_for
 
 # Database setup and ORM
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import func
 
 # Support for REST API in Flask
 from flask_restful import Resource, Api, reqparse, fields, marshal_with
@@ -88,6 +89,7 @@ db.create_all()
 # End Model definitions and create any new tables in the DB
 
 # Declare route functions
+# /user routes
 class CreateUser(Resource):
     def post(self):
         try:
@@ -109,6 +111,35 @@ class CreateUser(Resource):
         except Exception as e:
             return {'error': str(e)}
 
+class GetUser(Resource):
+    @marshal_with({
+        'firebase_id':fields.String,
+        'admin':fields.Integer,
+        'uri':fields.Url('getuser', absolute=True)
+    }, envelope='user')
+    def get(self, id):
+        return User.query.get(id)
+
+class GetAllUsers(Resource):
+    @marshal_with({
+        'firebase_id':fields.String,
+        'admin':fields.Integer,
+        'uri':fields.Url('getuser', absolute=True)
+    }, envelope='users')
+    def get(self):
+        return User.query.all()
+
+class GetUserDiscoveries(Resource):
+    @marshal_with({
+        'filter_params':fields.String,
+        'timestamp':fields.DateTime(dt_format='rfc822'),
+        'uri': fields.Url('getdiscovery', absolute=True)
+    }, envelope='discoveries')
+
+    def get(self, id):
+        return Discovery.query.filter_by(owner_id=id).all()
+
+# /dataset routes
 class CreateDataset(Resource):
     def post(self):
         try:
@@ -123,25 +154,18 @@ class CreateDataset(Resource):
             newDataset = Dataset(args['latitude'],args['longitude'],args['URL'],datetimeguess)
             db.session.add(newDataset)
             db.session.commit()
-            return url_for('getdataset',id=newDataset.id,_external=True)
+            return {"dataset":{"uri":url_for('getdataset',id=newDataset.id,_external=True)}}
 
         except Exception as e:
             return {'error': str(e)}
-
-class GetUser(Resource):
-    @marshal_with({
-        'firebase_id':fields.String,
-        'admin':fields.Integer,
-        'id':fields.Integer
-    }, envelope='user')
-    def get(self, id):
-        return User.query.get(id)
 
 class GetDataset(Resource):
     @marshal_with({
         'latitude':fields.Float,
         'longitude':fields.Float,
-        'id':fields.Integer
+        'URL':fields.String,
+        'date':fields.DateTime,
+        'uri': fields.Url('getdataset', absolute=True)
     }, envelope='dataset')
     def get(self, id):
         return Dataset.query.get(id)
@@ -150,56 +174,70 @@ class GetAllDatasets(Resource):
     @marshal_with({
         'latitude':fields.Float,
         'longitude':fields.Float,
-        'id':fields.Integer
+        'URL':fields.String,
+        'date':fields.DateTime,
+        'uri': fields.Url('getdataset', absolute=True)
     }, envelope='datasets')
     def get(self):
         return Dataset.query.all()
+
+class GetDatasetSummary(Resource):
+    def get(self):
+        total = Dataset.query.count()
+        averageLatitude = db.session.query(func.avg(Dataset.latitude)).first()[0]
+        averageLongitude = db.session.query(func.avg(Dataset.longitude)).first()[0]
+        return {"summary":{"totalDatasets":int(total),"averageLatitude":averageLatitude,"averageLongitude":averageLongitude}}
+
+# /discovery routes
+class GetDiscovery(Resource):
+    @marshal_with({
+        'filter_params':fields.String,
+        'timestamp':fields.DateTime(dt_format='rfc822'),
+        'uri': fields.Url('getdiscovery', absolute=True),
+        'datasets':fields.Nested({
+            'latitude':fields.Float,
+            'longitude':fields.Float,
+            'id':fields.Integer
+        }),
+        'owner':fields.Nested({
+            'firebase_id':fields.String,
+            'uri':fields.Url('getuser', absolute=True)
+        })
+    }, envelope='discovery')
+    def get(self, id):
+        return Discovery.query.get(id)
 
 class GetAllDiscoveries(Resource):
     @marshal_with({
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
         'uri': fields.Url('getdiscovery', absolute=True),
-        'owner_id':fields.Integer
-    }, envelope='discoveries')
-    def get(self):
-        return Discovery.query.all()
-
-class GetUserDiscoveries(Resource):
-    @marshal_with({
-        'filter_params':fields.String,
-        'timestamp':fields.DateTime(dt_format='rfc822'),
-        'uri': fields.Url('getdiscovery', absolute=True)
-    }, envelope='discoveries')
-
-    def get(self, id):
-        return Discovery.query.filter_by(owner_id=id).all()
-
-class GetDiscovery(Resource):
-    @marshal_with({
-        'filter_params':fields.String,
-        'timestamp':fields.DateTime(dt_format='rfc822'),
         'datasets':fields.Nested({
             'latitude':fields.Float,
             'longitude':fields.Float,
             'id':fields.Integer
         }),
-        'owner':fields.Url('getuser',absolute=True)
-    })
-    def get(self, id):
-        return Discovery.query.get(id)
+        'owner':fields.Nested({
+            'firebase_id':fields.String,
+            'uri':fields.Url('getuser', absolute=True)
+        })
+    }, envelope='discoveries')
+    def get(self):
+        return Discovery.query.all()
+
 
 # End route functions
 
 # Declare routing
 api.add_resource(CreateUser,        '/api/user/create')
 api.add_resource(GetUser,           '/api/user/<int:id>')
+api.add_resource(GetAllUsers,       '/api/users')
 api.add_resource(GetUserDiscoveries,'/api/user/<int:id>/discoveries')
 
 api.add_resource(CreateDataset,     '/api/dataset/create')
 api.add_resource(GetDataset,        '/api/dataset/<int:id>')
 api.add_resource(GetAllDatasets,    '/api/datasets')
-#api.add_resource(GetDatasetSummary, '/api/datasets/summary')
+api.add_resource(GetDatasetSummary, '/api/datasets/summary')
 #api.add_resource(SearchDatasets,    '/api/datasets/search')
 
 api.add_resource(GetDiscovery,      '/api/discovery/<int:id>')
