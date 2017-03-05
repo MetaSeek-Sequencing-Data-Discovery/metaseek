@@ -52,10 +52,11 @@ dataset_to_discovery = db.Table('dataset_to_discovery',
 
 class Discovery(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     filter_params = db.Column(db.String(40))
     timestamp = db.Column(db.DateTime)
     datasets = db.relationship('Dataset', secondary=dataset_to_discovery, backref=db.backref('discoveries', lazy='dynamic'))
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    owner = db.relationship('User',backref=db.backref('myDiscoveries',lazy='dynamic'))
 
     def __init__(self, owner_id, filter_params, datasets, timestamp=None, ):
         self.owner_id = owner_id
