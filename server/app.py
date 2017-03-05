@@ -1,5 +1,6 @@
 # Webapp framework
 from flask import Flask, url_for
+from flask_cors import CORS, cross_origin
 
 # Database setup and ORM
 from flask_sqlalchemy import SQLAlchemy
@@ -16,6 +17,7 @@ import json
 
 # Config / initialize the app, database and api
 app = Flask(__name__)
+CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)

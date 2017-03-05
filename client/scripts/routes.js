@@ -13,6 +13,7 @@ import NotFound from './components/NotFound';
 import Welcome from './components/Welcome';
 import Browse from './components/Browse';
 import Explore from './components/Explore';
+import ApiTest from './components/ApiTest';
 import MyAccount from './components/MyAccount';
 import AddDataset from './components/AddDataset';
 import DatasetDetail from './components/DatasetDetail';
@@ -30,6 +31,7 @@ var routes = (
     <Route path="/" component={Welcome}/>
     <Route path="/browse" component={Browse}/>
     <Route path="/explore" component={Explore}/>
+    <Route path="/apitest" component={ApiTest}/>
     <Route path="/myaccount" component={MyAccount}/>
     <Route path="/dataset/new" component={AddDataset}/>
     <Route path="/dataset/:id" component={DatasetDetail}/>
