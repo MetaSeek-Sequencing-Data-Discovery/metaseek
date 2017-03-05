@@ -1,5 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_restful import Resource, Api
+from flask_restful import reqparse
 from datetime import datetime
 import random
 
@@ -7,6 +9,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+api = Api(app)
 
 # each class becomes a table
 class Dataset(db.Model):
@@ -29,7 +32,7 @@ class Dataset(db.Model):
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    firebase_id = db.Column(db.String(28), primary_key=True)
+    firebase_id = db.Column(db.String(28), unique=True)
     admin = db.Column(db.Boolean)
     discoveries = db.relationship('Discovery', backref='user', lazy='dynamic')
 
@@ -63,22 +66,41 @@ class Discovery(db.Model):
     def __repr__(self):
         return '<Discovery %r>' % self.filter_params
 
-# TODO take this out into a 'bootstrap.py' file for kickstarting a new DB
-db.create_all()
 
-# some sample stuff you can do
 
-newuser = User('random' + str(random.random()),False)
-db.session.add(newuser)
+class CreateUser(Resource):
+    def post(self):
+        try:
+            parser = reqparse.RequestParser()
 
-newDataset = Dataset(random.random() * 100,random.random() * 100,'http://google.com', datetime.utcnow())
-db.session.add(newDataset)
+            parser.add_argument('firebase_id', type=str, help='Email address to create user')
+            parser.add_argument('admin', type=int)
 
-newDiscovery = Discovery(1,'{"some":value","another":"filter"}',[newDataset,Dataset(random.random() * 100,random.random() * 100,'http://google.com', datetime.utcnow())])
-db.session.add(newDiscovery)
+            args = parser.parse_args()
+            print args
 
-db.session.commit()
+            existingUser = User.query.filter_by(firebase_id=args['firebase_id']).first()
 
-User.query.filter_by(admin=True).first()
-Discovery.query.filter_by(owner_id=1).all()
-Dataset.query.filter(Dataset.latitude > 40).all()
+            if (existingUser):
+                return {'error':'User already exists!','uri':'http://127.0.0.1:5000/api/user/' + str(existingUser.id)}
+            else:
+                newUser = User(args['firebase_id'],args['admin'])
+                db.session.add(newUser)
+                db.session.commit()
+                return {'firebase_id': args['firebase_id'], 'admin': args['admin'], 'id': newUser.id}
+
+        except Exception as e:
+            return {'error': str(e)}
+
+class GetUser(Resource):
+    def get(self, user_id):
+        existingUser = User.query.get(user_id)
+        return {'firebase_id': existingUser.firebase_id, 'admin': existingUser.admin, 'id': existingUser.id}
+
+api.add_resource(CreateUser, '/api/user/create')
+api.add_resource(GetUser, '/api/user/<int:user_id>')
+
+if __name__ == '__main__':
+    # TODO take this out into a 'bootstrap.py' file for kickstarting a new DB
+    db.create_all()
+    app.run(debug=True)
