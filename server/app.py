@@ -225,6 +225,23 @@ class GetAllDiscoveries(Resource):
     def get(self):
         return Discovery.query.all()
 
+class CreateDiscovery(Resource):
+    def post(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('owner_id', type=int)
+            parser.add_argument('filter_params', type=str)
+            args = parser.parse_args()
+
+            matchingDatasets = Dataset.query.filter(Dataset.latitude < 40).filter(Dataset.longitude > 60).all()
+
+            newDiscovery = Discovery(2,'{"rules":[{"field":"latitude","type":1,"value":40},{"field":"longitude","type":2,"value":60}]}',matchingDatasets)
+            db.session.add(newDiscovery)
+            db.session.commit()
+            return {"discovery":{"uri":url_for('getdiscovery',id=newDiscovery.id,_external=True)}}
+
+        except Exception as e:
+            return {'error': str(e)}
 
 # End route functions
 
@@ -240,9 +257,9 @@ api.add_resource(GetAllDatasets,    '/api/datasets')
 api.add_resource(GetDatasetSummary, '/api/datasets/summary')
 #api.add_resource(SearchDatasets,    '/api/datasets/search')
 
+api.add_resource(CreateDiscovery,   '/api/discovery/create')
 api.add_resource(GetDiscovery,      '/api/discovery/<int:id>')
 api.add_resource(GetAllDiscoveries, '/api/discoveries')
-#api.add_resource(CreateDiscovery,   '/api/dataset/create')
 
 # Start the app!
 if __name__ == '__main__':
