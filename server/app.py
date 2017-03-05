@@ -88,6 +88,34 @@ db.create_all()
 
 # End Model definitions and create any new tables in the DB
 
+# Utility functions
+def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
+    fieldattr = getattr(targetClass,field)
+    if ruletype == 0:
+        queryObject = queryObject.filter(fieldattr == value)
+    elif ruletype == 1:
+        queryObject = queryObject.filter(fieldattr < value)
+    elif ruletype == 2:
+        queryObject = queryObject.filter(fieldattr > value)
+    elif ruletype == 3:
+        queryObject = queryObject.filter(fieldattr <= value)
+    elif ruletype == 4:
+        queryObject = queryObject.filter(fieldattr >= value)
+    elif ruletype == 5:
+        queryObject = queryObject.filter(fieldattr == value)
+    elif ruletype == 6:
+        queryObject = queryObject.filter(fieldattr != value)
+    elif ruletype == 7:
+        queryObject = queryObject.filter(fieldattr.like('%' + value + '%'))
+    elif ruletype == 8:
+        queryObject = queryObject.filter(fieldattr.in_(value))
+    elif ruletype == 9:
+        queryObject = queryObject.filter(~fieldattr.in_(value))
+    elif ruletype == 10:
+        queryObject = queryObject.filter(fieldattr != None)
+
+    return queryObject
+
 # Declare route functions
 # /user routes
 class CreateUser(Resource):
@@ -215,7 +243,9 @@ class GetAllDiscoveries(Resource):
         'datasets':fields.Nested({
             'latitude':fields.Float,
             'longitude':fields.Float,
-            'id':fields.Integer
+            'URL':fields.String,
+            'date':fields.DateTime,
+            'uri': fields.Url('getdataset', absolute=True)
         }),
         'owner':fields.Nested({
             'firebase_id':fields.String,
@@ -233,9 +263,20 @@ class CreateDiscovery(Resource):
             parser.add_argument('filter_params', type=str)
             args = parser.parse_args()
 
-            matchingDatasets = Dataset.query.filter(Dataset.latitude < 40).filter(Dataset.longitude > 60).all()
+            filter_params = json.loads(args['filter_params'])
+            rules = filter_params['rules']
 
-            newDiscovery = Discovery(2,'{"rules":[{"field":"latitude","type":1,"value":40},{"field":"longitude","type":2,"value":60}]}',matchingDatasets)
+            queryObject = Dataset.query
+
+            for rule in rules:
+                field = rule['field']
+                ruletype = rule['type']
+                value = rule['value']
+                queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+
+            matchingDatasets = queryObject.all()
+
+            newDiscovery = Discovery(args['owner_id'],args['filter_params'],matchingDatasets)
             db.session.add(newDiscovery)
             db.session.commit()
             return {"discovery":{"uri":url_for('getdiscovery',id=newDiscovery.id,_external=True)}}
