@@ -134,7 +134,7 @@ class CreateUser(Resource):
                 newUser = User(args['firebase_id'],args['admin'])
                 db.session.add(newUser)
                 db.session.commit()
-                return {'firebase_id': args['firebase_id'], 'admin': args['admin'], 'id': newUser.id}
+                return {"user":{"uri":url_for('getuser',id=newUser.id,_external=True)}}
 
         except Exception as e:
             return {'error': str(e)}
@@ -256,7 +256,9 @@ class GetDiscovery(Resource):
         'datasets':fields.Nested({
             'latitude':fields.Float,
             'longitude':fields.Float,
-            'id':fields.Integer
+            'URL':fields.String,
+            'date':fields.DateTime,
+            'uri': fields.Url('getdataset', absolute=True)
         }),
         'owner':fields.Nested({
             'firebase_id':fields.String,
