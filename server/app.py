@@ -112,15 +112,61 @@ class CreateUser(Resource):
             return {'error': str(e)}
 
 class GetUser(Resource):
-    def get(self, user_id):
-        existingUser = User.query.get(user_id)
-        return {'firebase_id': existingUser.firebase_id, 'admin': existingUser.admin, 'id': existingUser.id}
+    @marshal_with({
+        'firebase_id':fields.String,
+        'admin':fields.Integer,
+        'id':fields.Integer
+    }, envelope='user')
+    def get(self, id):
+        return User.query.get(id)
 
-api.add_resource(CreateUser, '/api/user/create')
-api.add_resource(GetUser, '/api/user/<int:user_id>')
+class GetDataset(Resource):
+    @marshal_with({
+        'latitude':fields.Float,
+        'longitude':fields.Float,
+        'id':fields.Integer
+    }, envelope='dataset')
+    def get(self, id):
+        return Dataset.query.get(id)
+
+class GetUserDiscoveries(Resource):
+    @marshal_with({
+        'filter_params':fields.String,
+        'timestamp':fields.DateTime(dt_format='rfc822'),
+        'uri': fields.Url('getdiscovery', absolute=True)
+    }, envelope='discoveries')
+
+    def get(self, id):
+        return Discovery.query.filter_by(owner_id=id).all()
+
+class GetDiscovery(Resource):
+    @marshal_with({
+        'filter_params':fields.String,
+        'timestamp':fields.DateTime(dt_format='rfc822'),
+        'datasets':fields.Nested({
+            'latitude':fields.Float,
+            'longitude':fields.Float,
+            'id':fields.Integer
+        })
+    })
+    def get(self, id):
+        return Discovery.query.get(id)
 
 # End route functions
 # Declare routing
+api.add_resource(CreateUser,        '/api/user/create')
+api.add_resource(GetUser,           '/api/user/<int:id>')
+api.add_resource(GetUserDiscoveries,'/api/user/<int:id>/discoveries')
+
+#api.add_resource(CreateDataset,     '/api/dataset/create')
+api.add_resource(GetDataset,        '/api/dataset/<int:id>')
+#api.add_resource(GetAllDatasets,    '/api/datasets')
+#api.add_resource(GetDatasetSummary, '/api/datasets')
+#api.add_resource(SearchDatasets,    '/api/datasets/search')
+
+api.add_resource(GetDiscovery,      '/api/discovery/<int:id>')
+#api.add_resource(CreateDiscovery,   '/api/dataset/create')
+
 # Start the app!
 if __name__ == '__main__':
     app.run(debug=True)
