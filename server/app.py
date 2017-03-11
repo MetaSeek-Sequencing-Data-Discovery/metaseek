@@ -220,7 +220,7 @@ class CreateDataset(Resource):
             newDataset = Dataset(args['biosample_link'],args['sample_title'],args['investigation_type'],args['library_source'], args['env_package'],datetimeguess, args['latitude'], args['longitude'], args['seq_method'], args['avg_read_length'], args['total_num_reads'], args['total_num_bases'], args['download_size'],args['avg_percent_gc'])
             db.session.add(newDataset)
             db.session.commit()
-            return {"dataset":{"uri":url_for('getdataset',id=newDataset.id,_external=True)}}
+            return {"dataset":{"id":newDataset.id,"uri":url_for('getdataset',id=newDataset.id,_external=True)}}
 
         except Exception as e:
             return {'error': str(e)}
@@ -240,6 +240,7 @@ marshalledDatasetFields = {
     'collection_date':fields.DateTime,
     'seq_method':fields.String,
     'sample_title':fields.String,
+    'id':fields.Integer,
     #this should also return the etc field for e.g. dataset details
     'uri': fields.Url('getdataset', absolute=True)
 }
