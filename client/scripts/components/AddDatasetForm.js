@@ -33,7 +33,6 @@ var AddDatasetForm = React.createClass({
   submitDataset : function(data) {
     // stringify removes undefined attributes (for optional metadata params)
     this.props.addDataset(JSON.parse(JSON.stringify(data)));
-    this.props.history.push('/dataset/' + this.props.datasetId);
   },
 
   render : function() {
@@ -68,9 +67,7 @@ var AddDatasetForm = React.createClass({
             <Tab label="Core Metadata" >
               <FormsyText
                 name="sample_title"
-                validations="isWords"
-                validationError={errorMessages.wordsError}
-                required
+                //required
                 hintText="Sample Title"
                 floatingLabelText="Sample Title"
               />
@@ -78,15 +75,13 @@ var AddDatasetForm = React.createClass({
               name="biosample_link"
               validations="isUrl"
               validationError={errorMessages.urlError}
-              required
+              //required
               hintText="http://www.example.com"
               floatingLabelText="URL"
               />
               <FormsyText
                 name="investigation_type"
-                validations="isWords"
-                validationError={errorMessages.wordsError}
-                required
+                //required
                 hintText="Investigation Type"
                 floatingLabelText="Investigation Type"
               />
@@ -94,7 +89,7 @@ var AddDatasetForm = React.createClass({
                 name="library_source"
                 validations="isWords"
                 validationError={errorMessages.wordsError}
-                required
+                //required
                 hintText="Library Source"
                 floatingLabelText="Library Source"
               />
@@ -102,7 +97,7 @@ var AddDatasetForm = React.createClass({
                 name="env_package"
                 validations="isWords"
                 validationError={errorMessages.wordsError}
-                required
+                //required
                 hintText="Env Package"
                 floatingLabelText="Env Package"
               />
@@ -114,7 +109,7 @@ var AddDatasetForm = React.createClass({
                name="latitude"
                validations="isNumeric"
                validationError={errorMessages.numericError}
-               required
+               //required
                hintText="Latitude of sample?"
                floatingLabelText="Latitude"
              />
@@ -122,7 +117,7 @@ var AddDatasetForm = React.createClass({
                name="longitude"
                validations="isNumeric"
                validationError={errorMessages.numericError}
-               required
+               //required
                hintText="Longitude of sample?"
                floatingLabelText="Longitude"
              />
@@ -148,7 +143,7 @@ var AddDatasetForm = React.createClass({
               <Tab label="Read Details" >
                 {/*<FormsySelect
                   name="database"
-                  required
+                  //required
                   floatingLabelText="Database?"
                   hintText="Database of sample?"
                   menuItems={this.selectFieldItems}
@@ -162,7 +157,7 @@ var AddDatasetForm = React.createClass({
                   name="seq_method"
                   validations="isWords"
                   validationError={errorMessages.wordsError}
-                  required
+                  //required
                   hintText="Sequencing Method"
                   floatingLabelText="Sequencing Method"
                 />
@@ -170,7 +165,7 @@ var AddDatasetForm = React.createClass({
                   name="avg_read_length"
                   validations="isNumeric"
                   validationError={errorMessages.numericError}
-                  required
+                  //required
                   hintText="Average Read Length"
                   floatingLabelText="Average Read Length"
                 />
@@ -178,7 +173,7 @@ var AddDatasetForm = React.createClass({
                   name="total_num_reads"
                   validations="isNumeric"
                   validationError={errorMessages.numericError}
-                  required
+                  //required
                   hintText="Total Number of Reads"
                   floatingLabelText="Total Number of Reads"
                 />
@@ -186,7 +181,7 @@ var AddDatasetForm = React.createClass({
                   name="total_num_bases"
                   validations="isNumeric"
                   validationError={errorMessages.numericError}
-                  required
+                  //required
                   hintText="Total Number of Bases"
                   floatingLabelText="Total Number of Bases"
                 />
@@ -194,7 +189,7 @@ var AddDatasetForm = React.createClass({
                   name="download_size"
                   validations="isNumeric"
                   validationError={errorMessages.numericError}
-                  required
+                  //required
                   hintText="Download Size (in MB)"
                   floatingLabelText="Download Size (in MB)"
                 />
@@ -202,7 +197,7 @@ var AddDatasetForm = React.createClass({
                   name="avg_percent_gc"
                   validations="isNumeric"
                   validationError={errorMessages.numericError}
-                  required
+                  //required
                   hintText="Average Percent GC"
                   floatingLabelText="Average Percent GC"
                 />
