@@ -13,6 +13,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Header from './Header';
 import ExploreFilters from './ExploreFilters';
 import ExploreTable from './ExploreTable';
+import ExploreSummaryStats from './ExploreSummaryStats';
 
 // Firebase setup
 var firebaseEndpoint = 'https://metaseq-6b779.firebaseio.com/';
@@ -36,12 +37,10 @@ var Explore = React.createClass({
 
     apiRequest.get('/datasets/summary')
     .then(function (response) {
-      self.setState({"fullData": response.data.summary,
-      'activeData':response.data.summary})
+      self.setState({"fullData": response.data.summary,});
     })
-
     //this.state.activeData = this.state.fullData;
-    //this.setState({ 'activeData' : this.state.activeData});
+    self.setState({ 'activeData' : this.state.fullData});
   },
   componentWillUnmount : function() {
     base.removeBinding(this.ref);
@@ -85,7 +84,7 @@ var Explore = React.createClass({
 
   render : function() {
     console.log(this.state);
-    console.log(this.state.fullData.totalDatasets);
+    console.log(this.state.activeData.totalDatasets);
     return (
       <div>
         <Header history={this.props.history}/>
@@ -107,6 +106,9 @@ var Explore = React.createClass({
                   disabled={this.state.discoveryId ? false : true}
                   label="Open Discovery"
                 />
+              </Paper>
+              <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
+                <ExploreSummaryStats activeData={this.state.activeData}/>
               </Paper>
               <Paper style={{'width':'80%','margin':'25px auto','padding':0}}>
                 <ExploreTable activeData={this.state.activeData}/>
