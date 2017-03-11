@@ -1,3 +1,14 @@
 client/build/*
 .DS_Store
 client/node_modules/*
+DataScraping/archive/reprocess_chunk4.py
+
+DataScraping/archive/remaining_uids.csv
+
+DataScraping/archive/BioSample_SRA_ScrapeFull.ipynb
+
+DataScraping/archive/ERRORLOG_Genbank_lowapi_parallel.csv
+
+DataScraping/archive/ERRORLOG_Genbank_update_chunk1_20170222.csv
+
+DataScraping/archive/ERRORLOG_Genbank_update_chunk1_20170222.csv

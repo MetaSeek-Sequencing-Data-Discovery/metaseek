@@ -233,6 +233,7 @@ class GetDataset(Resource):
         'avg_percent_gc':fields.Float,
         'biosample_link':fields.String,
         'sample_title':fields.String,
+        #this should also return the etc field for e.g. dataset details
         'uri': fields.Url('getdataset', absolute=True)
     }, envelope='dataset')
     def get(self, id):
