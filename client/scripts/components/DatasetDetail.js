@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 
 // Firebase imports / setup
 import Rebase from 're-base';
@@ -11,32 +12,31 @@ import {List, ListItem} from 'material-ui/List';
 // My component imports
 import Header from './Header';
 
-// Firebase setup
-var firebaseEndpoint = 'https://metaseq-6b779.firebaseio.com/';
-var base = Rebase.createClass(firebaseEndpoint);
+var apiRequest = axios.create({
+  baseURL: 'http://127.0.0.1:5000/api/'
+});
 
 var DatasetDetail = React.createClass({
   getInitialState: function() {
       return {
-        'dataset':{
-          'owner': 'nb',
-          'fields': {}
-        },
-        'datasetId':0
+        'dataset':{}
       }
   },
   componentWillMount: function() {
-    this.ref = base.syncState('/dataset/' + this.props.params.id, {
-          context: this,
-          state: 'dataset'
-      });
+
+    var self = this;
+
+    apiRequest.get('/dataset/' + this.props.params.id)
+    .then(function (response) {
+      self.setState({"dataset": response.data.dataset})
+    })
   },
   componentWillUnmount: function() {
-    base.removeBinding(this.ref);
+
   },
   renderField : function(field) {
     return (
-      <ListItem>{field} - {this.state.dataset.fields[field]}</ListItem>
+      <ListItem>{field} - {this.state.dataset[field]}</ListItem>
     )
   },
   render: function() {
@@ -59,7 +59,7 @@ var DatasetDetail = React.createClass({
             <Paper style={styles.paperStyle} zDepth={2}>
               <h2>Dataset Detail</h2>
                 <List>
-                  {Object.keys(this.state.dataset.fields).map(this.renderField)}
+                  {Object.keys(this.state.dataset).map(this.renderField)}
                 </List>
             </Paper>
             <div style={{

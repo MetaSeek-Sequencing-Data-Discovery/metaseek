@@ -26,19 +26,22 @@ var ApiTest = React.createClass({
 
   componentWillMount: function() {
     var self = this;
+
     apiRequest.get('/datasets')
     .then(function (response) {
-      self.setState({"apiResponse": response.data});
+      self.setState({"apiResponse": response.data})
     })
   },
 
   render : function() {
-    var resultItems = <li>no data yet</li>;
+    var resultItems = <li>Hi!</li>;
 
     if (this.state.apiResponse.datasets) {
       var datasets = this.state.apiResponse.datasets;
+      console.log(datasets);
       resultItems = datasets.map(function(dataset,index) {
-        return <li key={index}>{dataset.URL}</li>
+        console.log(dataset);
+        return <li key={index}>The latitude is {dataset.latitude}, and the longitude is {dataset.longitude}</li>
       });
     }
     return (

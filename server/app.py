@@ -28,22 +28,41 @@ api = Api(app)
 class Dataset(db.Model):
     # each attribute on a "Model" inherited class becomes a Column
     id = db.Column(db.Integer, primary_key=True)
+
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
-    URL = db.Column(db.Text)
-    date = db.Column(db.DateTime)
-    # full = db.Column(db.PickleType)
+    #collection_date = db.Column(db.DateTime)
+    investigation_type = db.Column(db.Text)
+    env_package = db.Column(db.Text)
+    library_source = db.Column(db.Text)
+    avg_read_length = db.Column(db.Float)
+    #seq_method = db.Column(db.Text)
+    total_num_reads = db.Column(db.Integer)
+    total_num_bases = db.Column(db.Integer)
+    download_size = db.Column(db.Integer)
+    avg_percent_gc = db.Column(db.Float)
+    biosample_link = db.Column(db.Text)
+    sample_title = db.Column(db.Text)
+    #etc = db.Column(db.PickleType)
 
     # Each class must have an init function
-    def __init__(self, latitude, longitude, URL, date):
+    def __init__(self, latitude=None, longitude=None, investigation_type=None, env_package=None, library_source=None, avg_read_length=None, total_num_reads=None, total_num_bases=None, download_size=None, avg_percent_gc=None, biosample_link=None, sample_title=None):
         self.latitude = latitude
         self.longitude = longitude
-        self.date = date
-        self.URL = URL
+        self.investigation_type = investigation_type
+        self.env_package = env_package
+        self.library_source = library_source
+        self.avg_read_length = avg_read_length
+        self.total_num_reads = total_num_reads
+        self.total_num_bases = total_num_bases
+        self.download_size = download_size
+        self.avg_percent_gc = avg_percent_gc
+        self.biosample_link = biosample_link
+        self.sample_title = sample_title
 
     # Friendly string representation
     def __repr__(self):
-        return '<Dataset %r>' % self.URL
+        return '<Dataset %r>' % self.biosample_link
 
 # For a many to many database relationship, use a mapping table (no class definition directly)
 # Eg. each discovery will have many datasets, and each dataset may belong to many discoveries
@@ -55,7 +74,7 @@ dataset_to_discovery = db.Table('dataset_to_discovery',
 
 class Discovery(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    filter_params = db.Column(db.String(40))
+    filter_params = db.Column(db.Text)
     timestamp = db.Column(db.DateTime)
     datasets = db.relationship('Dataset', secondary=dataset_to_discovery, backref=db.backref('discoveries', lazy='dynamic'))
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -140,6 +159,8 @@ class CreateUser(Resource):
 
         except Exception as e:
             return {'error': str(e)}
+    def get(self):
+        return "hi!"
 
 class GetUser(Resource):
     @marshal_with({
@@ -176,12 +197,21 @@ class CreateDataset(Resource):
             parser = reqparse.RequestParser()
             parser.add_argument('latitude', type=float, help='Email address to create user')
             parser.add_argument('longitude', type=float)
-            parser.add_argument('URL')
-            parser.add_argument('date', type=str)
-            args = parser.parse_args()
-            datetimeguess = dateparser.parse(args['date'])
+            parser.add_argument('investigation_type',type=str)
+            parser.add_argument('env_package',type=str)
+            parser.add_argument('library_source',type=str)
+            parser.add_argument('avg_read_length',type=float)
+            parser.add_argument('total_num_reads',type=int)
+            parser.add_argument('total_num_bases',type=int)
+            parser.add_argument('download_size',type=int)
+            parser.add_argument('avg_percent_gc',type=float)
+            parser.add_argument('biosample_link',type=str)
+            parser.add_argument('sample_title',type=str)
 
-            newDataset = Dataset(args['latitude'],args['longitude'],args['URL'],datetimeguess)
+            args = parser.parse_args()
+            #datetimeguess = dateparser.parse(args['date'])
+
+            newDataset = Dataset(args['latitude'],args['longitude'],args['investigation_type'],args['env_package'], args['library_source'], args['avg_read_length'], args['total_num_reads'], args['total_num_bases'], args['download_size'], args['avg_percent_gc'], args['biosample_link'], args['sample_title'])
             db.session.add(newDataset)
             db.session.commit()
             return {"dataset":{"uri":url_for('getdataset',id=newDataset.id,_external=True)}}
@@ -193,8 +223,16 @@ class GetDataset(Resource):
     @marshal_with({
         'latitude':fields.Float,
         'longitude':fields.Float,
-        'URL':fields.String,
-        'date':fields.DateTime,
+        'investigation_type':fields.String,
+        'env_package':fields.String,
+        'library_source':fields.String,
+        'avg_read_length':fields.Float,
+        'total_num_reads':fields.Integer,
+        'total_num_bases':fields.Integer,
+        'download_size':fields.Integer,
+        'avg_percent_gc':fields.Float,
+        'biosample_link':fields.String,
+        'sample_title':fields.String,
         'uri': fields.Url('getdataset', absolute=True)
     }, envelope='dataset')
     def get(self, id):
@@ -204,8 +242,16 @@ class GetAllDatasets(Resource):
     @marshal_with({
         'latitude':fields.Float,
         'longitude':fields.Float,
-        'URL':fields.String,
-        'date':fields.DateTime,
+        'investigation_type':fields.String,
+        'env_package':fields.String,
+        'library_source':fields.String,
+        'avg_read_length':fields.Float,
+        'total_num_reads':fields.Integer,
+        'total_num_bases':fields.Integer,
+        'download_size':fields.Integer,
+        'avg_percent_gc':fields.Float,
+        'biosample_link':fields.String,
+        'sample_title':fields.String,
         'uri': fields.Url('getdataset', absolute=True)
     }, envelope='datasets')
     def get(self):
@@ -214,29 +260,37 @@ class GetAllDatasets(Resource):
 class GetDatasetSummary(Resource):
     def get(self):
         total = Dataset.query.count()
-        averageLatitude = db.session.query(func.avg(Dataset.latitude)).first()[0]
-        averageLongitude = db.session.query(func.avg(Dataset.longitude)).first()[0]
-        return {"summary":{"totalDatasets":int(total),"averageLatitude":averageLatitude,"averageLongitude":averageLongitude}}
+        total_download_size = db.session.query(func.sum(Dataset.download_size)).first()[0]
+        #averageLatitude = db.session.query(func.avg(Dataset.latitude)).first()[0]
+        return {"summary":{"totalDatasets":int(total),"totalDownloadSize":int(total_download_size)}}
 
 class SearchDatasets(Resource):
     @marshal_with({
         'latitude':fields.Float,
         'longitude':fields.Float,
-        'URL':fields.String,
-        'date':fields.DateTime,
-        'uri': fields.Url('getdataset', absolute=True)
+        'investigation_type':fields.String,
+        'env_package':fields.String,
+        'library_source':fields.String,
+        'avg_read_length':fields.Float,
+        'total_num_reads':fields.Integer,
+        'total_num_bases':fields.Integer,
+        'download_size':fields.Integer,
+        'avg_percent_gc':fields.Float,
+        'biosample_link':fields.String,
+        'sample_title':fields.String
+        #'uri': fields.Url('getdataset', absolute=True)
     }, envelope='datasets')
     def post(self):
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('filter_params', type=str)
             args = parser.parse_args()
-
             filter_params = json.loads(args['filter_params'])
             rules = filter_params['rules']
 
             queryObject = Dataset.query
 
+            print rules
             for rule in rules:
                 field = rule['field']
                 ruletype = rule['type']
@@ -244,6 +298,7 @@ class SearchDatasets(Resource):
                 queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
 
             matchingDatasets = queryObject.all()
+            print matchingDatasets
             return matchingDatasets
 
         except Exception as e:
@@ -282,8 +337,16 @@ class GetDiscovery(Resource):
         'datasets':fields.Nested({
             'latitude':fields.Float,
             'longitude':fields.Float,
-            'URL':fields.String,
-            'date':fields.DateTime,
+            'investigation_type':fields.String,
+            'env_package':fields.String,
+            'library_source':fields.String,
+            'avg_read_length':fields.Float,
+            'total_num_reads':fields.Integer,
+            'total_num_bases':fields.Integer,
+            'download_size':fields.Integer,
+            'avg_percent_gc':fields.Float,
+            'biosample_link':fields.String,
+            'sample_title':fields.String,
             'uri': fields.Url('getdataset', absolute=True)
         }),
         'owner':fields.Nested({
@@ -302,8 +365,16 @@ class GetAllDiscoveries(Resource):
         'datasets':fields.Nested({
             'latitude':fields.Float,
             'longitude':fields.Float,
-            'URL':fields.String,
-            'date':fields.DateTime,
+            'investigation_type':fields.String,
+            'env_package':fields.String,
+            'library_source':fields.String,
+            'avg_read_length':fields.Float,
+            'total_num_reads':fields.Integer,
+            'total_num_bases':fields.Integer,
+            'download_size':fields.Integer,
+            'avg_percent_gc':fields.Float,
+            'biosample_link':fields.String,
+            'sample_title':fields.String,
             'uri': fields.Url('getdataset', absolute=True)
         }),
         'owner':fields.Nested({
