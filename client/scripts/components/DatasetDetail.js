@@ -34,9 +34,9 @@ var DatasetDetail = React.createClass({
   componentWillUnmount: function() {
 
   },
-  renderField : function(field) {
+  renderField : function(field, index) {
     return (
-      <ListItem>{field} - {this.state.dataset[field]}</ListItem>
+      <ListItem key={index}>{field} - {this.state.dataset[field]}</ListItem>
     )
   },
   render: function() {
