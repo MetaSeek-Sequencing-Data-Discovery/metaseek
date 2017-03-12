@@ -26,21 +26,52 @@ var apiRequest = axios.create({
 var Explore = React.createClass({
   getInitialState : function() {
     return {
-      'fullData': [],
+      'fullData': [
+    {
+      "avg_percent_gc": 0.51,
+      "avg_read_length": 0,
+      "biosample_link": "\"https://www.ncbi.nlm.nih.gov/biosample/5560474\"",
+      "download_size": 0,
+      "env_package": "\"water\"",
+      "investigation_type": "",
+      "latitude": 44.8016,
+      "library_source": "\"genomic\"",
+      "longitude": -110.729,
+      "sample_title": "\"Bacillus licheniformis ASZ2 isolated from Yellowstone National Park\"",
+      "total_num_bases": 0,
+      "total_num_reads": 0,
+      "uri": "http://127.0.0.1:5000/api/dataset/1"
+    },
+    {
+      "avg_percent_gc": 0.51,
+      "avg_read_length": 0,
+      "biosample_link": "\"https://www.ncbi.nlm.nih.gov/biosample/5560474\"",
+      "download_size": 0,
+      "env_package": "\"water\"",
+      "investigation_type": "\"bacteria\"",
+      "latitude": 44.8016,
+      "library_source": "\"genomic\"",
+      "longitude": -110.729,
+      "sample_title": "\"Bacillus licheniformis ASZ2 isolated from Yellowstone National Park\"",
+      "total_num_bases": 0,
+      "total_num_reads": 0,
+      "uri": "http://127.0.0.1:5000/api/dataset/2"
+    }],
       'rules':[],
-      'discoveryId':null
+      'discoveryId':null,
+      "summaryData":[]
     }
   },
 
   componentWillMount : function() {
     var self = this;
 
-    apiRequest.get('/datasets/summary')
+    apiRequest.get("/datasets/summary")
     .then(function (response) {
-      self.setState({"fullData": response.data.summary,});
+      self.setState({"summaryData": response.data.summary,});
     })
-    //this.state.activeData = this.state.fullData;
-    self.setState({ 'activeData' : this.state.fullData});
+    this.state.activeData = this.state.fullData;
+    this.setState({ 'activeData' : this.state.fullData});
   },
   componentWillUnmount : function() {
     base.removeBinding(this.ref);
@@ -84,7 +115,7 @@ var Explore = React.createClass({
 
   render : function() {
     console.log(this.state);
-    console.log(this.state.activeData.totalDatasets);
+    console.log(this.state.summaryData.totalDatasets);
     return (
       <div>
         <Header history={this.props.history}/>
@@ -108,7 +139,7 @@ var Explore = React.createClass({
                 />
               </Paper>
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
-                <ExploreSummaryStats activeData={this.state.activeData}/>
+                <ExploreSummaryStats summaryData={this.state.summaryData}/>
               </Paper>
               <Paper style={{'width':'80%','margin':'25px auto','padding':0}}>
                 <ExploreTable activeData={this.state.activeData}/>
