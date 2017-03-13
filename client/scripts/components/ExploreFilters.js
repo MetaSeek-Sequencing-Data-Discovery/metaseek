@@ -1,4 +1,5 @@
 import React from 'react';
+import LatFilter from './LatitudeFilter';
 
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -9,43 +10,31 @@ var ExploreFilters = React.createClass({
   getInitialState : function() {
     return {
       'database':0,
-      'env_package':0
+      'env_package':0,
+      'library_source':0
     }
   },
 
-  handleChange : function(type, event, index, value) {
+  handleSelectChange : function(type, event, index, value) {
     this.state[type] = value;
     this.setState(this.state);
 
-    var rules = [];
-    // This is janky as hell and won't scale beyond 3-4 without becoming a PITA
-    if (this.state.database > 0) {
+    var querytype = 0; //for a selectField, api query type will be ==
+
+    if (value=="All") {
+      this.props.removeRule(type);
+    } else {
       var dbRule = {
-        'field':'database',
-        'type':4
-      };
-      if (this.state.database == 1) {
-        dbRule.value = 'EBI';
-      } else {
-        dbRule.value = 'GenBank';
+        "field":type,
+        "type":querytype,
+        "value":value
       }
-      rules.push(dbRule);
+      var key = dbRule["field"]
+      console.log('key',key)
+      this.props.addRule(dbRule,key);
     }
 
-    if (this.state.env_package > 0) {
-      var envRule = {
-        'field':'env_package',
-        'type':4
-      };
-      if (this.state.env_package == 1) {
-        envRule.value = 'sediment';
-      } else {
-        envRule.value = 'soil';
-      }
-      rules.push(envRule);
-    }
-
-    this.props.applyRules(rules);
+    //this.props.applyRules(rules);
   },
 
   render : function() {
@@ -53,18 +42,32 @@ var ExploreFilters = React.createClass({
       <div>
         <MuiThemeProvider>
           <div>
+            <h4>Library Source</h4>
+            <SelectField value={this.state.library_source} onChange={this.handleSelectChange.bind(this,'library_source')}>
+              <MenuItem value={"All"} primaryText="All" />
+              <MenuItem value={"GENOMIC"} primaryText="Genomic" />
+              <MenuItem value={"METAGENOMIC"} primaryText="Metagenomic" />
+              <MenuItem value={"TRANSCRIPTOMIC"} primaryText="Transcriptomic" />
+              <MenuItem value={"METATRANSCRIPTOMIC"} primaryText="Metatranscriptomic" />
+              <MenuItem value={"SYNTHETIC"} primaryText="Synthetic" />
+              <MenuItem value={"VIRAL RNA"} primaryText="Viral RNA" />
+              <MenuItem value={"OTHER"} primaryText="Other" />
+            </SelectField>
+
             <h4>Choose Database</h4>
-            <SelectField value={this.state.database} onChange={this.handleChange.bind(this,'database')}>
-              <MenuItem value={0} primaryText="All" />
-              <MenuItem value={1} primaryText="EBI" />
-              <MenuItem value={2} primaryText="GenBank" />
+            <SelectField value={this.state.database} onChange={this.handleSelectChange.bind(this,'database')}>
+              <MenuItem value={"All"} primaryText="All" />
+              <MenuItem value={"EBI"} primaryText="EBI" />
+              <MenuItem value={"Genbank"} primaryText="GenBank" />
             </SelectField>
             <h4>Choose Environment Package</h4>
-            <SelectField value={this.state.env_package} onChange={this.handleChange.bind(this,'env_package')}>
-              <MenuItem value={0} primaryText="All" />
-              <MenuItem value={1} primaryText="sediment" />
-              <MenuItem value={2} primaryText="soil" />
+            <SelectField value={this.state.env_package} onChange={this.handleSelectChange.bind(this,'env_package')}>
+              <MenuItem value={"All"} primaryText="All" />
+              <MenuItem value={"sediment"} primaryText="sediment" />
+              <MenuItem value={"soil"} primaryText="soil" />
             </SelectField>
+            //<h4> Latitude </h4>
+            //<LatFilter/>
           </div>
         </MuiThemeProvider>
       </div>

@@ -15,6 +15,7 @@ import ExploreFilters from './ExploreFilters';
 import ExploreTable from './ExploreTable';
 import ExploreSummaryStats from './ExploreSummaryStats';
 
+
 // Firebase setup
 var firebaseEndpoint = 'https://metaseq-6b779.firebaseio.com/';
 var base = Rebase.createClass(firebaseEndpoint);
@@ -78,6 +79,7 @@ var Explore = React.createClass({
   },
 
   applyRules : function(rules) {
+    // I think this should be changed so that a SearchDatasetsSummary api call is made, updating the summaryData
     if (rules) {
       var tableData = this.state.fullData;
       for (var i = 0;i < rules.length;i++) {
@@ -91,12 +93,32 @@ var Explore = React.createClass({
         });
       }
       this.state.activeData = tableData;
-      this.state.rules = rules;
+      //this.state.rules = rules;
       this.setState(this.state);
     }
     else {
       this.setState({ 'activeData' : this.state.fullData});
     }
+  },
+
+  addRule(rule,key) {
+  //update our state
+  const rules = {...this.state.rules}; //make copy existing state
+  console.log('old',rules)
+  //add in our new rule
+  rules[key] = rule;
+  console.log(rules)
+  //set state
+  this.setState({"rules": rules})
+  },
+
+  removeRule(key) {
+  const rules = {...this.state.rules}; //make copy existing state
+  console.log('old',rules)
+  rules[key] = null;
+  console.log('new', rules)
+  //set state
+  this.setState({"rules": rules})
   },
 
   submitDiscovery : function() {
@@ -115,7 +137,6 @@ var Explore = React.createClass({
 
   render : function() {
     console.log(this.state);
-    console.log(this.state.summaryData.totalDatasets);
     return (
       <div>
         <Header history={this.props.history}/>
@@ -123,7 +144,7 @@ var Explore = React.createClass({
           <MuiThemeProvider>
             <div>
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
-                <ExploreFilters applyRules={this.applyRules}/>
+                <ExploreFilters applyRules={this.applyRules} addRule={this.addRule} removeRule={this.removeRule}/>
                 <RaisedButton
                   style={{'margin':'12px 12px 0 12px'}}
                   onClick={this.submitDiscovery}

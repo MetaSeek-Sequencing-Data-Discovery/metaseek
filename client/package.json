@@ -43,6 +43,7 @@
     "react-google-maps": "^4.11.0"
   },
   "dependencies": {
-    "axios": "^0.15.3"
+    "axios": "^0.15.3",
+    "rc-slider": "^6.1.2"
   }
 }
