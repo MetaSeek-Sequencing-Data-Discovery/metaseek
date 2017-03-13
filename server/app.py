@@ -39,7 +39,6 @@ class Dataset(db.Model):
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
 
-    seq_method = db.Column(db.Text)
     avg_read_length = db.Column(db.Float)
     total_num_reads = db.Column(db.Integer)
     total_num_bases = db.Column(db.Integer)
@@ -49,7 +48,7 @@ class Dataset(db.Model):
     #etc = db.Column(db.PickleType)
 
     # Each class must have an init function
-    def __init__(self,biosample_link=None,sample_title=None,investigation_type=None,library_source=None,env_package=None,collection_date=None,latitude=None,longitude=None,seq_method=None,avg_read_length=None,total_num_reads=None,total_num_bases=None,download_size=None,avg_percent_gc=None):
+    def __init__(self,biosample_link=None,sample_title=None,investigation_type=None,library_source=None,env_package=None,collection_date=None,latitude=None,longitude=None,avg_read_length=None,total_num_reads=None,total_num_bases=None,download_size=None,avg_percent_gc=None):
         self.latitude = latitude
         self.longitude = longitude
         self.investigation_type = investigation_type
@@ -63,7 +62,6 @@ class Dataset(db.Model):
         self.avg_percent_gc = avg_percent_gc
         self.biosample_link = biosample_link
         self.sample_title = sample_title
-        self.seq_method = seq_method
 
     # Friendly string representation
     def __repr__(self):
@@ -212,13 +210,12 @@ class CreateDataset(Resource):
             parser.add_argument('avg_percent_gc',type=float)
             parser.add_argument('biosample_link',type=str)
             parser.add_argument('sample_title',type=str)
-            parser.add_argument('seq_method',type=str)
             parser.add_argument('collection_date',type=str)
 
             args = parser.parse_args()
             datetimeguess = dateparser.parse(args['collection_date'])
 
-            newDataset = Dataset(args['biosample_link'],args['sample_title'],args['investigation_type'],args['library_source'], args['env_package'],datetimeguess, args['latitude'], args['longitude'], args['seq_method'], args['avg_read_length'], args['total_num_reads'], args['total_num_bases'], args['download_size'],args['avg_percent_gc'])
+            newDataset = Dataset(args['biosample_link'],args['sample_title'],args['investigation_type'],args['library_source'], args['env_package'],datetimeguess, args['latitude'], args['longitude'], args['avg_read_length'], args['total_num_reads'], args['total_num_bases'], args['download_size'],args['avg_percent_gc'])
             db.session.add(newDataset)
             db.session.commit()
             return {"dataset":{"id":newDataset.id,"uri":url_for('getdataset',id=newDataset.id,_external=True)}}
@@ -239,7 +236,6 @@ marshalledDatasetFields = {
     'avg_percent_gc':fields.Float,
     'biosample_link':fields.String,
     'collection_date':fields.DateTime,
-    'seq_method':fields.String,
     'sample_title':fields.String,
     'id':fields.Integer,
     #this should also return the etc field for e.g. dataset details
