@@ -256,8 +256,36 @@ class GetDatasetSummary(Resource):
     def get(self):
         total = Dataset.query.count()
         total_download_size = db.session.query(func.sum(Dataset.download_size)).first()[0]
+
+        #investigation_type
+        investigation_summary = dict(db.session.query(Dataset.investigation_type, func.count(Dataset.investigation_type)).group_by(Dataset.investigation_type).all())
+
         #counts of each category in library_source (for histograms)
         lib_source_summary = dict(db.session.query(Dataset.library_source, func.count(Dataset.library_source)).group_by(Dataset.library_source).all())
+
+        #env_package
+        env_pkg_summary = dict(db.session.query(Dataset.env_package, func.count(Dataset.env_package)).group_by(Dataset.env_package).all())
+
+        #collection_date - keep just year for summary for now (might want month for e.g. season searches later on, but default date is 03-13 00:00:00 and need to deal with that)
+        year_summary = dict(db.session.query(func.date_format(Dataset.collection_date, '%Y'),func.count(func.date_format(Dataset.collection_date, '%Y'))).group_by(func.date_format(Dataset.collection_date, '%Y')).all())
+
+        #latitude
+        lat_summary = dict(db.session.query(Dataset.latitude, func.count(Dataset.latitude)).group_by(Dataset.latitude).all())
+        lat_bins = Counter()
+        for k,v in lat_summary.items(): #is there a way to do this that doesn't loop through each returned value?
+            if not k:
+                next
+            else:
+                lat_bins[round(k,0)] += v
+
+        #longitude
+        lon_summary = dict(db.session.query(Dataset.longitude, func.count(Dataset.longitude)).group_by(Dataset.longitude).all())
+        lon_bins = Counter()
+        for k,v in lon_summary.items(): #is there a way to do this that doesn't loop through each returned value?
+            if not k:
+                next
+            else:
+                lon_bins[round(k,0)] += v
 
         #avg_read_length
         read_length_summary = dict(db.session.query(Dataset.avg_read_length, func.count(Dataset.avg_read_length)).group_by(Dataset.avg_read_length).all())
@@ -268,6 +296,46 @@ class GetDatasetSummary(Resource):
             else:
                 rd_lgth_bins[round(k,-2)] += v
 
+        #total_num_reads
+        total_rds_summary = dict(db.session.query(Dataset.total_num_reads, func.count(Dataset.total_num_reads)).group_by(Dataset.total_num_reads).all())
+        total_rds_bins = Counter()
+        for k,v in total_rds_summary.items():
+            if int(k)==0:
+                total_rds_bins['0'] += v #lotsa zeros
+            elif int(k)<1000: #if lower than 1000, count by hundreds
+                total_rds_bins[round(k,-2)] += v
+            elif int(k)<10000: #if lower than 10000, count by thousands
+                total_rds_bins[round(k,-3)] += v
+            elif int(k)<100000: #if between 10000-100,000, count by 10,000
+                total_rds_bins[round(k,-4)] += v
+            elif int(k)<1000000: #if between 100,000-1,000,000, count by 100,000
+                total_rds_bins[round(k,-5)] += v
+            elif int(k)<10000000: #if between 1,000,000-10,000,000, count by 1,000,000
+                total_rds_bins[round(k,-6)] += v
+            else:
+                total_rds_bins[round(k,-7)] += v #above 10,000,000, count by 10M
+
+        #total_num_bases
+        total_bases_summary = dict(db.session.query(Dataset.total_num_bases, func.count(Dataset.total_num_bases)).group_by(Dataset.total_num_bases).all())
+        total_bases_bins = Counter()
+        for k,v in total_bases_summary.items():
+            if int(k)==0:
+                total_bases_bins['0'] += v
+            elif int(k)<1000: #if lower than 1000, count by hundreds
+                total_bases_bins[round(k,-2)] += v
+            elif int(k)<10000: #if lower than 10000, count by thousands
+                total_bases_bins[round(k,-3)] += v
+            elif int(k)<100000: #if between 10000-100,000, count by 10,000
+                total_bases_bins[round(k,-4)] += v
+            elif int(k)<1000000: #if between 100,000-1,000,000, count by 100,000
+                total_bases_bins[round(k,-5)] += v
+            elif int(k)<10000000: #if between 1,000,000-10,000,000, count by 1,000,000
+                total_bases_bins[round(k,-6)] += v
+            elif int(k)<100000000: #if between 10,000,000-100,000,000, count by 10,000,000
+                total_bases_bins[round(k,-7)] += v
+            else:
+                total_bases_bins[round(k,-8)] += v #above 100,000,000, count by 100M
+
         #download_size (numeric binning example)
         down_size_summary = dict(db.session.query(Dataset.download_size, func.count(Dataset.download_size)).group_by(Dataset.download_size).all())
         down_size_bins = Counter()
@@ -276,13 +344,35 @@ class GetDatasetSummary(Resource):
                 down_size_bins['0'] += v #lotsa zeros
             elif int(k)<1000000:
                 down_size_bins['0.1'] += v #many are skewed, can create long tail bin
-            elif int(k)<1000000000:
-                down_size_bins['100000'] += v
+            elif int(k)<10000000:
+                down_size_bins['1000000'] += v
             else:
-                down_size_bins[round(k,-9)] += v #e.g. rounding -2 gives you 100-size bins;
+                down_size_bins[round(k,-7)] += v #round every 10MB
+
+        #avg_percent_gc
+        avg_gc_summary = dict(db.session.query(Dataset.avg_percent_gc, func.count(Dataset.avg_percent_gc)).group_by(Dataset.avg_percent_gc).all())
+        avg_gc_bins = Counter()
+        for k,v in avg_gc_summary.items(): #is there a way to do this that doesn't loop through each returned value?
+            if not k:
+                next
+            else:
+                avg_gc_bins[round(k,2)] += v
 
         #averageLatitude = db.session.query(func.avg(Dataset.latitude)).first()[0]
-        return {"summary":{"totalDatasets":int(total),"totalDownloadSize":int(total_download_size),"library_source_summary":lib_source_summary, "download_size_summary":down_size_bins, "avg_read_length_summary":rd_lgth_bins}}
+        return {"summary":{"totalDatasets":int(total),
+        "totalDownloadSize":int(total_download_size),
+        "investigation_type_summary":investigation_summary,
+        "library_source_summary":lib_source_summary,
+        "env_package_summary":env_pkg_summary,
+        "year_collected_summary":year_summary,
+        "latitude_summary":lat_bins,
+        "longitude_summary":lon_bins,
+        "avg_read_length_summary":rd_lgth_bins,
+        "total_reads_summary":total_rds_bins,
+        "total_bases_summary":total_bases_bins,
+        "download_size_summary":down_size_bins,
+        "avg_percent_gc_summary":avg_gc_bins
+        }}
 
 class SearchDatasets(Resource):
     @marshal_with(marshalledDatasetFields, envelope='datasets')
@@ -419,6 +509,10 @@ if __name__ == '__main__':
     #import sframe
     #sample_data = sframe.SFrame('/Users/Adrienne/Projects/metaseek/DataScraping/db_sample_data')
     #for row in sample_data:
-    #    newDataset = Dataset(row['latitude'],row['longitude'],row['investigation_type'],row['env_package'], row['library_source'], row['avg_read_length'], row['total_num_reads'], row['total_num_bases'], row['download_size'], row['avg_percent_gc'], row['biosample_link'], row['sample_title'])
-    #    db.session.add(newDataset)
-    #    db.session.commit()
+#        try:
+#            datetimeguess = dateparser.parse(row['collection_date'])
+#        except ValueError:
+#            datetimeguess = None
+#        newDataset = Dataset(row['biosample_link'],row['sample_title'],row['investigation_type'],row['library_source'], row['env_package'],datetimeguess, row['latitude'], row['longitude'], row['avg_read_length'], row['total_num_reads'], row['total_num_bases'], row['download_size'],row['avg_percent_gc'])
+#        db.session.add(newDataset)
+#        db.session.commit()
