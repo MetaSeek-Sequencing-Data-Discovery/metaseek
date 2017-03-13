@@ -259,15 +259,23 @@ class GetDatasetSummary(Resource):
 
         #investigation_type
         investigation_summary = dict(db.session.query(Dataset.investigation_type, func.count(Dataset.investigation_type)).group_by(Dataset.investigation_type).all())
+        if None in investigation_summary.keys():
+            del investigation_summary[None]
 
         #counts of each category in library_source (for histograms)
         lib_source_summary = dict(db.session.query(Dataset.library_source, func.count(Dataset.library_source)).group_by(Dataset.library_source).all())
+        if None in lib_source_summary.keys():
+            del lib_source_summary[None]
 
         #env_package
         env_pkg_summary = dict(db.session.query(Dataset.env_package, func.count(Dataset.env_package)).group_by(Dataset.env_package).all())
+        if None in env_pkg_summary.keys():
+            del env_pkg_summary[None]
 
         #collection_date - keep just year for summary for now (might want month for e.g. season searches later on, but default date is 03-13 00:00:00 and need to deal with that)
         year_summary = dict(db.session.query(func.date_format(Dataset.collection_date, '%Y'),func.count(func.date_format(Dataset.collection_date, '%Y'))).group_by(func.date_format(Dataset.collection_date, '%Y')).all())
+        if None in year_summary.keys():
+            del year_summary[None]
 
         #latitude
         lat_summary = dict(db.session.query(Dataset.latitude, func.count(Dataset.latitude)).group_by(Dataset.latitude).all())

@@ -54,17 +54,14 @@ var ExploreFilters = React.createClass({
               <MenuItem value={"OTHER"} primaryText="Other" />
             </SelectField>
 
-            <h4>Choose Database</h4>
-            <SelectField value={this.state.database} onChange={this.handleSelectChange.bind(this,'database')}>
-              <MenuItem value={"All"} primaryText="All" />
-              <MenuItem value={"EBI"} primaryText="EBI" />
-              <MenuItem value={"Genbank"} primaryText="GenBank" />
-            </SelectField>
-            <h4>Choose Environment Package</h4>
+            <h4>Choose Environmental Package</h4>
             <SelectField value={this.state.env_package} onChange={this.handleSelectChange.bind(this,'env_package')}>
               <MenuItem value={"All"} primaryText="All" />
-              <MenuItem value={"sediment"} primaryText="sediment" />
-              <MenuItem value={"soil"} primaryText="soil" />
+              {
+                Object
+                .keys(this.props.summaryData.env_package_summary)
+                .map(key => <MenuItem key={key} value={{key}} primaryText={key} />)
+              }
             </SelectField>
             //<h4> Latitude </h4>
             //<LatFilter/>

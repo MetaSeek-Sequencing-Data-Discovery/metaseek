@@ -14,6 +14,7 @@ import Header from './Header';
 import ExploreFilters from './ExploreFilters';
 import ExploreTable from './ExploreTable';
 import ExploreSummaryStats from './ExploreSummaryStats';
+import Loading from './Loading';
 
 
 // Firebase setup
@@ -60,16 +61,18 @@ var Explore = React.createClass({
     }],
       'rules':[],
       'discoveryId':null,
-      "summaryData":[]
+      "summaryData":[],
+      "loaded":false
     }
   },
 
   componentWillMount : function() {
     var self = this;
-
     apiRequest.get("/datasets/summary")
     .then(function (response) {
-      self.setState({"summaryData": response.data.summary,});
+      self.setState({"summaryData": response.data.summary,
+        "loaded":true
+      });
     })
     this.state.activeData = this.state.fullData;
     this.setState({ 'activeData' : this.state.fullData});
@@ -80,6 +83,7 @@ var Explore = React.createClass({
 
   applyRules : function(rules) {
     // I think this should be changed so that a SearchDatasetsSummary api call is made, updating the summaryData
+    //if this.state.summaryData.totalDatasets < threshold, can send fullData
     if (rules) {
       var tableData = this.state.fullData;
       for (var i = 0;i < rules.length;i++) {
@@ -104,19 +108,15 @@ var Explore = React.createClass({
   addRule(rule,key) {
   //update our state
   const rules = {...this.state.rules}; //make copy existing state
-  console.log('old',rules)
   //add in our new rule
   rules[key] = rule;
-  console.log(rules)
   //set state
   this.setState({"rules": rules})
   },
 
   removeRule(key) {
   const rules = {...this.state.rules}; //make copy existing state
-  console.log('old',rules)
   rules[key] = null;
-  console.log('new', rules)
   //set state
   this.setState({"rules": rules})
   },
@@ -136,6 +136,7 @@ var Explore = React.createClass({
   },
 
   render : function() {
+    if (!this.state.loaded) return <Loading/>;
     console.log(this.state);
     return (
       <div>
@@ -144,7 +145,7 @@ var Explore = React.createClass({
           <MuiThemeProvider>
             <div>
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
-                <ExploreFilters applyRules={this.applyRules} addRule={this.addRule} removeRule={this.removeRule}/>
+                <ExploreFilters applyRules={this.applyRules} addRule={this.addRule} removeRule={this.removeRule} summaryData={this.state.summaryData}/>
                 <RaisedButton
                   style={{'margin':'12px 12px 0 12px'}}
                   onClick={this.submitDiscovery}
