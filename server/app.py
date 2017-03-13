@@ -14,6 +14,7 @@ from datetime import datetime
 from dateutil import parser as dateparser
 import random
 import json
+from collections import Counter
 
 # Config / initialize the app, database and api
 app = Flask(__name__)
@@ -262,8 +263,33 @@ class GetDatasetSummary(Resource):
     def get(self):
         total = Dataset.query.count()
         total_download_size = db.session.query(func.sum(Dataset.download_size)).first()[0]
+        #counts of each category in library_source (for histograms)
+        lib_source_summary = dict(db.session.query(Dataset.library_source, func.count(Dataset.library_source)).group_by(Dataset.library_source).all())
+
+        #avg_read_length
+        read_length_summary = dict(db.session.query(Dataset.avg_read_length, func.count(Dataset.avg_read_length)).group_by(Dataset.avg_read_length).all())
+        rd_lgth_bins = Counter()
+        for k,v in read_length_summary.items(): #is there a way to do this that doesn't loop through each returned value?
+            if not k:
+                next
+            else:
+                rd_lgth_bins[round(k,-2)] += v
+
+        #download_size (numeric binning example)
+        down_size_summary = dict(db.session.query(Dataset.download_size, func.count(Dataset.download_size)).group_by(Dataset.download_size).all())
+        down_size_bins = Counter()
+        for k,v in down_size_summary.items():
+            if int(k)==0:
+                down_size_bins['0'] += v #lotsa zeros
+            elif int(k)<1000000:
+                down_size_bins['0.1'] += v #many are skewed, can create long tail bin
+            elif int(k)<1000000000:
+                down_size_bins['100000'] += v
+            else:
+                down_size_bins[round(k,-9)] += v #e.g. rounding -2 gives you 100-size bins;
+
         #averageLatitude = db.session.query(func.avg(Dataset.latitude)).first()[0]
-        return {"summary":{"totalDatasets":int(total),"totalDownloadSize":int(total_download_size)}}
+        return {"summary":{"totalDatasets":int(total),"totalDownloadSize":int(total_download_size),"library_source_summary":lib_source_summary, "download_size_summary":down_size_bins, "avg_read_length_summary":rd_lgth_bins}}
 
 class SearchDatasets(Resource):
     @marshal_with({
@@ -437,3 +463,11 @@ api.add_resource(GetAllDiscoveries,     '/api/discoveries')
 # Start the app!
 if __name__ == '__main__':
     app.run(debug=True)
+
+    #load sample data - this is a dumb way to do it because it will continue to upload and reupload it as long as you have the app running
+    #import sframe
+    #sample_data = sframe.SFrame('/Users/Adrienne/Projects/metaseek/DataScraping/db_sample_data')
+    #for row in sample_data:
+    #    newDataset = Dataset(row['latitude'],row['longitude'],row['investigation_type'],row['env_package'], row['library_source'], row['avg_read_length'], row['total_num_reads'], row['total_num_bases'], row['download_size'], row['avg_percent_gc'], row['biosample_link'], row['sample_title'])
+    #    db.session.add(newDataset)
+    #    db.session.commit()

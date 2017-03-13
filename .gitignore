@@ -12,3 +12,15 @@ DataScraping/archive/ERRORLOG_Genbank_lowapi_parallel.csv
 DataScraping/archive/ERRORLOG_Genbank_update_chunk1_20170222.csv
 
 DataScraping/archive/ERRORLOG_Genbank_update_chunk1_20170222.csv
+
+DataScraping/archive/ERRORLOG_Genbank_update_chunk2_20170222.csv
+
+DataScraping/archive/ERRORLOG_Genbank_update_chunk4_20170223.csv
+
+DataScraping/archive/Genbank_lowapi.ipynb
+
+DataScraping/archive/Genbank_lowapi.py
+
+DataScraping/archive/Genbank_update_chunks.py
+
+DataScraping/archive/Genbank_update_parallel.py
