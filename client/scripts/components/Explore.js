@@ -15,6 +15,7 @@ import ExploreFilters from './ExploreFilters';
 import ExploreTable from './ExploreTable';
 import ExploreSummaryStats from './ExploreSummaryStats';
 import Loading from './Loading';
+import Histogramrd3 from './Histogramrd3';
 
 
 // Firebase setup
@@ -32,7 +33,8 @@ var Explore = React.createClass({
       'rules':[],
       'discoveryId':null,
       "summaryData":[],
-      "loaded":false
+      "loaded":false,
+      "histinput":"avg_read_length_summary"
     }
   },
 
@@ -144,6 +146,9 @@ var Explore = React.createClass({
               </Paper>
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
                 <ExploreSummaryStats summaryData={this.state.summaryData}/>
+              </Paper>
+              <Paper style={{'width':'40%','margin':'25px auto','padding':25}}>
+                <Histogramrd3/>
               </Paper>
               <Paper style={{'width':'80%','margin':'25px auto','padding':0}}>
                 <ExploreTable activeData={this.state.activeData}/>
