@@ -1,17 +1,25 @@
 import React from 'react';
-import LatFilter from './LatitudeFilter';
 
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import LatitudeSliders from './LatitudeSliders';
+import LongitudeSliders from './LongitudeSliders';
+import AvgReadLengthSlider from './AvgReadLengthSlider';
 
 var ExploreFilters = React.createClass({
   getInitialState : function() {
     return {
-      'database':0,
-      'env_package':0,
-      'library_source':0
+      "env_package":0,
+      "library_source":0,
+      "investigation_type":0,
+      "latitudeMin":0,
+      "latitudeMax":0,
+      "longitudeMin":0,
+      "longitudeMax":0,
+      "avgRdLgthMin":0,
+      "avgRdLgthMax":0
     }
   },
 
@@ -19,7 +27,7 @@ var ExploreFilters = React.createClass({
     this.state[type] = value;
     this.setState(this.state);
 
-    var querytype = 0; //for a selectField, api query type will be ==
+    var querytype = 8; //for a selectField, api query type will always be ==
 
     if (value=="All") {
       this.props.removeRule(type);
@@ -27,15 +35,50 @@ var ExploreFilters = React.createClass({
       var dbRule = {
         "field":type,
         "type":querytype,
-        "value":value
+        "value":[value]
       }
       var key = dbRule["field"]
-      console.log('key',key)
       this.props.addRule(dbRule,key);
     }
 
-    //this.props.applyRules(rules);
+    //this.props.applyRules(this.props.rules);
   },
+
+
+  handleMinChange : function(type, field, value) {
+    this.state[type] = value;
+    this.setState(this.state);
+
+    var querytype = 4; //for a range minimum, api query type will always be >=
+
+    var dbRule = {
+      "field":field,
+      "type":querytype,
+      "value":[value]
+    }
+    var key = type
+    this.props.addRule(dbRule,key);
+    //this.props.applyRules(this.props.rules);
+  },
+
+  handleMaxChange : function(type, field, value) {
+    this.state[type] = value;
+    this.setState(this.state);
+
+    var querytype = 3; //for a range maximum, api query type will always be <=
+
+    var dbRule = {
+      "field":field,
+      "type":querytype,
+      "value":[value]
+    }
+    var key = type
+    this.props.addRule(dbRule,key);
+    //this.props.applyRules(this.props.rules);
+  },
+
+
+  //define handleMinRangeChange and handleMaxRangeChange functions
 
   render : function() {
     return (
@@ -43,28 +86,52 @@ var ExploreFilters = React.createClass({
         <MuiThemeProvider>
           <div>
             <h4>Library Source</h4>
-            <SelectField value={this.state.library_source} onChange={this.handleSelectChange.bind(this,'library_source')}>
+            <SelectField value={this.state.library_source} onChange={this.handleSelectChange.bind(this,"library_source")}>
               <MenuItem value={"All"} primaryText="All" />
-              <MenuItem value={"GENOMIC"} primaryText="Genomic" />
-              <MenuItem value={"METAGENOMIC"} primaryText="Metagenomic" />
-              <MenuItem value={"TRANSCRIPTOMIC"} primaryText="Transcriptomic" />
-              <MenuItem value={"METATRANSCRIPTOMIC"} primaryText="Metatranscriptomic" />
-              <MenuItem value={"SYNTHETIC"} primaryText="Synthetic" />
-              <MenuItem value={"VIRAL RNA"} primaryText="Viral RNA" />
-              <MenuItem value={"OTHER"} primaryText="Other" />
+              {
+                Object
+                .keys(this.props.summaryData.library_source_summary)
+                .map(key => <MenuItem key={key} value={key} primaryText={key} />)
+              }
             </SelectField>
 
             <h4>Choose Environmental Package</h4>
-            <SelectField value={this.state.env_package} onChange={this.handleSelectChange.bind(this,'env_package')}>
+            <SelectField value={this.state.env_package} onChange={this.handleSelectChange.bind(this,"env_package")}>
               <MenuItem value={"All"} primaryText="All" />
               {
                 Object
                 .keys(this.props.summaryData.env_package_summary)
-                .map(key => <MenuItem key={key} value={{key}} primaryText={key} />)
+                .map(key => <MenuItem key={key} value={key} primaryText={key} />)
               }
             </SelectField>
-            //<h4> Latitude </h4>
-            //<LatFilter/>
+
+            <h4>Investigation Type</h4>
+            <SelectField value={this.state.investigation_type} onChange={this.handleSelectChange.bind(this,"investigation_type")}>
+              <MenuItem value={"All"} primaryText="All" />
+              {
+                Object
+                .keys(this.props.summaryData.investigation_type_summary)
+                .map(key => <MenuItem key={key} value={key} primaryText={key} />)
+              }
+            </SelectField>
+            <h4>Latitude</h4>
+            <LatitudeSliders handleMinChange={this.handleMinChange}
+              handleMaxChange={this.handleMaxChange}
+              latitudeMin={this.state.latitudeMin}
+              latitudeMax={this.state.latitudeMax}
+            />
+          <h4>Longitude</h4>
+            <LongitudeSliders handleMinChange={this.handleMinChange}
+              handleMaxChange={this.handleMaxChange}
+              latitudeMin={this.state.longitudeMin}
+              latitudeMax={this.state.longitudeMax}
+            />
+          <h4>Enter an Average Read Length minimum and maximum</h4>
+            <AvgReadLengthSlider handleMinChange={this.handleMinChange}
+              handleMaxChange={this.handleMaxChange}
+              avgRdLgthMin={this.state.avgRdLgthMin}
+              avgRdLgthMax={this.state.avgRdLgthMax}
+            />
           </div>
         </MuiThemeProvider>
       </div>

@@ -213,7 +213,10 @@ class CreateDataset(Resource):
             parser.add_argument('collection_date',type=str)
 
             args = parser.parse_args()
-            datetimeguess = dateparser.parse(args['collection_date'])
+            try:
+                datetimeguess = dateparser.parse(row['collection_date'])
+            except ValueError:
+                datetimeguess = None
 
             newDataset = Dataset(args['biosample_link'],args['sample_title'],args['investigation_type'],args['library_source'], args['env_package'],datetimeguess, args['latitude'], args['longitude'], args['avg_read_length'], args['total_num_reads'], args['total_num_bases'], args['download_size'],args['avg_percent_gc'])
             db.session.add(newDataset)

@@ -28,37 +28,7 @@ var apiRequest = axios.create({
 var Explore = React.createClass({
   getInitialState : function() {
     return {
-      'fullData': [
-    {
-      "avg_percent_gc": 0.51,
-      "avg_read_length": 0,
-      "biosample_link": "\"https://www.ncbi.nlm.nih.gov/biosample/5560474\"",
-      "download_size": 0,
-      "env_package": "\"water\"",
-      "investigation_type": "",
-      "latitude": 44.8016,
-      "library_source": "\"genomic\"",
-      "longitude": -110.729,
-      "sample_title": "\"Bacillus licheniformis ASZ2 isolated from Yellowstone National Park\"",
-      "total_num_bases": 0,
-      "total_num_reads": 0,
-      "uri": "http://127.0.0.1:5000/api/dataset/1"
-    },
-    {
-      "avg_percent_gc": 0.51,
-      "avg_read_length": 0,
-      "biosample_link": "\"https://www.ncbi.nlm.nih.gov/biosample/5560474\"",
-      "download_size": 0,
-      "env_package": "\"water\"",
-      "investigation_type": "\"bacteria\"",
-      "latitude": 44.8016,
-      "library_source": "\"genomic\"",
-      "longitude": -110.729,
-      "sample_title": "\"Bacillus licheniformis ASZ2 isolated from Yellowstone National Park\"",
-      "total_num_bases": 0,
-      "total_num_reads": 0,
-      "uri": "http://127.0.0.1:5000/api/dataset/2"
-    }],
+      'fullData': [],
       'rules':[],
       'discoveryId':null,
       "summaryData":[],
@@ -106,12 +76,18 @@ var Explore = React.createClass({
   },
 
   addRule(rule,key) {
-  //update our state
   const rules = {...this.state.rules}; //make copy existing state
-  //add in our new rule
+  //add in our new rule; append "value" field as array oldarray.concat(newarray); (might mess up e.g. ranges where don't want mult; maybe separate AddMultRule and AddSingleRule fns)
   rules[key] = rule;
   //set state
-  this.setState({"rules": rules})
+  this.setState({"rules": rules});
+  //update summaryData state according to rules; call SearchDatasetSummary
+  //var self = this;
+  //apiRequest.post("/datasets/search/summary", [this.state.rules])
+  //.then(function (response) {
+  //  console.log(response);
+  //  self.setState({"summaryData": response.data.summary});
+  //});
   },
 
   removeRule(key) {
@@ -119,6 +95,7 @@ var Explore = React.createClass({
   rules[key] = null;
   //set state
   this.setState({"rules": rules})
+  //update summaryData state according to rules; call SearchDatasetSummary
   },
 
   submitDiscovery : function() {
@@ -137,15 +114,20 @@ var Explore = React.createClass({
 
   render : function() {
     if (!this.state.loaded) return <Loading/>;
-    console.log(this.state);
+    console.log(this.state.rules);
     return (
       <div>
         <Header history={this.props.history}/>
           <h2>Explore Data</h2>
           <MuiThemeProvider>
-            <div>
+            <div style={{distplay:'flex'}}>
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
-                <ExploreFilters applyRules={this.applyRules} addRule={this.addRule} removeRule={this.removeRule} summaryData={this.state.summaryData}/>
+                <ExploreFilters applyRules={this.applyRules}
+                  addRule={this.addRule}
+                  removeRule={this.removeRule}
+                  summaryData={this.state.summaryData}
+                  rules={this.state.rules}
+                  />
                 <RaisedButton
                   style={{'margin':'12px 12px 0 12px'}}
                   onClick={this.submitDiscovery}
