@@ -1,9 +1,6 @@
 import React from 'react';
 import axios from 'axios';
 
-// Firebase imports / setup
-import Rebase from 're-base';
-
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Paper from 'material-ui/Paper';
@@ -19,11 +16,6 @@ import ExploreSummaryStats from './ExploreSummaryStats';
 import Loading from './Loading';
 import Histogramrd3 from './Histogramrd3';
 
-
-// Firebase setup
-var firebaseEndpoint = 'https://metaseq-6b779.firebaseio.com/';
-var base = Rebase.createClass(firebaseEndpoint);
-
 var apiRequest = axios.create({
   baseURL: 'http://127.0.0.1:5000/api/'
 });
@@ -32,11 +24,15 @@ var Explore = React.createClass({
   getInitialState : function() {
     return {
       'fullData': [],
-      'rules':[],
-      'discoveryId':null,
+      'activeData': [],
       "summaryData":[],
+<<<<<<< HEAD
       "loaded":false,
       "histinput":"avg_read_length_summary"
+=======
+      "filter_params":"",
+      "loaded":false
+>>>>>>> origin/master
     }
   },
 
@@ -44,76 +40,53 @@ var Explore = React.createClass({
     var self = this;
     apiRequest.get("/datasets/summary")
     .then(function (response) {
-      self.setState({"summaryData": response.data.summary,
-        "loaded":true
-      });
-    })
-    this.state.activeData = this.state.fullData;
-    this.setState({ 'activeData' : this.state.fullData});
-  },
-  componentWillUnmount : function() {
-    base.removeBinding(this.ref);
-  },
+      // store the summary data response
+      self.setState({"summaryData": response.data.summary,"loaded":true});
 
-  applyRules : function(rules) {
-    // I think this should be changed so that a SearchDatasetsSummary api call is made, updating the summaryData
-    //if this.state.summaryData.totalDatasets < threshold, can send fullData
-    if (rules) {
-      var tableData = this.state.fullData;
-      for (var i = 0;i < rules.length;i++) {
-        // don't love this because it loops through every row once per rule (and we may have a lot!)
-        tableData = tableData.filter(function(row) {
-          if (row[rules[i].field] == rules[i].value) {
-            return true;
-          } else {
-            return false;
-          }
-        });
+      // if there aren't too many datasets, just get 'em all
+      if (response.data.summary.totalDatasets < 1000) {
+        apiRequest.get("/datasets")
+        .then(function (response) {
+          // store the full response and set loaded to true
+          self.setState({"fullData": response.data.datasets,"activeData" : response.data.datasets,"loaded":true});
+          self.state.activeData = self.state.fullData;
+          self.setState({ });
+        })
+      } else {
+        self.setState({"loaded":true});
       }
-      this.state.activeData = tableData;
-      //this.state.rules = rules;
-      this.setState(this.state);
-    }
-    else {
-      this.setState({ 'activeData' : this.state.fullData});
-    }
+    });
   },
 
-  addRule(rule,key) {
-  const rules = {...this.state.rules}; //make copy existing state
-  //add in our new rule; append "value" field as array oldarray.concat(newarray); (might mess up e.g. ranges where don't want mult; maybe separate AddMultRule and AddSingleRule fns)
-  rules[key] = rule;
-  //set state
-  this.setState({"rules": rules});
-  //update summaryData state according to rules; call SearchDatasetSummary
-  //var self = this;
-  //apiRequest.post("/datasets/search/summary", [this.state.rules])
-  //.then(function (response) {
-  //  console.log(response);
-  //  self.setState({"summaryData": response.data.summary});
-  //});
-  },
-
-  removeRule(key) {
-  const rules = {...this.state.rules}; //make copy existing state
-  rules[key] = null;
-  //set state
-  this.setState({"rules": rules})
-  //update summaryData state according to rules; call SearchDatasetSummary
+  updateFilterParams : function(filterStates) {
+    filterStates = Object.values(filterStates).filter(function(ruleObject){
+      if (ruleObject.value == "All") {
+        return false;
+      }
+      if (("field" in ruleObject) && ("value" in ruleObject) && ("type" in ruleObject)) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    this.state.filter_params = JSON.stringify({"rules":filterStates});
+    this.setState({"filter_params":JSON.stringify({"rules":filterStates})});
   },
 
   submitDiscovery : function() {
-    var discoveryId = (new Date()).getTime();
-    this.state.discoveryId = discoveryId;
-    this.ref = base.syncState('/discovery/' + this.state.discoveryId, {
-        context: this,
-        state: 'rules'
+    var self = this;
+    /* This is a valid object to pass to the backend:
+    {
+    	"filter_params": {"rules":[{"field":"biosample_link","type":7,"value":"google"}]}
+    }
+    */
+    var ruleObject = {"rules":[{"field":"biosample_link","type":7,"value":"google"}]};
+    apiRequest.post('/discovery/create', {
+      "owner_id":2,
+      "filter_params":JSON.stringify(ruleObject)
+    }).then(function (response) {
+      self.props.history.push('/discovery/' + response.data.discovery.id);
     });
-    this.setState(this.state);
-  },
-
-  openDiscovery : function() {
-    this.props.history.push('/discovery/' + this.state.discoveryId);
   },
 
   handleHistSelect : function(event,index,value) {
@@ -122,34 +95,27 @@ var Explore = React.createClass({
 
   render : function() {
     if (!this.state.loaded) return <Loading/>;
+<<<<<<< HEAD
     console.log(this.state.rules);
     console.log(this.state.summaryData[this.state.histinput])
+=======
+>>>>>>> origin/master
     return (
       <div>
         <Header history={this.props.history}/>
           <h2>Explore Data</h2>
           <MuiThemeProvider>
-            <div style={{distplay:'flex'}}>
+            <div style={{display:'flex'}}>
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
-                <ExploreFilters applyRules={this.applyRules}
-                  addRule={this.addRule}
-                  removeRule={this.removeRule}
+                <RaisedButton
+                style={{'margin':'12px 12px 0 12px'}}
+                onClick={this.submitDiscovery}
+                primary={true}
+                label="Save Discovery"
+                />
+                <ExploreFilters updateFilterParams={this.updateFilterParams}
                   summaryData={this.state.summaryData}
-                  rules={this.state.rules}
                   />
-                <RaisedButton
-                  style={{'margin':'12px 12px 0 12px'}}
-                  onClick={this.submitDiscovery}
-                  primary={true}
-                  label="Save Discovery"
-                />
-                <RaisedButton
-                  style={{'margin':'12px 12px 0 12px'}}
-                  onClick={this.openDiscovery}
-                  primary={true}
-                  disabled={this.state.discoveryId ? false : true}
-                  label="Open Discovery"
-                />
               </Paper>
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
                 <ExploreSummaryStats summaryData={this.state.summaryData}/>

@@ -152,15 +152,6 @@ var AddDatasetForm = React.createClass({
                   <MenuItem value={'edi'} primaryText="EDI" />
                   <MenuItem value={'other'} primaryText="Other" />
                 </FormsySelect>*/}
-
-                <FormsyText
-                  name="seq_method"
-                  validations="isWords"
-                  validationError={errorMessages.wordsError}
-                  //required
-                  hintText="Sequencing Method"
-                  floatingLabelText="Sequencing Method"
-                />
                 <FormsyText
                   name="avg_read_length"
                   validations="isNumeric"

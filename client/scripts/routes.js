@@ -23,9 +23,6 @@ import DiscoveryDetail from './components/DiscoveryDetail';
   Routes
 */
 
-/*
-*/
-
 var routes = (
   <Router history={browserHistory}>
     <Route path="/" component={Welcome}/>

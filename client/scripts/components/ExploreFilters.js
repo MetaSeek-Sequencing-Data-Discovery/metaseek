@@ -6,131 +6,109 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import LatitudeSliders from './LatitudeSliders';
 import LongitudeSliders from './LongitudeSliders';
-import AvgReadLengthSlider from './AvgReadLengthSlider';
+import AverageReadLengthInputs from './AverageReadLengthInputs';
 
 var ExploreFilters = React.createClass({
   getInitialState : function() {
     return {
-      "env_package":0,
-      "library_source":0,
-      "investigation_type":0,
-      "latitudeMin":0,
-      "latitudeMax":0,
-      "longitudeMin":0,
-      "longitudeMax":0,
-      "avgRdLgthMin":0,
-      "avgRdLgthMax":0
+      "filterStates": {
+        "env_package":{
+          "value":"All"
+        },
+        "library_source":{
+          "value":"All"
+        },
+        "investigation_type":{
+          "value":"All"
+        },
+        "latitudeMin":{
+          "value":-90
+        },
+        "latitudeMax":{
+          "value":90
+        },
+        "longitudeMin":{
+          "value":-180
+        },
+        "longitudeMax":{
+          "value":180
+        },
+        "avgRdLgthMin":{
+          "value":0
+        },
+        "avgRdLgthMax":{
+          "value":0
+        }
     }
-  },
+  }
+},
 
-  handleSelectChange : function(type, event, index, value) {
-    this.state[type] = value;
-    this.setState(this.state);
-
-    var querytype = 8; //for a selectField, api query type will always be ==
-
-    if (value=="All") {
-      this.props.removeRule(type);
-    } else {
-      var dbRule = {
-        "field":type,
-        "type":querytype,
-        "value":[value]
-      }
-      var key = dbRule["field"]
-      this.props.addRule(dbRule,key);
-    }
-
-    //this.props.applyRules(this.props.rules);
-  },
-
-
-  handleMinChange : function(type, field, value) {
-    this.state[type] = value;
-    this.setState(this.state);
-
-    var querytype = 4; //for a range minimum, api query type will always be >=
-
-    var dbRule = {
+  handleFilterChange : function(filterName, field, filterType, event, index, value) {
+    var newRule = {
       "field":field,
-      "type":querytype,
-      "value":[value]
-    }
-    var key = type
-    this.props.addRule(dbRule,key);
-    //this.props.applyRules(this.props.rules);
-  },
-
-  handleMaxChange : function(type, field, value) {
-    this.state[type] = value;
+      "type":filterType,
+      "value":value
+    };
+    this.state.filterStates[filterName] = newRule;
     this.setState(this.state);
-
-    var querytype = 3; //for a range maximum, api query type will always be <=
-
-    var dbRule = {
-      "field":field,
-      "type":querytype,
-      "value":[value]
-    }
-    var key = type
-    this.props.addRule(dbRule,key);
-    //this.props.applyRules(this.props.rules);
+    this.props.updateFilterParams(this.state.filterStates);
   },
 
-
-  //define handleMinRangeChange and handleMaxRangeChange functions
+  renderMenuItem : function(value, index) {
+    return (
+      <MenuItem key={index} value={value} primaryText={value} />
+    )
+  },
 
   render : function() {
     return (
       <div>
         <MuiThemeProvider>
           <div>
-            <h4>Library Source</h4>
-            <SelectField value={this.state.library_source} onChange={this.handleSelectChange.bind(this,"library_source")}>
+            {/* Ok, so...let's explain this change handler:
+              onChange={this.handleFilterChange.bind(this,"library_source","library_source",5)}
+              Javascript functions called in an event handler like this are often
+              called with the simpler onChange={this.handleFilterChange}
+              This will call the function with the standard arguments and scope
+              using bind allows us to call it in the same scope (by saying ".bind(this")
+              but then pass in additional arguments indicating the field and the filter type:
+              "library_source","library_source",5
+              These arguments are passed in first, prior to the standard function params.
+               */}
+             <h4>Library Source</h4>
+            <SelectField value={this.state.filterStates.library_source.value} onChange={this.handleFilterChange.bind(this,"library_source","library_source",5)}>
               <MenuItem value={"All"} primaryText="All" />
-              {
-                Object
-                .keys(this.props.summaryData.library_source_summary)
-                .map(key => <MenuItem key={key} value={key} primaryText={key} />)
-              }
+              {Object.keys(this.props.summaryData.library_source_summary)
+                     .map(this.renderMenuItem)}
             </SelectField>
 
             <h4>Choose Environmental Package</h4>
-            <SelectField value={this.state.env_package} onChange={this.handleSelectChange.bind(this,"env_package")}>
+            <SelectField value={this.state.filterStates.env_package.value} onChange={this.handleFilterChange.bind(this,"env_package","env_package",5)}>
               <MenuItem value={"All"} primaryText="All" />
-              {
-                Object
-                .keys(this.props.summaryData.env_package_summary)
-                .map(key => <MenuItem key={key} value={key} primaryText={key} />)
-              }
+              {Object.keys(this.props.summaryData.env_package_summary)
+                     .map(this.renderMenuItem)}
             </SelectField>
 
             <h4>Investigation Type</h4>
-            <SelectField value={this.state.investigation_type} onChange={this.handleSelectChange.bind(this,"investigation_type")}>
+            <SelectField value={this.state.filterStates.investigation_type.value} onChange={this.handleFilterChange.bind(this,"investigation_type","investigation_type",5)}>
               <MenuItem value={"All"} primaryText="All" />
-              {
-                Object
-                .keys(this.props.summaryData.investigation_type_summary)
-                .map(key => <MenuItem key={key} value={key} primaryText={key} />)
-              }
+              {Object.keys(this.props.summaryData.investigation_type_summary)
+                     .map(this.renderMenuItem)}
             </SelectField>
             <h4>Latitude</h4>
-            <LatitudeSliders handleMinChange={this.handleMinChange}
-              handleMaxChange={this.handleMaxChange}
-              latitudeMin={this.state.latitudeMin}
-              latitudeMax={this.state.latitudeMax}
+            <LatitudeSliders handleFilterChange={this.handleFilterChange}
+              minValue={this.state.filterStates.latitudeMin.value}
+              maxValue={this.state.filterStates.latitudeMax.value}
             />
           <h4>Longitude</h4>
-            <LongitudeSliders handleMinChange={this.handleMinChange}
-              handleMaxChange={this.handleMaxChange}
-              latitudeMin={this.state.longitudeMin}
-              latitudeMax={this.state.longitudeMax}
+            <LongitudeSliders handleFilterChange={this.handleFilterChange}
+              minValue={this.state.filterStates.longitudeMin.value}
+              maxValue={this.state.filterStates.longitudeMax.value}
             />
           <h4>Enter an Average Read Length minimum and maximum</h4>
-            <AvgReadLengthSlider handleMinChange={this.handleMinChange}
-              handleMaxChange={this.handleMaxChange}
-              avgRdLgthMin={this.state.avgRdLgthMin}
-              avgRdLgthMax={this.state.avgRdLgthMax}
+            <AverageReadLengthInputs handleFilterChange={this.handleFilterChange}
+              minValue={this.state.filterStates.avgRdLgthMin.value}
+              maxValue={this.state.filterStates.avgRdLgthMax.value}
             />
           </div>
         </MuiThemeProvider>

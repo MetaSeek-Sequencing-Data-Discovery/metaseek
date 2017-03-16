@@ -214,7 +214,7 @@ class CreateDataset(Resource):
 
             args = parser.parse_args()
             try:
-                datetimeguess = dateparser.parse(row['collection_date'])
+                datetimeguess = dateparser.parse(args['collection_date'])
             except ValueError:
                 datetimeguess = None
 
@@ -369,7 +369,6 @@ class GetDatasetSummary(Resource):
             else:
                 avg_gc_bins[round(k,2)] += v
 
-        #averageLatitude = db.session.query(func.avg(Dataset.latitude)).first()[0]
         return {"summary":{"totalDatasets":int(total),
         "totalDownloadSize":int(total_download_size),
         "investigation_type_summary":investigation_summary,
@@ -488,7 +487,7 @@ class CreateDiscovery(Resource):
             newDiscovery = Discovery(args['owner_id'],args['filter_params'],matchingDatasets)
             db.session.add(newDiscovery)
             db.session.commit()
-            return {"discovery":{"uri":url_for('getdiscovery',id=newDiscovery.id,_external=True)}}
+            return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id,_external=True)}}
 
         except Exception as e:
             return {'error': str(e)}
@@ -515,15 +514,3 @@ api.add_resource(GetAllDiscoveries,     '/api/discoveries')
 # Start the app!
 if __name__ == '__main__':
     app.run(debug=True)
-
-    #load sample data - this is a dumb way to do it because it will continue to upload and reupload it as long as you have the app running
-    #import sframe
-    #sample_data = sframe.SFrame('/Users/Adrienne/Projects/metaseek/DataScraping/db_sample_data')
-    #for row in sample_data:
-#        try:
-#            datetimeguess = dateparser.parse(row['collection_date'])
-#        except ValueError:
-#            datetimeguess = None
-#        newDataset = Dataset(row['biosample_link'],row['sample_title'],row['investigation_type'],row['library_source'], row['env_package'],datetimeguess, row['latitude'], row['longitude'], row['avg_read_length'], row['total_num_reads'], row['total_num_bases'], row['download_size'],row['avg_percent_gc'])
-#        db.session.add(newDataset)
-#        db.session.commit()
