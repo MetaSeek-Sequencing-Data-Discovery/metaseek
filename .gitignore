@@ -88,3 +88,5 @@ DataScraping/db_sample_data/objects.bin
 DataScraping/current_metaseek_colsandtypes.py
 
 DataScraping/MetaSeekColumnLabels.py
+
+client/scripts/components/Histogram.js

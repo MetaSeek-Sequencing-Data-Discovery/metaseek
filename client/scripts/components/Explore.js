@@ -8,6 +8,8 @@ import Rebase from 're-base';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 // My component imports
 import Header from './Header';
@@ -114,9 +116,14 @@ var Explore = React.createClass({
     this.props.history.push('/discovery/' + this.state.discoveryId);
   },
 
+  handleHistSelect : function(event,index,value) {
+    this.setState({"histinput":value})
+  },
+
   render : function() {
     if (!this.state.loaded) return <Loading/>;
     console.log(this.state.rules);
+    console.log(this.state.summaryData[this.state.histinput])
     return (
       <div>
         <Header history={this.props.history}/>
@@ -147,8 +154,15 @@ var Explore = React.createClass({
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
                 <ExploreSummaryStats summaryData={this.state.summaryData}/>
               </Paper>
-              <Paper style={{'width':'40%','margin':'25px auto','padding':25}}>
-                <Histogramrd3/>
+              <Paper style={{'width':'60%','margin':'25px auto','padding':25}}>
+                <Histogramrd3 summaryData={this.state.summaryData} histinput={this.state.histinput}/>
+                  <SelectField value={this.state.histinput} onChange={this.handleHistSelect.bind(this)}>
+                    {
+                      Object
+                      .keys(this.state.summaryData)
+                      .map(key => <MenuItem key={key} value={key} primaryText={key} />)
+                    }
+                  </SelectField>
               </Paper>
               <Paper style={{'width':'80%','margin':'25px auto','padding':0}}>
                 <ExploreTable activeData={this.state.activeData}/>
