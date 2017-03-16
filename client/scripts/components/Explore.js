@@ -1,9 +1,6 @@
 import React from 'react';
 import axios from 'axios';
 
-// Firebase imports / setup
-import Rebase from 're-base';
-
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Paper from 'material-ui/Paper';
@@ -15,11 +12,6 @@ import ExploreFilters from './ExploreFilters';
 import ExploreTable from './ExploreTable';
 import ExploreSummaryStats from './ExploreSummaryStats';
 import Loading from './Loading';
-
-
-// Firebase setup
-var firebaseEndpoint = 'https://metaseq-6b779.firebaseio.com/';
-var base = Rebase.createClass(firebaseEndpoint);
 
 var apiRequest = axios.create({
   baseURL: 'http://127.0.0.1:5000/api/'
@@ -111,6 +103,18 @@ var Explore = React.createClass({
 
     /* This is a valid object to pass to the backend:
     {
+    	"filter_params": {"rules":[{"field":"biosample_link","type":7,"value":"google"}]}
+    }
+    */
+
+    var ruleObject = {"rules":[{"field":"biosample_link","type":7,"value":"google"}]};
+    apiRequest.post('/discovery/create', {
+      "owner_id":2,
+      "filter_params":JSON.stringify(ruleObject)
+    }).then(function (response) {
+      console.log(response.data);
+      self.props.history.push('/discovery/' + response.data.discovery.id);
+    });
   },
 
   render : function() {
@@ -121,7 +125,14 @@ var Explore = React.createClass({
         <Header history={this.props.history}/>
           <h2>Explore Data</h2>
           <MuiThemeProvider>
+            <div style={{display:'flex'}}>
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
+                <RaisedButton
+                style={{'margin':'12px 12px 0 12px'}}
+                onClick={this.submitDiscovery}
+                primary={true}
+                label="Save Discovery"
+                />
                 <ExploreFilters applyRules={this.applyRules}
                   addRule={this.addRule}
                   removeRule={this.removeRule}
