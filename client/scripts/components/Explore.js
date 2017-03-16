@@ -113,7 +113,7 @@ var Explore = React.createClass({
                 <ExploreSummaryStats summaryData={this.state.summaryData}/>
               </Paper>
               <Paper style={{'width':'60%','margin':'25px auto','padding':25}}>
-                <Histogramrd3 summaryData={this.state.summaryData} histinput={this.state.histinput}/>
+                <Histogram summaryData={this.state.summaryData} histinput={this.state.histinput}/>
                   <SelectField value={this.state.histinput} onChange={this.handleHistSelect.bind(this)}>
                     {
                       Object

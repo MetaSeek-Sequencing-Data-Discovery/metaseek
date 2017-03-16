@@ -3,7 +3,7 @@ import rd3 from 'rd3';
 
 const BarChart = rd3.BarChart;
 
-var Histogramrd3 = React.createClass({
+var Histogram = React.createClass({
   getInitialState : function() {
     return {
       "data":[],
@@ -38,4 +38,4 @@ var Histogramrd3 = React.createClass({
   )}
 });
 
-export default Histogramrd3;
+export default Histogram;
