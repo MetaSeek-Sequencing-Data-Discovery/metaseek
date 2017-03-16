@@ -514,15 +514,3 @@ api.add_resource(GetAllDiscoveries,     '/api/discoveries')
 # Start the app!
 if __name__ == '__main__':
     app.run(debug=True)
-
-    #load sample data - this is a dumb way to do it because it will continue to upload and reupload it as long as you have the app running
-    #import sframe
-    #sample_data = sframe.SFrame('/Users/Adrienne/Projects/metaseek/DataScraping/db_sample_data')
-    #for row in sample_data:
-#        try:
-#            datetimeguess = dateparser.parse(row['collection_date'])
-#        except ValueError:
-#            datetimeguess = None
-#        newDataset = Dataset(row['biosample_link'],row['sample_title'],row['investigation_type'],row['library_source'], row['env_package'],datetimeguess, row['latitude'], row['longitude'], row['avg_read_length'], row['total_num_reads'], row['total_num_bases'], row['download_size'],row['avg_percent_gc'])
-#        db.session.add(newDataset)
-#        db.session.commit()
