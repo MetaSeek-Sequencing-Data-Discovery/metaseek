@@ -369,7 +369,6 @@ class GetDatasetSummary(Resource):
             else:
                 avg_gc_bins[round(k,2)] += v
 
-        #averageLatitude = db.session.query(func.avg(Dataset.latitude)).first()[0]
         return {"summary":{"totalDatasets":int(total),
         "totalDownloadSize":int(total_download_size),
         "investigation_type_summary":investigation_summary,

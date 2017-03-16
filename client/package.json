@@ -1,12 +1,12 @@
 {
-  "name": "MetaSEQ",
-  "version": "0.0.1",
-  "description": "MetaSEQ is a data discovery and analysis tool for genome sequencing data. Providing a rich front-end for exploration of metadata across a wide set of data repositories, use MetaSEQ to find the right aggregation of sequences for your analysis, and then access the raw sequencing data.",
+  "name": "MetaSeek",
+  "version": "0.0.2",
+  "description": "MetaSeek is a data discovery and analysis tool for genome sequencing data. Providing a rich front-end for exploration of metadata across a wide set of data repositories, use MetaSeek to find the right aggregation of sequences for your analysis, and then access the raw sequencing data.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Nick Brown",
+  "author": "Nick Brown, Adrienne Hoarfrost",
   "license": "MIT",
   "devDependencies": {
     "autobind-decorator": "1.3.2",
