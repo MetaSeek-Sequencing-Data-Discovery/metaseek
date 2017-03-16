@@ -51,7 +51,7 @@ var ExploreFilters = React.createClass({
     };
     this.state.filterStates[filterName] = newRule;
     this.setState(this.state);
-    //this.props.applyRules();
+    this.props.updateFilterParams(this.state.filterStates);
   },
 
   renderMenuItem : function(value, index) {

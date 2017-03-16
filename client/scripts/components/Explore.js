@@ -22,9 +22,8 @@ var Explore = React.createClass({
     return {
       'fullData': [],
       'activeData': [],
-      'rules':[],
-      'discoveryId':null,
       "summaryData":[],
+      "filter_params":"",
       "loaded":false
     }
   },
@@ -51,75 +50,39 @@ var Explore = React.createClass({
     });
   },
 
-  applyRules : function(rules) {
-    // I think this should be changed so that a SearchDatasetsSummary api call is made, updating the summaryData
-    //if this.state.summaryData.totalDatasets < threshold, can send fullData
-    if (rules) {
-      var tableData = this.state.fullData;
-      for (var i = 0;i < rules.length;i++) {
-        // don't love this because it loops through every row once per rule (and we may have a lot!)
-        tableData = tableData.filter(function(row) {
-          if (row[rules[i].field] == rules[i].value) {
-            return true;
-          } else {
-            return false;
-          }
-        });
+  updateFilterParams : function(filterStates) {
+    filterStates = Object.values(filterStates).filter(function(ruleObject){
+      if (ruleObject.value == "All") {
+        return false;
       }
-      this.state.activeData = tableData;
-      //this.state.rules = rules;
-      this.setState(this.state);
-    }
-    else {
-      this.setState({ 'activeData' : this.state.fullData});
-    }
-  },
-
-  addRule(rule,key) {
-    const rules = {...this.state.rules}; //make copy existing state
-    //add in our new rule; append "value" field as array oldarray.concat(newarray); (might mess up e.g. ranges where don't want mult; maybe separate AddMultRule and AddSingleRule fns)
-    rules[key] = rule;
-    //set state
-    this.setState({"rules": rules});
-    //update summaryData state according to rules; call SearchDatasetSummary
-    //var self = this;
-    //apiRequest.post("/datasets/search/summary", [this.state.rules])
-    //.then(function (response) {
-    //  console.log(response);
-    //  self.setState({"summaryData": response.data.summary});
-    //});
-  },
-
-  removeRule(key) {
-    const rules = {...this.state.rules}; //make copy existing state
-    rules[key] = null;
-    //set state
-    this.setState({"rules": rules})
-    //update summaryData state according to rules; call SearchDatasetSummary
+      if (("field" in ruleObject) && ("value" in ruleObject) && ("type" in ruleObject)) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    this.state.filter_params = JSON.stringify({"rules":filterStates});
+    this.setState({"filter_params":JSON.stringify({"rules":filterStates})});
   },
 
   submitDiscovery : function() {
     var self = this;
-
     /* This is a valid object to pass to the backend:
     {
     	"filter_params": {"rules":[{"field":"biosample_link","type":7,"value":"google"}]}
     }
     */
-
     var ruleObject = {"rules":[{"field":"biosample_link","type":7,"value":"google"}]};
     apiRequest.post('/discovery/create', {
       "owner_id":2,
       "filter_params":JSON.stringify(ruleObject)
     }).then(function (response) {
-      console.log(response.data);
       self.props.history.push('/discovery/' + response.data.discovery.id);
     });
   },
 
   render : function() {
     if (!this.state.loaded) return <Loading/>;
-    console.log(this.state.rules);
     return (
       <div>
         <Header history={this.props.history}/>
@@ -133,11 +96,8 @@ var Explore = React.createClass({
                 primary={true}
                 label="Save Discovery"
                 />
-                <ExploreFilters applyRules={this.applyRules}
-                  addRule={this.addRule}
-                  removeRule={this.removeRule}
+                <ExploreFilters updateFilterParams={this.updateFilterParams}
                   summaryData={this.state.summaryData}
-                  rules={this.state.rules}
                   />
               </Paper>
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
