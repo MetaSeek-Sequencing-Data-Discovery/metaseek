@@ -487,7 +487,7 @@ class CreateDiscovery(Resource):
             newDiscovery = Discovery(args['owner_id'],args['filter_params'],matchingDatasets)
             db.session.add(newDiscovery)
             db.session.commit()
-            return {"discovery":{"uri":url_for('getdiscovery',id=newDiscovery.id,_external=True)}}
+            return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id,_external=True)}}
 
         except Exception as e:
             return {'error': str(e)}

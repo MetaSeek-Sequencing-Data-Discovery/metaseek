@@ -29,6 +29,7 @@ var Explore = React.createClass({
   getInitialState : function() {
     return {
       'fullData': [],
+      'activeData': [],
       'rules':[],
       'discoveryId':null,
       "summaryData":[],
@@ -40,15 +41,22 @@ var Explore = React.createClass({
     var self = this;
     apiRequest.get("/datasets/summary")
     .then(function (response) {
-      self.setState({"summaryData": response.data.summary,
-        "loaded":true
-      });
-    })
-    this.state.activeData = this.state.fullData;
-    this.setState({ 'activeData' : this.state.fullData});
-  },
-  componentWillUnmount : function() {
-    base.removeBinding(this.ref);
+      // store the summary data response
+      self.setState({"summaryData": response.data.summary,"loaded":true});
+
+      // if there aren't too many datasets, just get 'em all
+      if (response.data.summary.totalDatasets < 1000) {
+        apiRequest.get("/datasets")
+        .then(function (response) {
+          // store the full response and set loaded to true
+          self.setState({"fullData": response.data.datasets,"activeData" : response.data.datasets,"loaded":true});
+          self.state.activeData = self.state.fullData;
+          self.setState({ });
+        })
+      } else {
+        self.setState({"loaded":true});
+      }
+    });
   },
 
   applyRules : function(rules) {
@@ -76,40 +84,33 @@ var Explore = React.createClass({
   },
 
   addRule(rule,key) {
-  const rules = {...this.state.rules}; //make copy existing state
-  //add in our new rule; append "value" field as array oldarray.concat(newarray); (might mess up e.g. ranges where don't want mult; maybe separate AddMultRule and AddSingleRule fns)
-  rules[key] = rule;
-  //set state
-  this.setState({"rules": rules});
-  //update summaryData state according to rules; call SearchDatasetSummary
-  //var self = this;
-  //apiRequest.post("/datasets/search/summary", [this.state.rules])
-  //.then(function (response) {
-  //  console.log(response);
-  //  self.setState({"summaryData": response.data.summary});
-  //});
+    const rules = {...this.state.rules}; //make copy existing state
+    //add in our new rule; append "value" field as array oldarray.concat(newarray); (might mess up e.g. ranges where don't want mult; maybe separate AddMultRule and AddSingleRule fns)
+    rules[key] = rule;
+    //set state
+    this.setState({"rules": rules});
+    //update summaryData state according to rules; call SearchDatasetSummary
+    //var self = this;
+    //apiRequest.post("/datasets/search/summary", [this.state.rules])
+    //.then(function (response) {
+    //  console.log(response);
+    //  self.setState({"summaryData": response.data.summary});
+    //});
   },
 
   removeRule(key) {
-  const rules = {...this.state.rules}; //make copy existing state
-  rules[key] = null;
-  //set state
-  this.setState({"rules": rules})
-  //update summaryData state according to rules; call SearchDatasetSummary
+    const rules = {...this.state.rules}; //make copy existing state
+    rules[key] = null;
+    //set state
+    this.setState({"rules": rules})
+    //update summaryData state according to rules; call SearchDatasetSummary
   },
 
   submitDiscovery : function() {
-    var discoveryId = (new Date()).getTime();
-    this.state.discoveryId = discoveryId;
-    this.ref = base.syncState('/discovery/' + this.state.discoveryId, {
-        context: this,
-        state: 'rules'
-    });
-    this.setState(this.state);
-  },
+    var self = this;
 
-  openDiscovery : function() {
-    this.props.history.push('/discovery/' + this.state.discoveryId);
+    /* This is a valid object to pass to the backend:
+    {
   },
 
   render : function() {
@@ -120,7 +121,6 @@ var Explore = React.createClass({
         <Header history={this.props.history}/>
           <h2>Explore Data</h2>
           <MuiThemeProvider>
-            <div style={{distplay:'flex'}}>
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
                 <ExploreFilters applyRules={this.applyRules}
                   addRule={this.addRule}
@@ -128,19 +128,6 @@ var Explore = React.createClass({
                   summaryData={this.state.summaryData}
                   rules={this.state.rules}
                   />
-                <RaisedButton
-                  style={{'margin':'12px 12px 0 12px'}}
-                  onClick={this.submitDiscovery}
-                  primary={true}
-                  label="Save Discovery"
-                />
-                <RaisedButton
-                  style={{'margin':'12px 12px 0 12px'}}
-                  onClick={this.openDiscovery}
-                  primary={true}
-                  disabled={this.state.discoveryId ? false : true}
-                  label="Open Discovery"
-                />
               </Paper>
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
                 <ExploreSummaryStats summaryData={this.state.summaryData}/>
