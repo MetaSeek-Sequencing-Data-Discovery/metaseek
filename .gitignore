@@ -11,6 +11,7 @@ DataScraping/archive/*
 *.xls
 *.ipynb
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 DataScraping/MGRAST/MGRAST_scrape.py
 
@@ -29,3 +30,5 @@ DataScraping/current_metaseek_colsandtypes.py
 DataScraping/MetaSeekColumnLabels.py
 =======
 >>>>>>> origin/master
+=======
+>>>>>>> 6446de5baacf6b872e3fd5014fde6012bc5664de

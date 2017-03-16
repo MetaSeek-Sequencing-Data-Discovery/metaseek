@@ -14,7 +14,7 @@ import ExploreFilters from './ExploreFilters';
 import ExploreTable from './ExploreTable';
 import ExploreSummaryStats from './ExploreSummaryStats';
 import Loading from './Loading';
-import Histogramrd3 from './Histogramrd3';
+import Histogram from './Histogram';
 
 var apiRequest = axios.create({
   baseURL: 'http://127.0.0.1:5000/api/'
@@ -26,13 +26,10 @@ var Explore = React.createClass({
       'fullData': [],
       'activeData': [],
       "summaryData":[],
-<<<<<<< HEAD
       "loaded":false,
-      "histinput":"avg_read_length_summary"
-=======
+      "histinput":"avg_read_length_summary",
       "filter_params":"",
       "loaded":false
->>>>>>> origin/master
     }
   },
 
@@ -95,11 +92,6 @@ var Explore = React.createClass({
 
   render : function() {
     if (!this.state.loaded) return <Loading/>;
-<<<<<<< HEAD
-    console.log(this.state.rules);
-    console.log(this.state.summaryData[this.state.histinput])
-=======
->>>>>>> origin/master
     return (
       <div>
         <Header history={this.props.history}/>
