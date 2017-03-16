@@ -214,7 +214,7 @@ class CreateDataset(Resource):
 
             args = parser.parse_args()
             try:
-                datetimeguess = dateparser.parse(row['collection_date'])
+                datetimeguess = dateparser.parse(args['collection_date'])
             except ValueError:
                 datetimeguess = None
 
