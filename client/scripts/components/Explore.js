@@ -67,15 +67,9 @@ var Explore = React.createClass({
 
   submitDiscovery : function() {
     var self = this;
-    /* This is a valid object to pass to the backend:
-    {
-    	"filter_params": {"rules":[{"field":"biosample_link","type":7,"value":"google"}]}
-    }
-    */
-    var ruleObject = {"rules":[{"field":"biosample_link","type":7,"value":"google"}]};
     apiRequest.post('/discovery/create', {
-      "owner_id":2,
-      "filter_params":JSON.stringify(ruleObject)
+      "owner_id":1,
+      "filter_params":this.state.filter_params
     }).then(function (response) {
       self.props.history.push('/discovery/' + response.data.discovery.id);
     });
