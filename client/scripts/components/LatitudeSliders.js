@@ -10,26 +10,16 @@ import Slider from 'material-ui/Slider';
      }
    },
 
-   handleMinSlider : function(event) {
-     var value=this.state.minSlider;
-     var type="latitude_min";
-     var field="latitude";
-     this.props.handleMinChange(type,field,value);
-   },
-
-   handleMaxSlider : function(event) {
-     var value=this.state.maxSlider;
-     var type="latitude_max";
-     var field="latitude";
-     this.props.handleMaxChange(type,field,value);
-   },
-
    handleMinValue : function(event, value) {
      this.setState({"minSlider": value});
    },
 
    handleMaxValue : function(event, value) {
      this.setState({"maxSlider": value});
+   },
+
+   handleDragStop : function(filterName, field, filterType, dragValue) {
+     this.props.handleFilterChange(filterName, field, filterType, event, null, dragValue);
    },
 
   render : function() {
@@ -43,20 +33,20 @@ import Slider from 'material-ui/Slider';
           <Slider
             min={-90}
             max={90}
-            step={0.5}
+            step={1}
             defaultValue={-90}
             value={this.state.minSlider}
             onChange={this.handleMinValue}
-            onDragStop={this.handleMinSlider}
+            onDragStop={this.handleDragStop.bind(this,"latitudeMin","latitude",4,this.state.minSlider)}
           />
           <Slider
             min={-90}
             max={90}
-            step={0.5}
+            step={1}
             defaultValue={90}
             value={this.state.maxSlider}
             onChange={this.handleMaxValue}
-            onDragStop={this.handleMaxSlider}
+            onDragStop={this.handleDragStop.bind(this,"latitudeMax","latitude",3,this.state.maxSlider)}
           />
         </div>
       </div>

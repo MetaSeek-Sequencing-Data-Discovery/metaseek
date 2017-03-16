@@ -3,7 +3,7 @@ import Slider from 'material-ui/Slider';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 
- var AvgReadLengthSlider = React.createClass({
+ var AverageReadLengthInputs = React.createClass({
    getInitialState : function() {
      return {
        "minValue":'',
@@ -11,18 +11,8 @@ import RaisedButton from 'material-ui/RaisedButton';
      }
    },
 
-   handleMinRange : function(event, value) {
-     var value=this.state.minValue;
-     var type="avgrdlgth_min";
-     var field="avg_read_length";
-     this.props.handleMinChange(type,field,value);
-   },
-
-   handleMaxRange : function(event, value) {
-     var value=this.state.maxValue;
-     var type="avgrdlgth_max";
-     var field="avg_read_length";
-     this.props.handleMaxChange(type,field,value);
+   handleSubmit : function(filterName, field, filterType, fieldValue, event) {
+     this.props.handleFilterChange(filterName, field, filterType, event, null, fieldValue);
    },
 
    handleMinValue : function(event, value) {
@@ -45,9 +35,11 @@ import RaisedButton from 'material-ui/RaisedButton';
             style={{'width':'20%'}}
           />
           <RaisedButton secondary={true} labelStyle={{'fontSize':'11px'}}
-          label="submit min"
-          onTouchTap={this.handleMinRange}/>
+            label="submit min"
+            onTouchTap={this.handleSubmit.bind(this,"avgRdLgthMin","avg_read_length",4,this.state.minValue)}/>
+
           <span>- - - -     Average Read Length     - - - -</span>
+
           <TextField
             hintText="enter a number"
             value={this.state.maxValue}
@@ -56,11 +48,11 @@ import RaisedButton from 'material-ui/RaisedButton';
           />
           <RaisedButton secondary={true} labelStyle={{'fontSize':'11px'}}
           label="submit max"
-          onTouchTap={this.handleMaxRange}/>
+          onTouchTap={this.handleSubmit.bind(this,"avgRdLgthMax","avg_read_length",3,this.state.maxValue)}/>
         </div>
       </div>
     );
   }
 });
 
-export default AvgReadLengthSlider;
+export default AverageReadLengthInputs;
