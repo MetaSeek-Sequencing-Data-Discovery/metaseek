@@ -10,25 +10,3 @@ DataScraping/*
 *.docx
 *.xls
 *.ipynb
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-DataScraping/MGRAST/MGRAST_scrape.py
-
-DataScraping/iMicrobe/iMicrobe_scrape_np.py
-
-DataScraping/Genbank/merge_insdc_scrapes.py
-
-DataScraping/Genbank/make_metaseek_insdc.py
-
-DataScraping/Genbank/merge_scrapes_fns.py
-
-DataScraping/db_sample_data/objects.bin
-
-DataScraping/current_metaseek_colsandtypes.py
-
-DataScraping/MetaSeekColumnLabels.py
-=======
->>>>>>> origin/master
-=======
->>>>>>> 6446de5baacf6b872e3fd5014fde6012bc5664de

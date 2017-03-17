@@ -27,7 +27,6 @@ var Explore = React.createClass({
       'fullData': [],
       'activeData': [],
       "summaryData":[],
-      "loaded":false,
       "histinput":"avg_read_length_summary",
       "filter_params":"",
       "loaded":false
