@@ -114,7 +114,7 @@ var Explore = React.createClass({
               </Paper>
               <Paper style={{'width':'60%','margin':'25px auto','padding':25}}>
                 <Histogram summaryData={this.state.summaryData} histinput={this.state.histinput}/>
-                  <SelectField value={this.state.histinput} onChange={this.handleHistSelect.bind(this)}>
+                  <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
                     {
                       Object
                       .keys(this.state.summaryData)
