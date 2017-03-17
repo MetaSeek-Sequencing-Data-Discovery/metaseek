@@ -25,9 +25,6 @@ var Histogram = React.createClass({
       }
     ];
 
-    console.log(data);
-    console.log(values);
-
     return  (
     	<BarChart
       data={barData}
