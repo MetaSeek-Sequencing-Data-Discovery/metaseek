@@ -21,8 +21,9 @@ var Explore = React.createClass({
   getInitialState : function() {
     return {
       'fullData': [],
-      'activeData': [],
       "summaryData":[],
+      'activeData': [],
+      'activeSummaryData': [],
       "filter_params":"",
       "loaded":false
     }
@@ -33,7 +34,8 @@ var Explore = React.createClass({
     apiRequest.get("/datasets/summary")
     .then(function (response) {
       // store the summary data response
-      self.setState({"summaryData": response.data.summary,"loaded":true});
+      self.setState({"summaryData": response.data.summary});
+      self.setState({"activeSummaryData": response.data.summary});
 
       // if there aren't too many datasets, just get 'em all
       if (response.data.summary.totalDatasets < 1000) {
@@ -50,6 +52,16 @@ var Explore = React.createClass({
     });
   },
 
+  updateActiveSummaryData : function() {
+    var self = this;
+    self.setState({"loaded":false});
+    apiRequest.post('/datasets/search/summary', {
+      "filter_params":this.state.filter_params
+    }).then(function (response) {
+      self.setState({"activeSummaryData": response.data.summary,"loaded":true});
+    });
+  },
+
   updateFilterParams : function(filterStates) {
     filterStates = Object.values(filterStates).filter(function(ruleObject){
       if (ruleObject.value == "All") {
@@ -63,6 +75,7 @@ var Explore = React.createClass({
     });
     this.state.filter_params = JSON.stringify({"rules":filterStates});
     this.setState({"filter_params":JSON.stringify({"rules":filterStates})});
+    this.updateActiveSummaryData();
   },
 
   submitDiscovery : function() {
@@ -95,7 +108,7 @@ var Explore = React.createClass({
                   />
               </Paper>
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
-                <ExploreSummaryStats summaryData={this.state.summaryData}/>
+                <ExploreSummaryStats summaryData={this.state.activeSummaryData}/>
               </Paper>
               <Paper style={{'width':'80%','margin':'25px auto','padding':0}}>
                 <ExploreTable activeData={this.state.activeData}/>
