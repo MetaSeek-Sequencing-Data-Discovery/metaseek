@@ -5,6 +5,8 @@ import axios from 'axios';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 // My component imports
 import Header from './Header';
@@ -12,6 +14,8 @@ import ExploreFilters from './ExploreFilters';
 import ExploreTable from './ExploreTable';
 import ExploreSummaryStats from './ExploreSummaryStats';
 import Loading from './Loading';
+import Histogram from './Histogram';
+import HeatmapChart from './HeatmapChart';
 
 var apiRequest = axios.create({
   baseURL: 'http://127.0.0.1:5000/api/'
@@ -21,9 +25,10 @@ var Explore = React.createClass({
   getInitialState : function() {
     return {
       'fullData': [],
-      "summaryData":[],
       'activeData': [],
       'activeSummaryData': [],
+      "summaryData":[],
+      "histinput":"avg_read_length_summary",
       "filter_params":"",
       "loaded":false
     }
@@ -88,6 +93,10 @@ var Explore = React.createClass({
     });
   },
 
+  handleHistSelect : function(event,index,value) {
+    this.setState({"histinput":value})
+  },
+
   render : function() {
     if (!this.state.loaded) return <Loading/>;
     return (
@@ -108,7 +117,20 @@ var Explore = React.createClass({
                   />
               </Paper>
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
-                <ExploreSummaryStats summaryData={this.state.activeSummaryData}/>
+                <ExploreSummaryStats summaryData={this.state.summaryData}/>
+              </Paper>
+              <Paper>
+                <HeatmapChart data={this.state.summaryData.latlon_map}/>
+              </Paper>
+              <Paper style={{'width':'60%','margin':'25px auto','padding':25}}>
+                <Histogram summaryData={this.state.summaryData} histinput={this.state.histinput}/>
+                  <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
+                    {
+                      Object
+                      .keys(this.state.summaryData)
+                      .map(key => <MenuItem key={key} value={key} primaryText={key} />)
+                    }
+                  </SelectField>
               </Paper>
               <Paper style={{'width':'80%','margin':'25px auto','padding':0}}>
                 <ExploreTable activeData={this.state.activeData}/>

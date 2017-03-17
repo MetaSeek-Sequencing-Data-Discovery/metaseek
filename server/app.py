@@ -15,6 +15,8 @@ from dateutil import parser as dateparser
 import random
 import json
 from collections import Counter
+import numpy as np
+import pandas as pd
 
 # Config / initialize the app, database and api
 app = Flask(__name__)
@@ -369,6 +371,26 @@ class GetDatasetSummary(Resource):
             else:
                 avg_gc_bins[round(k,2)] += v
 
+        #latlon map
+        latlon = db.session.query(Dataset.latitude,Dataset.longitude).filter(Dataset.latitude.isnot(None),Dataset.longitude.isnot(None)).all()
+        latlon = pd.DataFrame(latlon) #0th column is lat (yaxis), 1th column is lon (xaxis)
+        latlon_map = np.histogram2d(x=latlon['longitude'],y=latlon['latitude'],bins=[36,18], range=[[-180, 180], [-90, 90]]) #range should be flexible to rules in DatasetSearchSummary
+        #latlon_map[0] is the lonxlat (XxY) array of counts; latlon_map[1] is the nx/lon bin starts; map[2] ny/lat bin starts
+        lonstepsize = (latlon_map[1][1]-latlon_map[1][0])/2
+        latstepsize = (latlon_map[2][1]-latlon_map[2][0])/2
+        map_data = []
+        for lon_ix,lonbin in enumerate(latlon_map[0]):
+            print lon_ix, lonbin
+            for lat_ix,latbin in enumerate(lonbin):
+                #[latlon_map[2][ix]+latstepsize for ix,latbin in enumerate(latlon_map[0][0])]
+                lat = latlon_map[2][lat_ix]+latstepsize
+                lon = latlon_map[1][lon_ix]+lonstepsize
+                value = latbin
+                map_data.append({"lat":lat,"lon":lon,"count":value})
+
+        #num_latlon_None
+        num_latlon_None = (Dataset.query.count()-Dataset.query.filter(Dataset.latitude.isnot(None),Dataset.longitude.isnot(None)).count())
+
         return {"summary":{"totalDatasets":int(total),
         "totalDownloadSize":int(total_download_size),
         "investigation_type_summary":investigation_summary,
@@ -381,7 +403,9 @@ class GetDatasetSummary(Resource):
         "total_reads_summary":total_rds_bins,
         "total_bases_summary":total_bases_bins,
         "download_size_summary":down_size_bins,
-        "avg_percent_gc_summary":avg_gc_bins
+        "avg_percent_gc_summary":avg_gc_bins,
+        "latlon_map":map_data,
+        "num_latlon_None":num_latlon_None
         }}
 
 class SearchDatasets(Resource):

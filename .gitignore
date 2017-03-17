@@ -1,7 +1,7 @@
 client/build/*
 .DS_Store
 client/node_modules/*
-DataScraping/archive/*
+DataScraping/*
 *.0000
 *.frame_idx
 *.sidx
