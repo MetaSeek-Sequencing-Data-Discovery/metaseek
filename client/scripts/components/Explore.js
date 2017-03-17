@@ -15,6 +15,7 @@ import ExploreTable from './ExploreTable';
 import ExploreSummaryStats from './ExploreSummaryStats';
 import Loading from './Loading';
 import Histogram from './Histogram';
+import HeatmapChart from './HeatmapChart';
 
 var apiRequest = axios.create({
   baseURL: 'http://127.0.0.1:5000/api/'
@@ -111,6 +112,9 @@ var Explore = React.createClass({
               </Paper>
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
                 <ExploreSummaryStats summaryData={this.state.summaryData}/>
+              </Paper>
+              <Paper>
+                <HeatmapChart data={this.state.summaryData.latlon_map}/>
               </Paper>
               <Paper style={{'width':'60%','margin':'25px auto','padding':25}}>
                 <Histogram summaryData={this.state.summaryData} histinput={this.state.histinput}/>
