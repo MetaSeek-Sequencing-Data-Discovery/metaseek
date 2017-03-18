@@ -3,7 +3,7 @@
 #or just for all (but ones prefer misrep?), if target already nonempty, *just delete misrep*, or just replace, whichever better
 
 ##metaseek
-{'X1':'biosample_uid',
+columns = {'X1':'biosample_uid',
 ##MIxS
 #env_package
 'air environmental package':'env_package',
@@ -67,7 +67,7 @@
 'latitude and longitude':'lat_lon',
 'latitude_and_longitude':'lat_lon',
 #longitude_metaseek
-'geographic location (longitude)',
+'geographic location (longitude)':'longitude_metaseek',
 'vv long':'longitude_metaseek',
 'longitude (raw)':'longitude_metaseek',
 'longitude':'longitude_metaseek',
@@ -159,6 +159,5 @@
 'gold_id':'gold_stamp_id_link',
 #seq_quality_check
 'seq_qual_check':'seq_quality_check',
-'sequence quality check',:'seq_quality_check'
-
+'sequence quality check':'seq_quality_check'
 }

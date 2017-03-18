@@ -1,0 +1,10 @@
+Flask==0.12
+Flask_Cors==3.0.2
+Flask_RESTful==0.3.5
+Flask_SQLAlchemy==2.2
+numpy==1.11.1
+pandas==0.17.1
+beautifulsoup4==4.5.3
+python_dateutil==2.6.0
+sframe==2.1
+SQLAlchemy==1.1.6
