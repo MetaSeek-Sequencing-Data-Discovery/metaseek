@@ -10,7 +10,7 @@ injectTapEventPlugin();
 
 // My Imported Components
 import NotFound from './components/NotFound';
-import Welcome from './components/Welcome';
+import Signup from './components/Signup';
 import Browse from './components/Browse';
 import Explore from './components/Explore';
 import ApiTest from './components/ApiTest';
@@ -25,7 +25,7 @@ import DiscoveryDetail from './components/DiscoveryDetail';
 
 var routes = (
   <Router history={browserHistory}>
-    <Route path="/" component={Welcome}/>
+    <Route path="/" component={Signup}/>
     <Route path="/browse" component={Browse}/>
     <Route path="/explore" component={Explore}/>
     <Route path="/apitest" component={ApiTest}/>
