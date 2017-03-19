@@ -10,12 +10,12 @@ var stylus = require('gulp-stylus');
 var autoprefixer = require('gulp-autoprefixer');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
+var htmlreplace = require('gulp-html-replace');
 var buffer = require('vinyl-buffer');
 
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 var historyApiFallback = require('connect-history-api-fallback');
-
 
 /*
   Styles Task
@@ -41,6 +41,16 @@ gulp.task('styles',function() {
 gulp.task('images',function(){
   gulp.src('css/images/**')
     .pipe(gulp.dest('./build/css/images'))
+});
+
+gulp.task('copy-index-html', function() {
+    gulp.src('index.html')
+    // Perform minification tasks, etc here
+    .pipe(htmlreplace({
+            'css': './css/style.css',
+            'js': './main.js'
+    }))
+    .pipe(gulp.dest('./build'));
 });
 
 /*
@@ -103,7 +113,7 @@ gulp.task('scripts', function() {
 });
 
 // run 'scripts' task first, then watch for future changes
-gulp.task('default', ['images','styles','scripts','browser-sync'], function() {
+gulp.task('default', ['copy-index-html','images','styles','scripts','browser-sync'], function() {
   gulp.watch('css/**/*', ['styles']); // gulp watch for stylus changes
   return buildScript('main.js', true); // browserify watch for JS changes
 });

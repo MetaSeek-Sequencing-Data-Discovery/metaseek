@@ -12,3 +12,5 @@ DataScraping/*
 *.xls
 *.ipynb
 *.pem
+
+client/build/index.html
