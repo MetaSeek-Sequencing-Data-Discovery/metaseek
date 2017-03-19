@@ -54,7 +54,7 @@ var Welcome = React.createClass({
                 </Paper>
               </div>
               <h1 style={{'fontSize':'1.8em','marginTop':60}}>What is MetaSeek?</h1>
-              <p style={{'marginTop':'50px'}}>MetaSEQ is a data discovery and analysis tool for genome sequencing data. Providing a rich front-end for exploration of metadata across a wide set of data repositories, use MetaSEQ to find the right aggregation of sequences for your analysis, and then access the raw sequencing data.</p>
+              <p style={{'marginTop':'50px'}}>MetaSEQ is a data discovery and analysis tool for sequencing data. Providing a rich front-end for exploration of metadata across a wide set of data repositories, use MetaSeek to find the right aggregation of sequences for your analysis, and then access the raw sequencing data.</p>
           </div>
         </MuiThemeProvider>
       </div>

@@ -376,14 +376,13 @@ class GetDatasetSummary(Resource):
 
         #latlon map
         latlon = db.session.query(Dataset.latitude,Dataset.longitude).filter(Dataset.latitude.isnot(None),Dataset.longitude.isnot(None)).all()
-        latlon = pd.DataFrame(latlon) #0th column is lat (yaxis), 1th column is lon (xaxis)
+        latlon = pd.DataFrame(latlon,columns=['latitude','longitude']) #0th column is lat (yaxis), 1th column is lon (xaxis)
         latlon_map = np.histogram2d(x=latlon['longitude'],y=latlon['latitude'],bins=[36,18], range=[[-180, 180], [-90, 90]]) #range should be flexible to rules in DatasetSearchSummary
         #latlon_map[0] is the lonxlat (XxY) array of counts; latlon_map[1] is the nx/lon bin starts; map[2] ny/lat bin starts
         lonstepsize = (latlon_map[1][1]-latlon_map[1][0])/2
         latstepsize = (latlon_map[2][1]-latlon_map[2][0])/2
         map_data = []
         for lon_ix,lonbin in enumerate(latlon_map[0]):
-            print lon_ix, lonbin
             for lat_ix,latbin in enumerate(lonbin):
                 #[latlon_map[2][ix]+latstepsize for ix,latbin in enumerate(latlon_map[0][0])]
                 lat = latlon_map[2][lat_ix]+latstepsize
