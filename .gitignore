@@ -1,4 +1,5 @@
-client/build/*
+client/build/main.js
+client/build/css/*
 .DS_Store
 client/node_modules/*
 DataScraping/*
@@ -10,5 +11,4 @@ DataScraping/*
 *.docx
 *.xls
 *.ipynb
-
 *.pem

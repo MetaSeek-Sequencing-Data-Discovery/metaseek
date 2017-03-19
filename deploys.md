@@ -50,7 +50,7 @@ scp -r -i "metaseek.pem" ./server ubuntu@ec2-35-166-20-248.us-west-2.compute.ama
 
 Activate the virtualenv using `./bin/activate` and run `pip install -r requirements.txt` to install all python dependencies.
 
-Note that the app requires a METASEEK_DB environment variable to access the database properly. On a local development mac, run `printenv` to print your environment variables and confirm it is there and correct. If not, add it to your bash profile with `nano ~/.bash_profile`
+Note that the app requires a METASEEK_DB environment variable to access the database properly. On a local development mac, run `printenv` to print your environment variables and confirm it is there and correct. If not, add it to your bash profile with `nano ~/.bash_profile`.
 
 #### Setting up the database
 
