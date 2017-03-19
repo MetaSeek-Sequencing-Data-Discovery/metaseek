@@ -4,6 +4,8 @@
 * *deploy clientside on firebase - 0.5hr*
 * *set up SSL on server - 2hr*
 * Get Adrienne set up - 0.5hr
+* push changes via git - 1hr
+* automated deployments via github - 4hr
 
 ## Database
 * Add data to database! - 2hr
