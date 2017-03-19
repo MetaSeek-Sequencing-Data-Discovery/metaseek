@@ -18,10 +18,13 @@ from collections import Counter
 import numpy as np
 import pandas as pd
 
+import os
+dbPass = os.environ['METASEEK_DB']
+
 # Config / initialize the app, database and api
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@localhost/metaseek'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 api = Api(app)
@@ -537,4 +540,4 @@ api.add_resource(GetAllDiscoveries,     '/api/discoveries')
 
 # Start the app!
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
