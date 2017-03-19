@@ -1,9 +1,6 @@
 import React from 'react';
 import axios from 'axios';
 
-// Firebase imports / setup
-import Rebase from 're-base';
-
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Paper from 'material-ui/Paper';
@@ -13,7 +10,7 @@ import {List, ListItem} from 'material-ui/List';
 import Header from './Header';
 
 var apiRequest = axios.create({
-  baseURL: 'http://127.0.0.1:5000/api/'
+  baseURL: 'http://ec2-35-166-20-248.us-west-2.compute.amazonaws.com/api/'
 });
 
 var DatasetDetail = React.createClass({
@@ -23,16 +20,11 @@ var DatasetDetail = React.createClass({
       }
   },
   componentWillMount: function() {
-
     var self = this;
-
     apiRequest.get('/dataset/' + this.props.params.id)
     .then(function (response) {
       self.setState({"dataset": response.data.dataset})
     })
-  },
-  componentWillUnmount: function() {
-
   },
   renderField : function(field, index) {
     return (

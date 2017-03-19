@@ -2,9 +2,6 @@ import React from 'react';
 import createFragment from 'react-addons-create-fragment'
 import axios from 'axios';
 
-// Firebase imports / setup
-import Rebase from 're-base';
-
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Paper from 'material-ui/Paper';
@@ -14,7 +11,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Header from './Header';
 
 var apiRequest = axios.create({
-  baseURL: 'http://127.0.0.1:5000/api/'
+  baseURL: 'http://ec2-35-166-20-248.us-west-2.compute.amazonaws.com/api/'
 });
 
 var ApiTest = React.createClass({
