@@ -18,7 +18,7 @@ import Histogram from './Histogram';
 import HeatmapChart from './HeatmapChart';
 
 var apiRequest = axios.create({
-  baseURL: 'http://ec2-35-166-20-248.us-west-2.compute.amazonaws.com/api/'
+  baseURL: 'https://api.metaseek.cloud/api/'
 });
 
 var Explore = React.createClass({
