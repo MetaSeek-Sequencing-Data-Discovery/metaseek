@@ -10,6 +10,8 @@
 ## Database
 * Add data to database! - 2hr
 * ~~Automated DB backups - .5hr~~
+* Delete dataset ids 3:16 (inclusive) - they're redundant
+* increase max int length for total_num_bases, total_num_reads, and download_size (to maybe 15)
 
 ## API
 * SearchDatasetsSummary - 4hr
@@ -17,17 +19,18 @@
 * ~~*actually save discoveries to user - 0.5hr*~~
 
 ## Client
-* ~~*filter rules bug - 0.5hr*~~
+* ~~filter rules bug - 0.5hr~~
 * ~~Sign up welcome page - 2hr~~
 * Clean up welcome page - 1hr
 * ~~continuous color scale map, center - 1hr~~
 * ~~janky heatmap => map - 1hr~~
 * map - 4hr
 * Range selector - 2hr
-* ~~*prettify layout Explore - 4hr*~~
+* ~~prettify layout Explore - 4hr~~
 * clean up dataset detail - 1hr
 * design and build DiscoveryDetail (user; filter params; summary figs; download datasets) - 2hr
 * design and build UserDetail - 2hr
 * *convert CSS styles to MetaSeek colors globally - 0.5hr*
 * ~~*remove or fix authentication - 2hr*~~
 * simple export datasets button - 0.5hr
+* rotate hist labels
