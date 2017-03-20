@@ -41,6 +41,10 @@ gulp.task('styles',function() {
 gulp.task('images',function(){
   gulp.src('css/images/**')
     .pipe(gulp.dest('./build/css/images'))
+
+  gulp.src('images/**')
+    .pipe(gulp.dest('./build/images'))
+
 });
 
 gulp.task('copy-index-html', function() {
