@@ -30,7 +30,7 @@ var Explore = React.createClass({
       'activeSummaryData': [],
       "summaryData":[],
       "histinput":"avg_read_length_summary",
-      "filter_params":"",
+      "filter_params":JSON.stringify({"rules":[]}),
       "loaded":false,
       "firebase":{
         'uid':null,
@@ -45,8 +45,8 @@ var Explore = React.createClass({
     if (user) {
       this.state.firebase.name = user.displayName;
       this.state.firebase.uid = user.uid;
-      this.state.firebase.photo = user.photo;
-      this.setState(this.state.firebase);
+      this.state.firebase.photo = user.photoURL;
+      this.setState({"firebase": this.state.firebase});
     }
     var self = this;
     apiRequest.get("/datasets/summary")
@@ -109,7 +109,7 @@ var Explore = React.createClass({
     this.state.firebase.name = user.displayName;
     this.state.firebase.uid = user.uid;
     this.state.firebase.photo = user.photoURL;
-    this.setState(this.state.firebase);
+    this.setState({"firebase": this.state.firebase});
   },
 
   updateFilterParams : function(filterStates) {
