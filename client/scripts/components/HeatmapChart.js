@@ -28,7 +28,7 @@ const HeatmapChart = React.createClass({
     const gridSize_y = chartheight/num_y_bins
 
     return (
-      <div style={{width:720,position:'relative'}}>
+      <div style={{width:720,position:'relative',margin:'0 auto'}}>
         <div className="mapContainer" style={{width:720,height:360,backgroundImage: 'url(./images/BWmapBackground.jpg)', backgroundSize: 'cover',position:'absolute','top':0}}>
         </div>
         <div className="heatmapContainer" style={{width:720,height:360,position:'absolute','top':0}}>

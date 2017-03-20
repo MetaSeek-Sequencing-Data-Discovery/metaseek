@@ -95,18 +95,15 @@ var ExploreFilters = React.createClass({
               {Object.keys(this.props.summaryData.investigation_type_summary)
                      .map(this.renderMenuItem)}
             </SelectField>
-            <h4>Latitude</h4>
             <LatitudeSliders handleFilterChange={this.handleFilterChange}
               minValue={this.state.filterStates.latitudeMin.value}
               maxValue={this.state.filterStates.latitudeMax.value}
             />
-          <h4>Longitude</h4>
-            <LongitudeSliders handleFilterChange={this.handleFilterChange}
+            <LongitudeSliders style={{marginTop:12}} handleFilterChange={this.handleFilterChange}
               minValue={this.state.filterStates.longitudeMin.value}
               maxValue={this.state.filterStates.longitudeMax.value}
             />
-          <h4>Enter an Average Read Length minimum and maximum</h4>
-            <AverageReadLengthInputs handleFilterChange={this.handleFilterChange}
+            <AverageReadLengthInputs style={{marginTop:24}} handleFilterChange={this.handleFilterChange}
               minValue={this.state.filterStates.avgRdLgthMin.value}
               maxValue={this.state.filterStates.avgRdLgthMax.value}
             />

@@ -15,7 +15,7 @@ var SummaryStats = React.createClass({
       <div>
         <MuiThemeProvider>
           <div>
-            <List>
+            <List style={{padding:0}}>
               <ListItem>number of datasets - {this.props.summaryData.totalDatasets}</ListItem>
               <ListItem>estimated download size - {getReadableFileSizeString(this.props.summaryData.totalDownloadSize)}</ListItem>
             </List>

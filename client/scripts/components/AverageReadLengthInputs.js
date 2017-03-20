@@ -29,22 +29,17 @@ import RaisedButton from 'material-ui/RaisedButton';
       <div>
         <div>
           <TextField
-            hintText="enter a number"
+            hintText="Average read length min."
             value={this.state.minValue}
             onChange={this.handleMinValue}
-            style={{'width':'20%'}}
           />
           <RaisedButton secondary={true} labelStyle={{'fontSize':'11px'}}
             label="submit min"
             onTouchTap={this.handleSubmit.bind(this,"avgRdLgthMin","avg_read_length",4,this.state.minValue)}/>
-
-          <span>- - - -     Average Read Length     - - - -</span>
-
           <TextField
-            hintText="enter a number"
+            hintText="Average read length min."
             value={this.state.maxValue}
             onChange={this.handleMaxValue}
-            style={{'width':'20%'}}
           />
           <RaisedButton secondary={true} labelStyle={{'fontSize':'11px'}}
           label="submit max"

@@ -147,47 +147,60 @@ var Explore = React.createClass({
     return (
       <div>
         <Header history={this.props.history}/>
-          <h2>Explore Data</h2>
+          <h2 style={{fontSize:'2.6em',fontWeight:300}}>Explore</h2>
           <MuiThemeProvider>
-            <div style={{display:'flex'}}>
-              <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
-                <div>
-                <span>{this.state.firebase.uid ? "Hi, " + this.state.firebase.name + ". Thanks for using MetaSeek!" : "Create an account or log in to save a discovery to your account."}</span>
-                  <div><img style={{'width':'150px','height':'150px','display':this.state.firebase.uid ? 'inline' : 'none'}} src={this.state.firebase.photo}/></div>
-                </div>
-                <RaisedButton
-                style={{'margin':'12px 12px 0 12px'}}
-                onClick={this.state.firebase.uid ? this.submitDiscovery : this.triggerGoogleLogin}
-                primary={true}
-                label={this.state.firebase.uid ? "Save Discovery" : "Log In With Google"}
-                />
-                <RaisedButton style={{'margin':'20px 20px 20px 20px'}}
-                  label="Log Out"
-                  onClick={this.triggerLogout}
-                  primary={true}
-                  disabled={!(this.state.firebase.uid)}
-                />
-                <ExploreFilters updateFilterParams={this.updateFilterParams}
-                  summaryData={this.state.summaryData}
+            <div style={{'width':1192,'margin':'0px auto','padding':10}}>
+              <div style={{'height':780}}>
+                <Paper style={{'height':780,'overflowY':'scroll','width':380,float:'left','margin':'0 0 0 0','padding':24}}>
+                  <div style={{'margin':'12px auto'}}>
+                    <span>{this.state.firebase.uid ? "Hi, " + this.state.firebase.name + ". Thanks for using MetaSeek!" : "Create an account or log in to save a discovery to your account."}</span>
+                    <div><img style={{'width':'150px','height':'150px','display':this.state.firebase.uid ? 'inline' : 'none'}} src={this.state.firebase.photo}/></div>
+                  </div>
+                  <RaisedButton
+                    style={{'margin':'12px 12px 0 12px'}}
+                    onClick={this.state.firebase.uid ? this.submitDiscovery : this.triggerGoogleLogin}
+                    primary={true}
+                    label={this.state.firebase.uid ? "Save Discovery" : "Log In With Google"}
                   />
-              </Paper>
-              <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
-                <ExploreSummaryStats summaryData={this.state.summaryData}/>
-              </Paper>
-              <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
-                <HeatmapChart data={this.state.summaryData.latlon_map}/>
-              </Paper>
-              <Paper style={{'width':'60%','margin':'25px auto','padding':25}}>
-                <Histogram summaryData={this.state.summaryData} histinput={this.state.histinput}/>
-                  <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
-                    {
-                      Object
-                      .keys(this.state.summaryData)
-                      .map(key => <MenuItem key={key} value={key} primaryText={key} />)
-                    }
-                  </SelectField>
-              </Paper>
-              <Paper style={{'width':'80%','margin':'25px auto','padding':0}}>
+                  <RaisedButton
+                    style={{'margin':'12px 12px 0 12px'}}
+                    label="Log Out"
+                    onClick={this.triggerLogout}
+                    primary={true}
+                    disabled={!(this.state.firebase.uid)}
+                  />
+                  <ExploreFilters
+                    style={{'margin':'12px 12px 0 12px'}}
+                    updateFilterParams={this.updateFilterParams}
+                    summaryData={this.state.summaryData}
+                  />
+                </Paper>
+                <Paper style={{'float':'right','width':768,'height':408,'margin':'0 0 0 0','padding':24}}>
+                  <HeatmapChart data={this.state.summaryData.latlon_map}/>
+                </Paper>
+                <Paper style={{'float':'right','width':768,'height':348,'margin':'24px 0 0 0','padding':24}}>
+                  <div style={{'float':'left','width':300}}>
+                    <ExploreSummaryStats summaryData={this.state.summaryData}/>
+                  </div>
+                  <div style={{'float':'right','width':400}}>
+                    <Histogram summaryData={this.state.summaryData} histinput={this.state.histinput}/>
+                    <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
+                      {Object.keys(this.state.summaryData).filter(function(value) {
+                        if (value.indexOf('summary') !== -1) {
+                          return true;
+                        } else {
+                          return false;
+                        }
+                      }).map(function(value, index) {
+                          return (
+                            <MenuItem key={index} value={value} primaryText={value} />
+                          )
+                      })}
+                    </SelectField>
+                  </div>
+                </Paper>
+              </div>
+              <Paper style={{'width':'92%','margin':'24px auto','padding':0,'clear':'both'}}>
                 <ExploreTable activeData={this.state.activeData}/>
               </Paper>
             </div>

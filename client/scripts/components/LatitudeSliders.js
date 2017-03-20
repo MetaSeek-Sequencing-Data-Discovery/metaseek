@@ -25,31 +25,29 @@ import Slider from 'material-ui/Slider';
   render : function() {
     return (
       <div>
-      <p>
-        <span>Latitude range is {this.state.minSlider} to {this.state.maxSlider} inclusive</span>
-      </p>
-      <div>
-        <div>
-          <Slider
-            min={-90}
-            max={90}
-            step={1}
-            defaultValue={-90}
-            value={this.state.minSlider}
-            onChange={this.handleMinValue}
-            onDragStop={this.handleDragStop.bind(this,"latitudeMin","latitude",4,this.state.minSlider)}
-          />
-          <Slider
-            min={-90}
-            max={90}
-            step={1}
-            defaultValue={90}
-            value={this.state.maxSlider}
-            onChange={this.handleMaxValue}
-            onDragStop={this.handleDragStop.bind(this,"latitudeMax","latitude",3,this.state.maxSlider)}
-          />
-        </div>
-      </div>
+        <p style={{padding:0}}>
+          <span>Latitude range is {this.state.minSlider} to {this.state.maxSlider} inclusive</span>
+        </p>
+        <Slider
+          style={{height:6, marginTop:-6}}
+          min={-90}
+          max={90}
+          step={1}
+          defaultValue={-90}
+          value={this.state.minSlider}
+          onChange={this.handleMinValue}
+          onDragStop={this.handleDragStop.bind(this,"latitudeMin","latitude",4,this.state.minSlider)}
+        />
+        <Slider
+          style={{height:6, marginTop:-6}}
+          min={-90}
+          max={90}
+          step={1}
+          defaultValue={90}
+          value={this.state.maxSlider}
+          onChange={this.handleMaxValue}
+          onDragStop={this.handleDragStop.bind(this,"latitudeMax","latitude",3,this.state.maxSlider)}
+        />
       </div>
     );
   }
