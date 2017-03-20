@@ -19,10 +19,10 @@
 * SearchDatasetsSummary - 4hr
 * new call, give me dataset export script - 2hr
 
-* *actually save discoveries to user - 0.5hr*
+* ~~*actually save discoveries to user - 0.5hr*~~
 
 ## Client
-* *filter rules bug - 0.5hr*
+* ~~*filter rules bug - 0.5hr*~~
 * Sign up welcome page - 2hr
 * continuous color scale map, center - 1hr
 * janky heatmap => map - 1hr
@@ -31,6 +31,7 @@
 * *prettify layout Explore - 4hr*
 * clean up dataset detail - 1hr
 * design and build DiscoveryDetail (user; filter params; summary figs; download datasets) - 2hr
+* add a "my account" page - 2hr
 * *convert CSS styles to MetaSeek colors globally - 0.5hr*
-* *remove or fix authentication - 2hr*
+* ~~ *remove or fix authentication - 2hr*~~
 * simple export datasets button - 0.5hr
