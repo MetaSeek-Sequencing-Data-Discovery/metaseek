@@ -71,12 +71,14 @@ var Explore = React.createClass({
   },
 
   updateActiveSummaryData : function() {
-    var self = this;
-    self.setState({"loaded":false});
-    apiRequest.post('/datasets/search/summary', {
-      "filter_params":this.state.filter_params
-    }).then(function (response) {
-      self.setState({"activeSummaryData": response.data.summary,"loaded":true});
+    //var self = this;
+    //self.setState({"loaded":false});
+    //apiRequest.post('/datasets/search/summary', {
+    //  "filter_params":this.state.filter_params
+    //}).then(function (response) {
+    //  self.setState({"activeSummaryData": response.data.summary,"loaded":true});
+    //});
+  },
 
   triggerGoogleLogin : function() {
     var successfulLogin = this.successfulLogin;
