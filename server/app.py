@@ -493,7 +493,7 @@ class CreateDiscovery(Resource):
     def post(self):
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument('owner_id', type=int)
+            parser.add_argument('owner_id', type=str)
             parser.add_argument('filter_params', type=str)
             args = parser.parse_args()
 
