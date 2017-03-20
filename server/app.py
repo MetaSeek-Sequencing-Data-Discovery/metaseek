@@ -510,7 +510,9 @@ class CreateDiscovery(Resource):
 
             matchingDatasets = queryObject.all()
 
-            newDiscovery = Discovery(args['owner_id'],args['filter_params'],matchingDatasets)
+            owner = User.query.filter_by(firebase_id=args['owner_id']).first()
+
+            newDiscovery = Discovery(owner.id,args['filter_params'],matchingDatasets)
             db.session.add(newDiscovery)
             db.session.commit()
             return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id,_external=True)}}
