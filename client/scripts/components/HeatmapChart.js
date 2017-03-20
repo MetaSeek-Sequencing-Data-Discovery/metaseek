@@ -33,6 +33,10 @@ const HeatmapChart = React.createClass({
           data={data}
           gridSize_x={gridSize_x}
           gridSize_y={gridSize_y}
+          chartwidth={chartwidth}
+          chartheight={chartheight}
+          num_x_bins={num_x_bins}
+          num_y_bins={num_y_bins}
         />
       </svg>
     );

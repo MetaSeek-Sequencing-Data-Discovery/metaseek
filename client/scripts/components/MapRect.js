@@ -9,18 +9,20 @@ const MapRect = React.createClass({
     y: React.PropTypes.number,
     stroke: React.PropTypes.string,
     strokeopacity: React.PropTypes.number,
+    opacity: React.PropTypes.number,
     fill: React.PropTypes.string
   },
 
   getDefaultProps() {
     return{
       stroke: 'white',
-      strokeopacity: 0.6
+      strokeopacity: 0.6,
+      opacity: 0.6
     };
   },
 
   render() {
-    let {width, height, x, y, stroke, strokeopacity, fill} = this.props;
+    let {width, height, x, y, stroke, strokeopacity, opacity, fill} = this.props;
     return(
       <rect
         width={width}
@@ -29,6 +31,7 @@ const MapRect = React.createClass({
         y={y}
         stroke={stroke}
         strokeOpacity={strokeopacity}
+        opacity={opacity}
         fill={fill}
       />
 

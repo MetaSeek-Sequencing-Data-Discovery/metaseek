@@ -8,7 +8,11 @@ const MapDataSeries = React.createClass({
     data: React.PropTypes.array,
     gridSize_x: React.PropTypes.number,
     gridSize_y: React.PropTypes.number,
-    fill: React.PropTypes.string
+    fill: React.PropTypes.string,
+    chartwidth: React.PropTypes.number,
+    chartheight: React.PropTypes.number,
+    num_x_bins: React.PropTypes.number,
+    num_y_bins: React.PropTypes.number
   },
 
   getDefaultProps() {
@@ -18,26 +22,23 @@ const MapDataSeries = React.createClass({
   },
 
   render() {
-    let {data, gridSize_x, gridSize_y, fill} = this.props;
+    let {data, gridSize_x, gridSize_y, fill,chartwidth,chartheight,num_x_bins,num_y_bins} = this.props;
 
     var colorScale = d3.scale.linear()
   	.domain([0, d3.max(data, function(d) {return d.count; })])
-  	.range(["#FFFFFF", "#6369E0"])
-    console.log(colorScale);
-    console.log(d3.max(data.map(function(d) {return d.count; })));
-    console.log(colorScale(100));
-    console.log(data.map(function(d) {return d.count; }))
+  	.range(["#F4F4F6", "#6369E0"])
 
     let rectangle = data.map(function(datapoint,ix) {
-      var start_x = (datapoint.lon-5) //5 comes from 360/num_x_bins(36)/2, can abstract later
-      var start_y = (datapoint.lat+5)
+      var start_x = ((datapoint.lon-(360/num_x_bins/2))*(chartwidth/360)+(chartwidth/2)) //5 comes from 360/num_x_bins(36)/2, can abstract later chartwidth/360=2
+      var start_y = ((datapoint.lat-(180/num_y_bins/2))*(chartheight/180)+(chartheight/2))
+      var rect_fill = colorScale(datapoint.count)
       return(
         <MapRect
           width={gridSize_x}
           height={gridSize_y}
           x={start_x}
           y={start_y}
-          fill="red"
+          fill={rect_fill}
           key={ix}
           />
       );

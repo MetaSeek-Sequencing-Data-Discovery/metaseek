@@ -3,7 +3,7 @@
 ## Deployment
 * *deploy clientside on firebase - 0.5hr*
 * *set up SSL on server - 2hr*
-* Get Adrienne set up - 0.5hr
+* ~~Get Adrienne set up - 0.5hr~~
 * push changes via git - 1hr
 * automated deployments via github - 4hr
 
@@ -19,7 +19,7 @@
 ## Client
 * *filter rules bug - 0.5hr*
 * Sign up welcome page - 2hr
-* continuous color scale map, center - 1hr
+* ~~continuous color scale map, center - 1hr~~
 * janky heatmap => map - 1hr
 * map - 6hr
 * Range selector - 2hr
