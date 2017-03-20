@@ -28,17 +28,23 @@ const HeatmapChart = React.createClass({
     const gridSize_y = chartheight/num_y_bins
 
     return (
-      <svg width={chartwidth} height={chartheight}>
-        <MapDataSeries
-          data={data}
-          gridSize_x={gridSize_x}
-          gridSize_y={gridSize_y}
-          chartwidth={chartwidth}
-          chartheight={chartheight}
-          num_x_bins={num_x_bins}
-          num_y_bins={num_y_bins}
-        />
-      </svg>
+      <div style={{width:720,position:'relative'}}>
+        <div className="mapContainer" style={{width:720,height:360,backgroundImage: 'url(./images/BWmapBackground.jpg)', backgroundSize: 'cover',position:'absolute','top':0}}>
+        </div>
+        <div className="heatmapContainer" style={{width:720,height:360,position:'absolute','top':0}}>
+          <svg width={chartwidth} height={chartheight}>
+            <MapDataSeries
+              data={data}
+              gridSize_x={gridSize_x}
+              gridSize_y={gridSize_y}
+              chartwidth={chartwidth}
+              chartheight={chartheight}
+              num_x_bins={num_x_bins}
+              num_y_bins={num_y_bins}
+            />
+          </svg>
+        </div>
+      </div>
     );
   }
 

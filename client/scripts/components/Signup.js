@@ -111,7 +111,7 @@ var Signup = React.createClass({
               </Paper>
 
               <div style={{'width':'600px','position':'absolute', 'left':'50%','top':'50%'}}>
-                <div id="architecture img" stye={{'float':'left','width':'300px'}}>
+                <div id="architecture img" style={{'float':'left','width':'300px'}}>
                   <img src="./images/architecture.jpeg"/>
                 </div>
                 <div id="image descriptor" style={{'float':'right','width':'200px','textSize':'1.3em','padding':25}}>

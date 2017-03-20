@@ -174,7 +174,7 @@ var Explore = React.createClass({
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
                 <ExploreSummaryStats summaryData={this.state.summaryData}/>
               </Paper>
-              <Paper>
+              <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
                 <HeatmapChart data={this.state.summaryData.latlon_map}/>
               </Paper>
               <Paper style={{'width':'60%','margin':'25px auto','padding':25}}>
