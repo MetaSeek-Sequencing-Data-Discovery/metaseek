@@ -17,7 +17,7 @@ const MapRect = React.createClass({
     return{
       stroke: 'white',
       strokeopacity: 0.5,
-      opacity: 0.3
+      opacity: 0.7
     };
   },
 

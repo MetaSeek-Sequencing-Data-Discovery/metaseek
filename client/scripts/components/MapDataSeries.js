@@ -26,7 +26,7 @@ const MapDataSeries = React.createClass({
 
     var colorScale = d3.scale.linear()
   	.domain([0, d3.max(data, function(d) {return d.count; })])
-  	.range(["#F4F4F6", "#6369E0"])
+  	.range(["#FFFFFF", "#151174"])
 
     let rectangle = data.map(function(datapoint,ix) {
       var start_x = ((datapoint.lon-(360/num_x_bins/2))*(chartwidth/360)+(chartwidth/2)) //5 comes from 360/num_x_bins(36)/2, can abstract later chartwidth/360=2
