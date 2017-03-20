@@ -8,10 +8,11 @@
 * automated deployments via github - 4hr
 
 ## Database
-* Add data to database! - 2hr
+* ~~Add data to database! - 2hr~~
 * ~~Automated DB backups - .5hr~~
 * Delete dataset ids 3:16 (inclusive) - they're redundant
 * increase max int length for total_num_bases, total_num_reads, and download_size (to maybe 15)
+* Rebuild data in database after debug
 
 ## API
 * SearchDatasetsSummary - 4hr
@@ -34,3 +35,4 @@
 * ~~*remove or fix authentication - 2hr*~~
 * simple export datasets button - 0.5hr
 * rotate hist labels
+* check map color scale
