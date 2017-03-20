@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import Firebase from 'firebase';
 
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -18,7 +19,7 @@ import Histogram from './Histogram';
 import HeatmapChart from './HeatmapChart';
 
 var apiRequest = axios.create({
-  baseURL: 'http://ec2-35-166-20-248.us-west-2.compute.amazonaws.com/api/'
+  baseURL: 'https://api.metaseek.cloud/api/'
 });
 
 var Explore = React.createClass({
@@ -30,11 +31,23 @@ var Explore = React.createClass({
       "summaryData":[],
       "histinput":"avg_read_length_summary",
       "filter_params":"",
-      "loaded":false
+      "loaded":false,
+      "firebase":{
+        'uid':null,
+        'name':null,
+        'photo':null
+      }
     }
   },
 
   componentWillMount : function() {
+    var user = Firebase.auth().currentUser;
+    if (user) {
+      this.state.firebase.name = user.displayName;
+      this.state.firebase.uid = user.uid;
+      this.state.firebase.photo = user.photo;
+      this.setState(this.state.firebase);
+    }
     var self = this;
     apiRequest.get("/datasets/summary")
     .then(function (response) {
@@ -58,13 +71,45 @@ var Explore = React.createClass({
   },
 
   updateActiveSummaryData : function() {
-    var self = this;
-    self.setState({"loaded":false});
-    apiRequest.post('/datasets/search/summary', {
-      "filter_params":this.state.filter_params
-    }).then(function (response) {
-      self.setState({"activeSummaryData": response.data.summary,"loaded":true});
+    //var self = this;
+    //self.setState({"loaded":false});
+    //apiRequest.post('/datasets/search/summary', {
+    //  "filter_params":this.state.filter_params
+    //}).then(function (response) {
+    //  self.setState({"activeSummaryData": response.data.summary,"loaded":true});
+    //});
+  },
+
+  triggerGoogleLogin : function() {
+    var successfulLogin = this.successfulLogin;
+    var provider = new Firebase.auth.GoogleAuthProvider();
+    var auth = Firebase.auth().signInWithPopup(provider).then(function(result) {
+      var user = result.user;
+      successfulLogin(user);
+    }).catch(function(error) {
+      console.log("couldn't log in for some reason");
+      console.log(error);
     });
+  },
+
+  triggerLogout : function() {
+    var accountComponent = this;
+    var auth = Firebase.auth().signOut().then(function() {
+      accountComponent.state.firebase.name = null;
+      accountComponent.state.firebase.uid = null;
+      accountComponent.state.firebase.photo = null;
+      accountComponent.setState(accountComponent.state.firebase);
+    }, function(error) {
+      console.log("couldn't log out for some reason");
+      console.log(error);
+    });
+  },
+
+  successfulLogin : function(user) {
+    this.state.firebase.name = user.displayName;
+    this.state.firebase.uid = user.uid;
+    this.state.firebase.photo = user.photoURL;
+    this.setState(this.state.firebase);
   },
 
   updateFilterParams : function(filterStates) {
@@ -86,7 +131,7 @@ var Explore = React.createClass({
   submitDiscovery : function() {
     var self = this;
     apiRequest.post('/discovery/create', {
-      "owner_id":1,
+      "owner_id":this.state.firebase.uid,
       "filter_params":this.state.filter_params
     }).then(function (response) {
       self.props.history.push('/discovery/' + response.data.discovery.id);
@@ -106,11 +151,21 @@ var Explore = React.createClass({
           <MuiThemeProvider>
             <div style={{display:'flex'}}>
               <Paper style={{'width':'80%','margin':'25px auto','padding':25}}>
+                <div>
+                <span>{this.state.firebase.uid ? "Hi, " + this.state.firebase.name + ". Thanks for using MetaSeek!" : "Create an account or log in to save a discovery to your account."}</span>
+                  <div><img style={{'width':'150px','height':'150px','display':this.state.firebase.uid ? 'inline' : 'none'}} src={this.state.firebase.photo}/></div>
+                </div>
                 <RaisedButton
                 style={{'margin':'12px 12px 0 12px'}}
-                onClick={this.submitDiscovery}
+                onClick={this.state.firebase.uid ? this.submitDiscovery : this.triggerGoogleLogin}
                 primary={true}
-                label="Save Discovery"
+                label={this.state.firebase.uid ? "Save Discovery" : "Log In With Google"}
+                />
+                <RaisedButton style={{'margin':'20px 20px 20px 20px'}}
+                  label="Log Out"
+                  onClick={this.triggerLogout}
+                  primary={true}
+                  disabled={!(this.state.firebase.uid)}
                 />
                 <ExploreFilters updateFilterParams={this.updateFilterParams}
                   summaryData={this.state.summaryData}

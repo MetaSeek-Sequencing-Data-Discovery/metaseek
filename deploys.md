@@ -26,7 +26,7 @@ The Data Science Bytes guide has a great start to setting up an EC2 instance, se
 To SSH in:
 
 `
-ssh -i "metaseek.pem" ubuntu@ec2-54-213-48-36.us-west-2.compute.amazonaws.com
+ssh -i "metaseek.pem" ubuntu@ec2-35-166-20-248.us-west-2.compute.amazonaws.com
 `
 
 Stop before they `pip install` anything!
@@ -102,31 +102,131 @@ cat /etc/apache2/sites-available/000-default.conf
 
 This steals a bit from http://blog.dscpl.com.au/2014/09/using-python-virtual-environments-with.html about properly pointing a .wsgi script at a Python virtualenv.
 
-
 ```
 <VirtualHost *:80>
-  # These are defaults
-	ServerAdmin webmaster@localhost
+	# The ServerName directive sets the request scheme, hostname and port that
+	# the server uses to identify itself. This is used when creating
+	# redirection URLs. In the context of virtual hosts, the ServerName
+	# specifies what hostname must appear in the request's Host: header to
+	# match this virtual host. For the default virtual host (this file) this
+	# value is not decisive as it is used as a last resort host regardless.
+	# However, you must set it for any further virtual host explicitly.
+	ServerName api.metaseek.cloud
+
+	ServerAdmin nicholas.tyler.brown@gmail.com
 	DocumentRoot /var/www/html
 
-  # This was added - note the python-home that points to the # specific folder that is the root of your python virtual_env
-	WSGIDaemonProcess server python-home=/home/ubuntu/server threads=5
+	WSGIDaemonProcess metaseek python-home=/home/ubuntu/server threads=5
 	WSGIScriptAlias / /var/www/html/server/server.wsgi
 
-  # this was added as well
-	<Directory server>
-	    WSGIProcessGroup server
+	<Directory /var/www/html/server>
+	    WSGIProcessGroup metaseek
 	    WSGIApplicationGroup %{GLOBAL}
 	    Order deny,allow
 	    Allow from all
 	</Directory>
 
-  # and these are defaults
+	# Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
+	# error, crit, alert, emerg.
+	# It is also possible to configure the loglevel for particular
+	# modules, e.g.
+	LogLevel debug ssl:warn
+
 	ErrorLog ${APACHE_LOG_DIR}/error.log
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
 
+	# For most configuration files from conf-available/, which are
+	# enabled or disabled at a global level, it is possible to
+	# include a line for only one particular virtual host. For example the
+	# following line enables the CGI configuration for this host only
+	# after it has been globally disabled with "a2disconf".
+	#Include conf-available/serve-cgi-bin.conf
 </VirtualHost>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+
 ```
+
+#### Adding HTTPS with letsencrypt
+
+Let's Encrypt is awesome! Kinda! https://letsencrypt.org/
+
+They recommend certbot, which definitely almost works: https://certbot.eff.org/#ubuntuxenial-apache
+
+Certbot has a bug with WSGIDaemonProcess, where it duplicates your VirtualHost with the same process name, which causes Apache to fail to restart. https://github.com/certbot/certbot/issues/1820
+
+Hacky solution: comment out your WSGIDaemonProcess before running the tool, then uncomment it when you're done. Slightly less happy - author the new VirtualHost file yourself and give one of the two processes (http or https) a different name. This is our HTTPS VirtualHost:
+
+```
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+	# The ServerName directive sets the request scheme, hostname and port that
+	# the server uses to identify itself. This is used when creating
+	# redirection URLs. In the context of virtual hosts, the ServerName
+	# specifies what hostname must appear in the request's Host: header to
+	# match this virtual host. For the default virtual host (this file) this
+	# value is not decisive as it is used as a last resort host regardless.
+	# However, you must set it for any further virtual host explicitly.
+	ServerName api.metaseek.cloud
+
+	ServerAdmin nicholas.tyler.brown@gmail.com
+	DocumentRoot /var/www/html
+
+	WSGIDaemonProcess metaseekssl python-home=/home/ubuntu/server threads=5
+	WSGIScriptAlias / /var/www/html/server/server.wsgi
+
+	<Directory /var/www/html/server>
+	    WSGIProcessGroup metaseekssl
+	    WSGIApplicationGroup %{GLOBAL}
+	    Order deny,allow
+	    Allow from all
+	</Directory>
+
+	# Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
+	# error, crit, alert, emerg.
+	# It is also possible to configure the loglevel for particular
+	# modules, e.g.
+	LogLevel debug ssl:warn
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+	# For most configuration files from conf-available/, which are
+	# enabled or disabled at a global level, it is possible to
+	# include a line for only one particular virtual host. For example the
+	# following line enables the CGI configuration for this host only
+	# after it has been globally disabled with "a2disconf".
+	#Include conf-available/serve-cgi-bin.conf
+
+	SSLCertificateFile /etc/letsencrypt/live/api.metaseek.cloud/fullchain.pem
+	SSLCertificateKeyFile /etc/letsencrypt/live/api.metaseek.cloud/privkey.pem
+	Include /etc/letsencrypt/options-ssl-apache.conf
+
+</VirtualHost>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+</IfModule>
+```
+
+For some reason this seemed to break WSGI's ability to read the correct python, and to read from the OS environment variables so we had to add a change to the server.wsgi file:
+
+```
+import sys
+import os
+
+os.environ['METASEEK_DB'] = "REDACTED"
+print 'Replace me during deployment then comment this out!'
+print os.environ['METASEEK_DB']
+
+sys.path.insert(0, '/var/www/html/server')
+
+activate_this = '/home/ubuntu/server/bin/activate_this.py'
+execfile(activate_this, dict(__file__=activate_this))
+
+from app import app as application
+```
+
+This adds an env variable in the right context (obviously replace REDACTED with the true var) and loads the python virtualenv on the fly.
 
 #### Uh...whoops. Huh? Why'd it do that?
 

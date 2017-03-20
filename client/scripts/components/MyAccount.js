@@ -16,19 +16,21 @@ import Paper from 'material-ui/Paper';
 var MyAccount = React.createClass({
   getInitialState: function() {
       return {
-        'uid':null,
-        'name':null,
-        'photo':null
+        'firebase':{
+          'uid':null,
+          'name':null,
+          'photo':null
+        }
       }
   },
 
   componentWillMount: function() {
     var user = Firebase.auth().currentUser;
     if (user) {
-      this.state.name = user.displayName;
-      this.state.uid = user.uid;
-      this.state.photo = user.photoURL;
-      this.setState(this.state);
+      this.state.firebase.name = user.displayName;
+      this.state.firebase.uid = user.uid;
+      this.state.firebase.photo = user.photoURL;
+      this.setState(this.state.firebase);
     }
   },
 
@@ -47,10 +49,10 @@ var MyAccount = React.createClass({
   triggerLogout : function() {
     var accountComponent = this;
     var auth = Firebase.auth().signOut().then(function() {
-      accountComponent.state.name = null;
-      accountComponent.state.uid = null;
-      accountComponent.state.photo = null;
-      accountComponent.setState(accountComponent.state);
+      accountComponent.state.firebase.name = null;
+      accountComponent.state.firebase.uid = null;
+      accountComponent.state.firebase.photo = null;
+      accountComponent.setState(accountComponent.state.firebase);
     }, function(error) {
       console.log("couldn't log out for some reason");
       console.log(error);
@@ -58,10 +60,10 @@ var MyAccount = React.createClass({
   },
 
   successfulLogin : function(user) {
-    this.state.name = user.displayName;
-    this.state.uid = user.uid;
-    this.state.photo = user.photoURL;
-    this.setState(this.state);
+    this.state.firebase.name = user.displayName;
+    this.state.firebase.uid = user.uid;
+    this.state.firebase.photo = user.photoURL;
+    this.setState(this.state.firebase);
   },
 
   render : function() {
@@ -73,8 +75,8 @@ var MyAccount = React.createClass({
     };
 
     var headline = "You're not logged in. Want to log in?";
-    if (this.state.uid) {
-      var headline = "Hey, you're logged in as " + this.state.name;
+    if (this.state.firebase.uid) {
+      var headline = "Hey, you're logged in as " + this.state.firebase.name;
     }
 
     return (
@@ -85,17 +87,19 @@ var MyAccount = React.createClass({
           <div style={styles.container}>
             <h1>{headline}</h1>
             <div>
-               <img style={{'width':'150px','height':'150px','display':this.state.uid ? 'inline' : 'none'}} src={this.state.photo}/>
+               <img style={{'width':'150px','height':'150px','display':this.state.firebase.uid ? 'inline' : 'none'}} src={this.state.firebase.photo}/>
             </div>
             <RaisedButton style={{'margin':'20px 20px 20px 20px'}}
               label="Log In"
               onClick={this.triggerLogin}
               primary={true}
+              disabled={this.state.firebase.uid}
             />
             <RaisedButton style={{'margin':'20px 20px 20px 20px'}}
               label="Log Out"
               onClick={this.triggerLogout}
               primary={true}
+              disabled={!(this.state.firebase.uid)}
             />
           </div>
           </Paper>
