@@ -30,7 +30,7 @@ var Explore = React.createClass({
       'activeSummaryData': [],
       "summaryData":[],
       "histinput":"avg_read_length_summary",
-      "filter_params":"",
+      "filter_params":JSON.stringify({"rules":[]}),
       "loaded":false,
       "firebase":{
         'uid':null,
