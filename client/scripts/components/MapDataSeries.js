@@ -30,7 +30,7 @@ const MapDataSeries = React.createClass({
 
     let rectangle = data.map(function(datapoint,ix) {
       var start_x = ((datapoint.lon-(360/num_x_bins/2))*(chartwidth/360)+(chartwidth/2)) //5 comes from 360/num_x_bins(36)/2, can abstract later chartwidth/360=2
-      var start_y = ((datapoint.lat-(180/num_y_bins/2))*(chartheight/180)+(chartheight/2))
+      var start_y = ((datapoint.lat-(180/num_y_bins/2))*(chartheight/180)*-1+((chartheight/2)-20))
       var rect_fill = colorScale(datapoint.count)
       return(
         <MapRect
