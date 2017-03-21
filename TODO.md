@@ -12,6 +12,8 @@
 * ~~Automated DB backups - .5hr~~
 * increase max int length for total_num_bases, total_num_reads, and download_size (to maybe 15)
 * Rebuild data in database after debug
+* CV control env_package column before data upload
+* CV control investigation_type
 
 ## API
 * SearchDatasetsSummary - 4hr
@@ -33,6 +35,6 @@
 * *convert CSS styles to MetaSeek colors globally - 0.5hr*
 * ~~*remove or fix authentication - 2hr*~~
 * simple export datasets button - 0.5hr
-* rotate hist labels
+* ~~rotate hist labels~~
 * ~~check map color scale~~
-* change calculated numeric 0s to None - check histograms
+* ~~change calculated numeric 0s to None - check histograms~~

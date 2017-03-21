@@ -14,8 +14,15 @@ var Histogram = React.createClass({
   render: function() {
     var data = this.props.summaryData[this.props.histinput];
 
-    var values = Object.keys(data).map(function(value,index) {
-      return {"x":value, "y":data[value]};
+    var values = Object.keys(data).sort(function(a, b) {
+      var newkey = (parseFloat(a) - parseFloat(b));
+      if (newkey) {
+        return newkey;
+      } else{
+        return a - b;
+      }
+    }).map(function(value,index) {
+      return {"x":value,"y":data[value]};
     });
 
     var barData = [
@@ -28,9 +35,8 @@ var Histogram = React.createClass({
     return  (
     	<BarChart
       data={barData}
-      width={400}
-      height={250}
-      yAxisLabel="Dataset Count"
+      width={1000}
+      height={300}
       />
   )}
 });
