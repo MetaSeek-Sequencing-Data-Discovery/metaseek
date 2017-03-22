@@ -2,6 +2,8 @@ import React from 'react';
 
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import ColorPalette from './ColorPalette';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import Formsy from 'formsy-react';
 import Paper from 'material-ui/Paper';
@@ -55,7 +57,7 @@ var AddDatasetForm = React.createClass({
     };
 
     return (
-      <MuiThemeProvider>
+      <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
         <Paper style={styles.paperStyle} zDepth={2}>
           <Formsy.Form
            onValid={this.enableButton}

@@ -5,6 +5,8 @@ import Formsy from 'formsy-react';
 import Paper from 'material-ui/Paper';
 import FlatButton from 'material-ui/FlatButton';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import ColorPalette from './ColorPalette';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import {FormsyText} from 'formsy-material-ui/lib';
@@ -66,7 +68,7 @@ var Signup = React.createClass({
     return(
       <div>
         <Header history={this.props.history}/>
-        <MuiThemeProvider>
+        <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
           <div style={styles.container}>
             <h1 style={{'fontSize':'2.6em','marginTop':50,'fontWeight':'bold'}}>Sign up to test the beta version!</h1>
               <Paper style={styles.submitStyle}>

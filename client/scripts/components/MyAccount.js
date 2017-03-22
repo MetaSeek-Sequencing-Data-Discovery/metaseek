@@ -6,6 +6,8 @@ import Firebase from 'firebase';
 import RaisedButton from 'material-ui/RaisedButton';
 import Header from './Header';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import ColorPalette from './ColorPalette';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import Paper from 'material-ui/Paper';
 
 /*
@@ -82,7 +84,7 @@ var MyAccount = React.createClass({
     return (
       <div>
         <Header history={this.props.history}/>
-        <MuiThemeProvider>
+        <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
           <Paper style={{'width':'60%','margin':'25px auto'}} zDepth={2}>
           <div style={styles.container}>
             <h1>{headline}</h1>

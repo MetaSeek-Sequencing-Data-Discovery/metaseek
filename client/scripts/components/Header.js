@@ -3,6 +3,8 @@ import React from 'react';
 import { Link } from 'react-router';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import ColorPalette from './ColorPalette';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
@@ -20,7 +22,7 @@ var Header = React.createClass({
   },
   render : function() {
     return (
-    <MuiThemeProvider>
+    <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
        <AppBar
         title={<span style={{'cursor':'pointer'}}>MetaSeek</span>}
         onTitleTouchTap={this.handleTitleTouch}

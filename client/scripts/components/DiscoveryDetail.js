@@ -3,6 +3,8 @@ import axios from 'axios';
 
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import ColorPalette from './ColorPalette';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import Paper from 'material-ui/Paper';
 import {List, ListItem} from 'material-ui/List';
 
@@ -33,7 +35,7 @@ var DiscoveryDetail = React.createClass({
   },
   render: function() {
     return (
-      <MuiThemeProvider>
+      <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
         <div>
           <Header history={this.props.history}/>
           <Paper zDepth={2}>

@@ -4,6 +4,8 @@ import { Link } from 'react-router';
 // Material Design imports
 import FlatButton from 'material-ui/FlatButton';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import ColorPalette from './ColorPalette';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import Paper from 'material-ui/Paper';
 
 // My component imports
@@ -35,7 +37,7 @@ var Welcome = React.createClass({
     return (
       <div>
         <Header history={this.props.history}/>
-        <MuiThemeProvider>
+        <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
           <div style={styles.container}>
             <h1 style={{'fontSize':'2.6em'}}>Welcome to MetaSeek</h1>
             <p style={{'marginTop':'50px','marginBottom':40}}>Discover, curate, and get access to thousands of sequencing samples from all over the web.</p>

@@ -2,6 +2,8 @@ import React from 'react';
 
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import ColorPalette from './ColorPalette';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import LatitudeSliders from './LatitudeSliders';
@@ -63,7 +65,7 @@ var ExploreFilters = React.createClass({
   render : function() {
     return (
       <div>
-        <MuiThemeProvider>
+        <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
           <div>
             {/* Ok, so...let's explain this change handler:
               onChange={this.handleFilterChange.bind(this,"library_source","library_source",5)}

@@ -4,6 +4,8 @@ import { Link } from 'react-router';
 // Material Design imports
 import RaisedButton from 'material-ui/RaisedButton';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import ColorPalette from './ColorPalette';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
 // My component imports
 import Header from './Header';
@@ -27,7 +29,7 @@ var Browse = React.createClass({
         <Header history={this.props.history}/>
         <div style={styles.container}>
           <h2>Browse Existing Discoveries!</h2>
-          <MuiThemeProvider>
+          <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
             <div>
               <Link to='/'>
                 <RaisedButton label="Welcome" primary={true}/>
