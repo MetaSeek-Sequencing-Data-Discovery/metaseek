@@ -10,7 +10,8 @@
 ## Database
 * ~~Add data to database! - 2hr~~
 * ~~Automated DB backups - .5hr~~
-* increase max int length for total_num_bases, total_num_reads, and download_size (to maybe 15)
+* ~~Delete dataset ids 3:16 (inclusive) - they're redundant~~
+* ~~increase max int length for total_num_bases, total_num_reads, and download_size (to maybe 15)~~
 * Rebuild data in database after debug
 * CV control env_package column before data upload
 * CV control investigation_type

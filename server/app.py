@@ -24,7 +24,13 @@ dbPass = os.environ['METASEEK_DB']
 # Config / initialize the app, database and api
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+# production DB
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-35-166-20-248.us-west-2.compute.amazonaws.com/metaseek'
+
+# local DB - uncomment for local testing
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 api = Api(app)
@@ -45,9 +51,9 @@ class Dataset(db.Model):
     longitude = db.Column(db.Float)
 
     avg_read_length = db.Column(db.Float)
-    total_num_reads = db.Column(db.Integer)
-    total_num_bases = db.Column(db.Integer)
-    download_size = db.Column(db.Integer)
+    total_num_reads = db.Column(db.BIGINT)
+    total_num_bases = db.Column(db.BIGINT)
+    download_size = db.Column(db.BIGINT)
     avg_percent_gc = db.Column(db.Float)
 
     #etc = db.Column(db.PickleType)
