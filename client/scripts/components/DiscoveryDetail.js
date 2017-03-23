@@ -40,7 +40,7 @@ var DiscoveryDetail = React.createClass({
         <div>
           <Header history={this.props.history}/>
           <Paper zDepth={2}>
-            <h2>Dataset Detail</h2>
+            <h2>Discovery Details</h2>
                       {JSON.stringify(this.state.discovery)}
           </Paper>
         </div>
