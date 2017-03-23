@@ -274,7 +274,7 @@ class GetDatasetSummary(Resource):
         total = Dataset.query.count()
         print total
         pdtotal = len(resultDataframe.index)
-        print total
+        print pdtotal
 
         total_download_size = db.session.query(func.sum(Dataset.download_size)).first()[0]
         print total_download_size
@@ -307,19 +307,26 @@ class GetDatasetSummary(Resource):
             del env_pkg_summary[None]
         print env_pkg_summary
         pdenv_pkg_summary = dict(resultDataframe.groupby('env_package').size())
-        print env_pkg_summary.keys()
-        if '' in env_pkg_summary.keys():
-            print 'hi'
-            del env_pkg_summary['']
+        if '' in pdenv_pkg_summary.keys():
+            del pdenv_pkg_summary['']
         print pdenv_pkg_summary
 
         #collection_date - keep just year for summary for now (might want month for e.g. season searches later on, but default date is 03-13 00:00:00 and need to deal with that)
         year_summary = dict(db.session.query(func.date_format(Dataset.collection_date, '%Y'),func.count(func.date_format(Dataset.collection_date, '%Y'))).group_by(func.date_format(Dataset.collection_date, '%Y')).all())
-        if None in year_summary.keys():
-            del year_summary[None]
+        print year_summary
+        pdyearFrame = resultDataframe['collection_date'].dt.to_period("Y")
+        pdyear_summary = resultDataframe.groupby(pdyearFrame).size()
+        pdyear_summary.index = pdyear_summary.index.to_series().astype(str)
+        pdyear_summary = dict(pdyear_summary)
+        # Would really like to fill in empty values here, histogram of years without empty years is a bit odd
+        print pdyear_summary
 
         #latitude
         lat_summary = dict(db.session.query(Dataset.latitude, func.count(Dataset.latitude)).group_by(Dataset.latitude).all())
+        print lat_summary
+        pdlat_summary = dict(resultDataframe.groupby('latitude').size())
+        print pdlat_summary
+        # print lat_summary
         lat_bins = Counter()
         for k,v in lat_summary.items(): #is there a way to do this that doesn't loop through each returned value?
             if not k:
@@ -329,15 +336,26 @@ class GetDatasetSummary(Resource):
 
         #longitude
         lon_summary = dict(db.session.query(Dataset.longitude, func.count(Dataset.longitude)).group_by(Dataset.longitude).all())
+        pdlon_summary = dict(resultDataframe.groupby('longitude').size())
+        print lon_summary
+        print pdlon_summary
+
+        # print lon_summary
         lon_bins = Counter()
         for k,v in lon_summary.items(): #is there a way to do this that doesn't loop through each returned value?
             if not k:
                 next
             else:
                 lon_bins[round(k,0)] += v
+        #print lon_bins
 
         #avg_read_length
         read_length_summary = dict(db.session.query(Dataset.avg_read_length, func.count(Dataset.avg_read_length)).group_by(Dataset.avg_read_length).all())
+        pdread_length_summary = dict(resultDataframe.groupby('avg_read_length').size())
+        print read_length_summary
+        print pdread_length_summary
+
+        # print read_length_summary
         rd_lgth_bins = Counter()
         for k,v in read_length_summary.items(): #is there a way to do this that doesn't loop through each returned value?
             if not k:
@@ -347,6 +365,12 @@ class GetDatasetSummary(Resource):
 
         #total_num_reads
         total_rds_summary = dict(db.session.query(Dataset.total_num_reads, func.count(Dataset.total_num_reads)).group_by(Dataset.total_num_reads).all())
+        pdtotal_rds_summary = dict(resultDataframe.groupby('total_num_reads').size())
+        print total_rds_summary
+        print pdtotal_rds_summary
+
+
+        # print total_rds_summary
         total_rds_bins = Counter()
         for k,v in total_rds_summary.items():
             if int(k)==0:
@@ -366,6 +390,11 @@ class GetDatasetSummary(Resource):
 
         #total_num_bases
         total_bases_summary = dict(db.session.query(Dataset.total_num_bases, func.count(Dataset.total_num_bases)).group_by(Dataset.total_num_bases).all())
+        pdtotal_bases_summary = dict(resultDataframe.groupby('total_num_bases').size())
+        print total_bases_summary
+        print pdtotal_bases_summary
+
+        # print total_bases_summary
         total_bases_bins = Counter()
         for k,v in total_bases_summary.items():
             if int(k)==0:
@@ -387,6 +416,11 @@ class GetDatasetSummary(Resource):
 
         #download_size (numeric binning example)
         down_size_summary = dict(db.session.query(Dataset.download_size, func.count(Dataset.download_size)).group_by(Dataset.download_size).all())
+        pddown_size_summary = dict(resultDataframe.groupby('download_size').size())
+        print down_size_summary
+        print pddown_size_summary
+
+        # print down_size_summary
         down_size_bins = Counter()
         for k,v in down_size_summary.items():
             if int(k)==0:
@@ -400,6 +434,11 @@ class GetDatasetSummary(Resource):
 
         #avg_percent_gc
         avg_gc_summary = dict(db.session.query(Dataset.avg_percent_gc, func.count(Dataset.avg_percent_gc)).group_by(Dataset.avg_percent_gc).all())
+        pdavg_gc_summary = dict(resultDataframe.groupby('avg_percent_gc').size())
+        print avg_gc_summary
+        print pdavg_gc_summary
+
+        # print avg_gc_summary
         avg_gc_bins = Counter()
         for k,v in avg_gc_summary.items(): #is there a way to do this that doesn't loop through each returned value?
             if not k:
@@ -409,7 +448,16 @@ class GetDatasetSummary(Resource):
 
         #latlon map
         latlon = db.session.query(Dataset.latitude,Dataset.longitude).filter(Dataset.latitude.isnot(None),Dataset.longitude.isnot(None)).all()
+        #print latlon
         latlon = pd.DataFrame(latlon,columns=['latitude','longitude']) #0th column is lat (yaxis), 1th column is lon (xaxis)
+        pdlatlon  = resultDataframe[['latitude','longitude']]
+        print pdlatlon
+        pdlatlon = pdlatlon[pd.notnull(pdlatlon['latitude'])]
+        print pdlatlon
+        pdlatlon = pdlatlon[pd.notnull(pdlatlon['longitude'])]
+        print pdlatlon
+
+        #print latlon
         latlon_map = np.histogram2d(x=latlon['longitude'],y=latlon['latitude'],bins=[36,18], range=[[-180, 180], [-90, 90]]) #range should be flexible to rules in DatasetSearchSummary
         #latlon_map[0] is the lonxlat (XxY) array of counts; latlon_map[1] is the nx/lon bin starts; map[2] ny/lat bin starts
         lonstepsize = (latlon_map[1][1]-latlon_map[1][0])/2
@@ -423,8 +471,7 @@ class GetDatasetSummary(Resource):
                 value = latbin
                 map_data.append({"lat":lat,"lon":lon,"count":value})
 
-        #num_latlon_None
-        num_latlon_None = (Dataset.query.count()-Dataset.query.filter(Dataset.latitude.isnot(None),Dataset.longitude.isnot(None)).count())
+        print latlon_map
 
         return {"summary":{"totalDatasets":int(total),
         "totalDownloadSize":int(total_download_size),
@@ -439,8 +486,7 @@ class GetDatasetSummary(Resource):
         "total_bases_summary":total_bases_bins,
         "download_size_summary":down_size_bins,
         "avg_percent_gc_summary":avg_gc_bins,
-        "latlon_map":map_data,
-        "num_latlon_None":num_latlon_None
+        "latlon_map":map_data
         }}
 
 class SearchDatasets(Resource):
