@@ -7,7 +7,17 @@ var Loading = React.createClass({
 
   render : function() {
     return (
-      <h2>Loading the best webpage ever! Please stand by.</h2>
+      <div style={{'width':400,'margin':'125px auto 0px'}}>
+        <div className='uil-rolling-css' style={{'margin':'0px auto','transform':'scale(0.44)'}}>
+          <div>
+            <div>
+            </div>
+            <div>
+            </div>
+          </div>
+        </div>
+        <h2>Loading, just one moment. . .</h2>
+      </div>
     )
   }
 });
