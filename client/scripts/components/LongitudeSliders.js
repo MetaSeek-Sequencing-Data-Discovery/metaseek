@@ -36,7 +36,7 @@ import Slider from 'material-ui/Slider';
           defaultValue={-180}
           value={this.state.minSlider}
           onChange={this.handleMinValue}
-          onDragStop={this.handleDragStop.bind(this,"latitudeMin","latitude",4,this.state.minSlider)}
+          onDragStop={this.handleDragStop.bind(this,"longitudeMin","longitude",4,this.state.minSlider)}
         />
         <Slider
           style={{height:6, marginTop:-6}}
@@ -46,7 +46,7 @@ import Slider from 'material-ui/Slider';
           defaultValue={180}
           value={this.state.maxSlider}
           onChange={this.handleMaxValue}
-          onDragStop={this.handleDragStop.bind(this,"latitudeMin","latitude",4,this.state.minSlider)}
+          onDragStop={this.handleDragStop.bind(this,"longitudeMax","longitude",3,this.state.minSlider)}
         />
       </div>
     );
