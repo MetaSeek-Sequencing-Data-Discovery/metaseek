@@ -31,11 +31,12 @@ var Explore = React.createClass({
       'fullData': [],
       'activeData': [],
       'activeSummaryData': [],
-      "summaryData":[],
-      "histinput":"avg_read_length_summary",
-      "filter_params":JSON.stringify({"rules":[]}),
-      "loaded":false,
-      "firebase":{
+      'summaryData':[],
+      'histinput':'avg_read_length_summary',
+      'filter_params':JSON.stringify({'rules':[]}),
+      'loaded':false,
+      'processing':false,
+      'firebase':{
         'uid':null,
         'name':null,
         'photo':null
@@ -74,13 +75,13 @@ var Explore = React.createClass({
   },
 
   updateActiveSummaryData : function() {
-    //var self = this;
-    //self.setState({"loaded":false});
-    //apiRequest.post('/datasets/search/summary', {
-    //  "filter_params":this.state.filter_params
-    //}).then(function (response) {
-    //  self.setState({"activeSummaryData": response.data.summary,"loaded":true});
-    //});
+    var self = this;
+    self.setState({"processing":true});
+    apiRequest.post('/datasets/search/summary', {
+      "filter_params":this.state.filter_params
+    }).then(function (response) {
+      self.setState({"activeSummaryData": response.data.summary,"processing":false});
+    });
   },
 
   triggerGoogleLogin : function() {
@@ -175,22 +176,22 @@ var Explore = React.createClass({
                   <ExploreFilters
                     style={{'margin':'12px 12px 0 12px'}}
                     updateFilterParams={this.updateFilterParams}
-                    summaryData={this.state.summaryData}
+                    summaryData={this.state.activeSummaryData}
                   />
                 </Paper>
                 <Paper style={{'float':'right','width':768,'height':408,'margin':'0 0 0 0','padding':24}}>
-                  <HeatmapChart data={this.state.summaryData.latlon_map}/>
+                  {this.state.processing ? "Loading" : <HeatmapChart data={this.state.activeSummaryData.latlon_map}/>}
                 </Paper>
                 <Paper style={{'float':'right','width':768,'margin':'15px 0 0 0'}}>
                   <div style={{'float':'left','width':300}}>
-                    <ExploreSummaryStats summaryData={this.state.summaryData}/>
+                    <ExploreSummaryStats summaryData={this.state.activeSummaryData}/>
                   </div>
                 </Paper>
                 <Paper style={{'float':'right','width':768,'height':320,'margin':'15px 0 0 0','padding':10}}>
                   <div style={{'float':'right','width':760,'padding':24}}>
-                    <Histogram summaryData={this.state.summaryData} histinput={this.state.histinput} style={{paddingLeft:'15px'}}/>
+                    <Histogram summaryData={this.state.activeSummaryData} histinput={this.state.histinput} style={{paddingLeft:'15px'}}/>
                     <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
-                      {Object.keys(this.state.summaryData).filter(function(value) {
+                      {Object.keys(this.state.activeSummaryData).filter(function(value) {
                         if (value.indexOf('summary') !== -1) {
                           return true;
                         } else {
