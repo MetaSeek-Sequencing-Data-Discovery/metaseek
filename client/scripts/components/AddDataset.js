@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import apiConfig from '../config/api.js';
 
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -9,7 +10,7 @@ import AddDatasetForm from './AddDatasetForm';
 import Header from './Header';
 
 var apiRequest = axios.create({
-  baseURL: 'https://api.metaseek.cloud/api/'
+  baseURL: apiConfig.baseURL
 });
 
 var AddDataset = React.createClass({

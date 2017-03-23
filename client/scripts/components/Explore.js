@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import apiConfig from '../config/api.js';
 import Firebase from 'firebase';
 
 // Material Design imports
@@ -21,7 +22,7 @@ import Histogram from './Histogram';
 import HeatmapChart from './HeatmapChart';
 
 var apiRequest = axios.create({
-  baseURL: 'https://api.metaseek.cloud/api/'
+  baseURL: apiConfig.baseURL
 });
 
 var Explore = React.createClass({
