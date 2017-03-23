@@ -454,8 +454,16 @@ class SearchDatasetsSummary(Resource):
                 value = rule['value']
                 queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
 
-            matchCount = queryObject.count()
-            return matchCount
+            matchingDatasets = queryObject.all()
+            matchCount = len(matchingDatasets)
+
+            #YYYYYAAAAAAUUUUUSSSSSSSS - RETURNS RESULT OF QUERY AS DATAFRAME; okay as long as your result isn't too huge; otherwise look at selecting specific columns and doing multiple queries
+            result = pd.read_sql(queryObject.statement,db.session.bind)
+            total_download_size = sum(result["download_size"])
+
+            return {"summary":{"totalDatasets":int(matchCount),
+            "totalDownloadSize":int(total_download_size)
+            }}
 
         except Exception as e:
             return {'error': str(e)}
