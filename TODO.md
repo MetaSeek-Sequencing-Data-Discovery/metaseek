@@ -4,6 +4,7 @@
 * ~~*deploy clientside on firebase - 0.5hr*~~
 * ~~*set up SSL on server - 2hr*~~
 * ~~Get Adrienne set up - 0.5hr~~
+* *Get URL mapped to Firebase* - 0.5hr
 * push changes via git - 1hr
 * automated deployments via github - 4hr
 
@@ -27,13 +28,13 @@
 * Clean up welcome page - 1hr
 * ~~continuous color scale map, center - 1hr~~
 * ~~janky heatmap => map - 1hr~~
-* map - 4hr
+* ~~map - 4hr~~
 * Range selector - 2hr
 * ~~prettify layout Explore - 4hr~~
 * clean up dataset detail - 1hr
 * design and build DiscoveryDetail (user; filter params; summary figs; download datasets) - 2hr
 * design and build UserDetail - 2hr
-* *convert CSS styles to MetaSeek colors globally - 0.5hr*
+* ~~*convert CSS styles to MetaSeek colors globally - 0.5hr*~~
 * ~~*remove or fix authentication - 2hr*~~
 * simple export datasets button - 0.5hr
 * ~~rotate hist labels~~
