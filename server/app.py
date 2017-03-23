@@ -268,23 +268,50 @@ class GetAllDatasets(Resource):
 
 class GetDatasetSummary(Resource):
     def get(self):
+        queryObject = Dataset.query
+        resultDataframe = pd.read_sql(queryObject.statement,db.session.bind)
+
         total = Dataset.query.count()
+        print total
+        pdtotal = len(resultDataframe.index)
+        print total
+
         total_download_size = db.session.query(func.sum(Dataset.download_size)).first()[0]
+        print total_download_size
+        pdtotal_download_size = sum(resultDataframe["download_size"])
+        print pdtotal_download_size
 
         #investigation_type
         investigation_summary = dict(db.session.query(Dataset.investigation_type, func.count(Dataset.investigation_type)).group_by(Dataset.investigation_type).all())
-        if None in investigation_summary.keys():
-            del investigation_summary[None]
+        if '' in investigation_summary.keys():
+            del investigation_summary['']
+        print investigation_summary
+        pdinvestigation_summary = dict(resultDataframe.groupby('investigation_type').size())
+        if '' in pdinvestigation_summary.keys():
+            del pdinvestigation_summary['']
+        print pdinvestigation_summary
 
         #counts of each category in library_source (for histograms)
         lib_source_summary = dict(db.session.query(Dataset.library_source, func.count(Dataset.library_source)).group_by(Dataset.library_source).all())
         if None in lib_source_summary.keys():
             del lib_source_summary[None]
+        print lib_source_summary
+        pdlib_source_summary = dict(resultDataframe.groupby('library_source').size())
+        if '' in pdlib_source_summary.keys():
+            del pdlib_source_summary['']
+        print pdlib_source_summary
 
         #env_package
         env_pkg_summary = dict(db.session.query(Dataset.env_package, func.count(Dataset.env_package)).group_by(Dataset.env_package).all())
         if None in env_pkg_summary.keys():
             del env_pkg_summary[None]
+        print env_pkg_summary
+        pdenv_pkg_summary = dict(resultDataframe.groupby('env_package').size())
+        print env_pkg_summary.keys()
+        if '' in env_pkg_summary.keys():
+            print 'hi'
+            del env_pkg_summary['']
+        print pdenv_pkg_summary
 
         #collection_date - keep just year for summary for now (might want month for e.g. season searches later on, but default date is 03-13 00:00:00 and need to deal with that)
         year_summary = dict(db.session.query(func.date_format(Dataset.collection_date, '%Y'),func.count(func.date_format(Dataset.collection_date, '%Y'))).group_by(func.date_format(Dataset.collection_date, '%Y')).all())
@@ -464,7 +491,10 @@ class SearchDatasetsSummary(Resource):
             matchCount = len(matchingDatasets)
 
             #YYYYYAAAAAAUUUUUSSSSSSSS - RETURNS RESULT OF QUERY AS DATAFRAME; okay as long as your result isn't too huge; otherwise look at selecting specific columns and doing multiple queries
+            print queryObject
+            print queryObject.statement
             result = pd.read_sql(queryObject.statement,db.session.bind)
+            print result
             total_download_size = sum(result["download_size"])
 
             return {"summary":{"totalDatasets":int(matchCount),
@@ -555,4 +585,4 @@ api.add_resource(GetAllDiscoveries,     '/api/discoveries')
 
 # Start the app!
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
