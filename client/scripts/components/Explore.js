@@ -148,6 +148,29 @@ var Explore = React.createClass({
 
   render : function() {
     if (!this.state.loaded) return <Loading/>;
+
+    var mapRender = function(activeSummaryData,isProcessing) {
+      if (!isProcessing) {
+        if (activeSummaryData.empty) {
+          return <h3 style={{textAlign:'center'}}>Sorry, no matches!</h3>
+        } else {
+          return <HeatmapChart data={activeSummaryData.latlon_map}/>
+        }
+      } else {
+        return <div>
+          <div style={{'margin':'25px auto 0'}}>
+            <div className='uil-rolling-css' style={{'margin':'50px auto 0','transform':'scale(0.34)'}}>
+              <div>
+                <div></div>
+                <div></div>
+              </div>
+            </div>
+          </div>
+          <h3>Processing...</h3>
+        </div>
+      }
+    };
+
     return (
       <div>
         <Header history={this.props.history}/>
@@ -180,7 +203,9 @@ var Explore = React.createClass({
                   />
                 </Paper>
                 <Paper style={{'float':'right','width':768,'height':408,'margin':'0 0 0 0','padding':24}}>
-                  {this.state.processing ? "Loading" : <HeatmapChart data={this.state.activeSummaryData.latlon_map}/>}
+                  <div>
+                    {mapRender(this.state.activeSummaryData,this.state.processing)}
+                  </div>
                 </Paper>
                 <Paper style={{'float':'right','width':768,'margin':'15px 0 0 0'}}>
                   <div style={{'float':'left','width':300}}>
