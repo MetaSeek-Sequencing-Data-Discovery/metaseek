@@ -26,10 +26,10 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # production DB
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-35-166-20-248.us-west-2.compute.amazonaws.com/metaseek'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-35-166-20-248.us-west-2.compute.amazonaws.com/metaseek'
 
 # local DB - uncomment for local testing
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -151,6 +151,148 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
 
     return queryObject
 
+def summarizeDatasets(queryObject):
+    queryResultDataframe = pd.read_sql(queryObject.statement,db.session.bind)
+
+    total = len(queryResultDataframe.index)
+    total_download_size = sum(queryResultDataframe["download_size"])
+
+    investigation_summary = dict(queryResultDataframe.groupby('investigation_type').size())
+    if '' in investigation_summary.keys():
+        del investigation_summary['']
+
+    lib_source_summary = dict(queryResultDataframe.groupby('library_source').size())
+    if '' in lib_source_summary.keys():
+        del lib_source_summary['']
+
+    env_pkg_summary = dict(queryResultDataframe.groupby('env_package').size())
+    if '' in env_pkg_summary.keys():
+        del env_pkg_summary['']
+
+    # collection_date - keep just year for summary for now (might want month for e.g. season searches later on, but default date is 03-13 00:00:00 and need to deal with that)
+    # Would really like to fill in empty values here, histogram of years without empty years is a bit odd
+    yearFrame = queryResultDataframe['collection_date'].dt.to_period("A")
+    year_summary = queryResultDataframe.groupby(yearFrame).size()
+    year_summary.index = year_summary.index.to_series().astype(str)
+    year_summary = dict(year_summary)
+
+    lat_summary = dict(queryResultDataframe.groupby('latitude').size())
+    lat_bins = Counter()
+    for k,v in lat_summary.items(): #is there a way to do this that doesn't loop through each returned value?
+        if not k:
+            next
+        else:
+            lat_bins[round(k,0)] += v
+
+    lon_summary = dict(queryResultDataframe.groupby('longitude').size())
+    lon_bins = Counter()
+    for k,v in lon_summary.items(): #is there a way to do this that doesn't loop through each returned value?
+        if not k:
+            next
+        else:
+            lon_bins[round(k,0)] += v
+
+    read_length_summary = dict(queryResultDataframe.groupby('avg_read_length').size())
+    rd_lgth_bins = Counter()
+    for k,v in read_length_summary.items(): #is there a way to do this that doesn't loop through each returned value?
+        if not k:
+            next
+        else:
+            rd_lgth_bins[round(k,-2)] += v
+
+    total_rds_summary = dict(queryResultDataframe.groupby('total_num_reads').size())
+    total_rds_bins = Counter()
+    for k,v in total_rds_summary.items():
+        if int(k)==0:
+            total_rds_bins['0'] += v #lotsa zeros
+        elif int(k)<1000: #if lower than 1000, count by hundreds
+            total_rds_bins[round(k,-2)] += v
+        elif int(k)<10000: #if lower than 10000, count by thousands
+            total_rds_bins[round(k,-3)] += v
+        elif int(k)<100000: #if between 10000-100,000, count by 10,000
+            total_rds_bins[round(k,-4)] += v
+        elif int(k)<1000000: #if between 100,000-1,000,000, count by 100,000
+            total_rds_bins[round(k,-5)] += v
+        elif int(k)<10000000: #if between 1,000,000-10,000,000, count by 1,000,000
+            total_rds_bins[round(k,-6)] += v
+        else:
+            total_rds_bins[round(k,-7)] += v #above 10,000,000, count by 10M
+
+    total_bases_summary = dict(queryResultDataframe.groupby('total_num_bases').size())
+    total_bases_bins = Counter()
+    for k,v in total_bases_summary.items():
+        if int(k)==0:
+            total_bases_bins['0'] += v
+        elif int(k)<1000: #if lower than 1000, count by hundreds
+            total_bases_bins[round(k,-2)] += v
+        elif int(k)<10000: #if lower than 10000, count by thousands
+            total_bases_bins[round(k,-3)] += v
+        elif int(k)<100000: #if between 10000-100,000, count by 10,000
+            total_bases_bins[round(k,-4)] += v
+        elif int(k)<1000000: #if between 100,000-1,000,000, count by 100,000
+            total_bases_bins[round(k,-5)] += v
+        elif int(k)<10000000: #if between 1,000,000-10,000,000, count by 1,000,000
+            total_bases_bins[round(k,-6)] += v
+        elif int(k)<100000000: #if between 10,000,000-100,000,000, count by 10,000,000
+            total_bases_bins[round(k,-7)] += v
+        else:
+            total_bases_bins[round(k,-8)] += v #above 100,000,000, count by 100M
+
+    down_size_summary = dict(queryResultDataframe.groupby('download_size').size())
+    down_size_bins = Counter()
+    for k,v in down_size_summary.items():
+        if int(k)==0:
+            down_size_bins['0'] += v #lotsa zeros
+        elif int(k)<1000000:
+            down_size_bins['0.1'] += v #many are skewed, can create long tail bin
+        elif int(k)<10000000:
+            down_size_bins['1000000'] += v
+        else:
+            down_size_bins[round(k,-7)] += v #round every 10MB
+
+    avg_gc_summary = dict(queryResultDataframe.groupby('avg_percent_gc').size())
+    avg_gc_bins = Counter()
+    for k,v in avg_gc_summary.items(): #is there a way to do this that doesn't loop through each returned value?
+        if not k:
+            next
+        else:
+            avg_gc_bins[round(k,2)] += v
+
+    latlon  = queryResultDataframe[['latitude','longitude']]
+    latlon = latlon[pd.notnull(latlon['latitude'])]
+    latlon = latlon[pd.notnull(latlon['longitude'])]
+    latlon_map = np.histogram2d(x=latlon['longitude'],y=latlon['latitude'],bins=[36,18], range=[[-180, 180], [-90, 90]]) #range should be flexible to rules in DatasetSearchSummary
+    #latlon_map[0] is the lonxlat (XxY) array of counts; latlon_map[1] is the nx/lon bin starts; map[2] ny/lat bin starts
+    lonstepsize = (latlon_map[1][1]-latlon_map[1][0])/2
+    latstepsize = (latlon_map[2][1]-latlon_map[2][0])/2
+    map_data = []
+    for lon_ix,lonbin in enumerate(latlon_map[0]):
+        for lat_ix,latbin in enumerate(lonbin):
+            #[latlon_map[2][ix]+latstepsize for ix,latbin in enumerate(latlon_map[0][0])]
+            lat = latlon_map[2][lat_ix]+latstepsize
+            lon = latlon_map[1][lon_ix]+lonstepsize
+            value = latbin
+            map_data.append({"lat":lat,"lon":lon,"count":value})
+
+    return {
+        "summary":{
+            "totalDatasets":int(total),
+            "totalDownloadSize":int(total_download_size),
+            "investigation_type_summary":investigation_summary,
+            "library_source_summary":lib_source_summary,
+            "env_package_summary":env_pkg_summary,
+            "year_collected_summary":year_summary,
+            "latitude_summary":lat_bins,
+            "longitude_summary":lon_bins,
+            "avg_read_length_summary":rd_lgth_bins,
+            "total_reads_summary":total_rds_bins,
+            "total_bases_summary":total_bases_bins,
+            "download_size_summary":down_size_bins,
+            "avg_percent_gc_summary":avg_gc_bins,
+            "latlon_map":map_data
+            }
+        }
+
 # Declare route functions
 # /user routes
 class CreateUser(Resource):
@@ -266,229 +408,6 @@ class GetAllDatasets(Resource):
     def get(self):
         return Dataset.query.all()
 
-class GetDatasetSummary(Resource):
-    def get(self):
-        queryObject = Dataset.query
-        resultDataframe = pd.read_sql(queryObject.statement,db.session.bind)
-
-        total = Dataset.query.count()
-        print total
-        pdtotal = len(resultDataframe.index)
-        print pdtotal
-
-        total_download_size = db.session.query(func.sum(Dataset.download_size)).first()[0]
-        print total_download_size
-        pdtotal_download_size = sum(resultDataframe["download_size"])
-        print pdtotal_download_size
-
-        #investigation_type
-        investigation_summary = dict(db.session.query(Dataset.investigation_type, func.count(Dataset.investigation_type)).group_by(Dataset.investigation_type).all())
-        if '' in investigation_summary.keys():
-            del investigation_summary['']
-        print investigation_summary
-        pdinvestigation_summary = dict(resultDataframe.groupby('investigation_type').size())
-        if '' in pdinvestigation_summary.keys():
-            del pdinvestigation_summary['']
-        print pdinvestigation_summary
-
-        #counts of each category in library_source (for histograms)
-        lib_source_summary = dict(db.session.query(Dataset.library_source, func.count(Dataset.library_source)).group_by(Dataset.library_source).all())
-        if None in lib_source_summary.keys():
-            del lib_source_summary[None]
-        print lib_source_summary
-        pdlib_source_summary = dict(resultDataframe.groupby('library_source').size())
-        if '' in pdlib_source_summary.keys():
-            del pdlib_source_summary['']
-        print pdlib_source_summary
-
-        #env_package
-        env_pkg_summary = dict(db.session.query(Dataset.env_package, func.count(Dataset.env_package)).group_by(Dataset.env_package).all())
-        if None in env_pkg_summary.keys():
-            del env_pkg_summary[None]
-        print env_pkg_summary
-        pdenv_pkg_summary = dict(resultDataframe.groupby('env_package').size())
-        if '' in pdenv_pkg_summary.keys():
-            del pdenv_pkg_summary['']
-        print pdenv_pkg_summary
-
-        #collection_date - keep just year for summary for now (might want month for e.g. season searches later on, but default date is 03-13 00:00:00 and need to deal with that)
-        year_summary = dict(db.session.query(func.date_format(Dataset.collection_date, '%Y'),func.count(func.date_format(Dataset.collection_date, '%Y'))).group_by(func.date_format(Dataset.collection_date, '%Y')).all())
-        print year_summary
-        pdyearFrame = resultDataframe['collection_date'].dt.to_period("Y")
-        pdyear_summary = resultDataframe.groupby(pdyearFrame).size()
-        pdyear_summary.index = pdyear_summary.index.to_series().astype(str)
-        pdyear_summary = dict(pdyear_summary)
-        # Would really like to fill in empty values here, histogram of years without empty years is a bit odd
-        print pdyear_summary
-
-        #latitude
-        lat_summary = dict(db.session.query(Dataset.latitude, func.count(Dataset.latitude)).group_by(Dataset.latitude).all())
-        print lat_summary
-        pdlat_summary = dict(resultDataframe.groupby('latitude').size())
-        print pdlat_summary
-        # print lat_summary
-        lat_bins = Counter()
-        for k,v in lat_summary.items(): #is there a way to do this that doesn't loop through each returned value?
-            if not k:
-                next
-            else:
-                lat_bins[round(k,0)] += v
-
-        #longitude
-        lon_summary = dict(db.session.query(Dataset.longitude, func.count(Dataset.longitude)).group_by(Dataset.longitude).all())
-        pdlon_summary = dict(resultDataframe.groupby('longitude').size())
-        print lon_summary
-        print pdlon_summary
-
-        # print lon_summary
-        lon_bins = Counter()
-        for k,v in lon_summary.items(): #is there a way to do this that doesn't loop through each returned value?
-            if not k:
-                next
-            else:
-                lon_bins[round(k,0)] += v
-        #print lon_bins
-
-        #avg_read_length
-        read_length_summary = dict(db.session.query(Dataset.avg_read_length, func.count(Dataset.avg_read_length)).group_by(Dataset.avg_read_length).all())
-        pdread_length_summary = dict(resultDataframe.groupby('avg_read_length').size())
-        print read_length_summary
-        print pdread_length_summary
-
-        # print read_length_summary
-        rd_lgth_bins = Counter()
-        for k,v in read_length_summary.items(): #is there a way to do this that doesn't loop through each returned value?
-            if not k:
-                next
-            else:
-                rd_lgth_bins[round(k,-2)] += v
-
-        #total_num_reads
-        total_rds_summary = dict(db.session.query(Dataset.total_num_reads, func.count(Dataset.total_num_reads)).group_by(Dataset.total_num_reads).all())
-        pdtotal_rds_summary = dict(resultDataframe.groupby('total_num_reads').size())
-        print total_rds_summary
-        print pdtotal_rds_summary
-
-
-        # print total_rds_summary
-        total_rds_bins = Counter()
-        for k,v in total_rds_summary.items():
-            if int(k)==0:
-                total_rds_bins['0'] += v #lotsa zeros
-            elif int(k)<1000: #if lower than 1000, count by hundreds
-                total_rds_bins[round(k,-2)] += v
-            elif int(k)<10000: #if lower than 10000, count by thousands
-                total_rds_bins[round(k,-3)] += v
-            elif int(k)<100000: #if between 10000-100,000, count by 10,000
-                total_rds_bins[round(k,-4)] += v
-            elif int(k)<1000000: #if between 100,000-1,000,000, count by 100,000
-                total_rds_bins[round(k,-5)] += v
-            elif int(k)<10000000: #if between 1,000,000-10,000,000, count by 1,000,000
-                total_rds_bins[round(k,-6)] += v
-            else:
-                total_rds_bins[round(k,-7)] += v #above 10,000,000, count by 10M
-
-        #total_num_bases
-        total_bases_summary = dict(db.session.query(Dataset.total_num_bases, func.count(Dataset.total_num_bases)).group_by(Dataset.total_num_bases).all())
-        pdtotal_bases_summary = dict(resultDataframe.groupby('total_num_bases').size())
-        print total_bases_summary
-        print pdtotal_bases_summary
-
-        # print total_bases_summary
-        total_bases_bins = Counter()
-        for k,v in total_bases_summary.items():
-            if int(k)==0:
-                total_bases_bins['0'] += v
-            elif int(k)<1000: #if lower than 1000, count by hundreds
-                total_bases_bins[round(k,-2)] += v
-            elif int(k)<10000: #if lower than 10000, count by thousands
-                total_bases_bins[round(k,-3)] += v
-            elif int(k)<100000: #if between 10000-100,000, count by 10,000
-                total_bases_bins[round(k,-4)] += v
-            elif int(k)<1000000: #if between 100,000-1,000,000, count by 100,000
-                total_bases_bins[round(k,-5)] += v
-            elif int(k)<10000000: #if between 1,000,000-10,000,000, count by 1,000,000
-                total_bases_bins[round(k,-6)] += v
-            elif int(k)<100000000: #if between 10,000,000-100,000,000, count by 10,000,000
-                total_bases_bins[round(k,-7)] += v
-            else:
-                total_bases_bins[round(k,-8)] += v #above 100,000,000, count by 100M
-
-        #download_size (numeric binning example)
-        down_size_summary = dict(db.session.query(Dataset.download_size, func.count(Dataset.download_size)).group_by(Dataset.download_size).all())
-        pddown_size_summary = dict(resultDataframe.groupby('download_size').size())
-        print down_size_summary
-        print pddown_size_summary
-
-        # print down_size_summary
-        down_size_bins = Counter()
-        for k,v in down_size_summary.items():
-            if int(k)==0:
-                down_size_bins['0'] += v #lotsa zeros
-            elif int(k)<1000000:
-                down_size_bins['0.1'] += v #many are skewed, can create long tail bin
-            elif int(k)<10000000:
-                down_size_bins['1000000'] += v
-            else:
-                down_size_bins[round(k,-7)] += v #round every 10MB
-
-        #avg_percent_gc
-        avg_gc_summary = dict(db.session.query(Dataset.avg_percent_gc, func.count(Dataset.avg_percent_gc)).group_by(Dataset.avg_percent_gc).all())
-        pdavg_gc_summary = dict(resultDataframe.groupby('avg_percent_gc').size())
-        print avg_gc_summary
-        print pdavg_gc_summary
-
-        # print avg_gc_summary
-        avg_gc_bins = Counter()
-        for k,v in avg_gc_summary.items(): #is there a way to do this that doesn't loop through each returned value?
-            if not k:
-                next
-            else:
-                avg_gc_bins[round(k,2)] += v
-
-        #latlon map
-        latlon = db.session.query(Dataset.latitude,Dataset.longitude).filter(Dataset.latitude.isnot(None),Dataset.longitude.isnot(None)).all()
-        #print latlon
-        latlon = pd.DataFrame(latlon,columns=['latitude','longitude']) #0th column is lat (yaxis), 1th column is lon (xaxis)
-        pdlatlon  = resultDataframe[['latitude','longitude']]
-        print pdlatlon
-        pdlatlon = pdlatlon[pd.notnull(pdlatlon['latitude'])]
-        print pdlatlon
-        pdlatlon = pdlatlon[pd.notnull(pdlatlon['longitude'])]
-        print pdlatlon
-
-        #print latlon
-        latlon_map = np.histogram2d(x=latlon['longitude'],y=latlon['latitude'],bins=[36,18], range=[[-180, 180], [-90, 90]]) #range should be flexible to rules in DatasetSearchSummary
-        #latlon_map[0] is the lonxlat (XxY) array of counts; latlon_map[1] is the nx/lon bin starts; map[2] ny/lat bin starts
-        lonstepsize = (latlon_map[1][1]-latlon_map[1][0])/2
-        latstepsize = (latlon_map[2][1]-latlon_map[2][0])/2
-        map_data = []
-        for lon_ix,lonbin in enumerate(latlon_map[0]):
-            for lat_ix,latbin in enumerate(lonbin):
-                #[latlon_map[2][ix]+latstepsize for ix,latbin in enumerate(latlon_map[0][0])]
-                lat = latlon_map[2][lat_ix]+latstepsize
-                lon = latlon_map[1][lon_ix]+lonstepsize
-                value = latbin
-                map_data.append({"lat":lat,"lon":lon,"count":value})
-
-        print latlon_map
-
-        return {"summary":{"totalDatasets":int(total),
-        "totalDownloadSize":int(total_download_size),
-        "investigation_type_summary":investigation_summary,
-        "library_source_summary":lib_source_summary,
-        "env_package_summary":env_pkg_summary,
-        "year_collected_summary":year_summary,
-        "latitude_summary":lat_bins,
-        "longitude_summary":lon_bins,
-        "avg_read_length_summary":rd_lgth_bins,
-        "total_reads_summary":total_rds_bins,
-        "total_bases_summary":total_bases_bins,
-        "download_size_summary":down_size_bins,
-        "avg_percent_gc_summary":avg_gc_bins,
-        "latlon_map":map_data
-        }}
-
 class SearchDatasets(Resource):
     @marshal_with(marshalledDatasetFields, envelope='datasets')
     def post(self):
@@ -515,6 +434,11 @@ class SearchDatasets(Resource):
         except Exception as e:
             return {'error': str(e)}
 
+class GetDatasetSummary(Resource):
+    def get(self):
+        queryObject = Dataset.query
+        return summarizeDatasets(queryObject)
+
 class SearchDatasetsSummary(Resource):
     def post(self):
         try:
@@ -533,19 +457,7 @@ class SearchDatasetsSummary(Resource):
                 value = rule['value']
                 queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
 
-            matchingDatasets = queryObject.all()
-            matchCount = len(matchingDatasets)
-
-            #YYYYYAAAAAAUUUUUSSSSSSSS - RETURNS RESULT OF QUERY AS DATAFRAME; okay as long as your result isn't too huge; otherwise look at selecting specific columns and doing multiple queries
-            print queryObject
-            print queryObject.statement
-            result = pd.read_sql(queryObject.statement,db.session.bind)
-            print result
-            total_download_size = sum(result["download_size"])
-
-            return {"summary":{"totalDatasets":int(matchCount),
-            "totalDownloadSize":int(total_download_size)
-            }}
+            return summarizeDatasets(queryObject)
 
         except Exception as e:
             return {'error': str(e)}

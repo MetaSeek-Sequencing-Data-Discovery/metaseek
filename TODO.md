@@ -17,7 +17,7 @@
 * CV control investigation_type
 
 ## API
-* SearchDatasetsSummary - 4hr
+* ~~SearchDatasetsSummary - 4hr~~
 * new call, give me dataset export script - 2hr
 * ~~*actually save discoveries to user - 0.5hr*~~
 
