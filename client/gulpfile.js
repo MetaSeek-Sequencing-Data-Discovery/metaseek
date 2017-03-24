@@ -8,10 +8,12 @@ var notify = require('gulp-notify');
 
 var stylus = require('gulp-stylus');
 var autoprefixer = require('gulp-autoprefixer');
+var cleanCSS = require('gulp-clean-css');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var htmlreplace = require('gulp-html-replace');
 var buffer = require('vinyl-buffer');
+var imagemin = require('gulp-imagemin');
 
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
@@ -31,6 +33,7 @@ gulp.task('styles',function() {
   gulp.src('css/style.styl')
     .pipe(stylus())
     .pipe(autoprefixer())
+    .pipe(cleanCSS({compatibility: '*'}))
     .pipe(gulp.dest('./build/css/'))
     .pipe(reload({stream:true}))
 });
@@ -40,9 +43,11 @@ gulp.task('styles',function() {
 */
 gulp.task('images',function(){
   gulp.src('css/images/**')
+    .pipe(imagemin())
     .pipe(gulp.dest('./build/css/images'))
 
   gulp.src('images/**')
+    .pipe(imagemin())
     .pipe(gulp.dest('./build/images'))
 
 });
@@ -120,4 +125,19 @@ gulp.task('scripts', function() {
 gulp.task('default', ['copy-index-html','images','styles','scripts','browser-sync'], function() {
   gulp.watch('css/**/*', ['styles']); // gulp watch for stylus changes
   return buildScript('main.js', true); // browserify watch for JS changes
+});
+
+gulp.task('production', ['copy-index-html','images','styles','scripts'],function() {
+    process.env.NODE_ENV = 'production';
+
+    browserify({
+          entries: ['./scripts/main.js'],
+          debug : false,
+          transform:  [babelify.configure({stage : 0 })]
+        })
+        .bundle()
+        .pipe(source('main.js'))
+        .pipe(buffer())
+        .pipe(uglify({ mangle: false }))
+        .pipe(gulp.dest('./build'));
 });

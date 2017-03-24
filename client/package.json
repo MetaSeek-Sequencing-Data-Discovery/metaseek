@@ -1,6 +1,6 @@
 {
   "name": "MetaSeek",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "MetaSeek is a data discovery and analysis tool for genome sequencing data. Providing a rich front-end for exploration of metadata across a wide set of data repositories, use MetaSeek to find the right aggregation of sequences for your analysis, and then access the raw sequencing data.",
   "main": "index.js",
   "scripts": {
@@ -20,7 +20,9 @@
     "formsy-react": "^0.18.1",
     "gulp": "3.9.1",
     "gulp-autoprefixer": "3.1.0",
+    "gulp-clean-css": "^3.0.4",
     "gulp-html-replace": "^1.6.2",
+    "gulp-imagemin": "^3.1.1",
     "gulp-notify": "2.2.0",
     "gulp-rename": "1.2.2",
     "gulp-stylus": "2.1.0",
