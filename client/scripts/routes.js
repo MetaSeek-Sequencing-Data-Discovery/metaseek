@@ -21,9 +21,16 @@ import DiscoveryDetail from './components/DiscoveryDetail';
 /*
   Routes
 */
+var ReactGA = require('react-ga');
+ReactGA.initialize('UA-96087468-1');
+
+function logPageView() {
+  ReactGA.set({ page: window.location.pathname });
+  ReactGA.pageview(window.location.pathname);
+}
 
 var routes = (
-  <Router history={browserHistory}>
+  <Router history={browserHistory} onUpdate={logPageView}>
     <Route path="/" component={Signup}/>
     <Route path="/browse" component={Browse}/>
     <Route path="/explore" component={Explore}/>
