@@ -110,10 +110,16 @@ var Explore = React.createClass({
   },
 
   successfulLogin : function(user) {
-    this.state.firebase.name = user.displayName;
-    this.state.firebase.uid = user.uid;
-    this.state.firebase.photo = user.photoURL;
-    this.setState({"firebase": this.state.firebase});
+    var self = this;
+    self.state.firebase.name = user.displayName;
+    self.state.firebase.uid = user.uid;
+    self.state.firebase.photo = user.photoURL;
+    apiRequest.post('/user/create', {
+      "firebase_id":self.state.firebase.uid,
+      "admin":0
+    }).then(function(response){
+      this.setState({"firebase": self.state.firebase});
+    });
   },
 
   updateFilterParams : function(filterStates) {

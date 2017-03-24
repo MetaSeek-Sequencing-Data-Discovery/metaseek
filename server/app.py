@@ -326,7 +326,7 @@ class CreateUser(Resource):
             existingUser = User.query.filter_by(firebase_id=args['firebase_id']).first()
 
             if (existingUser):
-                return {'error':'User already exists!','uri':'http://127.0.0.1:5000/api/user/' + str(existingUser.id)}
+                return {'error':'User already exists!','uri':url_for('getuser',id=existingUser.id,_external=True)}
             else:
                 newUser = User(args['firebase_id'],args['admin'])
                 db.session.add(newUser)
