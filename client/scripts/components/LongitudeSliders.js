@@ -46,7 +46,7 @@ import Slider from 'material-ui/Slider';
           defaultValue={180}
           value={this.state.maxSlider}
           onChange={this.handleMaxValue}
-          onDragStop={this.handleDragStop.bind(this,"longitudeMax","longitude",3,this.state.minSlider)}
+          onDragStop={this.handleDragStop.bind(this,"longitudeMax","longitude",3,this.state.maxSlider)}
         />
       </div>
     );
