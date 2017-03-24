@@ -118,7 +118,7 @@ var Explore = React.createClass({
       "firebase_id":self.state.firebase.uid,
       "admin":0
     }).then(function(response){
-      this.setState({"firebase": self.state.firebase});
+      self.setState({"firebase": self.state.firebase});
     });
   },
 
