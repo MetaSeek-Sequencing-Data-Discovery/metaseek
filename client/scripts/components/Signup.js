@@ -2,6 +2,8 @@ import React from 'react';
 import * as firebase from "firebase";
 import firebaseConfig from '../config/firebase.js';
 firebase.initializeApp(firebaseConfig);
+import axios from 'axios';
+import apiConfig from '../config/api.js';
 
 import { Link } from 'react-router';
 
@@ -18,13 +20,39 @@ import Header from './Header';
 
 var db = firebase.database();
 var signupRef = db.ref("signups");
-
+var apiRequest = axios.create({
+  baseURL: apiConfig.baseURL
+});
 
 var Signup = React.createClass({
   getInitialState : function() {
     return {
       canSubmit:false,
-      submitted:false
+      submitted:false,
+      firebase:{
+        uid:null,
+        admin:0
+      }
+    }
+  },
+
+  componentWillMount: function() {
+    var user = firebase.auth().currentUser;
+    if (user) {
+      this.state.firebase.uid = user.uid;
+      var self = this;
+      apiRequest.post('/user/create', {
+        "firebase_id":self.state.firebase.uid,
+        "admin":0
+      }).then(function(response){
+        console.log(response.data.uri);
+        axios.get(response.data.uri).then(function(response){
+          if (response.data.user.admin) {
+            self.state.firebase.admin = 1;
+          }
+          self.setState({"firebase": self.state.firebase});
+        });
+      });
     }
   },
 
@@ -58,7 +86,7 @@ var Signup = React.createClass({
       container: {
         textAlign: 'center',
         paddingTop: 15,
-        width: 1200,
+        width: 1024,
         margin: '0 auto'
       },
       paper: {
@@ -72,10 +100,16 @@ var Signup = React.createClass({
         'textAlign':'center',
         'margin': '12px auto',
         'width': 400,
-        'marginBottom': 12,
+        'marginBottom': 25,
         'padding':5
       }
     };
+
+    var exploreButtonDisplay = 'none';
+    if (this.state.firebase.admin) {
+      exploreButtonDisplay = 'flex';
+    }
+
     return(
       <div>
         <Header history={this.props.history}/>
@@ -102,12 +136,14 @@ var Signup = React.createClass({
                   <RaisedButton
                     type="submit"
                     label="Signup"
+                    primary={true}
+                    style={{marginTop:12,marginBottom:12}}
                   />
                 </Formsy.Form>}
               </Paper>
             <h1 style={{'fontSize':'2.6em','marginTop':50}}>Welcome to MetaSeek</h1>
             <p style={{'marginTop':'10px','marginBottom':30}}>Discover, curate, and get access to thousands of sequencing samples from all over the web.</p>
-              <div style={{'display':'flex','maxWidth':500,'margin':'0 auto'}}>
+              <div style={{'display':exploreButtonDisplay,'maxWidth':500,'margin':'0 auto'}}>
                 <Paper style={styles.paper} zDepth={1}>
                   <Link style={{'display':'block','textAlign':'center'}} to='/explore'>
                     <FlatButton label="DISCOVER"></FlatButton>
@@ -129,13 +165,11 @@ var Signup = React.createClass({
                 <h3>MetaSeek brings together sequencing metadata from all the major repositories to let you easily search, filter, and curate sequencing datasets for your meta-analysis.</h3>
               </Paper>
               <h1 style={{'fontSize':'1.9em','marginTop':60}}>How to use MetaSeek</h1>
-              <div style={{'width':1200,'height':400,'margin':'12px auto 12px'}}>
+              <div>
 
-              <Paper style={{textAlign: 'center',
+              <Paper style={{
                       padding: 15,
-                      width: 1000,
-                      height: 400,
-                      margin: '0 auto'}} zDepth={2}>
+                      height: 400}} zDepth={2}>
                       <div style={{float:'left',width:500,'marginLeft':20,'marginTop':40}}>
                         <img src="./images/explore.jpeg"></img>
                       </div>
