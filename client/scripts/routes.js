@@ -32,12 +32,10 @@ function logPageView() {
 var routes = (
   <Router history={browserHistory} onUpdate={logPageView}>
     <Route path="/" component={Signup}/>
-    <Route path="/browse" component={Browse}/>
     <Route path="/explore" component={Explore}/>
     <Route path="/myaccount" component={MyAccount}/>
     <Route path="/dataset/new" component={AddDataset}/>
     <Route path="/dataset/:id" component={DatasetDetail}/>
-    <Route path="/discovery/new" component={Explore}/>
     <Route path="/discovery/:id" component={DiscoveryDetail}/>
     <Route path="*" component={NotFound}/>
   </Router>
