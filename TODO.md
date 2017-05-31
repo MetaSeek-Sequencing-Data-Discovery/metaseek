@@ -1,42 +1,50 @@
 # TODO
 
-## Deployment
-* ~~*deploy clientside on firebase - 0.5hr*~~
-* ~~*set up SSL on server - 2hr*~~
-* ~~Get Adrienne set up - 0.5hr~~
+ GOAL for July 6: Finish Explore and saving discovery to my profile
+ next priorities: Contribute/error detection/interactions between users
+
+## Back End
+* Redo database schema - 0.5d
+* Database migrations strategy - 2d
+* Populate database - 0.5d
+* Automate scraper updates - 1d
+* Data cleaning SRA - 1d
+* Externalize field merges and cv parsing - 0.5d
+* Data cleaning rest DBs - 3d
+* Write scraped data to db - 0.5d
+* Break up app.py (models folder/file, database, API calls, app) - 2d
+* Performance profiling app.py - 0.5d
+* Database administration cleanup/indexing - 0.5d
+* Make SearchDatasetSummary faster - ?4d
+* Paged dataset list response - 0.5d
+* Download csv API call - 0.5d
+* Download datasets py script API call - 1d
+
 * *Get URL mapped to Firebase* - 0.5hr
 * push changes via git - 1hr
 * automated deployments via github - 4hr
 
-## Database
-* ~~Add data to database! - 2hr~~
-* ~~Automated DB backups - .5hr~~
-* ~~Delete dataset ids 3:16 (inclusive) - they're redundant~~
-* ~~increase max int length for total_num_bases, total_num_reads, and download_size (to maybe 15)~~
-* Rebuild data in database after debug
-* CV control env_package column before data upload
-* CV control investigation_type
+## Front end
+* Make explore map real - 2d
+* Customize summary stat figs/redesign - 1d
+* Move all styles into CSS (SAS) - 0.5d
+* Convert to CSS grid - 0.5d
+* Simplify gulp process - 1d
+* Fix URL routing - 0.5d
+* Redesign landing page - 2d
+* Change to real email signup - 0.5d
+* Require Authentication structure - 1d
+* Table display with paging and essential cols - 0.5d
+* Add dataset details link to every table row
+* Design and build discovery details page - 2d
+* Design and build my account page - 1d
+* Design and build dataset details page - 4d
 
-## API
-* ~~SearchDatasetsSummary - 4hr~~
-* new call, give me dataset export script - 2hr
-* ~~*actually save discoveries to user - 0.5hr*~~
-
-## Client
-* ~~filter rules bug - 0.5hr~~
-* ~~Sign up welcome page - 2hr~~
-* Clean up welcome page - 1hr
-* ~~continuous color scale map, center - 1hr~~
-* ~~janky heatmap => map - 1hr~~
-* ~~map - 4hr~~
-* Range selector - 2hr
-* ~~prettify layout Explore - 4hr~~
-* clean up dataset detail - 1hr
-* design and build DiscoveryDetail (user; filter params; summary figs; download datasets) - 2hr
-* design and build UserDetail - 2hr
-* ~~*convert CSS styles to MetaSeek colors globally - 0.5hr*~~
-* ~~*remove or fix authentication - 2hr*~~
-* simple export datasets button - 0.5hr
-* ~~rotate hist labels~~
-* ~~check map color scale~~
-* ~~change calculated numeric 0s to None - check histograms~~
+## Next steps
+* Auto error flagging
+* User error flagging
+* User error corrections
+* Conditional filter bar
+* Make MetaSeek responsive
+* Discovery collaboration approach
+* Flesh out discovery browsing, account page
