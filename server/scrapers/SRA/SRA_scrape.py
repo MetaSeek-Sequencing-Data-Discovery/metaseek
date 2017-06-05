@@ -223,6 +223,63 @@ def get_srx_metadata(batch_uid_list):
 
     return sdict
 
+#takes list of SRX UIDs to query (batch_uid_list), and sdict into which to insert link uids;
+#return sdict with 'biosample_uid', 'pubmed_uids', and/or 'nuccore_uids' inserted; and link dict with lists of biosample_uids, pubmed_uids, and nuccore_uids to scrape
+def get_links(batch_uid_list, sdict):
+    print "sending elink request and parsing XML..."
+    elink_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/elink.fcgi?dbfrom=sra&db=biosample,pubmed,nuccore&tool=metaseq&email=metaseekcloud%40gmail.com'
+    for key in batch_uid_list:
+        #this makes url with end &id=###&id=###&id=### - returns a set of links in order of sra uids
+        elink_url = elink_url+'&id='+str(key)
+    #run api request and parse xml
+    e = urllib.urlopen(elink_url)
+    link_tree = etree.parse(e)
+    e.close()
+    link_xml = link_tree.getroot()
+    print "...parsing done!"
+
+    print "finding links..."
+    #scrape elink info
+    #note if there's no biosample link, <LinkSetDb> with <DbTo>=='biosample' just won't exist
+    biosample_uids = []
+    pubmed_uids = []
+    nuccore_uids = []
+
+    linksets = link_xml.findall("LinkSet")
+    for linkset in linksets:
+        srx_uid = linkset.find("IdList").findtext("Id")
+        #links from each target db will be in a tab called "LinkSetDb"
+        if len(linkset.findall("LinkSetDb"))>0:
+            for link in linkset.findall("LinkSetDb"):
+                id_set = []
+                if link.findtext("DbTo")=='biosample':
+                    #for all Links, get Ids
+                    for uid in link.findall("Link"):
+                        id_set.append(int(uid.findtext("Id")))
+                    biosample_uids.extend(id_set)
+                    sdict[srx_uid]['biosample_uid'] = id_set
+                elif link.findtext("DbTo")=='pubmed':
+                    for uid in link.findall("Link"):
+                        id_set.append(int(uid.findtext("Id")))
+                    pubmed_uids.extend(id_set)
+                    sdict[srx_uid]['pubmed_uids'] = id_set
+                elif link.findtext("DbTo")=='nuccore':
+                    for uid in link.findall("Link"):
+                        id_set.append(int(uid.findtext("Id")))
+                    nuccore_uids.extend(id_set)
+                    sdict[srx_uid]['nuccore_uids'] = id_set
+
+    biosample_uids = list(set(biosample_uids))
+    pubmed_uids = list(set(pubmed_uids))
+    nuccore_uids = list(set(nuccore_uids))
+
+    linkdict = {'biosample_uids':biosample_uids,'pubmed_uids':pubmed_uids,'nuccore_uids':nuccore_uids}
+    print "number of biosamples to scrape: %s" % len(linkdict['biosample_uids'])
+    print "number of pubmeds to scrape: %s" % len(linkdict['pubmed_uids'])
+    print "number of nuccores to scrape: %s" % len(linkdict['nuccore_uids'])
+
+    return sdict,linkdict
+
 
 if __name__ == "__main__":
     #make list of all publicly available UIDs in SRA
@@ -236,10 +293,16 @@ if __name__ == "__main__":
     #split UIDs to scrape into batches of 500 (max number of UIDs can call with eutilities api at one time)
     batches = get_batches(uid_list)
     #for each batch of 500 UIDs, scrape metadata
-    for batch in batches:
+    for batch_ix,batch in enumerate(batches):
+        print "processing batch %s out of %s......" % (batch_ix,len(batches))
         batch_uid_list = map(int,uid_list[batch[0]:batch[1]])
+        print "%s UIDs to scrape...... %s..." % (len(batch_uid_list),batch_uid_list[0:10])
         #scrape sra metadata, return as dictionary of dictionaries; each sdict key is the SRA UID, value is a dictionary of srx metadata key/value pairs
+        print "scraping SRX metadata..."
         sdict = get_srx_metadata(batch_uid_list=batch_uid_list)
+        #get link uids for any links to biosample, pubmed, and nuccore databases so can go scrape those too
+        print "getting elinks..."
+        sdict, linkdict = get_links(batch_uid_list=batch_uid_list,sdict=sdict)
 
 
     #efetch for batch of 500 biosamples; generate dictionary of dictionaries {'bio#':{},'bio##':{}...}
