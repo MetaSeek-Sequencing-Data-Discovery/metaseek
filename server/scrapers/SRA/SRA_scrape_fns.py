@@ -425,3 +425,102 @@ def get_nuccore_metadata(batch_uid_list,ndict):
         ndict[nuc_id] = nuc_dict
 
     return ndict
+
+
+def merge_scrapes(sdict,bdict,pdict,ndict):
+    for srx in sdict.keys():
+        if 'biosample_uid' in sdict[srx].keys():
+            #append biosample metadata values to list metadata values for that field in sdict[srx] (if multiple pubmeds, e.g., for each field have list value for all pubmeds, like with run stuff)
+            for bio in sdict[srx]['biosample_uid']:
+                bio = str(bio)
+                #don't need biosample_uid since already there
+                if 'biosample_link' in bdict[bio].keys():
+                    if 'biosample_link' in sdict[srx].keys(): #biosample_link
+                        sdict[srx]['biosample_link'].append(bdict[bio]['biosample_link'])
+                    else:
+                        sdict[srx]['biosample_link'] = [bdict[bio]['biosample_link']]
+                if 'metadata_publication_date' in bdict[bio].keys():
+                    if 'metadata_publication_date' in sdict[srx].keys(): #metadata_publication_date
+                        sdict[srx]['metadata_publication_date'].append(bdict[bio]['metadata_publication_date'])
+                    else:
+                        sdict[srx]['metadata_publication_date'] = [bdict[bio]['metadata_publication_date']]
+                if 'biosample_package' in bdict[bio].keys():
+                    if 'biosample_package' in sdict[srx].keys(): #biosample_package
+                        sdict[srx]['biosample_package'].append(bdict[bio]['biosample_package'])
+                    else:
+                        sdict[srx]['biosample_package'] = [bdict[bio]['biosample_package']]
+                if 'biosample_models' in bdict[bio].keys():
+                    if 'biosample_models' in sdict[srx].keys(): #biosample_models
+                        sdict[srx]['biosample_models'].append(bdict[bio]['biosample_models'])
+                    else:
+                        sdict[srx]['biosample_models'] = [bdict[bio]['biosample_models']]
+                if 'sample_attributes' in bdict[bio].keys():
+                    if 'sample_attributes' in sdict[srx].keys(): #sample_attributes
+                        sdict[srx]['sample_attributes'].append(bdict[bio]['sample_attributes'])
+                    else:
+                        sdict[srx]['sample_attributes'] = [bdict[bio]['sample_attributes']]
+
+        if 'pubmed_uids' in sdict[srx].keys():
+            #append pubmed metadata values to list metadata values for that field in sdict[srx]
+            for pub in sdict[srx]['pubmed_uids']:
+                pub = str(pub)
+                #don't need pubmed_uid since already there
+                if 'pubmed_link' in pdict[pub].keys():
+                    if 'pubmed_link' in sdict[srx].keys():
+                        sdict[srx]['pubmed_link'].append(pdict[pub]['pubmed_link'])
+                    else:
+                        sdict[srx]['pubmed_link'] = [pdict[pub]['pubmed_link']]
+                if 'pub_publication_date' in pdict[pub].keys():
+                    if 'pub_publication_date' in sdict[srx].keys():
+                        sdict[srx]['pub_publication_date'].append(pdict[pub]['pub_publication_date'])
+                    else:
+                        sdict[srx]['pub_publication_date'] = [pdict[pub]['pub_publication_date']]
+                if 'pub_authors' in pdict[pub].keys():
+                    if 'pub_authors' in sdict[srx].keys():
+                        sdict[srx]['pub_authors'].append(pdict[pub]['pub_authors'])
+                    else:
+                        sdict[srx]['pub_authors'] = [pdict[pub]['pub_authors']]
+                if 'pub_title' in pdict[pub].keys():
+                    if 'pub_title' in sdict[srx].keys():
+                        sdict[srx]['pub_title'].append(pdict[pub]['pub_title'])
+                    else:
+                        sdict[srx]['pub_title'] = [pdict[pub]['pub_title']]
+                if 'pub_volume' in pdict[pub].keys():
+                    if 'pub_volume' in sdict[srx].keys():
+                        sdict[srx]['pub_volume'].append(pdict[pub]['pub_volume'])
+                    else:
+                        sdict[srx]['pub_volume'] = [pdict[pub]['pub_volume']]
+                if 'pub_issue' in pdict[pub].keys():
+                    if 'pub_issue' in sdict[srx].keys():
+                        sdict[srx]['pub_issue'].append(pdict[pub]['pub_issue'])
+                    else:
+                        sdict[srx]['pub_issue'] = [pdict[pub]['pub_issue']]
+                if 'pub_pages' in pdict[pub].keys():
+                    if 'pub_pages' in sdict[srx].keys():
+                        sdict[srx]['pub_pages'].append(pdict[pub]['pub_pages'])
+                    else:
+                        sdict[srx]['pub_pages'] = [pdict[pub]['pub_pages']]
+                if 'pub_journal' in pdict[pub].keys():
+                    if 'pub_journal' in sdict[srx].keys():
+                        sdict[srx]['pub_journal'].append(pdict[pub]['pub_journal'])
+                    else:
+                        sdict[srx]['pub_journal'] = [pdict[pub]['pub_journal']]
+                if 'pub_doi' in pdict[pub].keys():
+                    if 'pub_doi' in sdict[srx].keys():
+                        sdict[srx]['pub_doi'].append(pdict[pub]['pub_doi'])
+                    else:
+                        sdict[srx]['pub_doi'] = [pdict[pub]['pub_doi']]
+
+        if 'nuccore_uids' in sdict[srx].keys():
+            #append nuccore metadata values to list metadata values for that field in sdict[srx]
+            for nuc in sdict[srx]['nuccore_uids']:
+                nuc = str(nuc)
+                #don't need nuccore_uid since already there - just add nuccore_link
+                if 'nuccore_link' in ndict[nuc].keys():
+                    if 'nuccore_link' in sdict[srx].keys():
+                        sdict[srx]['nuccore_link'].append(ndict[nuc]['nuccore_link'])
+                    else:
+                        sdict[srx]['nuccore_link'] = [ndict[nuc]['nuccore_link']]
+    return sdict
+
+                        

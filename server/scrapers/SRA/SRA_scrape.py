@@ -32,3 +32,19 @@ if __name__ == "__main__":
             bdict = get_biosample_metadata(batch_uid_list=biosample_batch_uids,bdict=bdict)
             bdict = get_biosample_metadata(batch_uid_list=biosample_batch_uids,bdict=bdict)
         #efetch for batch/es of pubmeds; generate pdict dictionary of dictionaries {'pub#':{},'pub#':{},...}
+        pubmed_batches = get_batches(uid_list=linkdict['pubmed_uids'])
+        pdict = {}
+        for p_batch_ix,p_batch in enumerate(pubmed_batches):
+            print "processing pubmed batch %s out of %s......" % (p_batch_ix+1,len(pubmed_batches))
+            pubmed_batch_uids = map(int,linkdict['pubmed_uids'][p_batch[0]:p_batch[1]])
+            pdict = get_pubmed_metadata(batch_uid_list=pubmed_batch_uids,pdict=pdict)
+        #efetch for batch/es of nuccores;
+        nuccore_batches = get_batches(uid_list=linkdict['nuccore_uids'])
+        ndict = {}
+        for n_batch_ix,n_batch in enumerate(nuccore_batches):
+            print "processing nuccore batch %s out of %s......" % (n_batch_ix+1,len(nuccore_batches))
+            nuccore_batch_uids = map(int,linkdict['nuccore_uids'][n_batch[0]:n_batch[1]])
+            ndict = get_nuccore_metadata(batch_uid_list=nuccore_batch_uids,ndict=ndict)
+
+        #merge sdict with scraped biosample/pubmed/nuccore metadata - add metadata from bdict/pdict/ndict where appropriate for each srx in sdict.
+        sdict = merge_scrapes(sdict=sdict,bdict=bdict,pdict=pdict,ndict=ndict)
