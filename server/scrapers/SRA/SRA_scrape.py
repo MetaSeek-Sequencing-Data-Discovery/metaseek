@@ -57,3 +57,6 @@ if __name__ == "__main__":
 
         #merge sdict with scraped biosample/pubmed/nuccore metadata - add metadata from bdict/pdict/ndict where appropriate for each srx in sdict.
         sdict = merge_scrapes(sdict=sdict,bdict=bdict,pdict=pdict,ndict=ndict,rules_json="rules.json")
+
+        #extract and merge MIxS fields from 'sample_attributes' field in each dict in sdict (if exists)
+        sdict = extract_and_merge_mixs_fields(sdict=sdict,field="sample_attributes",rules_json="rules.json")

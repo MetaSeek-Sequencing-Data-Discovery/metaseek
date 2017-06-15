@@ -358,32 +358,6 @@ def get_links(batch_uid_list, sdict):
 
     return sdict,linkdict
 
-def extract_and_merge_mixs_fields(source_dict, parent_dict, rules_json):
-    #source_dict e.g. bdict[bio_dict]['sample_attributes']; parent_dict e.g. bio_dict
-    #read in rules from json
-    with open('rules.json') as json_rules:
-        rules = json.load(json_rules)
-        json_rules.close()
-
-    for rule_set in rules.keys():
-        #find which redundant fields in rule set exist in sample_attributes
-        matches = [x for x in rules[rule_set] if x in source_dict.keys()]
-        if len(matches)>0:
-            #pick replacement as lowest index (highest priority) field ##**MAKE SURE YOU ENTER YOUR RULE SET LIST IN ORDER OF PRIORITY IN THE JSON FILE**##
-            replacement = rules[rule_set][min([rules[rule_set].index(j) for j in matches])]
-
-            #add column (key:value field) to bio_dict with appropriate MIxS key field
-            parent_dict[rule_set] = source_dict[replacement]
-
-            #not going to remove the replacement field in the dict, for e.g. where units are in the old field name ('age_in_years'); you'll be able to see it in the sample_attributes of the dataset details
-            #del source_dict[replacement]
-
-            #choosing to leave any additional lower-priority matches in sample_attributes
-            ##TODO: ERROR FLAG IF THERE ARE >1 MATCHES?
-
-    return parent_dict
-
-
 def get_biosample_metadata(batch_uid_list,bdict):
     #some stuff already captured with SRA - just get publication_date, Models, Package, and Attributes
     #and links?
@@ -429,11 +403,6 @@ def get_biosample_metadata(batch_uid_list,bdict):
                 elif attribute.get("attribute_name") is not None:
                     attr[attribute.get("attribute_name")] = attr_value
             bio_dict['sample_attributes'] = attr
-
-        #extract MIxS sample attributes from the 'sample_attributes' dict field and add as own field in bio_dict, where applicable
-        bio_dict = extract_and_merge_mixs_fields(source_dict=bio_dict['sample_attributes'], parent_dict=bio_dict, rules_json="rules.json")
-
-        ##TODO: parse investigation_type and env_package from 'biosample_models' and 'biosample_package' fields, if they exist (and check against sample attribute if extracted)
 
         bdict[bio_id] = bio_dict
 
@@ -510,12 +479,7 @@ def get_nuccore_metadata(batch_uid_list,ndict):
     return ndict
 
 
-def merge_scrapes(sdict,bdict,pdict,ndict,rules_json):
-    #read in rules_json
-    with open(rules_json) as json_rules:
-        rules = json.load(json_rules)
-        json_rules.close()
-
+def merge_scrapes(sdict,bdict,pdict,ndict):
     for srx in sdict.keys():
         if 'biosample_uid' in sdict[srx].keys():
             #add biosample metadata fields and values to sdict[srx]
@@ -538,16 +502,6 @@ def merge_scrapes(sdict,bdict,pdict,ndict,rules_json):
                     for biosample_field in biosample_fields:
                         if biosample_field in bdict[bio].keys():
                             sdict[srx][biosample_field] = bdict[bio][biosample_field]
-
-                    #for rule in rules.keys(), see if it's in bdict[bio]; if it is, add it to sdict[srx]; (for sequencing_method, check if already exists )
-                    for rule_set in rules.keys():
-                            #if rule_set is sequencing_method, check if sequencing_method field in sdict[srx] dict already exists; only add if it doesn't
-                            if rule_set=="sequencing_method":
-                                if "sequencing_method" in sdict[srx].keys():
-                                    continue
-                            else:
-                                #add column to sdict[srx] dict with appropriate MIxS key field
-                                sdict[srx][rule_set] = bdict[bio][rule_set]
 
         if 'pubmed_uids' in sdict[srx].keys():
             #append pubmed metadata values to list metadata values for that field in sdict[srx] (if multiple pubmeds, e.g., for each field have list value for all pubmeds, like with run stuff)
@@ -574,4 +528,31 @@ def merge_scrapes(sdict,bdict,pdict,ndict,rules_json):
                             sdict[srx]['nuccore_link'].append(ndict[nuc]['nuccore_link'])
                         else:
                             sdict[srx]['nuccore_link'] = [ndict[nuc]['nuccore_link']]
+    return sdict
+
+def extract_and_merge_mixs_fields(sdict, field, rules_json):
+    #field e.g. 'sample_attributes'; sdict should be dict of dicts
+    #read in rules from json
+    with open(rules_json) as json_rules:
+        rules = json.load(json_rules)
+        json_rules.close()
+
+    for srx in sdict.keys():
+        if field in sdict[srx].keys():
+            for rule_set in rules.keys():
+                #find which redundant fields in rule set exist in sample_attributes
+                matches = [x for x in rules[rule_set] if x in sdict[srx][field].keys()]
+                if len(matches)>0:
+                    #pick replacement as lowest index (highest priority) field ##**MAKE SURE YOU ENTER YOUR RULE SET LIST IN ORDER OF PRIORITY IN THE JSON FILE**##
+                    replacement = rules[rule_set][min([rules[rule_set].index(j) for j in matches])]
+
+                    #add column (key:value field) to bio_dict with appropriate MIxS key field
+                    sdict[rule_set] = sdict[srx][field][replacement]
+
+                    #not going to remove the replacement field in the dict, for e.g. where units are in the old field name ('age_in_years'); you'll be able to see it in the sample_attributes of the dataset details
+                    #del sdict[srx][field][replacement]
+
+                    #choosing to leave any additional lower-priority matches in sample_attributes
+                    ##TODO: ERROR FLAG IF THERE ARE >1 MATCHES?
+
     return sdict
