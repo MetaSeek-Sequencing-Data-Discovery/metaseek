@@ -547,7 +547,7 @@ def extract_and_merge_mixs_fields(sdict, field, rules_json):
                     replacement = rules[rule_set][min([rules[rule_set].index(j) for j in matches])]
 
                     #add column (key:value field) to bio_dict with appropriate MIxS key field
-                    sdict[rule_set] = sdict[srx][field][replacement]
+                    sdict[srx][rule_set] = sdict[srx][field][replacement]
 
                     #not going to remove the replacement field in the dict, for e.g. where units are in the old field name ('age_in_years'); you'll be able to see it in the sample_attributes of the dataset details
                     #del sdict[srx][field][replacement]
