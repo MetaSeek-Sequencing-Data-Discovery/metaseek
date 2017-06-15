@@ -1,6 +1,6 @@
 import urllib
 from lxml import etree
-
+import json
 
 def get_retstart_list(url):
     #define retstarts need for get_uid_list eutilities requests - since can only get 100,000 at a time, need to make multiple queries to get total list
@@ -56,11 +56,15 @@ def get_srx_metadata(batch_uid_list):
     sra_samples = sra_xml.findall("EXPERIMENT_PACKAGE")
     sdict = {}
 
-    for which,sra_sample in enumerate(sra_samples): #the order of experiment_packages ARE in order of sra ids given - that's good
-        print "--scraping srx metadata for sample %s out of %s" % (which+1,len(sra_samples))
-        srx_dict = {}
+    #if the length of sra_samples != length of batch_uid_list, then one or more of the uids did not return an efetch (maybe it's not public even though it shows up in esearch); if this is the case, raise EfetchError
+    if len(sra_samples)!=len(batch_uid_list):
+        raise EfetchError('length srx batch does not equal length returned efetches! skipping this batch')
 
+    for which,sra_sample in enumerate(sra_samples): #the order of experiment_packages ARE in order of sra ids given - that's good
+        srx_dict = {}
         srx_uid = str(batch_uid_list[which])
+        print "--scraping srx metadata for sample uid %s, %s out of %s" % (srx_uid, which+1,len(sra_samples))
+
         srx_dict['db_source_uid'] = srx_uid
         srx_dict['db_source'] = 'SRA'
         srx_dict['expt_link'] = "https://www.ncbi.nlm.nih.gov/sra/"+str(srx_uid)
@@ -77,8 +81,10 @@ def get_srx_metadata(batch_uid_list):
                 srx_dict["study_id"] = sra_sample.find("EXPERIMENT").find("STUDY_REF").find("IDENTIFIERS").findtext("PRIMARY_ID")
         if sra_sample.find("EXPERIMENT").find("DESIGN").findtext("DESIGN_DESCRIPTION") is not None:
             srx_dict['expt_design_description'] = sra_sample.find("EXPERIMENT").find("DESIGN").findtext("DESIGN_DESCRIPTION")
-        if sra_sample.find("EXPERIMENT").find("DESIGN").find("SAMPLE_DESCRIPTOR").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
-            srx_dict['sample_id'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("SAMPLE_DESCRIPTOR").find("IDENTIFIERS").findtext("PRIMARY_ID")
+        try:
+            srx_dict['sample_id'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("SAMPLE_DESCRIPTOR").get("accession")
+        except AttributeError:
+            pass
         if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_NAME") is not None:
             srx_dict['library_name'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_NAME")
         if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_STRATEGY") is not None:
@@ -95,7 +101,13 @@ def get_srx_metadata(batch_uid_list):
             srx_dict['library_construction_protocol'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_CONSTRUCTION_PROTOCOL")
         ###change platform to MIxS field sequencing_method - cv in SRA (not in MIxS)
         if sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren() is not None:
-            srx_dict['sequencing_method'] = sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].tag.lower()
+            if len(testxml.find("EXPERIMENT_PACKAGE").find("EXPERIMENT").find("PLATFORM").getchildren())>1:
+                #find the one that's actually a tag
+                for platform in testxml.find("EXPERIMENT_PACKAGE").find("EXPERIMENT").find("PLATFORM").getchildren():
+                    if type(platform.tag) is str:
+                        srx_dict['sequencing_method'] = platform.tag.lower()
+            else:
+                srx_dict['sequencing_method'] = sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].tag.lower()
             if sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].findtext("INSTRUMENT_MODEL") is not None:
                 srx_dict['instrument_model'] = sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].findtext("INSTRUMENT_MODEL")
 
@@ -104,21 +116,34 @@ def get_srx_metadata(batch_uid_list):
             srx_dict['submission_id'] = sra_sample.find("SUBMISSION").find("IDENTIFIERS").findtext("PRIMARY_ID")
 
         ###Organization - name, address, and contact
-        if sra_sample.find("Organization").findtext("Name") is not None:
-            srx_dict['organization_name'] = sra_sample.find("Organization").findtext("Name")
-        if sra_sample.find("Organization").find("Address") is not None:
-            address = ''
-            for line in sra_sample.find("Organization").find("Address").iterchildren():
-                address = address+line.text+', '
-            address = address[:-2]
-            srx_dict['organization_address'] = address
-        if len(sra_sample.find("Organization").findall("Contact"))>0:
-            contacts = []
-            for contact in sra_sample.find("Organization").findall("Contact"):
-                name = contact.find("Name").find("First").text+' '+contact.find("Name").find("Last").text
-                email = contact.get('email')
-                contacts.append(name+', '+email)
-            srx_dict['organization_contacts'] = contacts
+        if sra_sample.find("Organization") is not None:
+            try:
+                if sra_sample.find("Organization").findtext("Name") is not None:
+                    srx_dict['organization_name'] = sra_sample.find("Organization").findtext("Name")
+            except AttributeError:
+                pass
+            try:
+                if sra_sample.find("Organization").find("Address") is not None:
+                    address = ''
+                    for line in sra_sample.find("Organization").find("Address").iterchildren():
+                        address = address+line.text+', '
+                    address = address[:-2]
+                    srx_dict['organization_address'] = address
+            except AttributeError:
+                pass
+            try:
+                if len(sra_sample.find("Organization").findall("Contact"))>0:
+                    contacts = []
+                    for contact in sra_sample.find("Organization").findall("Contact"):
+                        try:
+                            name = contact.find("Name").find("First").text+' '+contact.find("Name").find("Last").text
+                        except AttributeError:
+                            name=''
+                        email = contact.get('email')
+                        contacts.append(name+', '+email)
+                    srx_dict['organization_contacts'] = contacts
+            except AttributeError:
+                pass
 
         ###STUDY -
         if sra_sample.find("STUDY").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
@@ -154,23 +179,27 @@ def get_srx_metadata(batch_uid_list):
             srx_dict['study_attributes'] = study_attributes
 
         ###SAMPLE - get some BioSample stuff that's in easier format here: sample id, biosample id (if exists; it should but sometimes doesn't); also title, sample name stuff, and description; rest get from biosample scraping
-        if sra_sample.find("SAMPLE").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
-            srx_dict['sample_id'] = sra_sample.find("SAMPLE").find("IDENTIFIERS").findtext("PRIMARY_ID")
-        if len(sra_sample.find("SAMPLE").find("IDENTIFIERS").findall("EXTERNAL_ID"))>0:
-            for external in sra_sample.find("SAMPLE").find("IDENTIFIERS").iterchildren("EXTERNAL_ID"):
-                if external.get("namespace")=='BioSample':
-                    srx_dict['biosample_id'] = external.text
-        if sra_sample.find("SAMPLE").findtext("TITLE") is not None:
-            srx_dict['sample_title'] = sra_sample.find("SAMPLE").findtext("TITLE")
-        if sra_sample.find("SAMPLE").find("SAMPLE_NAME") is not None:
-            if sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("TAXON_ID") is not None:
-                srx_dict['ncbi_taxon_id'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("TAXON_ID")
-            if sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("SCIENTIFIC_NAME") is not None:
-                srx_dict['taxon_scientific_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("SCIENTIFIC_NAME")
-            if sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("COMMON_NAME") is not None:
-                srx_dict['taxon_common_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("COMMON_NAME")
-        if sra_sample.find("SAMPLE").findtext("DESCRIPTION") is not None:
-            srx_dict['sample_description'] = sra_sample.find("SAMPLE").findtext("DESCRIPTION")
+        try:
+            if sra_sample.find("SAMPLE").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
+                srx_dict['sample_id'] = sra_sample.find("SAMPLE").find("IDENTIFIERS").findtext("PRIMARY_ID")
+            if len(sra_sample.find("SAMPLE").find("IDENTIFIERS").findall("EXTERNAL_ID"))>0:
+                for external in sra_sample.find("SAMPLE").find("IDENTIFIERS").iterchildren("EXTERNAL_ID"):
+                    if external.get("namespace")=='BioSample':
+                        srx_dict['biosample_id'] = external.text
+            if sra_sample.find("SAMPLE").findtext("TITLE") is not None:
+                srx_dict['sample_title'] = sra_sample.find("SAMPLE").findtext("TITLE")
+            if sra_sample.find("SAMPLE").find("SAMPLE_NAME") is not None:
+                if sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("TAXON_ID") is not None:
+                    srx_dict['host_taxon_id'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("TAXON_ID")
+                if sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("SCIENTIFIC_NAME") is not None:
+                    srx_dict['taxon_scientific_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("SCIENTIFIC_NAME")
+                if sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("COMMON_NAME") is not None:
+                    srx_dict['taxon_common_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("COMMON_NAME")
+            if sra_sample.find("SAMPLE").findtext("DESCRIPTION") is not None:
+                srx_dict['sample_description'] = sra_sample.find("SAMPLE").findtext("DESCRIPTION")
+        except AttributeError:
+            print "Sample scraping didn't work for srx uid %s, skipping" % (srx_uid)
+            pass
 
 
         ###Pool - skip, redundant
@@ -193,60 +222,77 @@ def get_srx_metadata(batch_uid_list):
             srx_dict['num_runs_in_accession'] = len(sra_sample.find("RUN_SET").findall("RUN"))
             for run in sra_sample.find("RUN_SET").findall("RUN"):
                 run_ids.append(run.get("accession"))
-                total_num_reads.append(int(run.get("total_spots")))
-                total_num_bases.append(int(run.get("total_bases")))
-                download_size.append(int(run.get("size")))
-                avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Run").get("spot_count"))+float(run.find("Run").get("spot_count_mates"))))
-                for base in run.find("Bases").findall("Base"):
-                    if base.get("value")=="A":
-                        baseA_count.append(int(base.get("count")))
-                        countA = int(base.get("count"))
-                    if base.get("value")=="C":
-                        baseC_count.append(int(base.get("count")))
-                        countC = int(base.get("count"))
-                    if base.get("value")=="G":
-                        baseG_count.append(int(base.get("count")))
-                        countG = int(base.get("count"))
-                    if base.get("value")=="T":
-                        baseT_count.append(int(base.get("count")))
-                        countT = int(base.get("count"))
-                    if base.get("value")=="N":
-                        baseN_count.append(int(base.get("count")))
-                        countN = int(base.get("count"))
-                gc_percent.append(float(countG+countC)/float(countC+countG+countA+countT))
-                qual_count = {}
-                if run.find("Run").find("QualityCount") is not None:
-                    for qual in run.find("Run").find("QualityCount").findall("Quality"):
-                        qual_count[qual.get("value")] = int(qual.get("count"))
-                read_quality_counts.append(qual_count)
+                total_num_reads.append(int(run.get("total_spots")) if run.get("total_spots") is str else None)
+                total_num_bases.append(int(run.get("total_bases")) if run.get("total_bases") is str else None)
+                download_size.append(int(run.get("size")) if run.get("size") is str else None)
+                if run.find("Bases") is not None:
+                    for base in run.find("Bases").findall("Base"):
+                        if base.get("value")=="A":
+                            baseA_count.append(int(base.get("count")))
+                            countA = int(base.get("count"))
+                        if base.get("value")=="C":
+                            baseC_count.append(int(base.get("count")))
+                            countC = int(base.get("count"))
+                        if base.get("value")=="G":
+                            baseG_count.append(int(base.get("count")))
+                            countG = int(base.get("count"))
+                        if base.get("value")=="T":
+                            baseT_count.append(int(base.get("count")))
+                            countT = int(base.get("count"))
+                        if base.get("value")=="N":
+                            baseN_count.append(int(base.get("count")))
+                            countN = int(base.get("count"))
+                    gc_percent.append(float(countG+countC)/float(countC+countG+countA+countT))
+                if run.find("Run") is not None:
+                    try:
+                        avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Run").get("spot_count"))+float(run.find("Run").get("spot_count_mates"))))
+                    except TypeError:
+                        avg_read_length.append(None)
+                    qual_count = {}
+                    if run.find("Run").find("QualityCount") is not None:
+                        for qual in run.find("Run").find("QualityCount").findall("Quality"):
+                            qual_count[qual.get("value")] = int(qual.get("count"))
+                    read_quality_counts.append(qual_count)
 
 
             max_index = total_num_reads.index(max(total_num_reads))
 
             srx_dict['run_ids'] = run_ids
-            srx_dict['run_ids_maxrun'] = run_ids[max_index]
+            if max_index<=(len(run_ids)-1):
+                srx_dict['run_ids_maxrun'] = run_ids[max_index]
             srx_dict['total_num_reads'] = total_num_reads
-            srx_dict['total_num_reads_maxrun'] = total_num_reads[max_index]
+            if max_index<=(len(total_num_reads)-1):
+                srx_dict['total_num_reads_maxrun'] = total_num_reads[max_index]
             srx_dict['total_num_bases'] = total_num_bases
-            srx_dict['total_num_bases_maxrun'] = total_num_bases[max_index]
+            if max_index<=(len(total_num_bases)-1):
+                srx_dict['total_num_bases_maxrun'] = total_num_bases[max_index]
             srx_dict['download_size'] = download_size
-            srx_dict['download_size_maxrun'] = download_size[max_index]
+            if max_index<=(len(download_size)-1):
+                srx_dict['download_size_maxrun'] = download_size[max_index]
             srx_dict['avg_read_length'] = avg_read_length
-            srx_dict['avg_read_length_maxrun'] = avg_read_length[max_index]
+            if max_index<=(len(avg_read_length)-1):
+                srx_dict['avg_read_length_maxrun'] = avg_read_length[max_index]
             srx_dict['baseA_count'] = baseA_count
-            srx_dict['baseA_count_maxrun'] = baseA_count[max_index]
+            if max_index<=(len(baseA_count)-1):
+                srx_dict['baseA_count_maxrun'] = baseA_count[max_index]
             srx_dict['baseC_count'] = baseC_count
-            srx_dict['baseC_count_maxrun'] = baseC_count[max_index]
+            if max_index<=(len(baseC_count)-1):
+                srx_dict['baseC_count_maxrun'] = baseC_count[max_index]
             srx_dict['baseG_count'] = baseG_count
-            srx_dict['baseG_count_maxrun'] = baseG_count[max_index]
+            if max_index<=(len(baseG_count)-1):
+                srx_dict['baseG_count_maxrun'] = baseG_count[max_index]
             srx_dict['baseT_count'] = baseT_count
-            srx_dict['baseT_count_maxrun'] = baseT_count[max_index]
+            if max_index<=(len(baseT_count)-1):
+                srx_dict['baseT_count_maxrun'] = baseT_count[max_index]
             srx_dict['baseN_count'] = baseN_count
-            srx_dict['baseN_count_maxrun'] = baseN_count[max_index]
+            if max_index<=(len(baseN_count)-1):
+                srx_dict['baseN_count_maxrun'] = baseN_count[max_index]
             srx_dict['gc_percent'] = gc_percent
-            srx_dict['gc_percent_maxrun'] = gc_percent[max_index]
+            if max_index<=(len(gc_percent)-1):
+                srx_dict['gc_percent_maxrun'] = gc_percent[max_index]
             srx_dict['read_quality_counts'] = read_quality_counts
-            srx_dict['read_quality_counts_maxrun'] = read_quality_counts[max_index]
+            if max_index<=(len(read_quality_counts)-1):
+                srx_dict['read_quality_counts_maxrun'] = read_quality_counts[max_index]
 
 
         sdict[srx_uid] = srx_dict
@@ -312,6 +358,31 @@ def get_links(batch_uid_list, sdict):
 
     return sdict,linkdict
 
+def extract_and_merge_mixs_fields(source_dict, parent_dict, rules_json):
+    #source_dict e.g. bdict[bio_dict]['sample_attributes']; parent_dict e.g. bio_dict
+    #read in rules from json
+    with open('rules.json') as json_rules:
+        rules = json.load(json_rules)
+        json_rules.close()
+
+    for rule_set in rules.keys():
+        #find which redundant fields in rule set exist in sample_attributes
+        matches = [x for x in rules[rule_set] if x in source_dict.keys()]
+        if len(matches)>0:
+            #pick replacement as lowest index (highest priority) field ##**MAKE SURE YOU ENTER YOUR RULE SET LIST IN ORDER OF PRIORITY IN THE JSON FILE**##
+            replacement = rules[rule_set][min([rules[rule_set].index(j) for j in matches])]
+
+            #add column (key:value field) to bio_dict with appropriate MIxS key field
+            parent_dict[rule_set] = source_dict[replacement]
+
+            #not going to remove the replacement field in the dict, for e.g. where units are in the old field name ('age_in_years'); you'll be able to see it in the sample_attributes of the dataset details
+            #del source_dict[replacement]
+
+            #choosing to leave any additional lower-priority matches in sample_attributes
+            ##TODO: ERROR FLAG IF THERE ARE >1 MATCHES?
+
+    return parent_dict
+
 
 def get_biosample_metadata(batch_uid_list,bdict):
     #some stuff already captured with SRA - just get publication_date, Models, Package, and Attributes
@@ -331,7 +402,7 @@ def get_biosample_metadata(batch_uid_list,bdict):
         print "--scraping biosample metadata for sample %s out of %s" % (which+1,len(biosamples))
         bio_dict = {}
 
-        bio_id = str(batch_uid_list[which])
+        bio_id = biosample.get("id")
         bio_dict['biosample_uid'] = bio_id
         bio_dict['biosample_link'] = "https://www.ncbi.nlm.nih.gov/biosample/"+str(bio_id)
         #publication date
@@ -359,9 +430,15 @@ def get_biosample_metadata(batch_uid_list,bdict):
                     attr[attribute.get("attribute_name")] = attr_value
             bio_dict['sample_attributes'] = attr
 
+        #extract MIxS sample attributes from the 'sample_attributes' dict field and add as own field in bio_dict, where applicable
+        bio_dict = extract_and_merge_mixs_fields(source_dict=bio_dict['sample_attributes'], parent_dict=bio_dict, rules_json="rules.json")
+
+        ##TODO: parse investigation_type and env_package from 'biosample_models' and 'biosample_package' fields, if they exist (and check against sample attribute if extracted)
+
         bdict[bio_id] = bio_dict
 
     return bdict
+
 
 
 def get_pubmed_metadata(batch_uid_list,pdict):
@@ -379,15 +456,21 @@ def get_pubmed_metadata(batch_uid_list,pdict):
     pubmeds = pub_xml.findall("DocSum")
 
     for which,pubmed in enumerate(pubmeds):
-        print "--scraping pubmed metadata for sample %s out of %s" % (which+1,len(pubmeds))
         pub_dict = {}
+        pub_id = pubmed.findtext("Id") #str(batch_uid_list[which])
+        print "--scraping pubmed metadata for sample %s,  %s out of %s" % (pub_id, which+1,len(pubmeds))
 
-        pub_id = str(batch_uid_list[which])
         pub_dict['pubmed_uid'] = pub_id
         pub_dict['pubmed_link'] = "https://www.ncbi.nlm.nih.gov/pubmed/"+str(pub_id)
 
         if pubmed.find("Item[@Name='PubDate']").text is not None:
-            pub_dict['pub_publication_date'] = datetime.strptime(pubmed.find("Item[@Name='PubDate']").text,"%Y %b %d")
+            try:
+                pub_dict['pub_publication_date'] = datetime.strptime(pubmed.find("Item[@Name='PubDate']").text,"%Y %b %d")
+            except ValueError:
+                try:
+                    pub_dict['pub_publication_date'] = datetime.strptime(pubmed.find("Item[@Name='PubDate']").text,"%Y %b")
+                except ValueError:
+                    pass
 
         if pubmed.find("Item[@Name='AuthorList']") is not None:
             authors = []
@@ -427,100 +510,68 @@ def get_nuccore_metadata(batch_uid_list,ndict):
     return ndict
 
 
-def merge_scrapes(sdict,bdict,pdict,ndict):
+def merge_scrapes(sdict,bdict,pdict,ndict,rules_json):
+    #read in rules_json
+    with open(rules_json) as json_rules:
+        rules = json.load(json_rules)
+        json_rules.close()
+
     for srx in sdict.keys():
         if 'biosample_uid' in sdict[srx].keys():
-            #append biosample metadata values to list metadata values for that field in sdict[srx] (if multiple pubmeds, e.g., for each field have list value for all pubmeds, like with run stuff)
-            for bio in sdict[srx]['biosample_uid']:
-                bio = str(bio)
-                #don't need biosample_uid since already there
-                if 'biosample_link' in bdict[bio].keys():
-                    if 'biosample_link' in sdict[srx].keys(): #biosample_link
-                        sdict[srx]['biosample_link'].append(bdict[bio]['biosample_link'])
-                    else:
-                        sdict[srx]['biosample_link'] = [bdict[bio]['biosample_link']]
-                if 'metadata_publication_date' in bdict[bio].keys():
-                    if 'metadata_publication_date' in sdict[srx].keys(): #metadata_publication_date
-                        sdict[srx]['metadata_publication_date'].append(bdict[bio]['metadata_publication_date'])
-                    else:
-                        sdict[srx]['metadata_publication_date'] = [bdict[bio]['metadata_publication_date']]
-                if 'biosample_package' in bdict[bio].keys():
-                    if 'biosample_package' in sdict[srx].keys(): #biosample_package
-                        sdict[srx]['biosample_package'].append(bdict[bio]['biosample_package'])
-                    else:
-                        sdict[srx]['biosample_package'] = [bdict[bio]['biosample_package']]
-                if 'biosample_models' in bdict[bio].keys():
-                    if 'biosample_models' in sdict[srx].keys(): #biosample_models
-                        sdict[srx]['biosample_models'].append(bdict[bio]['biosample_models'])
-                    else:
-                        sdict[srx]['biosample_models'] = [bdict[bio]['biosample_models']]
-                if 'sample_attributes' in bdict[bio].keys():
-                    if 'sample_attributes' in sdict[srx].keys(): #sample_attributes
-                        sdict[srx]['sample_attributes'].append(bdict[bio]['sample_attributes'])
-                    else:
-                        sdict[srx]['sample_attributes'] = [bdict[bio]['sample_attributes']]
+            #add biosample metadata fields and values to sdict[srx]
+
+            ##TODO: log an error if len(sdict[srx]['biosample_uid'])>1; otherwise, merge biosample scrapes
+            if len(sdict[srx]['biosample_uid'])==1:
+                #for bio in sdict[srx]['biosample_uid']:
+                    #bio = str(bio)
+                    #TAB EVERYTHING OUT ONE, use if else list append approach like below:
+                    #if 'biosample_link' in bdict[bio].keys():
+                    #    if 'biosample_link' in sdict[srx].keys(): #biosample_link
+                    #        sdict[srx]['biosample_link'].append(bdict[bio]['biosample_link'])
+                    #    else:
+                    #        sdict[srx]['biosample_link'] = [bdict[bio]['biosample_link']]
+
+                bio = str(sdict[srx]['biosample_uid'][0])
+                if bio in bdict.keys():
+                    #fields from biosample scrape need to add; don't need biosample_uid since already there
+                    biosample_fields = ['biosample_link','metadata_publication_date','biosample_package','biosample_models','sample_attributes']
+                    for biosample_field in biosample_fields:
+                        if biosample_field in bdict[bio].keys():
+                            sdict[srx][biosample_field] = bdict[bio][biosample_field]
+
+                    #for rule in rules.keys(), see if it's in bdict[bio]; if it is, add it to sdict[srx]; (for sequencing_method, check if already exists )
+                    for rule_set in rules.keys():
+                            #if rule_set is sequencing_method, check if sequencing_method field in sdict[srx] dict already exists; only add if it doesn't
+                            if rule_set=="sequencing_method":
+                                if "sequencing_method" in sdict[srx].keys():
+                                    continue
+                            else:
+                                #add column to sdict[srx] dict with appropriate MIxS key field
+                                sdict[srx][rule_set] = bdict[bio][rule_set]
 
         if 'pubmed_uids' in sdict[srx].keys():
-            #append pubmed metadata values to list metadata values for that field in sdict[srx]
+            #append pubmed metadata values to list metadata values for that field in sdict[srx] (if multiple pubmeds, e.g., for each field have list value for all pubmeds, like with run stuff)
             for pub in sdict[srx]['pubmed_uids']:
                 pub = str(pub)
-                #don't need pubmed_uid since already there
-                if 'pubmed_link' in pdict[pub].keys():
-                    if 'pubmed_link' in sdict[srx].keys():
-                        sdict[srx]['pubmed_link'].append(pdict[pub]['pubmed_link'])
-                    else:
-                        sdict[srx]['pubmed_link'] = [pdict[pub]['pubmed_link']]
-                if 'pub_publication_date' in pdict[pub].keys():
-                    if 'pub_publication_date' in sdict[srx].keys():
-                        sdict[srx]['pub_publication_date'].append(pdict[pub]['pub_publication_date'])
-                    else:
-                        sdict[srx]['pub_publication_date'] = [pdict[pub]['pub_publication_date']]
-                if 'pub_authors' in pdict[pub].keys():
-                    if 'pub_authors' in sdict[srx].keys():
-                        sdict[srx]['pub_authors'].append(pdict[pub]['pub_authors'])
-                    else:
-                        sdict[srx]['pub_authors'] = [pdict[pub]['pub_authors']]
-                if 'pub_title' in pdict[pub].keys():
-                    if 'pub_title' in sdict[srx].keys():
-                        sdict[srx]['pub_title'].append(pdict[pub]['pub_title'])
-                    else:
-                        sdict[srx]['pub_title'] = [pdict[pub]['pub_title']]
-                if 'pub_volume' in pdict[pub].keys():
-                    if 'pub_volume' in sdict[srx].keys():
-                        sdict[srx]['pub_volume'].append(pdict[pub]['pub_volume'])
-                    else:
-                        sdict[srx]['pub_volume'] = [pdict[pub]['pub_volume']]
-                if 'pub_issue' in pdict[pub].keys():
-                    if 'pub_issue' in sdict[srx].keys():
-                        sdict[srx]['pub_issue'].append(pdict[pub]['pub_issue'])
-                    else:
-                        sdict[srx]['pub_issue'] = [pdict[pub]['pub_issue']]
-                if 'pub_pages' in pdict[pub].keys():
-                    if 'pub_pages' in sdict[srx].keys():
-                        sdict[srx]['pub_pages'].append(pdict[pub]['pub_pages'])
-                    else:
-                        sdict[srx]['pub_pages'] = [pdict[pub]['pub_pages']]
-                if 'pub_journal' in pdict[pub].keys():
-                    if 'pub_journal' in sdict[srx].keys():
-                        sdict[srx]['pub_journal'].append(pdict[pub]['pub_journal'])
-                    else:
-                        sdict[srx]['pub_journal'] = [pdict[pub]['pub_journal']]
-                if 'pub_doi' in pdict[pub].keys():
-                    if 'pub_doi' in sdict[srx].keys():
-                        sdict[srx]['pub_doi'].append(pdict[pub]['pub_doi'])
-                    else:
-                        sdict[srx]['pub_doi'] = [pdict[pub]['pub_doi']]
+                if pub in pdict.keys():
+                    #don't need pubmed_uid since already there
+                    pubmed_fields = ['pubmed_link','pub_publication_date','pub_authors','pub_title','pub_volume','pub_issue','pub_pages','pub_journal','pub_doi']
+                    for pubmed_field in pubmed_fields:
+                        if pubmed_field in pdict[pub].keys():
+                            if pubmed_field in sdict[srx].keys(): #if field already in sdict[srx], append new value to existing list
+                                sdict[srx][pubmed_field].append(pdict[pub][pubmed_field])
+                            else: #otherwise add new field with list value (length of one)
+                                sdict[srx][pubmed_field] = [pdict[pub][pubmed_field]]
 
         if 'nuccore_uids' in sdict[srx].keys():
             #append nuccore metadata values to list metadata values for that field in sdict[srx]
             for nuc in sdict[srx]['nuccore_uids']:
                 nuc = str(nuc)
-                #don't need nuccore_uid since already there - just add nuccore_link
-                if 'nuccore_link' in ndict[nuc].keys():
-                    if 'nuccore_link' in sdict[srx].keys():
-                        sdict[srx]['nuccore_link'].append(ndict[nuc]['nuccore_link'])
-                    else:
-                        sdict[srx]['nuccore_link'] = [ndict[nuc]['nuccore_link']]
+                if nuc in ndict.keys():
+                    #don't need nuccore_uid since already there - just add nuccore_link
+                    if 'nuccore_link' in ndict[nuc].keys():
+                        if 'nuccore_link' in sdict[srx].keys():
+                            sdict[srx]['nuccore_link'].append(ndict[nuc]['nuccore_link'])
+                        else:
+                            sdict[srx]['nuccore_link'] = [ndict[nuc]['nuccore_link']]
     return sdict
-
-                        

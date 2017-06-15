@@ -1,6 +1,11 @@
 from SRA_scrape_fns import *
 
 if __name__ == "__main__":
+    class EfetchError(Exception):
+    def __init__(self, arg):
+        # Set some exception infomation
+        self.msg = arg
+
     #make list of all publicly available UIDs in SRA
     retstart_list = get_retstart_list(url='https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=public&field=ACS&rettype=count&tool=metaseq&email=metaseekcloud%40gmail.com')
     uid_list = get_uid_list(ret_list=retstart_list)
@@ -18,7 +23,12 @@ if __name__ == "__main__":
         print "%s UIDs to scrape...... %s..." % (len(batch_uid_list),batch_uid_list[0:10])
         #scrape sra metadata, return as dictionary of dictionaries; each sdict key is the SRA UID, value is a dictionary of srx metadata key/value pairs
         print "scraping SRX metadata..."
-        sdict = get_srx_metadata(batch_uid_list=batch_uid_list)
+        try:
+            sdict = get_srx_metadata(batch_uid_list=batch_uid_list)
+        except EfetchError, arg:
+            print arg
+            continue
+
         #get link uids for any links to biosample, pubmed, and nuccore databases so can go scrape those too
         print "getting elinks..."
         sdict, linkdict = get_links(batch_uid_list=batch_uid_list,sdict=sdict)
@@ -29,7 +39,6 @@ if __name__ == "__main__":
         for b_batch_ix,b_batch in enumerate(biosample_batches): #scrape biosample data for all the biosamples, in batches of 500
             print "processing biosample batch %s out of %s......" % (b_batch_ix+1,len(biosample_batches))
             biosample_batch_uids = map(int,linkdict['biosample_uids'][b_batch[0]:b_batch[1]])
-            bdict = get_biosample_metadata(batch_uid_list=biosample_batch_uids,bdict=bdict)
             bdict = get_biosample_metadata(batch_uid_list=biosample_batch_uids,bdict=bdict)
         #efetch for batch/es of pubmeds; generate pdict dictionary of dictionaries {'pub#':{},'pub#':{},...}
         pubmed_batches = get_batches(uid_list=linkdict['pubmed_uids'])
@@ -47,4 +56,4 @@ if __name__ == "__main__":
             ndict = get_nuccore_metadata(batch_uid_list=nuccore_batch_uids,ndict=ndict)
 
         #merge sdict with scraped biosample/pubmed/nuccore metadata - add metadata from bdict/pdict/ndict where appropriate for each srx in sdict.
-        sdict = merge_scrapes(sdict=sdict,bdict=bdict,pdict=pdict,ndict=ndict)
+        sdict = merge_scrapes(sdict=sdict,bdict=bdict,pdict=pdict,ndict=ndict,rules_json="rules.json")

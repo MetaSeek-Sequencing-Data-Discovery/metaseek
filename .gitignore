@@ -15,3 +15,7 @@ DataScraping/*
 *.pem
 
 client/build/index.html
+
+server/scrapers/SRA/subset_testdf_sframe/objects.bin
+
+server/scrapers/SRA/subset_testdf.txt
