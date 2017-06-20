@@ -20,13 +20,17 @@ if __name__ == "__main__":
         print "-scraping SRX metadata..."
         try:
             sdict = get_srx_metadata(batch_uid_list=batch_uid_list)
-        except EfetchError, arg:
-            print arg
+        except EfetchError, msg:
+            print msg
             continue
 
         #get link uids for any links to biosample, pubmed, and nuccore databases so can go scrape those too
         print "-getting elinks..."
-        sdict, linkdict = get_links(batch_uid_list=batch_uid_list,sdict=sdict)
+        try:
+            sdict, linkdict = get_links(batch_uid_list=batch_uid_list,sdict=sdict)
+        except EutilitiesConnectionError, msg:
+            print msg,"; skipping this batch"
+            continue
 
         #efetch for batch/es of biosamples; generate bdict dictionary of dictionaries {'bio#':{},'bio##':{}...}
         biosample_batches = get_batches(uid_list=linkdict['biosample_uids']) #split biosamples into batches of 500 (if there's less than 500 there will only be one batch)

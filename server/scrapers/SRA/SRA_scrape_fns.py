@@ -1,11 +1,14 @@
 import urllib
 from lxml import etree
 import json
+from datetime import datetime
+import time
 
 class EfetchError(Exception):
-    def __init__(self, arg):
-        # Set some exception infomation
-        self.msg = arg
+    pass
+
+class EutilitiesConnectionError(Exception):
+    pass
 
 def get_retstart_list(url):
     #define retstarts need for get_uid_list eutilities requests - since can only get 100,000 at a time, need to make multiple queries to get total list
@@ -43,6 +46,21 @@ def get_batches(uid_list):
     batches = [list(a) for a in zip(starts, ends)]
     return batches
 
+#fn to try to get request from eutilities (as part e.g. get_links fn); if connection error for some reason raise efetch error
+def geturl_with_retry(MaxRetry,url):
+        while(MaxRetry >= 0):
+            try:
+                base = urllib.urlopen(url)
+                base_tree = etree.parse(base)
+                base.close()
+                base_xml = base_tree.getroot()
+                return base_xml
+            except Exception:
+                print "Internet connectivity Error Retrying in 5 seconds"
+                time.sleep(5)
+                MaxRetry=MaxRetry - 1
+        raise EutilitiesConnectionError("eutilities connection error")
+
 
 def get_srx_metadata(batch_uid_list):
     print "--Querying API and parsing XML..."
@@ -52,15 +70,16 @@ def get_srx_metadata(batch_uid_list):
         #this makes url with end &id=###&id=###&id=### - returns a set of links in order of sra uids
         srx_url = srx_url+'&id='+str(key)
     #srx_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=sra&tool=metaseq&email=metaseekcloud%40gmail.com&id='+str(batch_uid_list)[1:-1]
-    s = urllib.urlopen(srx_url)
-    sra_tree = etree.parse(s)
-    s.close()
-    sra_xml = sra_tree.getroot()
+    sra_xml = geturl_with_retry(MaxRetry=5,url=srx_url)
+
+    try: #sometimes the url is parsed with lxml but is an error xml output from eutilities; this step fails in that case
+        sra_samples = sra_xml.findall("EXPERIMENT_PACKAGE")
+    except Exception:
+        raise EutilitiesConnectionError('eutilities connection error')
+
     print "--...parsing done for %s srxs in %s" % (len(batch_uid_list),(datetime.now()-s_parse_time))
     print "--getting srx metadata..."
     s_scrape_time = datetime.now()
-
-    sra_samples = sra_xml.findall("EXPERIMENT_PACKAGE")
     sdict = {}
 
     #if the length of sra_samples != length of batch_uid_list, then one or more of the uids did not return an efetch (maybe it's not public even though it shows up in esearch);
@@ -441,28 +460,33 @@ def get_srx_metadata(batch_uid_list):
 
 #takes list of SRX UIDs to query (batch_uid_list), and sdict into which to insert link uids;
 #return sdict with 'biosample_uid', 'pubmed_uids', and/or 'nuccore_uids' inserted; and link dict with lists of biosample_uids, pubmed_uids, and nuccore_uids to scrape
+#takes list of SRX UIDs to query (batch_uid_list), and sdict into which to insert link uids;
+#return sdict with 'biosample_uid', 'pubmed_uids', and/or 'nuccore_uids' inserted; and link dict with lists of biosample_uids, pubmed_uids, and nuccore_uids to scrape
 def get_links(batch_uid_list, sdict):
-    print "sending elink request and parsing XML..."
-    e_parse_time = datetime.now()
     elink_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/elink.fcgi?dbfrom=sra&db=biosample,pubmed,nuccore&tool=metaseq&email=metaseekcloud%40gmail.com'
     for key in batch_uid_list:
         #this makes url with end &id=###&id=###&id=### - returns a set of links in order of sra uids
         elink_url = elink_url+'&id='+str(key)
     #run api request and parse xml
-    e = urllib.urlopen(elink_url)
-    link_tree = etree.parse(e)
-    e.close()
-    link_xml = link_tree.getroot()
-    print "...parsing done in %s" % (datetime.now()-e_parse_time)
+    print "--sending elink request and parsing XML..."
+    e_parse_time = datetime.now()
+    link_xml = geturl_with_retry(MaxRetry=5,url=elink_url)
 
-    print "finding links..."
+    try: #sometimes the url is parsed with lxml but is an error xml output from eutilities; this step fails in that case
+        linksets = link_xml.findall("LinkSet")
+    except Exception:
+        raise EutilitiesConnectionError('eutilities connection error')
+
+    print "--...parsing done in %s" % (datetime.now()-e_parse_time)
+
+    print "--scraping links..."
+    e_scrape_time = datetime.now()
     #scrape elink info
     #note if there's no biosample link, <LinkSetDb> with <DbTo>=='biosample' just won't exist
     biosample_uids = []
     pubmed_uids = []
     nuccore_uids = []
 
-    linksets = link_xml.findall("LinkSet")
     for linkset in linksets:
         srx_uid = linkset.find("IdList").findtext("Id")
         #links from each target db will be in a tab called "LinkSetDb"
@@ -489,11 +513,12 @@ def get_links(batch_uid_list, sdict):
     biosample_uids = list(set(biosample_uids))
     pubmed_uids = list(set(pubmed_uids))
     nuccore_uids = list(set(nuccore_uids))
+    print "--done scraping links in %s" % (datetime.now()-e_scrape_time)
 
     linkdict = {'biosample_uids':biosample_uids,'pubmed_uids':pubmed_uids,'nuccore_uids':nuccore_uids}
-    print "number of biosamples to scrape: %s" % len(linkdict['biosample_uids'])
-    print "number of pubmeds to scrape: %s" % len(linkdict['pubmed_uids'])
-    print "number of nuccores to scrape: %s" % len(linkdict['nuccore_uids'])
+    print "---number of biosamples to scrape: %s" % len(linkdict['biosample_uids'])
+    print "---number of pubmeds to scrape: %s" % len(linkdict['pubmed_uids'])
+    print "---number of nuccores to scrape: %s" % len(linkdict['nuccore_uids'])
 
     return sdict,linkdict
 
