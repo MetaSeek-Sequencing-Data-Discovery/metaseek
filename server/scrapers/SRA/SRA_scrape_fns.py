@@ -10,6 +10,9 @@ class EfetchError(Exception):
 class EutilitiesConnectionError(Exception):
     pass
 
+class MultipleBiosampleError(Exception):
+    pass
+
 def get_retstart_list(url):
     #define retstarts need for get_uid_list eutilities requests - since can only get 100,000 at a time, need to make multiple queries to get total list
     #find out count of UIDs going to pull from SRA
@@ -677,19 +680,21 @@ def merge_scrapes(sdict,bdict,pdict,ndict):
         if 'biosample_uid' in sdict[srx].keys():
             #add biosample metadata fields and values to sdict[srx]
 
-            ##TODO: log an error if len(sdict[srx]['biosample_uid'])>1; otherwise, merge biosample scrapes
-            if len(sdict[srx]['biosample_uid'])==1:
-                #for bio in sdict[srx]['biosample_uid']:
-                    #bio = str(bio)
-                    #TAB EVERYTHING OUT ONE, use if else list append approach like below:
-                    #if 'biosample_link' in bdict[bio].keys():
-                    #    if 'biosample_link' in sdict[srx].keys(): #biosample_link
-                    #        sdict[srx]['biosample_link'].append(bdict[bio]['biosample_link'])
-                    #    else:
-                    #        sdict[srx]['biosample_link'] = [bdict[bio]['biosample_link']]
+            try:
+                if len(sdict[srx]['biosample_uid'])>1:
+                    raise MultipleBiosampleError
+            except MultipleBiosampleError:
+                #log an error with srx (uid), sdict[srx]['biosample_uid'] to file; look into it manually
+                f = open('MultipleBiosampleErrors.csv','a')
+                f.write(str(srx)+','+str(sdict[srx]['biosample_uid'])+'\n')
+                f.close()
+                continue
+                ##TODO: is a csv on the server fine? Should we save it somewhere else? In a new table in the db? This will be a very rare exception (a few per tens of thousands of accessions).
 
+            if len(sdict[srx]['biosample_uid'])==1:
                 bio = str(sdict[srx]['biosample_uid'][0])
-                if bio in bdict.keys():
+                if bio in bdict.keys(): #if bio not in bdict keys, why isn't it? biosample efetch doesn't exist yet for link that was found? biosample uid wasn't in efetch?
+                    ##TODO: error flag if a row has a value in biosample_uid but doesn't have anything in any of the biosample_fields
                     #fields from biosample scrape need to add; don't need biosample_uid since already there
                     biosample_fields = ['biosample_link','metadata_publication_date','biosample_package','biosample_models','sample_attributes']
                     for biosample_field in biosample_fields:
@@ -701,6 +706,7 @@ def merge_scrapes(sdict,bdict,pdict,ndict):
             for pub in sdict[srx]['pubmed_uids']:
                 pub = str(pub)
                 if pub in pdict.keys():
+                    ##TODO: error flag if a row has a value in pubmed_uids but doesn't have anything in any of the pubmed_fields
                     #don't need pubmed_uid since already there
                     pubmed_fields = ['pubmed_link','pub_publication_date','pub_authors','pub_title','pub_volume','pub_issue','pub_pages','pub_journal','pub_doi']
                     for pubmed_field in pubmed_fields:
@@ -723,7 +729,8 @@ def merge_scrapes(sdict,bdict,pdict,ndict):
                             sdict[srx]['nuccore_link'] = [ndict[nuc]['nuccore_link']]
     return sdict
 
-def extract_and_merge_mixs_fields(sdict, field, rules_json):
+
+def extract_and_merge_mixs_fields(sdict, fieldname, rules_json):
     #field e.g. 'sample_attributes'; sdict should be dict of dicts
     #read in rules from json
     with open(rules_json) as json_rules:
@@ -731,21 +738,19 @@ def extract_and_merge_mixs_fields(sdict, field, rules_json):
         json_rules.close()
 
     for srx in sdict.keys():
-        if field in sdict[srx].keys():
+        if fieldname in sdict[srx].keys():
             for rule_set in rules.keys():
+                #if rule_set is already an srx field with a value (e.g. sequencing_method, taxon_scientific_name), keep the old value and don't replace
+                if rule_set in sdict[srx][fieldname].keys() and sdict[srx][fieldname][rule_set] is not None:
+                    pass
                 #find which redundant fields in rule set exist in sample_attributes
-                matches = [x for x in rules[rule_set] if x in sdict[srx][field].keys()]
+                matches = [x for x in rules[rule_set] if x in sdict[srx][fieldname].keys()]
                 if len(matches)>0:
                     #pick replacement as lowest index (highest priority) field ##**MAKE SURE YOU ENTER YOUR RULE SET LIST IN ORDER OF PRIORITY IN THE JSON FILE**##
                     replacement = rules[rule_set][min([rules[rule_set].index(j) for j in matches])]
-
                     #add column (key:value field) to bio_dict with appropriate MIxS key field
-                    sdict[srx][rule_set] = sdict[srx][field][replacement]
+                    sdict[srx][rule_set] = sdict[srx][fieldname][replacement]
 
                     #not going to remove the replacement field in the dict, for e.g. where units are in the old field name ('age_in_years'); you'll be able to see it in the sample_attributes of the dataset details
-                    #del sdict[srx][field][replacement]
-
-                    #choosing to leave any additional lower-priority matches in sample_attributes
-                    ##TODO: ERROR FLAG IF THERE ARE >1 MATCHES?
-
+                    #choosing to leave any additional lower-priority matches in sample_attributes also
     return sdict

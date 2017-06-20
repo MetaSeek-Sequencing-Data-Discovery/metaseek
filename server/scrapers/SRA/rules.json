@@ -65,7 +65,7 @@
  "experimental_factor":["experimental_factor","treatment","experimental_treatment","experimental_condition",
                        "experimental condition"],
 
- "species":["species","ArrayExpress-Species","Species","species_name","species name","bee species"],
+ "taxon_scientific_name":["species","ArrayExpress-Species","Species","species_name","species name","bee species"],
 
  "specific_host":["host","host.species","host genus","host order","host_order","host_major_clade","host_species_abbrev","host_taxid","isolation_source",
                  "isolation source host associated","isolation source host-associated","lab_host","Lab host plant","beetle host","snail host"],
@@ -94,5 +94,5 @@
                         "collecting institution","collection_hospital","collection_hostiptal","collector_name","collector name"],
 
  "host_disease":["host_disease","host disease status","disease","study_disease","disease type","primary disease","diagnosis",
-                     "tissue_diagnosis","diagnosis full","ibd diagnosis"]         
+                     "tissue_diagnosis","diagnosis full","ibd diagnosis"]
  }
