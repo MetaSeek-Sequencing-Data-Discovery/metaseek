@@ -2,6 +2,11 @@ import urllib
 from lxml import etree
 import json
 
+class EfetchError(Exception):
+    def __init__(self, arg):
+        # Set some exception infomation
+        self.msg = arg
+
 def get_retstart_list(url):
     #define retstarts need for get_uid_list eutilities requests - since can only get 100,000 at a time, need to make multiple queries to get total list
     #find out count of UIDs going to pull from SRA
@@ -40,7 +45,7 @@ def get_batches(uid_list):
 
 
 def get_srx_metadata(batch_uid_list):
-    print "Querying API and parsing XML..."
+    print "--Querying API and parsing XML..."
     s_parse_time = datetime.now()
     srx_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=sra&tool=metaseq&email=metaseekcloud%40gmail.com'
     for key in batch_uid_list:
@@ -51,19 +56,22 @@ def get_srx_metadata(batch_uid_list):
     sra_tree = etree.parse(s)
     s.close()
     sra_xml = sra_tree.getroot()
-    print "...parsing done for %s srxs in %s" % (len(batch_uid_list),(datetime.now()-s_parse_time))
+    print "--...parsing done for %s srxs in %s" % (len(batch_uid_list),(datetime.now()-s_parse_time))
+    print "--getting srx metadata..."
+    s_scrape_time = datetime.now()
 
     sra_samples = sra_xml.findall("EXPERIMENT_PACKAGE")
     sdict = {}
 
-    #if the length of sra_samples != length of batch_uid_list, then one or more of the uids did not return an efetch (maybe it's not public even though it shows up in esearch); if this is the case, raise EfetchError
+    #if the length of sra_samples != length of batch_uid_list, then one or more of the uids did not return an efetch (maybe it's not public even though it shows up in esearch);
+    #if this is the case, raise EfetchError which will skip this batch of 500
     if len(sra_samples)!=len(batch_uid_list):
         raise EfetchError('length srx batch does not equal length returned efetches! skipping this batch')
 
     for which,sra_sample in enumerate(sra_samples): #the order of experiment_packages ARE in order of sra ids given - that's good
         srx_dict = {}
         srx_uid = str(batch_uid_list[which])
-        print "--scraping srx metadata for sample uid %s, %s out of %s" % (srx_uid, which+1,len(sra_samples))
+        #print "--scraping srx metadata for sample uid %s, %s out of %s" % (srx_uid, which+1,len(sra_samples))
 
         srx_dict['db_source_uid'] = srx_uid
         srx_dict['db_source'] = 'SRA'
@@ -72,48 +80,87 @@ def get_srx_metadata(batch_uid_list):
         #There are 7 top tag groups. Have to scrape data a little different for each: ['EXPERIMENT','SUBMISSION','Organization','STUDY','SAMPLE','Pool','RUN_SET']
 
         ###EXPERIMENT -
-        if sra_sample.find("EXPERIMENT").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
-            srx_dict['expt_id'] = sra_sample.find("EXPERIMENT").find("IDENTIFIERS").findtext("PRIMARY_ID")
-        if sra_sample.find("EXPERIMENT").findtext("TITLE") is not None:
-            srx_dict['expt_title'] = sra_sample.find("EXPERIMENT").findtext("TITLE")
-        if sra_sample.find("EXPERIMENT").find("STUDY_REF").find("IDENTIFIERS") is not None:
-            if sra_sample.find("EXPERIMENT").find("STUDY_REF").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
-                srx_dict["study_id"] = sra_sample.find("EXPERIMENT").find("STUDY_REF").find("IDENTIFIERS").findtext("PRIMARY_ID")
-        if sra_sample.find("EXPERIMENT").find("DESIGN").findtext("DESIGN_DESCRIPTION") is not None:
-            srx_dict['expt_design_description'] = sra_sample.find("EXPERIMENT").find("DESIGN").findtext("DESIGN_DESCRIPTION")
+        try:
+            if sra_sample.find("EXPERIMENT").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
+                srx_dict['expt_id'] = sra_sample.find("EXPERIMENT").find("IDENTIFIERS").findtext("PRIMARY_ID")
+        except AttributeError:
+            pass
+        try:
+            if sra_sample.find("EXPERIMENT").findtext("TITLE") is not None:
+                srx_dict['expt_title'] = sra_sample.find("EXPERIMENT").findtext("TITLE")
+        except AttributeError:
+            pass
+        try:
+            if sra_sample.find("EXPERIMENT").find("STUDY_REF").find("IDENTIFIERS") is not None:
+                if sra_sample.find("EXPERIMENT").find("STUDY_REF").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
+                    srx_dict["study_id"] = sra_sample.find("EXPERIMENT").find("STUDY_REF").find("IDENTIFIERS").findtext("PRIMARY_ID")
+        except AttributeError:
+            pass
+        try:
+            if sra_sample.find("EXPERIMENT").find("DESIGN").findtext("DESIGN_DESCRIPTION") is not None:
+                srx_dict['expt_design_description'] = sra_sample.find("EXPERIMENT").find("DESIGN").findtext("DESIGN_DESCRIPTION")
+        except AttributeError:
+            pass
         try:
             srx_dict['sample_id'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("SAMPLE_DESCRIPTOR").get("accession")
         except AttributeError:
             pass
-        if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_NAME") is not None:
-            srx_dict['library_name'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_NAME")
-        if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_STRATEGY") is not None:
-            srx_dict['library_strategy'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_STRATEGY")
-        if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SOURCE").lower() is not None:
-            srx_dict['library_source'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SOURCE").lower()
-        ###change library_selection to MIxS field library_screening_strategy (cv for SRA, not for MIxS)
-        if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SELECTION") is not None:
-            srx_dict['library_screening_strategy'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SELECTION")
-        ###change library_layout to MIxS field library_construction_method - cv single | paired
-        if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_LAYOUT") is not None:
-            srx_dict['library_construction_method'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").find("LIBRARY_LAYOUT").getchildren()[0].tag.lower()
-        if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_CONSTRUCTION_PROTOCOL") is not None:
-            srx_dict['library_construction_protocol'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_CONSTRUCTION_PROTOCOL")
-        ###change platform to MIxS field sequencing_method - cv in SRA (not in MIxS)
-        if sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren() is not None:
-            if len(testxml.find("EXPERIMENT_PACKAGE").find("EXPERIMENT").find("PLATFORM").getchildren())>1:
-                #find the one that's actually a tag
-                for platform in testxml.find("EXPERIMENT_PACKAGE").find("EXPERIMENT").find("PLATFORM").getchildren():
-                    if type(platform.tag) is str:
-                        srx_dict['sequencing_method'] = platform.tag.lower()
-            else:
-                srx_dict['sequencing_method'] = sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].tag.lower()
-            if sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].findtext("INSTRUMENT_MODEL") is not None:
-                srx_dict['instrument_model'] = sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].findtext("INSTRUMENT_MODEL")
+        try:
+            if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_NAME") is not None:
+                srx_dict['library_name'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_NAME")
+        except AttributeError:
+            pass
+        try:
+            if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_STRATEGY") is not None:
+                srx_dict['library_strategy'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_STRATEGY")
+        except AttributeError:
+            pass
+        try:
+            if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SOURCE").lower() is not None:
+                srx_dict['library_source'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SOURCE").lower()
+        except AttributeError:
+            pass
+        try:
+            ###change library_selection to MIxS field library_screening_strategy (cv for SRA, not for MIxS)
+            if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SELECTION") is not None:
+                srx_dict['library_screening_strategy'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SELECTION")
+        except AttributeError:
+            pass
+        try:
+            ###change library_layout to MIxS field library_construction_method - cv single | paired
+            if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_LAYOUT") is not None:
+                srx_dict['library_construction_method'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").find("LIBRARY_LAYOUT").getchildren()[0].tag.lower()
+        except AttributeError:
+            pass
+        try:
+            if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_CONSTRUCTION_PROTOCOL") is not None:
+                srx_dict['library_construction_protocol'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_CONSTRUCTION_PROTOCOL")
+        except AttributeError:
+            pass
+        try:
+            ###change platform to MIxS field sequencing_method - cv in SRA (not in MIxS)
+            if sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren() is not None:
+                if len(sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren())>1:
+                    #find the one that's actually a tag
+                    for platform in sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren():
+                        if type(platform.tag) is str:
+                            srx_dict['sequencing_method'] = platform.tag.lower()
+                else:
+                    srx_dict['sequencing_method'] = sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].tag.lower()
+            try:
+                if sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].findtext("INSTRUMENT_MODEL") is not None:
+                    srx_dict['instrument_model'] = sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].findtext("INSTRUMENT_MODEL")
+            except AttributeError:
+                pass
+        except AttributeError:
+            pass
 
         ###SUBMISSION - just need the submission id
-        if sra_sample.find("SUBMISSION").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
-            srx_dict['submission_id'] = sra_sample.find("SUBMISSION").find("IDENTIFIERS").findtext("PRIMARY_ID")
+        try:
+            if sra_sample.find("SUBMISSION").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
+                srx_dict['submission_id'] = sra_sample.find("SUBMISSION").find("IDENTIFIERS").findtext("PRIMARY_ID")
+        except AttributeError:
+            pass
 
         ###Organization - name, address, and contact
         if sra_sample.find("Organization") is not None:
@@ -146,156 +193,248 @@ def get_srx_metadata(batch_uid_list):
                 pass
 
         ###STUDY -
-        if sra_sample.find("STUDY").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
-            srx_dict['study_id'] = sra_sample.find("STUDY").find("IDENTIFIERS").findtext("PRIMARY_ID")
-        if len(sra_sample.find("STUDY").find("IDENTIFIERS").findall("EXTERNAL_ID"))>0:
-            for external in sra_sample.find("STUDY").find("IDENTIFIERS").iterchildren("EXTERNAL_ID"):
-                if external.get("namespace")=='BioProject':
-                    srx_dict['bioproject_id'] = external.text
-        if sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_TITLE") is not None:
-            srx_dict['study_title'] = sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_TITLE")
+        try:
+            if sra_sample.find("STUDY").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
+                srx_dict['study_id'] = sra_sample.find("STUDY").find("IDENTIFIERS").findtext("PRIMARY_ID")
+        except AttributeError:
+            pass
+        try:
+            if len(sra_sample.find("STUDY").find("IDENTIFIERS").findall("EXTERNAL_ID"))>0:
+                for external in sra_sample.find("STUDY").find("IDENTIFIERS").iterchildren("EXTERNAL_ID"):
+                    if external.get("namespace")=='BioProject':
+                        srx_dict['bioproject_id'] = external.text
+        except AttributeError:
+            pass
+        try:
+            if sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_TITLE") is not None:
+                srx_dict['study_title'] = sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_TITLE")
+        except AttributeError:
+            pass
+        try:
         ###rename existing_study_type to study_type
-        if sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE") is not None:
-            if sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("existing_study_type")=="Other":
-                srx_dict['study_type'] = 'Other'
-                if sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("add_study_type") is not None:
-                    srx_dict['study_type_other'] = sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("add_study_type")
-            else:
-                srx_dict['study_type'] = sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("existing_study_type")
-        if sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_ABSTRACT"):
-            srx_dict['study_abstract'] = sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_ABSTRACT")
-        if sra_sample.find("STUDY").find("STUDY_LINKS") is not None:
-            study_links = {}
-            for study_link in sra_sample.find("STUDY").find("STUDY_LINKS").iterchildren():
-                if study_link.find("XREF_LINK") is not None:
-                    study_links[study_link.find("XREF_LINK").findtext("DB")] = study_link.find("XREF_LINK").findtext("ID")
-                if study_link.find("URL_LINK") is not None:
-                    study_links[study_link.find("URL_LINK").findtext("LABEL")] = study_link.find("URL_LINK").findtext("URL")
-            srx_dict['study_links'] = study_links
-        if sra_sample.find("STUDY").find("STUDY_ATTRIBUTES") is not None:
-            study_attributes = {}
-            for attr in sra_sample.find("STUDY").find("STUDY_ATTRIBUTES").iterchildren():
-                study_attributes[attr.findtext("TAG")] = attr.findtext("VALUE")
-            srx_dict['study_attributes'] = study_attributes
+            if sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE") is not None:
+                if sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("existing_study_type")=="Other":
+                    srx_dict['study_type'] = 'Other'
+                    if sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("add_study_type") is not None:
+                        srx_dict['study_type_other'] = sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("add_study_type")
+                else:
+                    srx_dict['study_type'] = sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("existing_study_type")
+        except AttributeError:
+            pass
+        try:
+            if sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_ABSTRACT"):
+                srx_dict['study_abstract'] = sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_ABSTRACT")
+        except AttributeError:
+            pass
+        try:
+            if sra_sample.find("STUDY").find("STUDY_LINKS") is not None:
+                study_links = {}
+                for study_link in sra_sample.find("STUDY").find("STUDY_LINKS").iterchildren():
+                    if study_link.find("XREF_LINK") is not None:
+                        study_links[study_link.find("XREF_LINK").findtext("DB")] = study_link.find("XREF_LINK").findtext("ID")
+                    if study_link.find("URL_LINK") is not None:
+                        study_links[study_link.find("URL_LINK").findtext("LABEL")] = study_link.find("URL_LINK").findtext("URL")
+                srx_dict['study_links'] = study_links
+        except AttributeError:
+            pass
+        try:
+            if sra_sample.find("STUDY").find("STUDY_ATTRIBUTES") is not None:
+                study_attributes = {}
+                for attr in sra_sample.find("STUDY").find("STUDY_ATTRIBUTES").iterchildren():
+                    study_attributes[attr.findtext("TAG")] = attr.findtext("VALUE")
+                srx_dict['study_attributes'] = study_attributes
+        except AttributeError:
+            pass
 
         ###SAMPLE - get some BioSample stuff that's in easier format here: sample id, biosample id (if exists; it should but sometimes doesn't); also title, sample name stuff, and description; rest get from biosample scraping
         try:
             if sra_sample.find("SAMPLE").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
                 srx_dict['sample_id'] = sra_sample.find("SAMPLE").find("IDENTIFIERS").findtext("PRIMARY_ID")
+        except AttributeError:
+            pass
+        try:
             if len(sra_sample.find("SAMPLE").find("IDENTIFIERS").findall("EXTERNAL_ID"))>0:
                 for external in sra_sample.find("SAMPLE").find("IDENTIFIERS").iterchildren("EXTERNAL_ID"):
                     if external.get("namespace")=='BioSample':
                         srx_dict['biosample_id'] = external.text
+        except AttributeError:
+            pass
+        try:
             if sra_sample.find("SAMPLE").findtext("TITLE") is not None:
                 srx_dict['sample_title'] = sra_sample.find("SAMPLE").findtext("TITLE")
+        except AttributeError:
+            pass
+        try:
             if sra_sample.find("SAMPLE").find("SAMPLE_NAME") is not None:
                 if sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("TAXON_ID") is not None:
-                    srx_dict['host_taxon_id'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("TAXON_ID")
+                    srx_dict['ncbi_taxon_id'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("TAXON_ID")
+        except AttributeError:
+            pass
+        try:
                 if sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("SCIENTIFIC_NAME") is not None:
                     srx_dict['taxon_scientific_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("SCIENTIFIC_NAME")
+        except AttributeError:
+            pass
+        try:
                 if sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("COMMON_NAME") is not None:
                     srx_dict['taxon_common_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("COMMON_NAME")
+        except AttributeError:
+            pass
+        try:
             if sra_sample.find("SAMPLE").findtext("DESCRIPTION") is not None:
                 srx_dict['sample_description'] = sra_sample.find("SAMPLE").findtext("DESCRIPTION")
         except AttributeError:
-            print "Sample scraping didn't work for srx uid %s, skipping" % (srx_uid)
             pass
-
 
         ###Pool - skip, redundant
 
         ###RUN_SET - record stats for each run as list, for best run (maxrun, run for which total_num_reads is largest) as single value
-        run_ids = []
-        total_num_reads = []
-        total_num_bases = []
-        download_size = []
-        avg_read_length = []
-        baseA_count = []
-        baseC_count = []
-        baseG_count = []
-        baseT_count = []
-        baseN_count = []
-        gc_percent = []
-        read_quality_counts = []
-
-        if len(sra_sample.find("RUN_SET").findall("RUN"))>0:
-            srx_dict['num_runs_in_accession'] = len(sra_sample.find("RUN_SET").findall("RUN"))
-            for run in sra_sample.find("RUN_SET").findall("RUN"):
-                run_ids.append(run.get("accession"))
-                total_num_reads.append(int(run.get("total_spots")) if run.get("total_spots") is str else None)
-                total_num_bases.append(int(run.get("total_bases")) if run.get("total_bases") is str else None)
-                download_size.append(int(run.get("size")) if run.get("size") is str else None)
-                if run.find("Bases") is not None:
-                    for base in run.find("Bases").findall("Base"):
-                        if base.get("value")=="A":
-                            baseA_count.append(int(base.get("count")))
-                            countA = int(base.get("count"))
-                        if base.get("value")=="C":
-                            baseC_count.append(int(base.get("count")))
-                            countC = int(base.get("count"))
-                        if base.get("value")=="G":
-                            baseG_count.append(int(base.get("count")))
-                            countG = int(base.get("count"))
-                        if base.get("value")=="T":
-                            baseT_count.append(int(base.get("count")))
-                            countT = int(base.get("count"))
-                        if base.get("value")=="N":
-                            baseN_count.append(int(base.get("count")))
-                            countN = int(base.get("count"))
-                    gc_percent.append(float(countG+countC)/float(countC+countG+countA+countT))
-                if run.find("Run") is not None:
+        if sra_sample.find("RUN_SET") is not None:
+            run_ids = []
+            total_num_reads = []
+            total_num_bases = []
+            download_size = []
+            avg_read_length = []
+            baseA_count = []
+            baseC_count = []
+            baseG_count = []
+            baseT_count = []
+            baseN_count = []
+            gc_percent = []
+            read_quality_counts = []
+            if len(sra_sample.find("RUN_SET").findall("RUN"))>0:
+                srx_dict['num_runs_in_accession'] = len(sra_sample.find("RUN_SET").findall("RUN"))
+                for run in sra_sample.find("RUN_SET").findall("RUN"):
                     try:
-                        avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Run").get("spot_count"))+float(run.find("Run").get("spot_count_mates"))))
-                    except TypeError:
+                        run_ids.append(run.get("accession"))
+                    except AttributeError:
+                        run_ids.append(None)
+                    try:
+                        total_num_reads.append(int(run.get("total_spots")))
+                    except AttributeError:
+                        total_num_reads.append(None)
+                    try:
+                        total_num_bases.append(int(run.get("total_bases")))
+                    except AttributeError:
+                        total_num_bases.append(None)
+                    try:
+                        download_size.append(int(run.get("size"))
+                    except (AttributeError, ValueError) as e:
+                        download_size.append(None)
+                    try:
+                        if len(run.find("Bases").findall("Base"))>0:
+                            for base in run.find("Bases").findall("Base"):
+                                try:
+                                    if base.get("value")=="A":
+                                        baseA_count.append(int(base.get("count")))
+                                        countA = int(base.get("count"))
+                                except (AttributeError, ValueError) as e:
+                                    baseA_count.append(None)
+                                    countA=None
+                                try:
+                                    if base.get("value")=="C":
+                                        baseC_count.append(int(base.get("count")))
+                                        countC = int(base.get("count"))
+                                except (AttributeError, ValueError) as e:
+                                    baseC_count.append(None)
+                                    countC=None
+                                try:
+                                    if base.get("value")=="G":
+                                        baseG_count.append(int(base.get("count")))
+                                        countG = int(base.get("count"))
+                                except (AttributeError, ValueError) as e:
+                                    baseG_count.append(None)
+                                    countG=None
+                                try:
+                                    if base.get("value")=="T":
+                                        baseT_count.append(int(base.get("count")))
+                                        countT = int(base.get("count"))
+                                except (AttributeError, ValueError) as e:
+                                    baseT_count.append(None)
+                                    countT=None
+                                try:
+                                    if base.get("value")=="N":
+                                        baseN_count.append(int(base.get("count")))
+                                        countN = int(base.get("count"))
+                                except (AttributeError, ValueError) as e:
+                                    baseN_count.append(None)
+                            try:
+                                gc_percent.append(float(countG+countC)/float(countC+countG+countA+countT))
+                            except TypeError:
+                                gc_percent.append(None)
+                    except AttributeError:
+                        baseA_count.append(None)
+                        baseC_count.append(None)
+                        baseG_count.append(None)
+                        baseT_count.append(None)
+                        baseN_count.append(None)
+                        gc_percent.append(None)
+                    #need calculate avg read length; can come from "Run" or "Statistics" heading
+                    if run.find("Run") is not None:
+                        try:
+                            #have to account for whether it's paired or single to calculate avg read length (bases/reads will be double the actual avg read count if it's paired)
+                            avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Run").get("spot_count"))+float(run.find("Run").get("spot_count_mates"))))
+                        except TypeError: #if one of these values doesn't exist, try getting it from "Statistics" heading; otherwise just add as None
+                            if run.find("Statistics") is not None:
+                                try:
+                                    avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Statistics").get("nreads"))*float(run.find("Statistics").get("nspots"))))
+                                except TypeError:
+                                    avg_read_length.append(None)
+                            else:
+                                avg_read_length.append(None)
+                        try:
+                            qual_count = {}
+                            if len(run.find("Run").find("QualityCount").findall("Quality"))>0:
+                                for qual in run.find("Run").find("QualityCount").findall("Quality"):
+                                    try:
+                                        qual_count[qual.get("value")] = int(qual.get("count"))
+                                    except (AttributeError,ValueError) as e:
+                                        pass
+                            read_quality_counts.append(qual_count)
+                        except AttributeError:
+                            read_quality_counts.append(None)
+                    elif run.find("Statistics") is not None: #if Run doesn't exist, try get avg_read_length from Statistics heading if it exists
+                        try:
+                            #have to account for whether it's paired or single to calculate avg read length (bases/reads will be double the actual avg read count if it's paired)
+                            avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Statistics").get("nreads"))*float(run.find("Statistics").get("nspots"))))
+                        except TypeError:
+                            avg_read_length.append(None)
+                    else: #if both Run and Statistics missing, just add None
                         avg_read_length.append(None)
-                    qual_count = {}
-                    if run.find("Run").find("QualityCount") is not None:
-                        for qual in run.find("Run").find("QualityCount").findall("Quality"):
-                            qual_count[qual.get("value")] = int(qual.get("count"))
-                    read_quality_counts.append(qual_count)
+                        read_quality_counts.append(None)
 
 
-            max_index = total_num_reads.index(max(total_num_reads))
+                max_index = total_num_reads.index(max(total_num_reads))
 
-            srx_dict['run_ids'] = run_ids
-            if max_index<=(len(run_ids)-1):
+                srx_dict['run_ids'] = run_ids
                 srx_dict['run_ids_maxrun'] = run_ids[max_index]
-            srx_dict['total_num_reads'] = total_num_reads
-            if max_index<=(len(total_num_reads)-1):
-                srx_dict['total_num_reads_maxrun'] = total_num_reads[max_index]
-            srx_dict['total_num_bases'] = total_num_bases
-            if max_index<=(len(total_num_bases)-1):
+                srx_dict['library_reads_sequenced'] = total_num_reads
+                srx_dict['library_reads_sequenced_maxrun'] = total_num_reads[max_index]
+                srx_dict['total_num_bases'] = total_num_bases
                 srx_dict['total_num_bases_maxrun'] = total_num_bases[max_index]
-            srx_dict['download_size'] = download_size
-            if max_index<=(len(download_size)-1):
+                srx_dict['download_size'] = download_size
                 srx_dict['download_size_maxrun'] = download_size[max_index]
-            srx_dict['avg_read_length'] = avg_read_length
-            if max_index<=(len(avg_read_length)-1):
+                srx_dict['avg_read_length'] = avg_read_length
                 srx_dict['avg_read_length_maxrun'] = avg_read_length[max_index]
-            srx_dict['baseA_count'] = baseA_count
-            if max_index<=(len(baseA_count)-1):
+                srx_dict['baseA_count'] = baseA_count
                 srx_dict['baseA_count_maxrun'] = baseA_count[max_index]
-            srx_dict['baseC_count'] = baseC_count
-            if max_index<=(len(baseC_count)-1):
+                srx_dict['baseC_count'] = baseC_count
                 srx_dict['baseC_count_maxrun'] = baseC_count[max_index]
-            srx_dict['baseG_count'] = baseG_count
-            if max_index<=(len(baseG_count)-1):
+                srx_dict['baseG_count'] = baseG_count
                 srx_dict['baseG_count_maxrun'] = baseG_count[max_index]
-            srx_dict['baseT_count'] = baseT_count
-            if max_index<=(len(baseT_count)-1):
+                srx_dict['baseT_count'] = baseT_count
                 srx_dict['baseT_count_maxrun'] = baseT_count[max_index]
-            srx_dict['baseN_count'] = baseN_count
-            if max_index<=(len(baseN_count)-1):
+                srx_dict['baseN_count'] = baseN_count
                 srx_dict['baseN_count_maxrun'] = baseN_count[max_index]
-            srx_dict['gc_percent'] = gc_percent
-            if max_index<=(len(gc_percent)-1):
+                srx_dict['gc_percent'] = gc_percent
                 srx_dict['gc_percent_maxrun'] = gc_percent[max_index]
-            srx_dict['read_quality_counts'] = read_quality_counts
-            if max_index<=(len(read_quality_counts)-1):
-                srx_dict['read_quality_counts_maxrun'] = read_quality_counts[max_index]
+                srx_dict['run_quality_counts'] = read_quality_counts
+                srx_dict['run_quality_counts_maxrun'] = read_quality_counts[max_index]
 
 
         sdict[srx_uid] = srx_dict
+
+    print "--done getting srx metadata in %s" % (datetime.now()-s_scrape_time)
 
     return sdict
 
