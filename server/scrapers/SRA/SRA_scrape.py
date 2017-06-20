@@ -63,6 +63,6 @@ if __name__ == "__main__":
         ##TODO: cv parsing
 
         #clean up sdict so that any nan or na values (or values that should be na) are None
-        na_values = ['NA','','unspecified','not available','Unknown','unknown','not given','Not available',None,'not applicable','Not applicable','Not Applicable','N/A','n/a','not provided','Not Provided','Not provided']
+        na_values = ['NA','','Missing','missing','unspecified','not available','not given','Not available',None,'not applicable','Not applicable','Not Applicable','N/A','n/a','not provided','Not Provided','Not provided']
         for srx in sdict.keys():
             sdict[srx] = {k:sdict[srx][k] for k in sdict[srx].keys() if sdict[srx][k] not in na_values}

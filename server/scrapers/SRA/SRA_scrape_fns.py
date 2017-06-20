@@ -524,54 +524,65 @@ def get_links(batch_uid_list, sdict):
 
 def get_biosample_metadata(batch_uid_list,bdict):
     #some stuff already captured with SRA - just get publication_date, Models, Package, and Attributes
-    #and links?
-    print "Querying API and parsing XML..."
+    print "--Querying API and parsing XML..."
     b_parse_time = datetime.now()
     biosample_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=biosample&tool=metaseq&email=metaseekcloud%40gmail.com&id='+str(batch_uid_list)[1:-1]
-    b = urllib.urlopen(biosample_url)
-    bio_tree = etree.parse(b)
-    b.close()
-    bio_xml = bio_tree.getroot()
-    print "...parsing done for %s biosamples in %s" % (len(batch_uid_list),(datetime.now()-b_parse_time))
+    bio_xml = geturl_with_retry(MaxRetry=5,url=biosample_url)
+    try:
+        biosamples = bio_xml.findall("BioSample")
+    except Exception:
+        raise EutilitiesConnectionError('eutilities connection error')
 
-    biosamples = bio_xml.findall("BioSample")
+    print "...parsing done for %s biosamples in %s" % (len(batch_uid_list),(datetime.now()-b_parse_time))
+    print "--getting biosample metadata..."
+    b_scrape_time = datetime.now()
 
     for which,biosample in enumerate(biosamples):
-        print "--scraping biosample metadata for sample %s out of %s" % (which+1,len(biosamples))
         bio_dict = {}
-
-        bio_id = biosample.get("id")
+        try: #if biosample doesn't record biosample uid, not going to be able to merge with sdict; so skip
+            if biosample.get("id") is not None:
+                bio_id = biosample.get("id")
+            else:
+                raise AttributeError('no uid attribute in biosample')
+        except AttributeError:
+            continue
         bio_dict['biosample_uid'] = bio_id
         bio_dict['biosample_link'] = "https://www.ncbi.nlm.nih.gov/biosample/"+str(bio_id)
         #publication date
-        if biosample.get('publication_date') is not None:
-            bio_dict['metadata_publication_date'] = datetime.strptime(biosample.get('publication_date'), '%Y-%m-%dT%H:%M:%S.%f')
+        try:
+            if biosample.get('publication_date') is not None:
+                bio_dict['metadata_publication_date'] = datetime.strptime(biosample.get('publication_date'), '%Y-%m-%dT%H:%M:%S.%f')
+        except ValueError: #if can't parse datetime, wrong format or something
+            pass
         #if Package exists, probably don't need Models (but get them anyway); from package/models will parse investigation_type and env_package
         if biosample.findtext("Package") is not None:
             bio_dict['biosample_package'] = biosample.findtext("Package")
-        if biosample.find("Models") is not None:
+        try:
             models = []
             for model in biosample.find("Models").findall("Model"):
                 models.append(model.text)
             bio_dict['biosample_models'] = models
+        except AttributeError:
+            pass
 
         #Attributes - loop through attributes; save all as dict in single column (parse later)
         if biosample.find("Attributes") is not None:
             attr = {}
             for attribute in biosample.find("Attributes").findall("Attribute"):
-                attr_value = attribute.text
-                if attr_value=="missing" or attr_value=="Missing" or attr_value=="not applicable" or attr_value=="Not Applicable" or attr_value=="N/A": #if value is any of several None standins, change to None
-                    attr_value = None
-                if attribute.get("harmonized_name") is not None:
-                    attr[attribute.get("harmonized_name")] = attr_value
-                elif attribute.get("attribute_name") is not None:
-                    attr[attribute.get("attribute_name")] = attr_value
+                try:
+                    attr_value = attribute.text
+                    if attribute.get("harmonized_name") is not None:
+                        attr[attribute.get("harmonized_name")] = attr_value
+                    elif attribute.get("attribute_name") is not None:
+                        attr[attribute.get("attribute_name")] = attr_value
+                except AttributeError:
+                    pass
             bio_dict['sample_attributes'] = attr
 
         bdict[bio_id] = bio_dict
 
+    print "--done getting biosample metadata in %s" % (datetime.now()-b_scrape_time)
     return bdict
-
 
 
 def get_pubmed_metadata(batch_uid_list,pdict):
