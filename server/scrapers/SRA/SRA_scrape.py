@@ -38,14 +38,20 @@ if __name__ == "__main__":
         for b_batch_ix,b_batch in enumerate(biosample_batches): #scrape biosample data for all the biosamples, in batches of 500
             print "-processing biosample batch %s out of %s......" % (b_batch_ix+1,len(biosample_batches))
             biosample_batch_uids = map(int,linkdict['biosample_uids'][b_batch[0]:b_batch[1]])
-            bdict = get_biosample_metadata(batch_uid_list=biosample_batch_uids,bdict=bdict)
+            try:
+                bdict = get_biosample_metadata(batch_uid_list=biosample_batch_uids,bdict=bdict)
+            except EutilitiesConnectionError, msg:
+                print msg, "; skipping this biosample batch"
         #efetch for batch/es of pubmeds; generate pdict dictionary of dictionaries {'pub#':{},'pub#':{},...}
         pubmed_batches = get_batches(uid_list=linkdict['pubmed_uids'])
         pdict = {}
         for p_batch_ix,p_batch in enumerate(pubmed_batches):
             print "-processing pubmed batch %s out of %s......" % (p_batch_ix+1,len(pubmed_batches))
             pubmed_batch_uids = map(int,linkdict['pubmed_uids'][p_batch[0]:p_batch[1]])
-            pdict = get_pubmed_metadata(batch_uid_list=pubmed_batch_uids,pdict=pdict)
+            try:
+                pdict = get_pubmed_metadata(batch_uid_list=pubmed_batch_uids,pdict=pdict)
+            except EutilitiesConnectionError, msg:
+                print msg, "; skipping this pubmed batch"
         #efetch for batch/es of nuccores;
         nuccore_batches = get_batches(uid_list=linkdict['nuccore_uids'])
         ndict = {}

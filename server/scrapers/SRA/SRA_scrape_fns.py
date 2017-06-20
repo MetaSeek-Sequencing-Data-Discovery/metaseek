@@ -586,41 +586,53 @@ def get_biosample_metadata(batch_uid_list,bdict):
 
 
 def get_pubmed_metadata(batch_uid_list,pdict):
-    #some stuff already captured with SRA - just get publication_date, Models, Package, and Attributes
-    #and links?
-    print "Querying API and parsing XML..."
+    print "--Querying API and parsing XML..."
     p_parse_time = datetime.now()
     pub_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&tool=metaseq&email=metaseekcloud%40gmail.com&id='+str(pubmed_batch_uids)[1:-1]
-    p = urllib.urlopen(pub_url)
-    pub_tree = etree.parse(p)
-    p.close()
-    pub_xml = pub_tree.getroot()
-    print "...parsing done for %s pubmeds in %s" % (len(pubmed_batch_uids),(datetime.now()-p_parse_time))
+    pub_xml = geturl_with_retry(MaxRetry=5,url=pub_url)
 
-    pubmeds = pub_xml.findall("DocSum")
+    try:
+        pubmeds = pub_xml.findall("DocSum")
+    except Exception:
+        raise EutilitiesConnectionError('eutilities connection error')
+
+    print "--...parsing done for %s pubmeds in %s" % (len(pubmed_batch_uids),(datetime.now()-p_parse_time))
+    print "--scraping pubmed metadata..."
+    p_scrape_time = datetime.now()
 
     for which,pubmed in enumerate(pubmeds):
         pub_dict = {}
-        pub_id = pubmed.findtext("Id") #str(batch_uid_list[which])
-        print "--scraping pubmed metadata for sample %s,  %s out of %s" % (pub_id, which+1,len(pubmeds))
+        try: #if pubmed doesn't pubmed uid (it should), not going to be able to merge with sdict; so skip
+            if pubmed.findtext("Id") is not None:
+                pub_id = pubmed.findtext("Id")
+            else:
+                raise AttributeError('no uid attribute in pubmed')
+        except AttributeError:
+            continue
 
         pub_dict['pubmed_uid'] = pub_id
         pub_dict['pubmed_link'] = "https://www.ncbi.nlm.nih.gov/pubmed/"+str(pub_id)
 
-        if pubmed.find("Item[@Name='PubDate']").text is not None:
-            try:
-                pub_dict['pub_publication_date'] = datetime.strptime(pubmed.find("Item[@Name='PubDate']").text,"%Y %b %d")
-            except ValueError:
+        try:
+            if pubmed.find("Item[@Name='PubDate']").text is not None:
                 try:
-                    pub_dict['pub_publication_date'] = datetime.strptime(pubmed.find("Item[@Name='PubDate']").text,"%Y %b")
+                    pub_dict['pub_publication_date'] = datetime.strptime(pubmed.find("Item[@Name='PubDate']").text,"%Y %b %d")
                 except ValueError:
-                    pass
+                    try:
+                        pub_dict['pub_publication_date'] = datetime.strptime(pubmed.find("Item[@Name='PubDate']").text,"%Y %b")
+                    except ValueError:
+                        pass
+        except AttributeError:
+            pass
 
-        if pubmed.find("Item[@Name='AuthorList']") is not None:
-            authors = []
-            for author in pubmed.find("Item[@Name='AuthorList']").findall("Item[@Name='Author']"):
-                authors.append(author.text)
-            pub_dict['pub_authors'] = authors
+        try:
+            if pubmed.find("Item[@Name='AuthorList']") is not None:
+                authors = []
+                for author in pubmed.find("Item[@Name='AuthorList']").findall("Item[@Name='Author']"):
+                    authors.append(author.text)
+                pub_dict['pub_authors'] = authors
+        except AttributeError:
+            pass
 
         if pubmed.findtext("Item[@Name='Title']") is not None:
             pub_dict['pub_title'] = pubmed.findtext("Item[@Name='Title']")
@@ -637,12 +649,16 @@ def get_pubmed_metadata(batch_uid_list,pdict):
 
         pdict[pub_id] = pub_dict
 
+    print "--done scraping pubmed metadata in %s" % (datetime.now()-p_scrape_time)
+
     return pdict
 
 
 def get_nuccore_metadata(batch_uid_list,ndict):
+    print "--scraping nuccore metadata..."
+    n_scrape_time = datetime.now()
+
     for which,nuccore in enumerate(batch_uid_list):
-        print "--scraping nuccore metadata for sample %s out of %s" % (which+1,len(batch_uid_list))
         nuc_dict = {}
 
         nuc_id = str(nuccore)
@@ -650,6 +666,8 @@ def get_nuccore_metadata(batch_uid_list,ndict):
         nuc_dict['nuccore_link'] = 'https://www.ncbi.nlm.nih.gov/nuccore/'+nuc_id
 
         ndict[nuc_id] = nuc_dict
+
+    print "--done scraping nuccore metadata in %s" % (datetime.now()-n_scrape_time)
 
     return ndict
 
