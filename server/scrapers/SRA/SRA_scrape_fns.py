@@ -645,7 +645,9 @@ def get_links(batch_uid_list, sdict):
     return sdict,linkdict
 
 def get_biosample_metadata(batch_uid_list,bdict):
-    #some stuff already captured with SRA - just get publication_date, Models, Package, and Attributes
+    #some stuff already captured with SRA - get again though in case biosample hasn't imported into SRA accession yet
+    #biosample_id, sample_title, ncbi_taxon_id, taxon_scientific_name, sample_description,
+    #publication_date, Models, Package, and Attributes
     print "...Querying API and parsing biosample XML..."
     b_parse_time = datetime.now()
     biosample_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=biosample&tool=metaseq&email=metaseekcloud%40gmail.com&id='+str(batch_uid_list)[1:-1]
@@ -676,6 +678,45 @@ def get_biosample_metadata(batch_uid_list,bdict):
             continue
         bio_dict['biosample_uid'] = bio_id
         bio_dict['biosample_link'] = "https://www.ncbi.nlm.nih.gov/biosample/"+str(bio_id)
+        #biosample_id
+        if biosample.get("accession") is not None: #won't error if doesn't exist
+            bio_dict['biosample_id'] = biosample.get("accession")
+        #sample_title
+        try:
+            if biosample.find("Description").findtext("Title") is not None: #don't want to record as None in case this already exists in srx accession but is none in biosample
+                bio_dict['sample_title'] = biosample.find("Description").findtext("Title")
+        except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(biosample_url)+",AttributeError sample_title ,get_biosample_metadata\n")
+            f.close()
+            pass
+        #ncbi_taxon_id
+        try:
+            if biosample.find("Description").find("Organism").get("taxonomy_id") is not None:
+                bio_dict['ncbi_taxon_id'] = biosample.find("Description").find("Organism").get("taxonomy_id")
+        except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(biosample_url)+",AttributeError ncbi_taxon_id ,get_biosample_metadata\n")
+            f.close()
+            pass
+        #taxon_scientific_name
+        try:
+            if biosample.find("Description").find("Organism").get("taxonomy_name") is not None:
+                bio_dict['taxon_scientific_name'] = biosample.find("Description").find("Organism").get("taxonomy_name")
+        except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(biosample_url)+",AttributeError taxon_scientific_name ,get_biosample_metadata\n")
+            f.close()
+            pass
+        #sample_description
+        try:
+            if biosample.find("Description").find("Comment").findtext("Paragraph") is not None:
+                bio_dict['sample_description'] = biosample.find("Description").find("Comment").findtext("Paragraph")
+        except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(biosample_url)+",AttributeError sample_description ,get_biosample_metadata\n")
+            f.close()
+            pass
         #publication date
         try:
             bio_dict['metadata_publication_date'] = datetime.strptime(biosample.get('publication_date'), '%Y-%m-%dT%H:%M:%S.%f')
@@ -841,7 +882,7 @@ def merge_scrapes(sdict,bdict,pdict,ndict):
                 if bio in bdict.keys(): #if bio not in bdict keys, why isn't it? biosample efetch doesn't exist yet for link that was found? biosample uid wasn't in efetch? eutilitiesconnection error during biosample scrape?
                     ##TODO: error flag if a row has a value in biosample_uid but doesn't have anything in any of the biosample_fields
                     #fields from biosample scrape need to add; don't need biosample_uid since already there
-                    biosample_fields = ['biosample_link','metadata_publication_date','biosample_package','biosample_models','sample_attributes']
+                    biosample_fields = ['biosample_link','metadata_publication_date','biosample_package','biosample_models','sample_attributes','biosample_id', 'sample_title', 'ncbi_taxon_id', 'taxon_scientific_name', 'sample_description']
                     for biosample_field in biosample_fields:
                         if biosample_field in bdict[bio].keys():
                             sdict[srx][biosample_field] = bdict[bio][biosample_field]
