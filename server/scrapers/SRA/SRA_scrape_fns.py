@@ -3,6 +3,7 @@ from lxml import etree
 import json
 from datetime import datetime
 import time
+import os
 
 class EfetchError(Exception):
     pass
@@ -62,11 +63,15 @@ def geturl_with_retry(MaxRetry,url):
                 print "Internet connectivity Error Retrying in 5 seconds"
                 time.sleep(5)
                 MaxRetry=MaxRetry - 1
+
+        f = open('ScrapeErrors.csv','a')
+        f.write(str(url)+",eutilities connection error,"+"geturl_with_retry\n")
+        f.close()
         raise EutilitiesConnectionError("eutilities connection error")
 
 
 def get_srx_metadata(batch_uid_list):
-    print "--Querying API and parsing XML..."
+    print "...Querying API and parsing SRX XML..."
     s_parse_time = datetime.now()
     srx_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=sra&tool=metaseq&email=metaseekcloud%40gmail.com'
     for key in batch_uid_list:
@@ -78,10 +83,13 @@ def get_srx_metadata(batch_uid_list):
     try: #sometimes the url is parsed with lxml but is an error xml output from eutilities; this step fails in that case
         sra_samples = sra_xml.findall("EXPERIMENT_PACKAGE")
     except Exception:
+        f = open('ScrapeErrors.csv','a')
+        f.write(str(srx_url)+",eutilities connection error,"+"get_srx_metadata\n")
+        f.close()
         raise EutilitiesConnectionError('eutilities connection error')
 
-    print "--...parsing done for %s srxs in %s" % (len(batch_uid_list),(datetime.now()-s_parse_time))
-    print "--getting srx metadata..."
+    print "......parsing done for %s srxs in %s" % (len(batch_uid_list),(datetime.now()-s_parse_time))
+    print "...scraping srx metadata..."
     s_scrape_time = datetime.now()
     sdict = {}
 
@@ -103,360 +111,468 @@ def get_srx_metadata(batch_uid_list):
 
         ###EXPERIMENT -
         try:
-            if sra_sample.find("EXPERIMENT").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
-                srx_dict['expt_id'] = sra_sample.find("EXPERIMENT").find("IDENTIFIERS").findtext("PRIMARY_ID")
+            srx_dict['expt_id'] = sra_sample.find("EXPERIMENT").find("IDENTIFIERS").findtext("PRIMARY_ID")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError expt_id,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if sra_sample.find("EXPERIMENT").findtext("TITLE") is not None:
-                srx_dict['expt_title'] = sra_sample.find("EXPERIMENT").findtext("TITLE")
+            srx_dict['expt_title'] = sra_sample.find("EXPERIMENT").findtext("TITLE")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError expt_title,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if sra_sample.find("EXPERIMENT").find("STUDY_REF").find("IDENTIFIERS") is not None:
-                if sra_sample.find("EXPERIMENT").find("STUDY_REF").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
-                    srx_dict["study_id"] = sra_sample.find("EXPERIMENT").find("STUDY_REF").find("IDENTIFIERS").findtext("PRIMARY_ID")
+            srx_dict["study_id"] = sra_sample.find("EXPERIMENT").find("STUDY_REF").find("IDENTIFIERS").findtext("PRIMARY_ID")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError study_id,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if sra_sample.find("EXPERIMENT").find("DESIGN").findtext("DESIGN_DESCRIPTION") is not None:
-                srx_dict['expt_design_description'] = sra_sample.find("EXPERIMENT").find("DESIGN").findtext("DESIGN_DESCRIPTION")
+            srx_dict['expt_design_description'] = sra_sample.find("EXPERIMENT").find("DESIGN").findtext("DESIGN_DESCRIPTION")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError expt_design_description,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
             srx_dict['sample_id'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("SAMPLE_DESCRIPTOR").get("accession")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError sample_id,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_NAME") is not None:
-                srx_dict['library_name'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_NAME")
+            srx_dict['library_name'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_NAME")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError library_name,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_STRATEGY") is not None:
-                srx_dict['library_strategy'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_STRATEGY")
+            srx_dict['library_strategy'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_STRATEGY")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError library_strategy,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SOURCE").lower() is not None:
-                srx_dict['library_source'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SOURCE").lower()
+            srx_dict['library_source'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SOURCE").lower()
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError library_source,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
             ###change library_selection to MIxS field library_screening_strategy (cv for SRA, not for MIxS)
-            if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SELECTION") is not None:
-                srx_dict['library_screening_strategy'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SELECTION")
+            srx_dict['library_screening_strategy'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SELECTION")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError library_screening_strategy,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
             ###change library_layout to MIxS field library_construction_method - cv single | paired
-            if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_LAYOUT") is not None:
-                srx_dict['library_construction_method'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").find("LIBRARY_LAYOUT").getchildren()[0].tag.lower()
+            srx_dict['library_construction_method'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").find("LIBRARY_LAYOUT").getchildren()[0].tag.lower()
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError library_construction_method,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_CONSTRUCTION_PROTOCOL") is not None:
-                srx_dict['library_construction_protocol'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_CONSTRUCTION_PROTOCOL")
+            srx_dict['library_construction_protocol'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_CONSTRUCTION_PROTOCOL")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError library_construction_protocol,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
             ###change platform to MIxS field sequencing_method - cv in SRA (not in MIxS)
-            if sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren() is not None:
-                if len(sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren())>1:
-                    #find the one that's actually a tag
-                    for platform in sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren():
-                        if type(platform.tag) is str:
-                            srx_dict['sequencing_method'] = platform.tag.lower()
-                else:
-                    srx_dict['sequencing_method'] = sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].tag.lower()
-            try:
-                if sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].findtext("INSTRUMENT_MODEL") is not None:
-                    srx_dict['instrument_model'] = sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].findtext("INSTRUMENT_MODEL")
-            except AttributeError:
-                pass
+            if len(sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren())>1:
+                #find the one that's actually a tag
+                for platform in sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren():
+                    if type(platform.tag) is str:
+                        srx_dict['sequencing_method'] = platform.tag.lower()
+                        srx_dict['instrument_model'] = platform.findtext("INSTRUMENT_MODEL")
+            else:
+                srx_dict['sequencing_method'] = sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].tag.lower()
+                srx_dict['instrument_model'] = sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].findtext("INSTRUMENT_MODEL")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError sequencing_method or instrument_model,"+"get_srx_metadata\n")
+            f.close()
             pass
 
         ###SUBMISSION - just need the submission id
         try:
-            if sra_sample.find("SUBMISSION").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
-                srx_dict['submission_id'] = sra_sample.find("SUBMISSION").find("IDENTIFIERS").findtext("PRIMARY_ID")
+            srx_dict['submission_id'] = sra_sample.find("SUBMISSION").find("IDENTIFIERS").findtext("PRIMARY_ID")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError submission_id,"+"get_srx_metadata\n")
+            f.close()
             pass
 
         ###Organization - name, address, and contact
-        if sra_sample.find("Organization") is not None:
-            try:
-                if sra_sample.find("Organization").findtext("Name") is not None:
-                    srx_dict['organization_name'] = sra_sample.find("Organization").findtext("Name")
-            except AttributeError:
-                pass
-            try:
-                if sra_sample.find("Organization").find("Address") is not None:
-                    address = ''
-                    for line in sra_sample.find("Organization").find("Address").iterchildren():
-                        address = address+line.text+', '
-                    address = address[:-2]
-                    srx_dict['organization_address'] = address
-            except AttributeError:
-                pass
-            try:
-                if len(sra_sample.find("Organization").findall("Contact"))>0:
-                    contacts = []
-                    for contact in sra_sample.find("Organization").findall("Contact"):
-                        try:
-                            name = contact.find("Name").find("First").text+' '+contact.find("Name").find("Last").text
-                        except AttributeError:
-                            name=''
-                        email = contact.get('email')
-                        contacts.append(name+', '+email)
-                    srx_dict['organization_contacts'] = contacts
-            except AttributeError:
-                pass
+        try:
+            srx_dict['organization_name'] = sra_sample.find("Organization").findtext("Name")
+        except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError organization_name,"+"get_srx_metadata\n")
+            f.close()
+            pass
+        try:
+            address = ''
+            if sra_sample.find("Organization").find("Address") is not None: #really common not to have this
+                for line in sra_sample.find("Organization").find("Address").iterchildren():
+                    address = address+line.text+', '
+                address = address[:-2]
+            srx_dict['organization_address'] = address
+        except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError organization_address,"+"get_srx_metadata\n")
+            f.close()
+            pass
+        try:
+            if len(sra_sample.find("Organization").findall("Contact"))>0:
+                contacts = []
+                for contact in sra_sample.find("Organization").findall("Contact"):
+                    try:
+                        name = contact.find("Name").find("First").text+' '+contact.find("Name").find("Last").text
+                    except AttributeError:
+                        name=''
+                    email = contact.get('email')
+                    contacts.append(name+', '+email)
+                srx_dict['organization_contacts'] = contacts
+        except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError organization_contacts,"+"get_srx_metadata\n")
+            f.close()
+            pass
 
         ###STUDY -
         try:
-            if sra_sample.find("STUDY").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
-                srx_dict['study_id'] = sra_sample.find("STUDY").find("IDENTIFIERS").findtext("PRIMARY_ID")
+            srx_dict['study_id'] = sra_sample.find("STUDY").find("IDENTIFIERS").findtext("PRIMARY_ID")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError study_id,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if len(sra_sample.find("STUDY").find("IDENTIFIERS").findall("EXTERNAL_ID"))>0:
-                for external in sra_sample.find("STUDY").find("IDENTIFIERS").iterchildren("EXTERNAL_ID"):
-                    if external.get("namespace")=='BioProject':
-                        srx_dict['bioproject_id'] = external.text
+            for external in sra_sample.find("STUDY").find("IDENTIFIERS").iterchildren("EXTERNAL_ID"):
+                if external.get("namespace")=='BioProject':
+                    srx_dict['bioproject_id'] = external.text
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError bioproject_id,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_TITLE") is not None:
-                srx_dict['study_title'] = sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_TITLE")
+            srx_dict['study_title'] = sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_TITLE")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError study_title,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
         ###rename existing_study_type to study_type
-            if sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE") is not None:
-                if sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("existing_study_type")=="Other":
-                    srx_dict['study_type'] = 'Other'
-                    if sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("add_study_type") is not None:
-                        srx_dict['study_type_other'] = sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("add_study_type")
-                else:
-                    srx_dict['study_type'] = sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("existing_study_type")
+            if sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("existing_study_type")=="Other":
+                srx_dict['study_type'] = 'Other'
+                if sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("add_study_type") is not None:
+                    srx_dict['study_type_other'] = sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("add_study_type")
+            else:
+                srx_dict['study_type'] = sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("existing_study_type")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError study_type or study_type_other,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_ABSTRACT"):
-                srx_dict['study_abstract'] = sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_ABSTRACT")
+            srx_dict['study_abstract'] = sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_ABSTRACT")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError study_abstract,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if sra_sample.find("STUDY").find("STUDY_LINKS") is not None:
-                study_links = {}
+            study_links = {}
+            if sra_sample.find("STUDY").find("STUDY_LINKS") is not None: #really common to not have this, so keep so don't get a million error logs
                 for study_link in sra_sample.find("STUDY").find("STUDY_LINKS").iterchildren():
                     if study_link.find("XREF_LINK") is not None:
                         study_links[study_link.find("XREF_LINK").findtext("DB")] = study_link.find("XREF_LINK").findtext("ID")
                     if study_link.find("URL_LINK") is not None:
                         study_links[study_link.find("URL_LINK").findtext("LABEL")] = study_link.find("URL_LINK").findtext("URL")
-                srx_dict['study_links'] = study_links
+            srx_dict['study_links'] = study_links
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError study_links,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if sra_sample.find("STUDY").find("STUDY_ATTRIBUTES") is not None:
-                study_attributes = {}
+            study_attributes = {}
+            if sra_sample.find("STUDY").find("STUDY_ATTRIBUTES") is not None: #really common not to have this
                 for attr in sra_sample.find("STUDY").find("STUDY_ATTRIBUTES").iterchildren():
                     study_attributes[attr.findtext("TAG")] = attr.findtext("VALUE")
-                srx_dict['study_attributes'] = study_attributes
+            srx_dict['study_attributes'] = study_attributes
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError study_attributes,"+"get_srx_metadata\n")
+            f.close()
             pass
 
         ###SAMPLE - get some BioSample stuff that's in easier format here: sample id, biosample id (if exists; it should but sometimes doesn't); also title, sample name stuff, and description; rest get from biosample scraping
         try:
-            if sra_sample.find("SAMPLE").find("IDENTIFIERS").findtext("PRIMARY_ID") is not None:
-                srx_dict['sample_id'] = sra_sample.find("SAMPLE").find("IDENTIFIERS").findtext("PRIMARY_ID")
+            srx_dict['sample_id'] = sra_sample.find("SAMPLE").find("IDENTIFIERS").findtext("PRIMARY_ID")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError sample_id,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if len(sra_sample.find("SAMPLE").find("IDENTIFIERS").findall("EXTERNAL_ID"))>0:
-                for external in sra_sample.find("SAMPLE").find("IDENTIFIERS").iterchildren("EXTERNAL_ID"):
-                    if external.get("namespace")=='BioSample':
-                        srx_dict['biosample_id'] = external.text
+            for external in sra_sample.find("SAMPLE").find("IDENTIFIERS").iterchildren("EXTERNAL_ID"):
+                if external.get("namespace")=='BioSample':
+                    srx_dict['biosample_id'] = external.text
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError biosample_id,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if sra_sample.find("SAMPLE").findtext("TITLE") is not None:
-                srx_dict['sample_title'] = sra_sample.find("SAMPLE").findtext("TITLE")
+            srx_dict['sample_title'] = sra_sample.find("SAMPLE").findtext("TITLE")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError sample_title,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if sra_sample.find("SAMPLE").find("SAMPLE_NAME") is not None:
-                if sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("TAXON_ID") is not None:
-                    srx_dict['ncbi_taxon_id'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("TAXON_ID")
+            srx_dict['ncbi_taxon_id'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("TAXON_ID")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError ncbi_taxon_id,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-                if sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("SCIENTIFIC_NAME") is not None:
-                    srx_dict['taxon_scientific_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("SCIENTIFIC_NAME")
+            srx_dict['taxon_scientific_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("SCIENTIFIC_NAME")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError taxon_scientific_name,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-                if sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("COMMON_NAME") is not None:
-                    srx_dict['taxon_common_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("COMMON_NAME")
+            srx_dict['taxon_common_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("COMMON_NAME")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError taxon_common_name,"+"get_srx_metadata\n")
+            f.close()
             pass
         try:
-            if sra_sample.find("SAMPLE").findtext("DESCRIPTION") is not None:
-                srx_dict['sample_description'] = sra_sample.find("SAMPLE").findtext("DESCRIPTION")
+            srx_dict['sample_description'] = sra_sample.find("SAMPLE").findtext("DESCRIPTION")
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError sample_description,"+"get_srx_metadata\n")
+            f.close()
             pass
 
         ###Pool - skip, redundant
 
         ###RUN_SET - record stats for each run as list, for best run (maxrun, run for which total_num_reads is largest) as single value
-        if sra_sample.find("RUN_SET") is not None:
-            run_ids = []
-            total_num_reads = []
-            total_num_bases = []
-            download_size = []
-            avg_read_length = []
-            baseA_count = []
-            baseC_count = []
-            baseG_count = []
-            baseT_count = []
-            baseN_count = []
-            gc_percent = []
-            read_quality_counts = []
-            if len(sra_sample.find("RUN_SET").findall("RUN"))>0:
-                srx_dict['num_runs_in_accession'] = len(sra_sample.find("RUN_SET").findall("RUN"))
-                for run in sra_sample.find("RUN_SET").findall("RUN"):
-                    try:
-                        run_ids.append(run.get("accession"))
-                    except AttributeError:
-                        run_ids.append(None)
-                    try:
-                        total_num_reads.append(int(run.get("total_spots")))
-                    except AttributeError:
-                        total_num_reads.append(None)
-                    try:
-                        total_num_bases.append(int(run.get("total_bases")))
-                    except AttributeError:
-                        total_num_bases.append(None)
-                    try:
-                        download_size.append(int(run.get("size"))
-                    except (AttributeError, ValueError) as e:
-                        download_size.append(None)
-                    try:
-                        if len(run.find("Bases").findall("Base"))>0:
-                            for base in run.find("Bases").findall("Base"):
-                                try:
-                                    if base.get("value")=="A":
-                                        baseA_count.append(int(base.get("count")))
-                                        countA = int(base.get("count"))
-                                except (AttributeError, ValueError) as e:
-                                    baseA_count.append(None)
-                                    countA=None
-                                try:
-                                    if base.get("value")=="C":
-                                        baseC_count.append(int(base.get("count")))
-                                        countC = int(base.get("count"))
-                                except (AttributeError, ValueError) as e:
-                                    baseC_count.append(None)
-                                    countC=None
-                                try:
-                                    if base.get("value")=="G":
-                                        baseG_count.append(int(base.get("count")))
-                                        countG = int(base.get("count"))
-                                except (AttributeError, ValueError) as e:
-                                    baseG_count.append(None)
-                                    countG=None
-                                try:
-                                    if base.get("value")=="T":
-                                        baseT_count.append(int(base.get("count")))
-                                        countT = int(base.get("count"))
-                                except (AttributeError, ValueError) as e:
-                                    baseT_count.append(None)
-                                    countT=None
-                                try:
-                                    if base.get("value")=="N":
-                                        baseN_count.append(int(base.get("count")))
-                                        countN = int(base.get("count"))
-                                except (AttributeError, ValueError) as e:
-                                    baseN_count.append(None)
-                            try:
-                                gc_percent.append(float(countG+countC)/float(countC+countG+countA+countT))
-                            except TypeError:
-                                gc_percent.append(None)
-                    except AttributeError:
-                        baseA_count.append(None)
-                        baseC_count.append(None)
-                        baseG_count.append(None)
-                        baseT_count.append(None)
-                        baseN_count.append(None)
-                        gc_percent.append(None)
-                    #need calculate avg read length; can come from "Run" or "Statistics" heading
-                    if run.find("Run") is not None:
-                        try:
-                            #have to account for whether it's paired or single to calculate avg read length (bases/reads will be double the actual avg read count if it's paired)
-                            avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Run").get("spot_count"))+float(run.find("Run").get("spot_count_mates"))))
-                        except TypeError: #if one of these values doesn't exist, try getting it from "Statistics" heading; otherwise just add as None
-                            if run.find("Statistics") is not None:
-                                try:
-                                    avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Statistics").get("nreads"))*float(run.find("Statistics").get("nspots"))))
-                                except TypeError:
-                                    avg_read_length.append(None)
-                            else:
-                                avg_read_length.append(None)
-                        try:
-                            qual_count = {}
-                            if len(run.find("Run").find("QualityCount").findall("Quality"))>0:
-                                for qual in run.find("Run").find("QualityCount").findall("Quality"):
-                                    try:
-                                        qual_count[qual.get("value")] = int(qual.get("count"))
-                                    except (AttributeError,ValueError) as e:
-                                        pass
-                            read_quality_counts.append(qual_count)
-                        except AttributeError:
-                            read_quality_counts.append(None)
-                    elif run.find("Statistics") is not None: #if Run doesn't exist, try get avg_read_length from Statistics heading if it exists
-                        try:
-                            #have to account for whether it's paired or single to calculate avg read length (bases/reads will be double the actual avg read count if it's paired)
-                            avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Statistics").get("nreads"))*float(run.find("Statistics").get("nspots"))))
-                        except TypeError:
-                            avg_read_length.append(None)
-                    else: #if both Run and Statistics missing, just add None
-                        avg_read_length.append(None)
-                        read_quality_counts.append(None)
+        run_ids = []
+        total_num_reads = []
+        total_num_bases = []
+        download_size = []
+        avg_read_length = []
+        baseA_count = []
+        baseC_count = []
+        baseG_count = []
+        baseT_count = []
+        baseN_count = []
+        gc_percent = []
+        read_quality_counts = []
+        try:
+            srx_dict['num_runs_in_accession'] = len(sra_sample.find("RUN_SET").findall("RUN"))
+        except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError num_runs_in_accession,"+"get_srx_metadata\n")
+            f.close()
+            pass
+        try:
+            run_list = sra_sample.find("RUN_SET").findall("RUN")
+        except AttributeError:
+            run_list = []
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",AttributeError prob missing run_set,"+"get_srx_metadata\n")
+            f.close()
+            pass
+        for run in run_list:
+            try:
+                run_id = run.get("accession")
+                run_ids.append(run_id)
+            except AttributeError:
+                run_id = None
+                run_ids.append(run_id)
+                f = open('ScrapeErrors.csv','a')
+                f.write(str(srx_uid)+",AttributeError run missing accession,"+"get_srx_metadata\n")
+                f.close()
+                pass
+            try:
+                total_num_reads.append(int(run.get("total_spots")))
+            except (TypeError, ValueError) as e: #will be typeerror if int(None); valueerror if can't make int (is string or weird characters)
+                total_num_reads.append(None)
+                f = open('ScrapeErrors.csv','a')
+                f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" library_reads_sequenced,get_srx_metadata\n")
+                f.close()
+                pass
+            try:
+                total_num_bases.append(int(run.get("total_bases")))
+            except (TypeError, ValueError) as e:
+                total_num_bases.append(None)
+                f = open('ScrapeErrors.csv','a')
+                f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" total_num_bases,get_srx_metadata\n")
+                f.close()
+                pass
+            try:
+                download_size.append(int(run.get("size")))
+            except (TypeError, ValueError) as e:
+                download_size.append(None)
+                f = open('ScrapeErrors.csv','a')
+                f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" download_size,get_srx_metadata\n")
+                f.close()
+                pass
+            try:
+                base_list = run.find("Bases").findall("Base")
+            except AttributeError:
+                base_list = []
+                pass
+            if len(base_list)==0:
+                baseA_count.append(None)
+                baseC_count.append(None)
+                baseG_count.append(None)
+                baseT_count.append(None)
+                baseN_count.append(None)
+                gc_percent.append(None)
+                countA=None
+                countC=None
+                countG=None
+                countT=None
+            for base in base_list:
+                try:
+                    if base.get("value")=="A":
+                        baseA_count.append(int(base.get("count")))
+                        countA = int(base.get("count"))
+                except (TypeError, ValueError) as e:
+                    baseA_count.append(None)
+                    countA=None
+                    f = open('ScrapeErrors.csv','a')
+                    f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseA_count,get_srx_metadata\n")
+                    f.close()
+                    pass
+                try:
+                    if base.get("value")=="C":
+                        baseC_count.append(int(base.get("count")))
+                        countC = int(base.get("count"))
+                except (TypeError, ValueError) as e:
+                    baseC_count.append(None)
+                    countC=None
+                    f = open('ScrapeErrors.csv','a')
+                    f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseC_count,get_srx_metadata\n")
+                    f.close()
+                try:
+                    if base.get("value")=="G":
+                        baseG_count.append(int(base.get("count")))
+                        countG = int(base.get("count"))
+                except (TypeError, ValueError) as e:
+                    baseG_count.append(None)
+                    countG=None
+                    f = open('ScrapeErrors.csv','a')
+                    f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseG_count,get_srx_metadata\n")
+                    f.close()
+                try:
+                    if base.get("value")=="T":
+                        baseT_count.append(int(base.get("count")))
+                        countT = int(base.get("count"))
+                except (TypeError, ValueError) as e:
+                    baseT_count.append(None)
+                    countT=None
+                    f = open('ScrapeErrors.csv','a')
+                    f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseT_count,get_srx_metadata\n")
+                    f.close()
+                try:
+                    if base.get("value")=="N":
+                        baseN_count.append(int(base.get("count")))
+                        countN = int(base.get("count"))
+                except (TypeError, ValueError) as e:
+                    baseN_count.append(None)
+                    f = open('ScrapeErrors.csv','a')
+                    f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseN_count,get_srx_metadata\n")
+                    f.close()
+            try:
+                gc_percent.append(float(countG+countC)/float(countC+countG+countA+countT))
+            except TypeError as e:
+                gc_percent.append(None)
+                f = open('ScrapeErrors.csv','a')
+                f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" gc_percent,get_srx_metadata\n")
+                f.close()
+                pass
 
+            #avg read length; need calculate, can come from "Run" or "Statistics" heading
+            try:
+                #have to account for whether it's paired or single to calculate avg read length (bases/reads will be double the actual avg read count if it's paired)
+                avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Run").get("spot_count"))+float(run.find("Run").get("spot_count_mates"))))
+            except (TypeError, AttributeError) as e: #if one of these values doesn't exist (TypeError), or "Run" tag doesn't exist (AttributeError), try getting it from "Statistics" heading; otherwise just add as None
+                try:
+                    avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Statistics").get("nreads"))*float(run.find("Statistics").get("nspots"))))
+                except (TypeError, AttributeError) as e:
+                    avg_read_length.append(None)
+                    f = open('ScrapeErrors.csv','a')
+                    f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" avg_read_length,get_srx_metadata\n")
+                    f.close()
+                    pass
+            #quality count - need get from Run tag if exists
+            qual_count = {}
+            try:
+                qual_list = run.find("Run").find("QualityCount").findall("Quality")
+            except AttributeError:
+                qual_list = []
+            for qual in qual_list:
+                try:
+                    qual_count[qual.get("value")] = int(qual.get("count"))
+                except (TypeError,ValueError) as e:
+                    pass
+            read_quality_counts.append(qual_count)
 
-                max_index = total_num_reads.index(max(total_num_reads))
+        max_index = total_num_reads.index(max(total_num_reads))
 
-                srx_dict['run_ids'] = run_ids
-                srx_dict['run_ids_maxrun'] = run_ids[max_index]
-                srx_dict['library_reads_sequenced'] = total_num_reads
-                srx_dict['library_reads_sequenced_maxrun'] = total_num_reads[max_index]
-                srx_dict['total_num_bases'] = total_num_bases
-                srx_dict['total_num_bases_maxrun'] = total_num_bases[max_index]
-                srx_dict['download_size'] = download_size
-                srx_dict['download_size_maxrun'] = download_size[max_index]
-                srx_dict['avg_read_length'] = avg_read_length
-                srx_dict['avg_read_length_maxrun'] = avg_read_length[max_index]
-                srx_dict['baseA_count'] = baseA_count
-                srx_dict['baseA_count_maxrun'] = baseA_count[max_index]
-                srx_dict['baseC_count'] = baseC_count
-                srx_dict['baseC_count_maxrun'] = baseC_count[max_index]
-                srx_dict['baseG_count'] = baseG_count
-                srx_dict['baseG_count_maxrun'] = baseG_count[max_index]
-                srx_dict['baseT_count'] = baseT_count
-                srx_dict['baseT_count_maxrun'] = baseT_count[max_index]
-                srx_dict['baseN_count'] = baseN_count
-                srx_dict['baseN_count_maxrun'] = baseN_count[max_index]
-                srx_dict['gc_percent'] = gc_percent
-                srx_dict['gc_percent_maxrun'] = gc_percent[max_index]
-                srx_dict['run_quality_counts'] = read_quality_counts
-                srx_dict['run_quality_counts_maxrun'] = read_quality_counts[max_index]
+        srx_dict['run_ids'] = run_ids
+        srx_dict['run_ids_maxrun'] = run_ids[max_index]
+        srx_dict['library_reads_sequenced'] = total_num_reads
+        srx_dict['library_reads_sequenced_maxrun'] = total_num_reads[max_index]
+        srx_dict['total_num_bases'] = total_num_bases
+        srx_dict['total_num_bases_maxrun'] = total_num_bases[max_index]
+        srx_dict['download_size'] = download_size
+        srx_dict['download_size_maxrun'] = download_size[max_index]
+        srx_dict['avg_read_length'] = avg_read_length
+        srx_dict['avg_read_length_maxrun'] = avg_read_length[max_index]
+        srx_dict['baseA_count'] = baseA_count
+        srx_dict['baseA_count_maxrun'] = baseA_count[max_index]
+        srx_dict['baseC_count'] = baseC_count
+        srx_dict['baseC_count_maxrun'] = baseC_count[max_index]
+        srx_dict['baseG_count'] = baseG_count
+        srx_dict['baseG_count_maxrun'] = baseG_count[max_index]
+        srx_dict['baseT_count'] = baseT_count
+        srx_dict['baseT_count_maxrun'] = baseT_count[max_index]
+        srx_dict['baseN_count'] = baseN_count
+        srx_dict['baseN_count_maxrun'] = baseN_count[max_index]
+        srx_dict['gc_percent'] = gc_percent
+        srx_dict['gc_percent_maxrun'] = gc_percent[max_index]
+        srx_dict['run_quality_counts'] = read_quality_counts
+        srx_dict['run_quality_counts_maxrun'] = read_quality_counts[max_index]
 
 
         sdict[srx_uid] = srx_dict
 
-    print "--done getting srx metadata in %s" % (datetime.now()-s_scrape_time)
+    print "...done scraping srx metadata in %s" % (datetime.now()-s_scrape_time)
 
     return sdict
 
@@ -471,18 +587,21 @@ def get_links(batch_uid_list, sdict):
         #this makes url with end &id=###&id=###&id=### - returns a set of links in order of sra uids
         elink_url = elink_url+'&id='+str(key)
     #run api request and parse xml
-    print "--sending elink request and parsing XML..."
+    print "...sending elink request and parsing XML..."
     e_parse_time = datetime.now()
     link_xml = geturl_with_retry(MaxRetry=5,url=elink_url)
 
     try: #sometimes the url is parsed with lxml but is an error xml output from eutilities; this step fails in that case
         linksets = link_xml.findall("LinkSet")
     except Exception:
+        f = open('ScrapeErrors.csv','a')
+        f.write(str(elink_url)+",eutilities connection error,"+"get_links\n")
+        f.close()
         raise EutilitiesConnectionError('eutilities connection error')
 
-    print "--...parsing done in %s" % (datetime.now()-e_parse_time)
+    print "......parsing done in %s" % (datetime.now()-e_parse_time)
 
-    print "--scraping links..."
+    print "...scraping links..."
     e_scrape_time = datetime.now()
     #scrape elink info
     #note if there's no biosample link, <LinkSetDb> with <DbTo>=='biosample' just won't exist
@@ -516,28 +635,31 @@ def get_links(batch_uid_list, sdict):
     biosample_uids = list(set(biosample_uids))
     pubmed_uids = list(set(pubmed_uids))
     nuccore_uids = list(set(nuccore_uids))
-    print "--done scraping links in %s" % (datetime.now()-e_scrape_time)
+    print "...done scraping links in %s" % (datetime.now()-e_scrape_time)
 
     linkdict = {'biosample_uids':biosample_uids,'pubmed_uids':pubmed_uids,'nuccore_uids':nuccore_uids}
-    print "---number of biosamples to scrape: %s" % len(linkdict['biosample_uids'])
-    print "---number of pubmeds to scrape: %s" % len(linkdict['pubmed_uids'])
-    print "---number of nuccores to scrape: %s" % len(linkdict['nuccore_uids'])
+    print "......number of biosamples to scrape: %s" % len(linkdict['biosample_uids'])
+    print "......number of pubmeds to scrape: %s" % len(linkdict['pubmed_uids'])
+    print "......number of nuccores to scrape: %s" % len(linkdict['nuccore_uids'])
 
     return sdict,linkdict
 
 def get_biosample_metadata(batch_uid_list,bdict):
     #some stuff already captured with SRA - just get publication_date, Models, Package, and Attributes
-    print "--Querying API and parsing XML..."
+    print "...Querying API and parsing biosample XML..."
     b_parse_time = datetime.now()
     biosample_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=biosample&tool=metaseq&email=metaseekcloud%40gmail.com&id='+str(batch_uid_list)[1:-1]
     bio_xml = geturl_with_retry(MaxRetry=5,url=biosample_url)
     try:
         biosamples = bio_xml.findall("BioSample")
     except Exception:
+        f = open('ScrapeErrors.csv','a')
+        f.write(str(biosample_url)+",eutilities connection error,"+"get_biosample_metadata\n")
+        f.close()
         raise EutilitiesConnectionError('eutilities connection error')
 
     print "...parsing done for %s biosamples in %s" % (len(batch_uid_list),(datetime.now()-b_parse_time))
-    print "--getting biosample metadata..."
+    print "...scraping biosample metadata..."
     b_scrape_time = datetime.now()
 
     for which,biosample in enumerate(biosamples):
@@ -548,14 +670,19 @@ def get_biosample_metadata(batch_uid_list,bdict):
             else:
                 raise AttributeError('no uid attribute in biosample')
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(biosample_url)+",AttributeError couldnt find biosample id which "+str(which)+",get_biosample_metadata\n")
+            f.close()
             continue
         bio_dict['biosample_uid'] = bio_id
         bio_dict['biosample_link'] = "https://www.ncbi.nlm.nih.gov/biosample/"+str(bio_id)
         #publication date
         try:
-            if biosample.get('publication_date') is not None:
-                bio_dict['metadata_publication_date'] = datetime.strptime(biosample.get('publication_date'), '%Y-%m-%dT%H:%M:%S.%f')
-        except ValueError: #if can't parse datetime, wrong format or something
+            bio_dict['metadata_publication_date'] = datetime.strptime(biosample.get('publication_date'), '%Y-%m-%dT%H:%M:%S.%f')
+        except (TypeError,ValueError) as e: #if can't parse datetime (ValueError) or publication_date is none (TypeError)
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(bio_id)+","+str(e.__class__._name__)+" metadata_publication_date,"+"get_biosample_metadata\n")
+            f.close()
             pass
         #if Package exists, probably don't need Models (but get them anyway); from package/models will parse investigation_type and env_package
         if biosample.findtext("Package") is not None:
@@ -566,10 +693,13 @@ def get_biosample_metadata(batch_uid_list,bdict):
                 models.append(model.text)
             bio_dict['biosample_models'] = models
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(bio_id)+",AttributeError biosample_models,get_biosample_metadata\n")
+            f.close()
             pass
 
         #Attributes - loop through attributes; save all as dict in single column (parse later)
-        if biosample.find("Attributes") is not None:
+        try:
             attr = {}
             for attribute in biosample.find("Attributes").findall("Attribute"):
                 try:
@@ -579,28 +709,39 @@ def get_biosample_metadata(batch_uid_list,bdict):
                     elif attribute.get("attribute_name") is not None:
                         attr[attribute.get("attribute_name")] = attr_value
                 except AttributeError:
+                    f = open('ScrapeErrors.csv','a')
+                    f.write(str(bio_id)+",AttributeError sample_attribute,get_biosample_metadata\n")
+                    f.close()
                     pass
             bio_dict['sample_attributes'] = attr
+        except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(bio_id)+",AttributeError sample_attributes,get_biosample_metadata\n")
+            f.close()
+            pass
 
         bdict[bio_id] = bio_dict
 
-    print "--done getting biosample metadata in %s" % (datetime.now()-b_scrape_time)
+    print "...done scraping biosample metadata in %s" % (datetime.now()-b_scrape_time)
     return bdict
 
 
 def get_pubmed_metadata(batch_uid_list,pdict):
-    print "--Querying API and parsing XML..."
+    print "...Querying API and parsing XML..."
     p_parse_time = datetime.now()
-    pub_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&tool=metaseq&email=metaseekcloud%40gmail.com&id='+str(pubmed_batch_uids)[1:-1]
+    pub_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&tool=metaseq&email=metaseekcloud%40gmail.com&id='+str(batch_uid_list)[1:-1]
     pub_xml = geturl_with_retry(MaxRetry=5,url=pub_url)
 
     try:
         pubmeds = pub_xml.findall("DocSum")
     except Exception:
+        f = open('ScrapeErrors.csv','a')
+        f.write(str(pub_url)+",eutilities connection error,get_pubmed_metadata\n")
+        f.close()
         raise EutilitiesConnectionError('eutilities connection error')
 
-    print "--...parsing done for %s pubmeds in %s" % (len(pubmed_batch_uids),(datetime.now()-p_parse_time))
-    print "--scraping pubmed metadata..."
+    print "......parsing done for %s pubmeds in %s" % (len(batch_uid_list),(datetime.now()-p_parse_time))
+    print "...scraping pubmed metadata..."
     p_scrape_time = datetime.now()
 
     for which,pubmed in enumerate(pubmeds):
@@ -611,33 +752,37 @@ def get_pubmed_metadata(batch_uid_list,pdict):
             else:
                 raise AttributeError('no uid attribute in pubmed')
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(pub_url)+",AttributeError couldnt find pubmed id which "+str(which)+",get_pubmed_metadata\n")
+            f.close()
             continue
 
         pub_dict['pubmed_uid'] = pub_id
         pub_dict['pubmed_link'] = "https://www.ncbi.nlm.nih.gov/pubmed/"+str(pub_id)
 
         try:
-            if pubmed.find("Item[@Name='PubDate']").text is not None:
-                try:
-                    pub_dict['pub_publication_date'] = datetime.strptime(pubmed.find("Item[@Name='PubDate']").text,"%Y %b %d")
-                except ValueError:
-                    try:
-                        pub_dict['pub_publication_date'] = datetime.strptime(pubmed.find("Item[@Name='PubDate']").text,"%Y %b")
-                    except ValueError:
-                        pass
-        except AttributeError:
-            pass
+            pub_dict['pub_publication_date'] = datetime.strptime(pubmed.find("Item[@Name='PubDate']").text,"%Y %b %d")
+        except (AttributeError,ValueError) as e: #if can't find attrib (attributeerror) or can't parse datetime (valueerror)
+            try:
+                pub_dict['pub_publication_date'] = datetime.strptime(pubmed.find("Item[@Name='PubDate']").text,"%Y %b")
+            except (AttributeError,ValueError) as e:
+                f = open('ScrapeErrors.csv','a')
+                f.write(str(pub_id)+","+str(e.__class__.__name__)+" pub_publication_date,get_pubmed_metadata\n")
+                f.close()
+                pass
 
         try:
-            if pubmed.find("Item[@Name='AuthorList']") is not None:
-                authors = []
-                for author in pubmed.find("Item[@Name='AuthorList']").findall("Item[@Name='Author']"):
-                    authors.append(author.text)
-                pub_dict['pub_authors'] = authors
+            authors = []
+            for author in pubmed.find("Item[@Name='AuthorList']").findall("Item[@Name='Author']"):
+                authors.append(author.text)
+            pub_dict['pub_authors'] = authors
         except AttributeError:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(pub_id)+",AttributeError pub_authors,get_pubmed_metadata\n")
+            f.close()
             pass
 
-        if pubmed.findtext("Item[@Name='Title']") is not None:
+        if pubmed.findtext("Item[@Name='Title']") is not None: #if doesn't exist is just None, doesn't give attributeerror
             pub_dict['pub_title'] = pubmed.findtext("Item[@Name='Title']")
         if pubmed.findtext("Item[@Name='Volume']") is not None:
             pub_dict['pub_volume'] = pubmed.findtext("Item[@Name='Volume']")
@@ -652,13 +797,13 @@ def get_pubmed_metadata(batch_uid_list,pdict):
 
         pdict[pub_id] = pub_dict
 
-    print "--done scraping pubmed metadata in %s" % (datetime.now()-p_scrape_time)
+    print "...done scraping pubmed metadata in %s" % (datetime.now()-p_scrape_time)
 
     return pdict
 
 
 def get_nuccore_metadata(batch_uid_list,ndict):
-    print "--scraping nuccore metadata..."
+    print "...scraping nuccore metadata..."
     n_scrape_time = datetime.now()
 
     for which,nuccore in enumerate(batch_uid_list):
@@ -670,7 +815,7 @@ def get_nuccore_metadata(batch_uid_list,ndict):
 
         ndict[nuc_id] = nuc_dict
 
-    print "--done scraping nuccore metadata in %s" % (datetime.now()-n_scrape_time)
+    print "...done scraping nuccore metadata in %s" % (datetime.now()-n_scrape_time)
 
     return ndict
 
@@ -685,15 +830,15 @@ def merge_scrapes(sdict,bdict,pdict,ndict):
                     raise MultipleBiosampleError
             except MultipleBiosampleError:
                 #log an error with srx (uid), sdict[srx]['biosample_uid'] to file; look into it manually
-                f = open('MultipleBiosampleErrors.csv','a')
-                f.write(str(srx)+','+str(sdict[srx]['biosample_uid'])+'\n')
+                f = open('ScrapeErrors.csv','a')
+                f.write(str(srx)+",MultipleBiosampleError"+str(sdict[srx]['biosample_uid'])+",merge_scrapes\n")
                 f.close()
                 continue
                 ##TODO: is a csv on the server fine? Should we save it somewhere else? In a new table in the db? This will be a very rare exception (a few per tens of thousands of accessions).
 
             if len(sdict[srx]['biosample_uid'])==1:
                 bio = str(sdict[srx]['biosample_uid'][0])
-                if bio in bdict.keys(): #if bio not in bdict keys, why isn't it? biosample efetch doesn't exist yet for link that was found? biosample uid wasn't in efetch?
+                if bio in bdict.keys(): #if bio not in bdict keys, why isn't it? biosample efetch doesn't exist yet for link that was found? biosample uid wasn't in efetch? eutilitiesconnection error during biosample scrape?
                     ##TODO: error flag if a row has a value in biosample_uid but doesn't have anything in any of the biosample_fields
                     #fields from biosample scrape need to add; don't need biosample_uid since already there
                     biosample_fields = ['biosample_link','metadata_publication_date','biosample_package','biosample_models','sample_attributes']
