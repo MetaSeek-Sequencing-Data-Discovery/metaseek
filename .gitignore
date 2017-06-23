@@ -19,3 +19,15 @@ client/build/index.html
 server/scrapers/SRA/subset_testdf_sframe/objects.bin
 
 server/scrapers/SRA/subset_testdf.txt
+
+metaseek_schema.xlsx
+
+*.ipynb
+
+server/scrapers/SRA/SRA_scrape_fns.pyc
+
+*.ipynb
+
+metaseek_schema.txt
+
+server/scrapers/SRA/SRA_AutoIngest_dev.ipynb
