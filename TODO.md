@@ -5,13 +5,17 @@
 
 ## Back End
 * Redo database schema - 0.5d
-* Database migrations strategy - 2d
-* Populate database - 0.5d
-* Automate scraper updates - 1d
-* Data cleaning SRA - 1d
-* Externalize field merges and cv parsing - 0.5d
-* Data cleaning rest DBs - 3d
+* ~~Data cleaning SRA - 1d~~
+* ~~Field merges~~
+* ~~Externalize field merges - 0.5d~~
+* error handling SRA scrapers
 * Write scraped data to db - 0.5d
+* Populate database - 0.5d
+* Data cleaning rest DBs - 3d
+* Automate scraper updates - 1d
+
+* Database migrations strategy - 2d
+* cv parsing
 * Break up app.py (models folder/file, database, API calls, app) - 2d
 * Performance profiling app.py - 0.5d
 * Database administration cleanup/indexing - 0.5d
@@ -19,6 +23,7 @@
 * Paged dataset list response - 0.5d
 * Download csv API call - 0.5d
 * Download datasets py script API call - 1d
+
 
 * *Get URL mapped to Firebase* - 0.5hr
 * push changes via git - 1hr

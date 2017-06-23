@@ -65,7 +65,7 @@ def geturl_with_retry(MaxRetry,url):
                 MaxRetry=MaxRetry - 1
 
         f = open('ScrapeErrors.csv','a')
-        f.write(str(url)+",eutilities connection error,"+"geturl_with_retry\n")
+        f.write("url,eutilities connection error,"+"geturl_with_retry\n")
         f.close()
         raise EutilitiesConnectionError("eutilities connection error")
 
@@ -84,7 +84,7 @@ def get_srx_metadata(batch_uid_list):
         sra_samples = sra_xml.findall("EXPERIMENT_PACKAGE")
     except Exception:
         f = open('ScrapeErrors.csv','a')
-        f.write(str(srx_url)+",eutilities connection error,"+"get_srx_metadata\n")
+        f.write("url,eutilities connection error,"+"get_srx_metadata\n")
         f.close()
         raise EutilitiesConnectionError('eutilities connection error')
 
@@ -176,7 +176,8 @@ def get_srx_metadata(batch_uid_list):
             pass
         try:
             ###change library_layout to MIxS field library_construction_method - cv single | paired
-            srx_dict['library_construction_method'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").find("LIBRARY_LAYOUT").getchildren()[0].tag.lower()
+            layout = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").find("LIBRARY_LAYOUT").getchildren()[0].tag.lower()
+            srx_dict['library_construction_method'] = layout
         except AttributeError:
             f = open('ScrapeErrors.csv','a')
             f.write(str(srx_uid)+",AttributeError library_construction_method,"+"get_srx_metadata\n")
@@ -323,57 +324,59 @@ def get_srx_metadata(batch_uid_list):
             pass
 
         ###SAMPLE - get some BioSample stuff that's in easier format here: sample id, biosample id (if exists; it should but sometimes doesn't); also title, sample name stuff, and description; rest get from biosample scraping
-        try:
-            srx_dict['sample_id'] = sra_sample.find("SAMPLE").find("IDENTIFIERS").findtext("PRIMARY_ID")
-        except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError sample_id,"+"get_srx_metadata\n")
-            f.close()
-            pass
-        try:
-            for external in sra_sample.find("SAMPLE").find("IDENTIFIERS").iterchildren("EXTERNAL_ID"):
-                if external.get("namespace")=='BioSample':
-                    srx_dict['biosample_id'] = external.text
-        except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError biosample_id,"+"get_srx_metadata\n")
-            f.close()
-            pass
-        try:
-            srx_dict['sample_title'] = sra_sample.find("SAMPLE").findtext("TITLE")
-        except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError sample_title,"+"get_srx_metadata\n")
-            f.close()
-            pass
-        try:
-            srx_dict['ncbi_taxon_id'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("TAXON_ID")
-        except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError ncbi_taxon_id,"+"get_srx_metadata\n")
-            f.close()
-            pass
-        try:
-            srx_dict['taxon_scientific_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("SCIENTIFIC_NAME")
-        except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError taxon_scientific_name,"+"get_srx_metadata\n")
-            f.close()
-            pass
-        try:
-            srx_dict['taxon_common_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("COMMON_NAME")
-        except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError taxon_common_name,"+"get_srx_metadata\n")
-            f.close()
-            pass
-        try:
-            srx_dict['sample_description'] = sra_sample.find("SAMPLE").findtext("DESCRIPTION")
-        except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError sample_description,"+"get_srx_metadata\n")
-            f.close()
-            pass
+        #it's common to not have a Sample tag (Biosample not imported or something, but elink usually exists); just ignore in this case
+        if sra_sample.find("SAMPLE") is not None:
+            try:
+                srx_dict['sample_id'] = sra_sample.find("SAMPLE").find("IDENTIFIERS").findtext("PRIMARY_ID")
+            except AttributeError:
+                f = open('ScrapeErrors.csv','a')
+                f.write(str(srx_uid)+",AttributeError sample_id,"+"get_srx_metadata\n")
+                f.close()
+                pass
+            try:
+                for external in sra_sample.find("SAMPLE").find("IDENTIFIERS").iterchildren("EXTERNAL_ID"):
+                    if external.get("namespace")=='BioSample':
+                        srx_dict['biosample_id'] = external.text
+            except AttributeError:
+                f = open('ScrapeErrors.csv','a')
+                f.write(str(srx_uid)+",AttributeError biosample_id,"+"get_srx_metadata\n")
+                f.close()
+                pass
+            try:
+                srx_dict['sample_title'] = sra_sample.find("SAMPLE").findtext("TITLE")
+            except AttributeError:
+                f = open('ScrapeErrors.csv','a')
+                f.write(str(srx_uid)+",AttributeError sample_title,"+"get_srx_metadata\n")
+                f.close()
+                pass
+            try:
+                srx_dict['ncbi_taxon_id'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("TAXON_ID")
+            except AttributeError:
+                f = open('ScrapeErrors.csv','a')
+                f.write(str(srx_uid)+",AttributeError ncbi_taxon_id,"+"get_srx_metadata\n")
+                f.close()
+                pass
+            try:
+                srx_dict['taxon_scientific_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("SCIENTIFIC_NAME")
+            except AttributeError:
+                f = open('ScrapeErrors.csv','a')
+                f.write(str(srx_uid)+",AttributeError taxon_scientific_name,"+"get_srx_metadata\n")
+                f.close()
+                pass
+            try:
+                srx_dict['taxon_common_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("COMMON_NAME")
+            except AttributeError:
+                f = open('ScrapeErrors.csv','a')
+                f.write(str(srx_uid)+",AttributeError taxon_common_name,"+"get_srx_metadata\n")
+                f.close()
+                pass
+            try:
+                srx_dict['sample_description'] = sra_sample.find("SAMPLE").findtext("DESCRIPTION")
+            except AttributeError:
+                f = open('ScrapeErrors.csv','a')
+                f.write(str(srx_uid)+",AttributeError sample_description,"+"get_srx_metadata\n")
+                f.close()
+                pass
 
         ###Pool - skip, redundant
 
@@ -417,7 +420,10 @@ def get_srx_metadata(batch_uid_list):
                 f.close()
                 pass
             try:
-                total_num_reads.append(int(run.get("total_spots")))
+                if run.get("total_spots") is not None: #really common to be missing this, don't log error
+                    total_num_reads.append(int(run.get("total_spots")))
+                else:
+                    total_num_reads.append(None)
             except (TypeError, ValueError) as e: #will be typeerror if int(None); valueerror if can't make int (is string or weird characters)
                 total_num_reads.append(None)
                 f = open('ScrapeErrors.csv','a')
@@ -425,7 +431,10 @@ def get_srx_metadata(batch_uid_list):
                 f.close()
                 pass
             try:
-                total_num_bases.append(int(run.get("total_bases")))
+                if run.get("total_bases") is not None:
+                    total_num_bases.append(int(run.get("total_bases")))
+                else:
+                    total_num_bases.append(None)
             except (TypeError, ValueError) as e:
                 total_num_bases.append(None)
                 f = open('ScrapeErrors.csv','a')
@@ -433,7 +442,10 @@ def get_srx_metadata(batch_uid_list):
                 f.close()
                 pass
             try:
-                download_size.append(int(run.get("size")))
+                if run.get("size") is not None:
+                    download_size.append(int(run.get("size")))
+                else:
+                    download_size.append(None)
             except (TypeError, ValueError) as e:
                 download_size.append(None)
                 f = open('ScrapeErrors.csv','a')
@@ -445,7 +457,7 @@ def get_srx_metadata(batch_uid_list):
             except AttributeError:
                 base_list = []
                 pass
-            if len(base_list)==0:
+            if len(base_list)!=5: #if doesn't have all five bases counted, ignore
                 baseA_count.append(None)
                 baseC_count.append(None)
                 baseG_count.append(None)
@@ -456,79 +468,106 @@ def get_srx_metadata(batch_uid_list):
                 countC=None
                 countG=None
                 countT=None
-            for base in base_list:
-                try:
-                    if base.get("value")=="A":
-                        baseA_count.append(int(base.get("count")))
-                        countA = int(base.get("count"))
-                except (TypeError, ValueError) as e:
+            else:
+                #if base_list is length 5, but has weird values like 0,1,2,3,. (see srx uid 4172335), only use if has the values it should
+                should_be = ['A', 'C', 'G', 'T', 'N']
+                nucleotides = []
+                for base in base_list:
+                    nucleotides.append(base.get("value"))
+                if set(nucleotides)!=set(should_be): #only try to get base counts and gc percent if tags are right
                     baseA_count.append(None)
-                    countA=None
-                    f = open('ScrapeErrors.csv','a')
-                    f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseA_count,get_srx_metadata\n")
-                    f.close()
-                    pass
-                try:
-                    if base.get("value")=="C":
-                        baseC_count.append(int(base.get("count")))
-                        countC = int(base.get("count"))
-                except (TypeError, ValueError) as e:
                     baseC_count.append(None)
-                    countC=None
-                    f = open('ScrapeErrors.csv','a')
-                    f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseC_count,get_srx_metadata\n")
-                    f.close()
-                try:
-                    if base.get("value")=="G":
-                        baseG_count.append(int(base.get("count")))
-                        countG = int(base.get("count"))
-                except (TypeError, ValueError) as e:
                     baseG_count.append(None)
-                    countG=None
-                    f = open('ScrapeErrors.csv','a')
-                    f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseG_count,get_srx_metadata\n")
-                    f.close()
-                try:
-                    if base.get("value")=="T":
-                        baseT_count.append(int(base.get("count")))
-                        countT = int(base.get("count"))
-                except (TypeError, ValueError) as e:
                     baseT_count.append(None)
-                    countT=None
-                    f = open('ScrapeErrors.csv','a')
-                    f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseT_count,get_srx_metadata\n")
-                    f.close()
-                try:
-                    if base.get("value")=="N":
-                        baseN_count.append(int(base.get("count")))
-                        countN = int(base.get("count"))
-                except (TypeError, ValueError) as e:
                     baseN_count.append(None)
-                    f = open('ScrapeErrors.csv','a')
-                    f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseN_count,get_srx_metadata\n")
-                    f.close()
-            try:
-                gc_percent.append(float(countG+countC)/float(countC+countG+countA+countT))
-            except TypeError as e:
-                gc_percent.append(None)
-                f = open('ScrapeErrors.csv','a')
-                f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" gc_percent,get_srx_metadata\n")
-                f.close()
-                pass
+                    gc_percent.append(None)
+                    countA=None
+                    countC=None
+                    countG=None
+                    countT=None
+                elif set(nucleotides)==set(should_be):
+                    for base in base_list:
+                        try:
+                            if base.get("value")=="A":
+                                baseA_count.append(int(base.get("count")))
+                                countA = int(base.get("count"))
+                        except (TypeError, ValueError) as e:
+                            baseA_count.append(None)
+                            countA=None
+                            f = open('ScrapeErrors.csv','a')
+                            f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseA_count,get_srx_metadata\n")
+                            f.close()
+                            pass
+                        try:
+                            if base.get("value")=="C":
+                                baseC_count.append(int(base.get("count")))
+                                countC = int(base.get("count"))
+                        except (TypeError, ValueError) as e:
+                            baseC_count.append(None)
+                            countC=None
+                            f = open('ScrapeErrors.csv','a')
+                            f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseC_count,get_srx_metadata\n")
+                            f.close()
+                        try:
+                            if base.get("value")=="G":
+                                baseG_count.append(int(base.get("count")))
+                                countG = int(base.get("count"))
+                        except (TypeError, ValueError) as e:
+                            baseG_count.append(None)
+                            countG=None
+                            f = open('ScrapeErrors.csv','a')
+                            f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseG_count,get_srx_metadata\n")
+                            f.close()
+                        try:
+                            if base.get("value")=="T":
+                                baseT_count.append(int(base.get("count")))
+                                countT = int(base.get("count"))
+                        except (TypeError, ValueError) as e:
+                            baseT_count.append(None)
+                            countT=None
+                            f = open('ScrapeErrors.csv','a')
+                            f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseT_count,get_srx_metadata\n")
+                            f.close()
+                        try:
+                            if base.get("value")=="N":
+                                baseN_count.append(int(base.get("count")))
+                                countN = int(base.get("count"))
+                        except (TypeError, ValueError) as e:
+                            baseN_count.append(None)
+                            f = open('ScrapeErrors.csv','a')
+                            f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseN_count,get_srx_metadata\n")
+                            f.close()
+                    try:
+                        gc_percent.append(float(countG+countC)/float(countC+countG+countA+countT))
+                    except TypeError as e:
+                        gc_percent.append(None)
+                        f = open('ScrapeErrors.csv','a')
+                        f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" gc_percent,get_srx_metadata\n")
+                        f.close()
+                        pass
 
             #avg read length; need calculate, can come from "Run" or "Statistics" heading
             try:
                 #have to account for whether it's paired or single to calculate avg read length (bases/reads will be double the actual avg read count if it's paired)
                 avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Run").get("spot_count"))+float(run.find("Run").get("spot_count_mates"))))
-            except (TypeError, AttributeError) as e: #if one of these values doesn't exist (TypeError), or "Run" tag doesn't exist (AttributeError), try getting it from "Statistics" heading; otherwise just add as None
+            except (TypeError, AttributeError) as e: #if one of these values doesn't exist (TypeError), or "Run" tag doesn't exist (AttributeError), try getting it from "Statistics" heading;
                 try:
                     avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Statistics").get("nreads"))*float(run.find("Statistics").get("nspots"))))
                 except (TypeError, AttributeError) as e:
-                    avg_read_length.append(None)
-                    f = open('ScrapeErrors.csv','a')
-                    f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" avg_read_length,get_srx_metadata\n")
-                    f.close()
-                    pass
+                    try: #if statistics doesn't work, try dividing total bases by total reads and dividing by 2 if paired
+                        if layout=='paired':
+                            avg_read_length.append(float(run.get("total_bases"))/(float(run.get("total_spots"))*2))
+                        elif layout=='single':
+                            avg_read_length.append(float(run.get("total_bases"))/(float(run.get("total_spots"))))
+                    except (NameError,TypeError,AttributeError) as e:
+                        avg_read_length.append(None)
+                        if e.__class__.__name__=='TypeError': #don't log typeerror because really common to be missing values
+                            pass
+                        else:
+                            f = open('ScrapeErrors.csv','a')
+                            f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" avg_read_length,get_srx_metadata\n")
+                            f.close()
+                            pass
             #quality count - need get from Run tag if exists
             qual_count = {}
             try:
@@ -595,7 +634,7 @@ def get_links(batch_uid_list, sdict):
         linksets = link_xml.findall("LinkSet")
     except Exception:
         f = open('ScrapeErrors.csv','a')
-        f.write(str(elink_url)+",eutilities connection error,"+"get_links\n")
+        f.write("url,eutilities connection error,"+"get_links\n")
         f.close()
         raise EutilitiesConnectionError('eutilities connection error')
 
@@ -656,7 +695,7 @@ def get_biosample_metadata(batch_uid_list,bdict):
         biosamples = bio_xml.findall("BioSample")
     except Exception:
         f = open('ScrapeErrors.csv','a')
-        f.write(str(biosample_url)+",eutilities connection error,"+"get_biosample_metadata\n")
+        f.write("url,eutilities connection error,"+"get_biosample_metadata\n")
         f.close()
         raise EutilitiesConnectionError('eutilities connection error')
 
@@ -673,7 +712,7 @@ def get_biosample_metadata(batch_uid_list,bdict):
                 raise AttributeError('no uid attribute in biosample')
         except AttributeError:
             f = open('ScrapeErrors.csv','a')
-            f.write(str(biosample_url)+",AttributeError couldnt find biosample id which "+str(which)+",get_biosample_metadata\n")
+            f.write("url,AttributeError couldnt find biosample id which "+str(which)+",get_biosample_metadata\n")
             f.close()
             continue
         bio_dict['biosample_uid'] = bio_id
@@ -687,7 +726,7 @@ def get_biosample_metadata(batch_uid_list,bdict):
                 bio_dict['sample_title'] = biosample.find("Description").findtext("Title")
         except AttributeError:
             f = open('ScrapeErrors.csv','a')
-            f.write(str(biosample_url)+",AttributeError sample_title ,get_biosample_metadata\n")
+            f.write(str(bio_id)+",AttributeError sample_title ,get_biosample_metadata\n")
             f.close()
             pass
         #ncbi_taxon_id
@@ -696,7 +735,7 @@ def get_biosample_metadata(batch_uid_list,bdict):
                 bio_dict['ncbi_taxon_id'] = biosample.find("Description").find("Organism").get("taxonomy_id")
         except AttributeError:
             f = open('ScrapeErrors.csv','a')
-            f.write(str(biosample_url)+",AttributeError ncbi_taxon_id ,get_biosample_metadata\n")
+            f.write(str(bio_id)+",AttributeError ncbi_taxon_id ,get_biosample_metadata\n")
             f.close()
             pass
         #taxon_scientific_name
@@ -705,16 +744,17 @@ def get_biosample_metadata(batch_uid_list,bdict):
                 bio_dict['taxon_scientific_name'] = biosample.find("Description").find("Organism").get("taxonomy_name")
         except AttributeError:
             f = open('ScrapeErrors.csv','a')
-            f.write(str(biosample_url)+",AttributeError taxon_scientific_name ,get_biosample_metadata\n")
+            f.write(str(bio_id)+",AttributeError taxon_scientific_name ,get_biosample_metadata\n")
             f.close()
             pass
         #sample_description
         try:
-            if biosample.find("Description").find("Comment").findtext("Paragraph") is not None:
-                bio_dict['sample_description'] = biosample.find("Description").find("Comment").findtext("Paragraph")
+            if biosample.find("Description").find("Comment") is not None:
+                if biosample.find("Description").find("Comment").findtext("Paragraph") is not None:
+                    bio_dict['sample_description'] = biosample.find("Description").find("Comment").findtext("Paragraph")
         except AttributeError:
             f = open('ScrapeErrors.csv','a')
-            f.write(str(biosample_url)+",AttributeError sample_description ,get_biosample_metadata\n")
+            f.write(str(bio_id)+",AttributeError sample_description ,get_biosample_metadata\n")
             f.close()
             pass
         #publication date
@@ -777,7 +817,7 @@ def get_pubmed_metadata(batch_uid_list,pdict):
         pubmeds = pub_xml.findall("DocSum")
     except Exception:
         f = open('ScrapeErrors.csv','a')
-        f.write(str(pub_url)+",eutilities connection error,get_pubmed_metadata\n")
+        f.write("url,eutilities connection error,get_pubmed_metadata\n")
         f.close()
         raise EutilitiesConnectionError('eutilities connection error')
 
@@ -794,7 +834,7 @@ def get_pubmed_metadata(batch_uid_list,pdict):
                 raise AttributeError('no uid attribute in pubmed')
         except AttributeError:
             f = open('ScrapeErrors.csv','a')
-            f.write(str(pub_url)+",AttributeError couldnt find pubmed id which "+str(which)+",get_pubmed_metadata\n")
+            f.write("uid,AttributeError couldnt find pubmed id which "+str(which)+",get_pubmed_metadata\n")
             f.close()
             continue
 
@@ -807,10 +847,13 @@ def get_pubmed_metadata(batch_uid_list,pdict):
             try:
                 pub_dict['pub_publication_date'] = datetime.strptime(pubmed.find("Item[@Name='PubDate']").text,"%Y %b")
             except (AttributeError,ValueError) as e:
-                f = open('ScrapeErrors.csv','a')
-                f.write(str(pub_id)+","+str(e.__class__.__name__)+" pub_publication_date,get_pubmed_metadata\n")
-                f.close()
-                pass
+                try:
+                    pub_dict['pub_publication_date'] = datetime.strptime(pubmed.find("Item[@Name='PubDate']").text,"%Y")
+                except (AttributeError,ValueError) as e:
+                    f = open('ScrapeErrors.csv','a')
+                    f.write(str(pub_id)+","+str(e.__class__.__name__)+" pub_publication_date,get_pubmed_metadata\n")
+                    f.close()
+                    pass
 
         try:
             authors = []
