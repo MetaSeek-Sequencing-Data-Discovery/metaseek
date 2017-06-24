@@ -48,8 +48,10 @@
   "dependencies": {
     "axios": "^0.15.3",
     "d3": "^3.5.17",
+    "prop-types": "^15.5.10",
     "rc-slider": "^6.1.2",
     "rd3": "^0.7.4",
-    "react-ga": "^2.1.2"
+    "react-ga": "^2.1.2",
+    "victory": "^0.21.0"
   }
 }
