@@ -20,6 +20,7 @@ import ExploreSummaryStats from './ExploreSummaryStats';
 import Loading from './Loading';
 import Histogram from './Histogram';
 import HeatmapChart from './HeatmapChart';
+import Plotly from './Plotly';
 
 var apiRequest = axios.create({
   baseURL: apiConfig.baseURL
@@ -237,6 +238,9 @@ var Explore = React.createClass({
                   </div>
                 </Paper>
               </div>
+              <Paper style={{'width':'92%','margin':'24px auto','padding':0,'clear':'both'}}>
+                <Plotly />
+              </Paper>
               <Paper style={{'width':'92%','margin':'24px auto','padding':0,'clear':'both'}}>
                 <ExploreTable activeData={this.state.activeData}/>
               </Paper>
