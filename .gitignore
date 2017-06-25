@@ -17,3 +17,5 @@ DataScraping/*
 client/build/index.html
 
 *.pyc
+
+server/bootstrapData/
