@@ -5,50 +5,255 @@ from datetime import datetime
 # each class becomes a table
 class Dataset(db.Model):
     # each attribute on a "Model" inherited class becomes a Column
-    id = db.Column(db.Integer, primary_key=True)
+    #id = db.Column(db.Integer, primary_key=True)
 
-    biosample_link = db.Column(db.Text)
-    sample_title = db.Column(db.Text)
-    investigation_type = db.Column(db.Text)
+    db_source_uid = db.Column(db.String(50),primary_key=True)
+    db_source = db.Column(db.String(20))
+    expt_link = db.Column(db.Text)
+    expt_id = db.Column(db.String(30))
+    expt_title = db.Column(db.Text)
+    expt_design_description = db.Column(db.Text)
+    library_name = db.Column(db.Text)
+    library_strategy = db.Column(db.Text)
     library_source = db.Column(db.Text)
+    library_screening_strategy = db.Column(db.Text)
+    library_construction_method = db.Column(db.Text)
+    library_construction_protocol = db.Column(db.Text)
+    sequencing_method = db.Column(db.Text)
+    instrument_model = db.Column(db.Text)
+    submission_id = db.Column(db.String(30))
+    organization_name = db.Column(db.Text)
+    organization_address = db.Column(db.Text)
+    organization_contacts = db.Column(db.Text)
+    study_id = db.Column(db.String(30))
+    bioproject_id = db.Column(db.String(40))
+    study_title = db.Column(db.Text)
+    study_type = db.Column(db.Text)
+    study_type_other = db.Column(db.Text)
+    study_abstract = db.Column(db.Text)
+    study_links = db.Column(db.PickleType)
+    study_attributes = db.Column(db.PickleType)
+    sample_id = db.Column(db.String(30))
+    biosample_id = db.Column(db.String(40))
+    sample_title = db.Column(db.Text)
+    ncbi_taxon_id = db.Column(db.String(50))
+    taxon_scientific_name = db.Column(db.Text)
+    taxon_common_name = db.Column(db.Text)
+    sample_description = db.Column(db.Text)
+    num_runs_in_accession = db.Column(db.Integer)
+    run_ids = db.Column(db.PickleType)
+    run_ids_maxrun = db.Column(db.String(30))
+    library_reads_sequenced = db.Column(db.PickleType)
+    library_reads_sequenced_maxrun = = db.Column(db.BIGINT)
+    total_num_bases = db.Column(db.PickleType)
+    total_num_bases_maxrun = = db.Column(db.BIGINT)
+    download_size = db.Column(db.PickleType)
+    download_size_maxrun = = db.Column(db.BIGINT)
+    avg_read_length = db.Column(db.PickleType)
+    avg_read_length_maxrun = db.Column(db.Float)
+    baseA_count = db.Column(db.PickleType)
+    baseA_count_maxrun = = db.Column(db.BIGINT)
+    baseC_count = db.Column(db.PickleType)
+    baseC_count_maxrun = = db.Column(db.BIGINT)
+    baseG_count = db.Column(db.PickleType)
+    baseG_count_maxrun = = db.Column(db.BIGINT)
+    baseT_count = db.Column(db.PickleType)
+    baseT_count_maxrun = = db.Column(db.BIGINT)
+    baseN_count = db.Column(db.PickleType)
+    baseN_count_maxrun = = db.Column(db.BIGINT)
+    gc_percent = db.Column(db.PickleType)
+    gc_percent_maxrun = db.Column(db.Float)
+    run_quality_counts = db.Column(db.PickleType)
+    run_quality_counts_maxrun = db.Column(db.PickleType)
+    biosample_uid = db.Column(db.String(30))
+    pubmed_uids = db.Column(db.PickleType)
+    nuccore_uids = db.Column(db.PickleType)
+    biosample_link = db.Column(db.Text)
+    metadata_publication_date = db.Column(db.DateTime)
+    biosample_package = db.Column(db.Text)
+    biosample_models = db.Column(db.PickleType)
+    sample_attributes = db.Column(db.PickleType)
+    pubmed_link = db.Column(db.PickleType)
+    pub_publication_date = db.Column(db.PickleType)
+    pub_authors = db.Column(db.PickleType)
+    pub_title = db.Column(db.PickleType)
+    pub_volume = db.Column(db.PickleType)
+    pub_issue = db.Column(db.PickleType)
+    pub_pages = db.Column(db.PickleType)
+    pub_journal = db.Column(db.PickleType)
+    pub_doi = db.Column(db.PickleType)
+    nuccore_link = db.Column(db.PickleType)
+    investigation_type = db.Column(db.Text)
     env_package = db.Column(db.Text)
-    collection_date = db.Column(db.DateTime)
-    latitude = db.Column(db.Float)
-    longitude = db.Column(db.Float)
-
-    avg_read_length = db.Column(db.Float)
-    total_num_reads = db.Column(db.BIGINT)
-    total_num_bases = db.Column(db.BIGINT)
-    download_size = db.Column(db.BIGINT)
-    avg_percent_gc = db.Column(db.Float)
+    project_name = db.Column(db.Text)
+    lat_lon = db.Column(db.Text)
+    latitude = db.Column(db.Text)
+    longitude = db.Column(db.Text)
+    geo_loc_name = db.Column(db.Text)
+    collection_date = db.Column(db.Text)
+    collection_time = db.Column(db.Text)
+    env_biome = db.Column(db.Text)
+    env_feature = db.Column(db.Text)
+    env_material = db.Column(db.Text)
+    depth = db.Column(db.Text)
+    elevation = db.Column(db.Text)
+    altitude = db.Column(db.Text)
+    target_gene = db.Column(db.Text)
+    target_subfragment = db.Column(db.Text)
+    ploidy = db.Column(db.Text)
+    num_replicons = db.Column(db.Text)
+    estimated_size = db.Column(db.Text)
+    ref_biomaterial = db.Column(db.Text)
+    propagation = db.Column(db.Text)
+    assembly = db.Column(db.Text)
+    finishing_strategy = db.Column(db.Text)
+    isol_growth_condt = db.Column(db.Text)
+    experimental_factor = db.Column(db.Text)
+    specific_host = db.Column(db.Text)
+    subspecific_genetic_lineage = db.Column(db.Text)
+    tissue = db.Column(db.Text)
+    sex = db.Column(db.Text)
+    sample_type = db.Column(db.Text)
+    age = db.Column(db.Text)
+    dev_stage = db.Column(db.Text)
+    biomaterial_provider = db.Column(db.Text)
+    host_disease = db.Column(db.Text)
 
     #etc = db.Column(db.PickleType)
 
     # Each class must have an init function
-    def __init__(self,biosample_link=None,sample_title=None,investigation_type=None,library_source=None,env_package=None,collection_date=None,latitude=None,longitude=None,avg_read_length=None,total_num_reads=None,total_num_bases=None,download_size=None,avg_percent_gc=None):
-        self.latitude = latitude
-        self.longitude = longitude
+    def __init__(self, db_source_uid=None,db_source=None,expt_link=None,expt_id=None,expt_title=None,expt_design_description=None,library_name=None,library_strategy=None,library_source=None,library_screening_strategy=None,library_construction_method=None,library_construction_protocol=None,sequencing_method=None,instrument_model=None,
+    submission_id=None,organization_name=None,organization_address=None,organization_contacts=None,
+    study_id=None,bioproject_id=None,study_title=None,study_type=None,study_type_other=None,study_abstract=None,study_links=None,study_attributes=None,
+    sample_id=None,biosample_id=None,sample_title=None,ncbi_taxon_id=None,taxon_scientific_name=None,taxon_common_name=None,sample_description=None,
+    num_runs_in_accession=None,run_ids=None,run_ids_maxrun=None,library_reads_sequenced=None,library_reads_sequenced_maxrun=None,total_num_bases=None,total_num_bases_maxrun=None,download_size=None,download_size_maxrun=None,avg_read_length=None,avg_read_length_maxrun=None,
+    baseA_count=None,baseA_count_maxrun=None,baseC_count=None,baseC_count_maxrun=None,baseG_count=None,baseG_count_maxrun=None,baseT_count=None,baseT_count_maxrun=None,baseN_count=None,baseN_count_maxrun=None,gc_percent=None,gc_percent_maxrun=None,run_quality_counts=None,run_quality_counts_maxrun=None,
+    biosample_uid=None,pubmed_uids=None,nuccore_uids=None,biosample_link=None,metadata_publication_date=None,biosample_package=None,biosample_models=None,sample_attributes=None,
+    pubmed_link=None,pub_publication_date=None,pub_authors=None,pub_title=None,pub_volume=None,pub_issue=None,pub_pages=None,pub_journal=None,pub_doi=None,nuccore_link=None,
+    investigation_type=None,env_package=None,project_name=None,lat_lon=None,latitude=None,longitude=None,geo_loc_name=None,collection_date=None,collection_time=None,env_biome=None,env_feature=None,env_material=None,depth=None,elevation=None,altitude=None,target_gene=None,target_subfragment=None,
+    ploidy=None,num_replicons=None,estimated_size=None,ref_biomaterial=None,propagation=None,assembly=None,finishing_strategy=None,isol_growth_condt=None,experimental_factor=None,specific_host=None,subspecific_genetic_lineage=None,tissue=None,sex=None,sample_type=None,age=None,dev_stage=None,biomaterial_provider=None,host_disease=None):
+
+        self.db_source_uid = db_source_uid
+        self.db_source = db_source
+        self.expt_link = expt_link
+        self.expt_id = expt_id
+        self.expt_title = expt_title
+        self.expt_design_description = expt_design_description
+        self.library_name = library_name
+        self.library_strategy = library_strategy
+        self.library_source = library_source
+        self.library_screening_strategy = library_screening_strategy
+        self.library_construction_method = library_construction_method
+        self.library_construction_protocol = library_construction_protocol
+        self.sequencing_method = sequencing_method
+        self.instrument_model = instrument_model
+        self.submission_id = submission_id
+        self.organization_name = organization_name
+        self.organization_address = organization_address
+        self.organization_contacts = organization_contacts
+        self.study_id = study_id
+        self.bioproject_id = bioproject_id
+        self.study_title = study_title
+        self.study_type = study_type
+        self.study_type_other = study_type_other
+        self.study_abstract = study_abstract
+        self.study_links = study_links
+        self.study_attributes = study_attributes
+        self.sample_id = sample_id
+        self.biosample_id = biosample_id
+        self.sample_title = sample_title
+        self.ncbi_taxon_id = ncbi_taxon_id
+        self.taxon_scientific_name = taxon_scientific_name
+        self.taxon_common_name = taxon_common_name
+        self.sample_description = sample_description
+        self.num_runs_in_accession = num_runs_in_accession
+        self.run_ids = run_ids
+        self.run_ids_maxrun = run_ids_maxrun
+        self.library_reads_sequenced = library_reads_sequenced
+        self.library_reads_sequenced_maxrun = library_reads_sequenced_maxrun
+        self.total_num_bases = total_num_bases
+        self.total_num_bases_maxrun = total_num_bases_maxrun
+        self.download_size = download_size
+        self.download_size_maxrun = download_size_maxrun
+        self.avg_read_length = avg_read_length
+        self.avg_read_length_maxrun = avg_read_length_maxrun
+        self.baseA_count = baseA_count
+        self.baseA_count_maxrun = baseA_count_maxrun
+        self.baseC_count = baseC_count
+        self.baseC_count_maxrun = baseC_count_maxrun
+        self.baseG_count = baseG_count
+        self.baseG_count_maxrun = baseG_count_maxrun
+        self.baseT_count = baseT_count
+        self.baseT_count_maxrun = baseT_count_maxrun
+        self.baseN_count = baseN_count
+        self.baseN_count_maxrun = baseN_count_maxrun
+        self.gc_percent = gc_percent
+        self.gc_percent_maxrun = gc_percent_maxrun
+        self.run_quality_counts = run_quality_counts
+        self.run_quality_counts_maxrun = run_quality_counts_maxrun
+        self.biosample_uid = biosample_uid
+        self.pubmed_uids = pubmed_uids
+        self.nuccore_uids = nuccore_uids
+        self.biosample_link = biosample_link
+        self.metadata_publication_date = metadata_publication_date
+        self.biosample_package = biosample_package
+        self.biosample_models = biosample_models
+        self.sample_attributes = sample_attributes
+        self.pubmed_link = pubmed_link
+        self.pub_publication_date = pub_publication_date
+        self.pub_authors = pub_authors
+        self.pub_title = pub_title
+        self.pub_volume = pub_volume
+        self.pub_issue = pub_issue
+        self.pub_pages = pub_pages
+        self.pub_journal = pub_journal
+        self.pub_doi = pub_doi
+        self.nuccore_link = nuccore_link
         self.investigation_type = investigation_type
         self.env_package = env_package
-        self.library_source = library_source
-        self.avg_read_length = avg_read_length
+        self.project_name = project_name
+        self.lat_lon = lat_lon
+        self.latitude = latitude
+        self.longitude = longitude
+        self.geo_loc_name = geo_loc_name
         self.collection_date = collection_date
-        self.total_num_reads = total_num_reads
-        self.total_num_bases = total_num_bases
-        self.download_size = download_size
-        self.avg_percent_gc = avg_percent_gc
-        self.biosample_link = biosample_link
-        self.sample_title = sample_title
+        self.collection_time = collection_time
+        self.env_biome = env_biome
+        self.env_feature = env_feature
+        self.env_material = env_material
+        self.depth = depth
+        self.elevation = elevation
+        self.altitude = altitude
+        self.target_gene = target_gene
+        self.target_subfragment = target_subfragment
+        self.ploidy = ploidy
+        self.num_replicons = num_replicons
+        self.estimated_size = estimated_size
+        self.ref_biomaterial = ref_biomaterial
+        self.propagation = propagation
+        self.assembly = assembly
+        self.finishing_strategy = finishing_strategy
+        self.isol_growth_condt = isol_growth_condt
+        self.experimental_factor = experimental_factor
+        self.specific_host = specific_host
+        self.subspecific_genetic_lineage = subspecific_genetic_lineage
+        self.tissue = tissue
+        self.sex = sex
+        self.sample_type = sample_type
+        self.age = age
+        self.dev_stage = dev_stage
+        self.biomaterial_provider = biomaterial_provider
+        self.host_disease = host_disease
 
     # Friendly string representation
     def __repr__(self):
-        return '<Dataset %r>' % self.biosample_link
+        return '<Dataset %r>' % self.db_source_uid
 
 # For a many to many database relationship, use a mapping table (no class definition directly)
 # Eg. each discovery will have many datasets, and each dataset may belong to many discoveries
 # Each row in this table is one "dataset in discovery" membership
 dataset_to_discovery = db.Table('dataset_to_discovery',
-    db.Column('dataset_id', db.Integer, db.ForeignKey('dataset.id')),
+    db.Column('dataset_id', db.Integer, db.ForeignKey('dataset.db_source_id')),
     db.Column('discovery_id', db.Integer, db.ForeignKey('discovery.id'))
 )
 
