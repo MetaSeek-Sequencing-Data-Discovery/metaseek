@@ -7,6 +7,7 @@ var watchify = require('watchify');
 var notify = require('gulp-notify');
 var autoprefixer = require('gulp-autoprefixer');
 var cleanCSS = require('gulp-clean-css');
+var uglifyify = require('uglifyify');
 var uglify = require('gulp-uglify');
 var htmlreplace = require('gulp-html-replace');
 var buffer = require('vinyl-buffer');
@@ -103,16 +104,26 @@ gulp.task('default', ['copy-index-html','images','styles','browser-sync'], funct
   return buildScript('main.js', true); // browserify watch for JS changes
 });
 
-gulp.task('build', ['copy-index-html','images','styles'],function() {
+gulp.task('apply-prod-environment', function() {
+    process.stdout.write("Setting NODE_ENV to 'production'" + "\n");
+    process.env.NODE_ENV = 'production';
+    if (process.env.NODE_ENV != 'production') {
+        throw new Error("Failed to set NODE_ENV to production!!!!");
+    } else {
+        process.stdout.write("Successfully set NODE_ENV to production" + "\n");
+    }
+});
+
+gulp.task('build', ['apply-prod-environment','copy-index-html','images','styles'],function() {
   return browserify({
           entries: ['./scripts/main.js'],
           debug : false,
-          transform:  [babelify.configure({stage : 0 })]
+          transform:  [babelify, reactify, uglifyify]
         })
         .bundle()
         .on('error', handleErrors)
         .pipe(source('main.js'))
         .pipe(buffer()) //  uglifying ~doubles the time to build but saves ~30% space in output filesize
-        .pipe(uglify({ mangle: false }))
+        .pipe(uglify({ mangle: true }))
         .pipe(gulp.dest('./build'));
 });
