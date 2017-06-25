@@ -15,3 +15,5 @@ DataScraping/*
 *.pem
 
 client/build/index.html
+
+*.pyc
