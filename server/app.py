@@ -83,6 +83,8 @@ class CreateDataset(Resource):
     def post(self):
         try:
             parser = reqparse.RequestParser()
+            # Note that any arguments added here MUST be present in the POST request or the request will fail with
+            # 400 - Bad Request as the response
             parser.add_argument('latitude', type=float, help='Email address to create user')
             parser.add_argument('longitude', type=float)
             parser.add_argument('investigation_type',type=str)
