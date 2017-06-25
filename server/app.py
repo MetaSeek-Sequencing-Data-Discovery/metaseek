@@ -109,11 +109,14 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     firebase_id = db.Column(db.String(28), unique=True)
     admin = db.Column(db.Boolean)
+    betaSignup = db.Column(db.Boolean)
+    testField = db.Column(db.Boolean)
     discoveries = db.relationship('Discovery', backref='user', lazy='dynamic')
 
-    def __init__(self, firebase_id, admin=False):
+    def __init__(self, firebase_id, admin=False, betaSignup=True):
         self.firebase_id = firebase_id
         self.admin = admin
+        self.betaSignup = betaSignup
 
     def __repr__(self):
         return '<User %r>' % self.firebase_id
@@ -328,7 +331,7 @@ class CreateUser(Resource):
             if (existingUser):
                 return {'error':'User already exists!','uri':url_for('getuser',id=existingUser.id,_external=True)}
             else:
-                newUser = User(args['firebase_id'],args['admin'])
+                newUser = User(args['firebase_id'],args['admin'],0)
                 db.session.add(newUser)
                 db.session.commit()
                 return {"user":{"uri":url_for('getuser',id=newUser.id,_external=True)}}
