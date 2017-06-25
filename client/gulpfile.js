@@ -45,7 +45,7 @@ gulp.task('images',function() {
 
 gulp.task('copy-index-html', function() {
     gulp.src('index.html')
-      .pipe(htmlreplace({'css': './css/styles.css','js': './main.js'}))
+      .pipe(htmlreplace({'css': '/css/styles.css','js': '/main.js'}))
       .pipe(gulp.dest('./build'));
 });
 
