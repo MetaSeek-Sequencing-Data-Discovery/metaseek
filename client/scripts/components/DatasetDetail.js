@@ -2,10 +2,9 @@ import React from 'react';
 import axios from 'axios';
 import apiConfig from '../config/api.js';
 
-// Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import ColorPalette from './ColorPalette';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import ColorPalette from './ColorPalette';
 import Paper from 'material-ui/Paper';
 import {List, ListItem} from 'material-ui/List';
 
@@ -35,23 +34,11 @@ var DatasetDetail = React.createClass({
     )
   },
   render: function() {
-    var styles = {
-      paperStyle: {
-        width: '75%',
-        maxWidth: 800,
-        margin: '15px auto',
-        padding: 30,
-      },
-      submitStyle: {
-        marginTop: 32,
-      },
-    };
-
     return (
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
           <div>
             <Header history={this.props.history}/>
-            <Paper style={styles.paperStyle} zDepth={2}>
+            <Paper className="singleSheet" zDepth={2}>
               <h2>Dataset Detail</h2>
                 <List>
                   {Object.keys(this.state.dataset).map(this.renderField)}

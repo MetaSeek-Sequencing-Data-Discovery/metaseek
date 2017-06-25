@@ -1,15 +1,16 @@
 import React from 'react';
 
-// Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import ColorPalette from './ColorPalette';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import ColorPalette from './ColorPalette';
+
 import {Tabs, Tab} from 'material-ui/Tabs';
-import Formsy from 'formsy-react';
 import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
+
+import Formsy from 'formsy-react';
 import { FormsyCheckbox, FormsyDate, FormsyRadio, FormsyRadioGroup,
     FormsySelect, FormsyText, FormsyTime, FormsyToggle } from 'formsy-material-ui/lib';
 
@@ -21,12 +22,14 @@ var AddDatasetForm = React.createClass({
   },
 
   enableButton: function() {
+    console.log('setting as valid');
     this.setState({
       canSubmit: true,
     });
   },
 
   disableButton : function() {
+    console.log('setting as invalid');
     this.setState({
       canSubmit: false,
     });
@@ -37,28 +40,21 @@ var AddDatasetForm = React.createClass({
     this.props.addDataset(JSON.parse(JSON.stringify(data)));
   },
 
+  notifyFormError : function(data) {
+    // stringify removes undefined attributes (for optional metadata params)
+    console.log('Invalid form submission!');
+    console.log(data);
+  },
+
   render : function() {
     var errorMessages = {
       wordsError: "Please only use letters",
       numericError: "Please provide a number",
       urlError: "Please provide a valid URL",
     };
-
-    var styles = {
-      paperStyle: {
-        width: '75%',
-        maxWidth: 800,
-        margin: '15px auto',
-        padding: 30,
-      },
-      submitStyle: {
-        marginTop: 32,
-      },
-    };
-
     return (
       <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
-        <Paper style={styles.paperStyle} zDepth={2}>
+        <Paper className="singleSheet" zDepth={2}>
           <Formsy.Form
            onValid={this.enableButton}
            onInvalid={this.disableButton}
@@ -127,17 +123,14 @@ var AddDatasetForm = React.createClass({
                  <FormsyRadio
                    value="light"
                    label="prepare for light speed"
-                   style={styles.switchStyle}
                  />
                  <FormsyRadio
                    value="not_light"
                    label="light speed too slow"
-                   style={styles.switchStyle}
                  />
                  <FormsyRadio
                    value="ludicrous"
                    label="go to ludicrous speed"
-                   style={styles.switchStyle}
                    disabled={true}
                  />
                </FormsyRadioGroup>*/}
@@ -197,7 +190,7 @@ var AddDatasetForm = React.createClass({
               </Tab>
               <Tab label="More Info" >
               <FormsyText
-                style={{'display':'block'}}
+                className="blockField"
                 name="description"
                 validations="isWords"
                 validationError={errorMessages.wordsError}
@@ -210,7 +203,7 @@ var AddDatasetForm = React.createClass({
             </Tab>
             </Tabs>
             <RaisedButton
-              style={styles.submitStyle}
+              className="submitButton"
               type="submit"
               label="Submit Dataset"
               disabled={!this.state.canSubmit}
