@@ -1,20 +1,17 @@
 {
   "name": "MetaSeek",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "MetaSeek is a data discovery and analysis tool for genome sequencing data. Providing a rich front-end for exploration of metadata across a wide set of data repositories, use MetaSeek to find the right aggregation of sequences for your analysis, and then access the raw sequencing data.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "Nick Brown, Adrienne Hoarfrost",
   "license": "MIT",
+  "repository":"https://github.com/ahoarfrost/metaseek",
   "devDependencies": {
-    "autobind-decorator": "1.3.2",
-    "babel": "5.8.23",
+    "axios": "^0.15.3",
     "babelify": "6.4.0",
     "browser-sync": "2.9.11",
     "browserify": "11.2.0",
     "connect-history-api-fallback": "1.1.0",
+    "d3": "^3.5.17",
     "firebase": "^3.0.0",
     "formsy-material-ui": "^0.5.0",
     "formsy-react": "^0.18.1",
@@ -24,21 +21,13 @@
     "gulp-html-replace": "^1.6.2",
     "gulp-imagemin": "^3.1.1",
     "gulp-notify": "2.2.0",
-    "gulp-rename": "1.2.2",
-    "gulp-stylus": "2.1.0",
     "gulp-uglify": "1.4.2",
-    "gulp-util": "3.0.7",
-    "history": "1.12.5",
-    "install": "0.1.8",
     "material-ui": "^0.15.4",
-    "re-base": "1.2.1",
+    "rd3": "^0.7.4",
     "react": "15.3.1",
-    "react-addons-css-transition-group": "15.3.1",
-    "react-catalyst": "0.3.0",
-    "react-d3-map": "^0.8.3",
     "react-dom": "15.3.1",
-    "react-google-maps": "^4.11.0",
-    "react-mixin": "3.0.0",
+    "react-ga": "^2.1.2",
+    "react-input-range": "^1.1.4",
     "react-router": "2.5.2",
     "react-tap-event-plugin": "^1.0.0",
     "reactify": "^1.1.1",
@@ -46,12 +35,5 @@
     "vinyl-buffer": "1.0.0",
     "vinyl-source-stream": "1.1.0",
     "watchify": "3.4.0"
-  },
-  "dependencies": {
-    "axios": "^0.15.3",
-    "d3": "^3.5.17",
-    "rc-slider": "^6.1.2",
-    "rd3": "^0.7.4",
-    "react-ga": "^2.1.2"
   }
 }
