@@ -1,0 +1,98 @@
+{"investigation_type":["investigation_type"],
+
+ "env_package":["env_package","env package","environment package","environmental package","enviornmental package","water environmental package",
+                "human gut environmental package","humam oral environmental package","host-associated environmental package","human-associated environmental package",
+                "plant-associated environmental package","human vaginal environmental package","human skin environmental package","wastewater/sludge environmental package",
+                "soil environmental package","sediment environmental package","microbial mat/biofilm environmental package","built environment environmental package",
+               "miscellaneous environmental package","package","attribute_package","Enviornmental package","migs env package","migs env_package","env_packagr"],
+
+ "project_name":["project_name","project name","project","projectid","Internal project id","study_name"],
+
+ "lat_lon":["lat_lon","lat_lan","lat_lo","lat lon","geographic location (latitude and longitude)","geographic location (latitude, longitude)",
+            "geographical location (lat lon)","latitude and longitude","latitude_and_longitude"],
+
+ "latitude":["latitude","lat","latitude.dd","latitude (raw)","Geographic location (latitude)","geographic location (latitude)"],
+ "longitude":["longitude","lon","longitude (raw)","Geographic location (longitude)","geographic location (longitude)","longitude.dd","long"],
+
+ "geo_loc_name":["geo_loc_name","geo loc name","geo-loc-name","geographic location","geographic location (country and/or sea)","geographic location (country and/or sea",
+                 "geographic location (region and locality)","\"geographic location (country and/or sea,region)\"","geographic location (country 2)",
+                 "geo_loc","geo_loc_name_coord","geo_loc_name2","location details","collection_location","location","collection location","collection site","collection_site"],
+
+ "collection_date":["collection_date","collection date","collection-date","collection timestamp","collection_timestamp","colection date","collection date unformat","collection_date_unformat","date collected","Colletion date","sampling_date_m_d_yy","date of sample","sampling date m d yy"],
+ "collection_time":["collection_time","collectiontime","collection Time","time collected","collection time"],
+
+ "env_biome":["env_biome","biome","env biome","environment (biome)","environment biome"],
+
+ "env_feature":["env_feature","env feature","environment feature","environment_feature","feature","environment (feature)",
+                "environment (featurel)","Environment (featurel)"],
+
+ "env_material":["env_material","env material","environment (material)","environment material","environment_material","material",
+                 "Sample material","environmental_material_level"],
+
+ "sequencing_method":["seq_method","Sequencing method","sequencing meth","seq meth","seq_meth","sequencing_meth","sequencing_platform","Sequencing platform","platform",
+             "sequencing method","sequencing_method","seq_methods","library method","seq_method_detail1","seq_method_detail2"],
+
+ "depth":["depth","depth (m)","geographic location (depth)","soil depth","depth_start","depth_end","depth range"],
+
+ "elevation":["elevation","elev","geographic location (elevation)","elev (m)","elevation_m","env_elevation","estimated elevation",
+              "tot_depth_water_col","depth_below_sealevel","total depth water col","alt_elev","geographic location (altitude/elevation)","gps elevation"],
+
+ "altitude":["altitude","metres_in_altitude","geographic location (altitude)","alt_elev","geographic location (altitude/elevation)"],
+
+ "target_gene":["target_gene","target gene","target genes","primer_target","Amplicon target","target","rrna_fragment","gene","target locus",
+                "chip target","rRNA_fragment","RNAi target gene name","target_molecule","enrichment target"],
+
+ "target_subfragment":["target_subfragment","target subfragment","target_subfragment_usa","country_target_subfragment"],
+
+ "ploidy":["ploidy"],
+
+ "num_replicons": ["num_replicons","number of replicons","number_of_replicons"],
+
+ "estimated_size":["estimated_size","estimated size"],
+
+ "ref_biomaterial":["ref_biomaterial","reference_for_biomaterial","reference for biomaterial"],
+
+ "propagation":["propagaion"],
+
+ "assembly":["assembly","assembler"],
+
+ "finishing_strategy":["finishing_strategy","current finishing status","finishing strategy (depth of coverage)"],
+
+ "isol_growth_condt":["isol_growth_condt","isol_growth_condt.1","isolation and growth condition","isolation_and_growth_condition",
+                      "isolation_and_growth_conditions","growth condition","growth conditions","culture conditions","growth_med","exp_growth_medium",
+                     "growth medium type","growt protocol","growth","culturing condition","culturing_condition"],
+
+ "experimental_factor":["experimental_factor","treatment","experimental_treatment","experimental_condition",
+                       "experimental condition"],
+
+ "taxon_scientific_name":["species","ArrayExpress-Species","Species","species_name","species name","bee species"],
+
+ "specific_host":["host","host.species","host genus","host order","host_order","host_major_clade","host_species_abbrev","host_taxid","isolation_source",
+                 "isolation source host associated","isolation source host-associated","lab_host","Lab host plant","beetle host","snail host"],
+
+ "subspecific_genetic_lineage":["strain","strain name","alternate strain name","strain_name_alias","Alternate strain","plant strain","substrain",
+                               "mescs strain","infection strain","mouse strain","strains","culture strain","cultivar","isolate","isolate_name_alias",
+                               "ecotype","ecotype background","ecotype and background","breed","breed name","horse_breed","mouse breeding","breeding cage",
+                               "breed grouping","strain/variation","strain genotype","strain / genotype","strain/genotype","genotype",
+                               "biovar","serovar","serotype","concise genotype name","sample_genotype","plant genotype","Plant genotype","mouse genotype"],
+
+ "tissue":["tissue","tissues","tissue group","cell_or_tissue_type","tissue source/type","organ/tissue","primary tissue","host tissue","tissue of origin",
+          "brain tissue","host_tissue_sampled","host tissue subsection","host_tissue","tissue / cells","cell/tissue type","tissue_lib"],
+
+ "sex":["sex","DNA sex","cell sex","subject gender","Sex (0=Male, 1=Female)"],
+
+ "sample_type":["sample_type"],
+
+ "age":["age","host_age","age years","age in years","age_years","age_in_years","age (in years)","age (days)","age baby days","age_baby_days",
+      "age_days","age_months","age months","estimated age","age cat","age_cat","agegroup","age_category","age group","age_group",
+       "age category","age_class"],
+
+ "dev_stage":["dev_stage","develpomental stage","developemntal stage","developemental stage","develomental stage","life_stage",
+             "growth_stage","growth stage","growing stage","life cycle stage"],
+
+ "biomaterial_provider":["biomaterial_provider","collected_by","isolated_by","collected_b","tissue biomaterial_provider",
+                        "collecting institution","collection_hospital","collection_hostiptal","collector_name","collector name"],
+
+ "host_disease":["host_disease","host disease status","disease","study_disease","disease type","primary disease","diagnosis",
+                     "tissue_diagnosis","diagnosis full","ibd diagnosis"]
+ }
