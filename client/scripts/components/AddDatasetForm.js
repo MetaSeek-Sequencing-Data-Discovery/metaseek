@@ -54,7 +54,7 @@ var AddDatasetForm = React.createClass({
     };
     return (
       <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
-        <Paper className="singleSheet" zDepth={2}>
+        <Paper className="single-sheet" zDepth={2}>
           <Formsy.Form
            onValid={this.enableButton}
            onInvalid={this.disableButton}
@@ -190,7 +190,7 @@ var AddDatasetForm = React.createClass({
               </Tab>
               <Tab label="More Info" >
               <FormsyText
-                className="blockField"
+                className="block-field"
                 name="description"
                 validations="isWords"
                 validationError={errorMessages.wordsError}
@@ -203,7 +203,7 @@ var AddDatasetForm = React.createClass({
             </Tab>
             </Tabs>
             <RaisedButton
-              className="submitButton"
+              className="submit-button"
               type="submit"
               label="Submit Dataset"
               disabled={!this.state.canSubmit}

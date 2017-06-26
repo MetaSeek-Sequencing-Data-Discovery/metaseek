@@ -438,7 +438,7 @@ button.github:after, input[type=submit].github:after {
 
 /* General layout */
 
-.singleSheet {
+.single-sheet {
   width: 1024px;
   margin: 15px auto;
   padding: 30px;
@@ -446,15 +446,15 @@ button.github:after, input[type=submit].github:after {
 
 /* Add Dataset layout */
 
-.submitButton {
+.submit-button {
   margin-top:32px;
 }
 
-.blockField {
+.block-field {
   display:block;
 }
 
-.summaryBox {
+.summary-box {
   box-sizing: border-box;
   margin: 0;
   padding: 10px;
