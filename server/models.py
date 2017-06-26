@@ -1,28 +1,5 @@
-# Webapp framework
-from flask import Flask, url_for
-from flask_cors import CORS, cross_origin
-
-# Database setup and ORM
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import func
-
-# Support for REST API in Flask
-from flask_restful import Resource, Api, reqparse, fields, marshal_with
-
-# Utilities
+from app import db
 from datetime import datetime
-from dateutil import parser as dateparser
-import random
-import json
-import sframe
-from collections import Counter
-
-# Config / initialize the app, database and api
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-
 
 # Declare Models - Dataset, User, Discovery
 # each class becomes a table
@@ -40,9 +17,9 @@ class Dataset(db.Model):
     longitude = db.Column(db.Float)
 
     avg_read_length = db.Column(db.Float)
-    total_num_reads = db.Column(db.Integer)
-    total_num_bases = db.Column(db.Integer)
-    download_size = db.Column(db.Integer)
+    total_num_reads = db.Column(db.BIGINT)
+    total_num_bases = db.Column(db.BIGINT)
+    download_size = db.Column(db.BIGINT)
     avg_percent_gc = db.Column(db.Float)
 
     #etc = db.Column(db.PickleType)
@@ -106,16 +83,3 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.firebase_id
-
-# TODO take this out into a 'bootstrap.py' file for kickstarting a new DB
-db.create_all()
-
-sample_data = sframe.SFrame('/Users/Adrienne/Projects/metaseek/DataScraping/db_sample_data')
-for row in sample_data:
-    try:
-        datetimeguess = dateparser.parse(row['collection_date'])
-    except ValueError:
-        datetimeguess = None
-    newDataset = Dataset(row['biosample_link'],row['sample_title'],row['investigation_type'],row['library_source'], row['env_package'],datetimeguess, row['latitude'], row['longitude'], row['avg_read_length'], row['total_num_reads'], row['total_num_bases'], row['download_size'],row['avg_percent_gc'])
-    db.session.add(newDataset)
-    db.session.commit()

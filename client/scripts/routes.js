@@ -10,8 +10,7 @@ injectTapEventPlugin();
 
 // My Imported Components
 import NotFound from './components/NotFound';
-import Signup from './components/Signup';
-import Browse from './components/Browse';
+import Welcome from './components/Welcome';
 import Explore from './components/Explore';
 import MyAccount from './components/MyAccount';
 import AddDataset from './components/AddDataset';
@@ -31,13 +30,11 @@ function logPageView() {
 
 var routes = (
   <Router history={browserHistory} onUpdate={logPageView}>
-    <Route path="/" component={Signup}/>
-    <Route path="/browse" component={Browse}/>
+    <Route path="/" component={Welcome}/>
     <Route path="/explore" component={Explore}/>
     <Route path="/myaccount" component={MyAccount}/>
     <Route path="/dataset/new" component={AddDataset}/>
     <Route path="/dataset/:id" component={DatasetDetail}/>
-    <Route path="/discovery/new" component={Explore}/>
     <Route path="/discovery/:id" component={DiscoveryDetail}/>
     <Route path="*" component={NotFound}/>
   </Router>

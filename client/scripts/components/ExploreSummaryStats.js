@@ -1,8 +1,8 @@
 import React from 'react';
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import ColorPalette from './ColorPalette';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import ColorPalette from './ColorPalette';
 import Paper from 'material-ui/Paper';
 import {List, ListItem} from 'material-ui/List';
 import {getReadableFileSizeString} from '../helpers';
@@ -18,9 +18,9 @@ var SummaryStats = React.createClass({
       <div>
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
           <div>
-            <List className="summaryBox" >
-              <ListItem><b style={{"display":"inline-block","color":"#6369E0"}}>{this.props.summaryData.totalDatasets}</b> datasets </ListItem>
-              <ListItem><b style={{"display":"inline-block","color":"#6369E0"}}>{getReadableFileSizeString(this.props.summaryData.totalDownloadSize)}</b>   estimated download size </ListItem>
+            <List>
+              <ListItem><span className="callout">{this.props.summaryData.totalDatasets}</span> datasets.</ListItem>
+              <ListItem><span className="callout">{getReadableFileSizeString(this.props.summaryData.totalDownloadSize)}</span> estimated download size.</ListItem>
             </List>
           </div>
         </MuiThemeProvider>

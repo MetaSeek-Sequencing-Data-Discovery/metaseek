@@ -2,8 +2,8 @@ import React from 'react';
 
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import ColorPalette from './ColorPalette';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import ColorPalette from './ColorPalette';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import LatitudeSliders from './LatitudeSliders';
@@ -101,11 +101,11 @@ var ExploreFilters = React.createClass({
               minValue={this.state.filterStates.latitudeMin.value}
               maxValue={this.state.filterStates.latitudeMax.value}
             />
-            <LongitudeSliders style={{marginTop:12}} handleFilterChange={this.handleFilterChange}
+            <LongitudeSliders handleFilterChange={this.handleFilterChange}
               minValue={this.state.filterStates.longitudeMin.value}
               maxValue={this.state.filterStates.longitudeMax.value}
             />
-            <AverageReadLengthInputs style={{marginTop:24}} handleFilterChange={this.handleFilterChange}
+            <AverageReadLengthInputs handleFilterChange={this.handleFilterChange}
               minValue={this.state.filterStates.avgRdLgthMin.value}
               maxValue={this.state.filterStates.avgRdLgthMax.value}
             />

@@ -20,10 +20,4 @@ var LatFilter = React.createClass({
   }
 });
 
-
-//ReactDOM.render(
-//  <App />,
-//  document.getElementById('app')
-//);
-
 export default LatFilter;

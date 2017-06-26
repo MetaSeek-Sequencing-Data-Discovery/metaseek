@@ -1,67 +1,174 @@
 import React from 'react';
+import * as firebase from "firebase";
+import firebaseConfig from '../config/firebase.js';
+firebase.initializeApp(firebaseConfig);
+
+import axios from 'axios';
+import apiConfig from '../config/api.js';
+
 import { Link } from 'react-router';
 
-// Material Design imports
-import FlatButton from 'material-ui/FlatButton';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import ColorPalette from './ColorPalette';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import Paper from 'material-ui/Paper';
+import ColorPalette from './ColorPalette';
 
-// My component imports
+import Paper from 'material-ui/Paper';
+import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
+
+import Formsy from 'formsy-react';
+import {FormsyText} from 'formsy-material-ui/lib';
+
 import Header from './Header';
+
+var db = firebase.database();
+var signupRef = db.ref("signups");
+var apiRequest = axios.create({
+  baseURL: apiConfig.baseURL
+});
 
 var Welcome = React.createClass({
   getInitialState : function() {
-    return {}
-  },
-  render : function() {
-    var styles = {
-      container: {
-        textAlign: 'center',
-        paddingTop: 45,
-        width: '80%',
-        margin: '0 auto',
-        maxWidth: '800px',
-        minWidth: '500px'
-      },
-      paper: {
-        'backgroundColor':'#92CBC5',
-        'width':200,
-        'height':200,
-        'padding':15,
-        'textAlign':'left',
-        'margin':'0 auto'
+    return {
+      canSubmit:false,
+      submitted:false,
+      firebase:{
+        uid:null,
+        admin:0
       }
+    }
+  },
+
+  componentWillMount: function() {
+    var user = firebase.auth().currentUser;
+    if (user) {
+      this.state.firebase.uid = user.uid;
+      var self = this;
+      apiRequest.post('/user/create', {
+        "firebase_id":self.state.firebase.uid,
+        "admin":0
+      }).then(function(response){
+        console.log(response.data.uri);
+        axios.get(response.data.uri).then(function(response){
+          if (response.data.user.admin) {
+            self.state.firebase.admin = 1;
+          }
+          self.setState({"firebase": self.state.firebase});
+        });
+      });
+    }
+  },
+
+  enableButton: function() {
+    this.setState({
+      canSubmit: true,
+    });
+  },
+
+  disableButton : function() {
+    this.setState({
+      canSubmit: false,
+    });
+  },
+
+  submitEmail : function(entry) {
+    var newSignupRef = signupRef.push();
+
+    var newSignup = entry;
+    newSignupRef.set(newSignup);
+    this.setState({
+      submitted: true,
+    });
+  },
+
+  render : function() {
+    var errorMessages = {
+      emailError: "Please provide a valid email address"
     };
-    return (
+
+    var exploreButtonDisplay = 'none';
+    if (this.state.firebase.admin) {
+      exploreButtonDisplay = 'flex';
+    }
+
+    return(
       <div>
         <Header history={this.props.history}/>
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
-          <div style={styles.container}>
-            <h1 style={{'fontSize':'2.6em'}}>Welcome to MetaSeek</h1>
-            <p style={{'marginTop':'50px','marginBottom':40}}>Discover, curate, and get access to thousands of sequencing samples from all over the web.</p>
-              <div style={{'display':'flex','maxWidth':500,'margin':'0 auto'}}>
-                <Paper style={styles.paper} zDepth={3}>
-                  <p style={{'margin':0}}>Explore publicly available samples by filtering, sorting, and saving your discoveries. Once you've curated a set of samples, easily download metadata and instructions for raw data download.</p>
-                  <Link style={{'display':'block','marginTop':15,'textAlign':'center'}} to='/explore'>
+          <div className="welcome-container">
+            <h1 className="welcome-announce">Sign up to test the beta version!</h1>
+              <Paper className="welcome-signup-submit">
+                {this.state.submitted ? <h2>Thanks for signing up! We'll be in touch soon.</h2> :
+                  <Formsy.Form
+                     onValid={this.enableButton}
+                     onInvalid={this.disableButton}
+                     onValidSubmit={this.submitEmail}
+                     onInvalidSubmit={this.notifyFormError}
+                     >
+                    <p>Enter your email address to be notified when our beta version is released</p>
+                    <FormsyText
+                      className="welcome-email-field"
+                      name="email address"
+                      validations="isEmail"
+                      validationError={errorMessages.emailError}
+                      required
+                      hintText="metaseek.cloud@gmail.com"
+                    />
+                    <RaisedButton
+                      type="submit"
+                      label="Signup"
+                      primary={true}
+                    />
+                  </Formsy.Form>
+                }
+              </Paper>
+            <h1>Welcome to MetaSeek</h1>
+            <p>Discover, curate, and get access to thousands of sequencing samples from all over the web.</p>
+              <div style={{'display':exploreButtonDisplay}}>
+                <Paper zDepth={1}>
+                  <Link to='/explore'>
                     <FlatButton label="DISCOVER"></FlatButton>
                   </Link>
                 </Paper>
-                <Paper style={styles.paper} zDepth={3}>
-                  <p style={{'margin':0}}>Explore publicly available samples by filtering, sorting, and saving your discoveries. Once you've curated a set of samples, easily download metadata and instructions for raw data download.</p>
-                  <Link style={{'display':'block','marginTop':15,'textAlign':'center'}} to='/dataset/new'>
+                <Paper zDepth={1}>
+                  <Link to='/dataset/new'>
                     <FlatButton label="CONTRIBUTE"></FlatButton>
                   </Link>
                 </Paper>
               </div>
-              <h1 style={{'fontSize':'1.8em','marginTop':60}}>What is MetaSeek?</h1>
-              <p style={{'marginTop':'50px'}}>MetaSEQ is a data discovery and analysis tool for sequencing data. Providing a rich front-end for exploration of metadata across a wide set of data repositories, use MetaSeek to find the right aggregation of sequences for your analysis, and then access the raw sequencing data.</p>
+              <h1>What is MetaSeek?</h1>
+              <Paper className="single-sheet">
+                <h3>MetaSeek brings together sequencing metadata from all the major repositories to let you easily search, filter, and curate sequencing datasets for your meta-analysis.</h3>
+              </Paper>
+              <h1>How to use MetaSeek</h1>
+              <div>
+
+              <Paper className="explore-preview-sheet">
+                <div className="explore-preview-sheet-left">
+                  <img src="./images/explore.jpeg"></img>
+                </div>
+                <div className="explore-preview-sheet-right">
+                  <h3>Explore Datasets</h3>
+                    <p>Search and filter on the metadata you care about</p>
+                  <h3>Save and share your discovery</h3>
+                    <p>Get dummy code for data download.</p>
+                    <p>Browse other users’ discoveries, save ones you like or use one as a launching off point.</p>
+                  <h3>Contribute to the metadata pool</h3>
+                    <p>Metadata is only as good as the community it serves.</p>
+                    <p>Flag or correct metadata errors, or annotate a dataset or discovery.</p>
+                </div>
+              </Paper>
+            </div>
+              <h4>Follow our progress on GitHub, or run your own install of MetaSeek:
+              </h4>
+              <a className="github-button" href="https://github.com/ahoarfrost/metaseek/subscription" data-style="mega" data-count-href="/ahoarfrost/metaseek/watchers" data-count-api="/repos/ahoarfrost/metaseek#subscribers_count" data-count-aria-label="# watchers on GitHub" aria-label="Watch ahoarfrost/metaseek on GitHub">Watch</a>
           </div>
-        </MuiThemeProvider>
-      </div>
+      </MuiThemeProvider>
+    </div>
     )
   }
+
 });
 
 export default Welcome;
