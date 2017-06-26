@@ -76,6 +76,9 @@ if __name__ == "__main__":
 
         #extract and merge MIxS fields from 'sample_attributes' field in each dict in sdict (if exists)
         sdict = extract_and_merge_mixs_fields(sdict=sdict,fieldname="sample_attributes",rules_json="rules.json")
+        #coerce sample attributes field to str for db insertion
+        for srx in sdict.keys():
+            sdict[srx]['sample_attributes'] = str(sdict[srx]['sample_attributes'])
 
         ##TODO: cv parsing
 

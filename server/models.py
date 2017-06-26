@@ -5,9 +5,9 @@ from datetime import datetime
 # each class becomes a table
 class Dataset(db.Model):
     # each attribute on a "Model" inherited class becomes a Column
-    #id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
-    db_source_uid = db.Column(db.String(50),primary_key=True)
+    db_source_uid = db.Column(db.String(50))
     db_source = db.Column(db.String(20))
     expt_link = db.Column(db.Text)
     expt_id = db.Column(db.String(30))
@@ -42,15 +42,15 @@ class Dataset(db.Model):
     sample_description = db.Column(db.Text)
     num_runs_in_accession = db.Column(db.Integer)
     run_ids_maxrun = db.Column(db.String(30))
-    library_reads_sequenced_maxrun = = db.Column(db.BIGINT)
-    total_num_bases_maxrun = = db.Column(db.BIGINT)
-    download_size_maxrun = = db.Column(db.BIGINT)
+    library_reads_sequenced_maxrun = db.Column(db.BIGINT)
+    total_num_bases_maxrun = db.Column(db.BIGINT)
+    download_size_maxrun = db.Column(db.BIGINT)
     avg_read_length_maxrun = db.Column(db.Float)
-    baseA_count_maxrun = = db.Column(db.BIGINT)
-    baseC_count_maxrun = = db.Column(db.BIGINT)
-    baseG_count_maxrun = = db.Column(db.BIGINT)
-    baseT_count_maxrun = = db.Column(db.BIGINT)
-    baseN_count_maxrun = = db.Column(db.BIGINT)
+    baseA_count_maxrun = db.Column(db.BIGINT)
+    baseC_count_maxrun = db.Column(db.BIGINT)
+    baseG_count_maxrun = db.Column(db.BIGINT)
+    baseT_count_maxrun = db.Column(db.BIGINT)
+    baseN_count_maxrun = db.Column(db.BIGINT)
     gc_percent_maxrun = db.Column(db.Float)
     run_quality_counts_maxrun = db.Column(db.Text)
     biosample_uid = db.Column(db.String(30))
@@ -60,7 +60,6 @@ class Dataset(db.Model):
     biosample_package = db.Column(db.Text)
     biosample_models = db.Column(db.Text)
     sample_attributes = db.Column(db.Text)
-    nuccore_link = db.Column(db.Text)
     investigation_type = db.Column(db.Text)
     env_package = db.Column(db.Text)
     project_name = db.Column(db.Text)
@@ -96,6 +95,7 @@ class Dataset(db.Model):
     dev_stage = db.Column(db.Text)
     biomaterial_provider = db.Column(db.Text)
     host_disease = db.Column(db.Text)
+    date_scraped = db.Column(db.DateTime)
 
     #etc = db.Column(db.PickleType)
 
@@ -106,9 +106,10 @@ class Dataset(db.Model):
     sample_id=None,biosample_id=None,sample_title=None,ncbi_taxon_id=None,taxon_scientific_name=None,taxon_common_name=None,sample_description=None,
     num_runs_in_accession=None,run_ids_maxrun=None,library_reads_sequenced_maxrun=None,total_num_bases_maxrun=None,download_size_maxrun=None,avg_read_length_maxrun=None,
     baseA_count_maxrun=None,baseC_count_maxrun=None,baseG_count_maxrun=None,baseT_count_maxrun=None,baseN_count_maxrun=None,gc_percent_maxrun=None,run_quality_counts_maxrun=None,
-    biosample_uid=None,nuccore_uids=None,biosample_link=None,metadata_publication_date=None,biosample_package=None,biosample_models=None,sample_attributes=None,nuccore_link=None,
+    biosample_uid=None,nuccore_uids=None,biosample_link=None,metadata_publication_date=None,biosample_package=None,biosample_models=None,sample_attributes=None,
     investigation_type=None,env_package=None,project_name=None,lat_lon=None,latitude=None,longitude=None,geo_loc_name=None,collection_date=None,collection_time=None,env_biome=None,env_feature=None,env_material=None,depth=None,elevation=None,altitude=None,target_gene=None,target_subfragment=None,
-    ploidy=None,num_replicons=None,estimated_size=None,ref_biomaterial=None,propagation=None,assembly=None,finishing_strategy=None,isol_growth_condt=None,experimental_factor=None,specific_host=None,subspecific_genetic_lineage=None,tissue=None,sex=None,sample_type=None,age=None,dev_stage=None,biomaterial_provider=None,host_disease=None):
+    ploidy=None,num_replicons=None,estimated_size=None,ref_biomaterial=None,propagation=None,assembly=None,finishing_strategy=None,isol_growth_condt=None,experimental_factor=None,specific_host=None,subspecific_genetic_lineage=None,tissue=None,sex=None,sample_type=None,age=None,dev_stage=None,biomaterial_provider=None,host_disease=None,
+    date_scraped=None):
 
         self.db_source_uid = db_source_uid
         self.db_source = db_source
@@ -163,7 +164,6 @@ class Dataset(db.Model):
         self.biosample_package = biosample_package
         self.biosample_models = biosample_models
         self.sample_attributes = sample_attributes
-        self.nuccore_link = nuccore_link
         self.investigation_type = investigation_type
         self.env_package = env_package
         self.project_name = project_name
@@ -199,6 +199,7 @@ class Dataset(db.Model):
         self.dev_stage = dev_stage
         self.biomaterial_provider = biomaterial_provider
         self.host_disease = host_disease
+        self.date_scraped = date_scraped
 
     # Friendly string representation
     def __repr__(self):
@@ -208,7 +209,7 @@ class Dataset(db.Model):
 # Eg. each discovery will have many datasets, and each dataset may belong to many discoveries
 # Each row in this table is one "dataset in discovery" membership
 dataset_to_discovery = db.Table('dataset_to_discovery',
-    db.Column('dataset_id', db.Integer, db.ForeignKey('dataset.db_source_id')),
+    db.Column('dataset_id', db.Integer, db.ForeignKey('dataset.id')),
     db.Column('discovery_id', db.Integer, db.ForeignKey('discovery.id'))
 )
 

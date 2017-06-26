@@ -246,7 +246,7 @@ def get_srx_metadata(batch_uid_list):
                         name=''
                     email = contact.get('email')
                     contacts.append(name+', '+email)
-                srx_dict['organization_contacts'] = contacts
+                srx_dict['organization_contacts'] = str(contacts) #coerce to string for db writing
         except AttributeError:
             f = open('ScrapeErrors.csv','a')
             f.write(str(srx_uid)+",AttributeError organization_contacts,"+"get_srx_metadata\n")
@@ -305,7 +305,7 @@ def get_srx_metadata(batch_uid_list):
                         study_links[study_link.find("XREF_LINK").findtext("DB")] = study_link.find("XREF_LINK").findtext("ID")
                     if study_link.find("URL_LINK") is not None:
                         study_links[study_link.find("URL_LINK").findtext("LABEL")] = study_link.find("URL_LINK").findtext("URL")
-            srx_dict['study_links'] = study_links
+            srx_dict['study_links'] = str(study_links) #coerce to str for db
         except AttributeError:
             f = open('ScrapeErrors.csv','a')
             f.write(str(srx_uid)+",AttributeError study_links,"+"get_srx_metadata\n")
@@ -316,7 +316,7 @@ def get_srx_metadata(batch_uid_list):
             if sra_sample.find("STUDY").find("STUDY_ATTRIBUTES") is not None: #really common not to have this
                 for attr in sra_sample.find("STUDY").find("STUDY_ATTRIBUTES").iterchildren():
                     study_attributes[attr.findtext("TAG")] = attr.findtext("VALUE")
-            srx_dict['study_attributes'] = study_attributes
+            srx_dict['study_attributes'] = str(study_attributes) #coerce to str for db
         except AttributeError:
             f = open('ScrapeErrors.csv','a')
             f.write(str(srx_uid)+",AttributeError study_attributes,"+"get_srx_metadata\n")
@@ -508,6 +508,7 @@ def get_srx_metadata(batch_uid_list):
                             f = open('ScrapeErrors.csv','a')
                             f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseC_count,get_srx_metadata\n")
                             f.close()
+                            pass
                         try:
                             if base.get("value")=="G":
                                 baseG_count.append(int(base.get("count")))
@@ -518,6 +519,7 @@ def get_srx_metadata(batch_uid_list):
                             f = open('ScrapeErrors.csv','a')
                             f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseG_count,get_srx_metadata\n")
                             f.close()
+                            pass
                         try:
                             if base.get("value")=="T":
                                 baseT_count.append(int(base.get("count")))
@@ -528,6 +530,7 @@ def get_srx_metadata(batch_uid_list):
                             f = open('ScrapeErrors.csv','a')
                             f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseT_count,get_srx_metadata\n")
                             f.close()
+                            pass
                         try:
                             if base.get("value")=="N":
                                 baseN_count.append(int(base.get("count")))
@@ -537,9 +540,10 @@ def get_srx_metadata(batch_uid_list):
                             f = open('ScrapeErrors.csv','a')
                             f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseN_count,get_srx_metadata\n")
                             f.close()
+                            pass
                     try:
                         gc_percent.append(float(countG+countC)/float(countC+countG+countA+countT))
-                    except TypeError as e:
+                    except (TypeError, ZeroDivisionError) as e:
                         gc_percent.append(None)
                         f = open('ScrapeErrors.csv','a')
                         f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" gc_percent,get_srx_metadata\n")
@@ -550,16 +554,16 @@ def get_srx_metadata(batch_uid_list):
             try:
                 #have to account for whether it's paired or single to calculate avg read length (bases/reads will be double the actual avg read count if it's paired)
                 avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Run").get("spot_count"))+float(run.find("Run").get("spot_count_mates"))))
-            except (TypeError, AttributeError) as e: #if one of these values doesn't exist (TypeError), or "Run" tag doesn't exist (AttributeError), try getting it from "Statistics" heading;
+            except (TypeError, AttributeError, ValueError, ZeroDivisionError) as e: #if one of these values doesn't exist (TypeError), or "Run" tag doesn't exist (AttributeError), or string value that can't be coerced to float (ValueError), try getting it from "Statistics" heading;
                 try:
                     avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Statistics").get("nreads"))*float(run.find("Statistics").get("nspots"))))
-                except (TypeError, AttributeError) as e:
+                except (TypeError, AttributeError, ValueError, ZeroDivisionError) as e:
                     try: #if statistics doesn't work, try dividing total bases by total reads and dividing by 2 if paired
                         if layout=='paired':
                             avg_read_length.append(float(run.get("total_bases"))/(float(run.get("total_spots"))*2))
                         elif layout=='single':
                             avg_read_length.append(float(run.get("total_bases"))/(float(run.get("total_spots"))))
-                    except (NameError,TypeError,AttributeError) as e:
+                    except (NameError,TypeError,AttributeError, ValueError, ZeroDivisionError) as e:
                         avg_read_length.append(None)
                         if e.__class__.__name__=='TypeError': #don't log typeerror because really common to be missing values
                             pass
@@ -606,7 +610,7 @@ def get_srx_metadata(batch_uid_list):
         srx_dict['gc_percent'] = gc_percent
         srx_dict['gc_percent_maxrun'] = gc_percent[max_index]
         srx_dict['run_quality_counts'] = read_quality_counts
-        srx_dict['run_quality_counts_maxrun'] = read_quality_counts[max_index]
+        srx_dict['run_quality_counts_maxrun'] = str(read_quality_counts[max_index]) #coerce to str for db
 
 
         sdict[srx_uid] = srx_dict
@@ -772,7 +776,7 @@ def get_biosample_metadata(batch_uid_list,bdict):
             models = []
             for model in biosample.find("Models").findall("Model"):
                 models.append(model.text)
-            bio_dict['biosample_models'] = models
+            bio_dict['biosample_models'] = str(models) #coerce to str for db
         except AttributeError:
             f = open('ScrapeErrors.csv','a')
             f.write(str(bio_id)+",AttributeError biosample_models,get_biosample_metadata\n")
@@ -956,6 +960,9 @@ def merge_scrapes(sdict,bdict,pdict,ndict):
                             sdict[srx]['nuccore_link'].append(ndict[nuc]['nuccore_link'])
                         else:
                             sdict[srx]['nuccore_link'] = [ndict[nuc]['nuccore_link']]
+            if 'nuccore_link' in sdict[srx].keys():
+                sdict[srx]['nuccore_link'] = str(sdict[srx]['nuccore_link']) #coerce to str for db
+            sdict[srx]['nuccore_uids'] = str(sdict[srx]['nuccore_uids']) #coerce to str for db
     return sdict
 
 
