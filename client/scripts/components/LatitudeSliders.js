@@ -25,11 +25,11 @@ import Slider from 'material-ui/Slider';
   render : function() {
     return (
       <div>
-        <p style={{padding:0}}>
+        <p>
           <span>Latitude range is {this.state.minSlider} to {this.state.maxSlider} inclusive</span>
         </p>
         <Slider
-          style={{height:6, marginTop:-6}}
+          className="explore-filter-slider"
           min={-90}
           max={90}
           step={1}
@@ -39,7 +39,7 @@ import Slider from 'material-ui/Slider';
           onDragStop={this.handleDragStop.bind(this,"latitudeMin","latitude",4,this.state.minSlider)}
         />
         <Slider
-          style={{height:6, marginTop:-6}}
+          className="explore-filter-slider"
           min={-90}
           max={90}
           step={1}

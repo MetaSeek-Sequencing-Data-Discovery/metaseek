@@ -22,7 +22,7 @@ const MapRect = React.createClass({
   },
 
   render() {
-    let {width, height, x, y, stroke, strokeopacity, opacity, fill} = this.props;
+    var {width, height, x, y, stroke, strokeopacity, opacity, fill} = this.props;
     return(
       <rect
         width={width}

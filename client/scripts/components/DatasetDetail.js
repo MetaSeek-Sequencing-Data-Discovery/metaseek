@@ -44,32 +44,6 @@ var DatasetDetail = React.createClass({
                   {Object.keys(this.state.dataset).map(this.renderField)}
                 </List>
             </Paper>
-            <div style={{
-              width: '75%',
-              maxWidth: 800,
-              height: 300,
-              margin: '15px auto',
-              display: 'flex'
-            }}>
-              <Paper style={{
-                padding: 30,
-                width: '48%',
-                height: 300,
-                margin: 'auto'
-              }} zDepth={2}>
-                <h2>Rollup Info</h2>
-                <p>Maybe a chart goes here or something?</p>
-              </Paper>
-              <Paper style={{
-                padding: 30,
-                width: '48%',
-                height: 300,
-                margin: 'auto'
-              }} zDepth={2}>
-                <h2>More Rollup Info</h2>
-                <p>Maybe a chart goes here or something?</p>
-              </Paper>
-            </div>
           </div>
         </MuiThemeProvider>
     )

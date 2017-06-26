@@ -435,6 +435,19 @@ ul {
   padding: 0;
 }
 
+.logotype {
+  cursor: pointer;
+}
+
+.callout {
+  color:#6369E0;
+  font-weight:700;
+}
+
+.button-link {
+  text-decoration: none;
+}
+
 /* Github follow buttons */
 
 button.github, input[type=submit].github {
@@ -506,12 +519,29 @@ button.github:after, input[type=submit].github:after {
   margin: 12px 12px 0 12px;
 }
 
+.explore-filter-slider {
+  height: 6px;
+  margin-top: -6px;
+}
+
 .explore-right-map {
 	 float: right;
 	 width: 788px;
 	 height: 408px;
 	 margin: 0;
 	 padding: 24px;
+}
+
+.explore-map-container {
+  width:720px;
+  margin:0 auto;
+}
+
+.explore-map-heat-container {
+  width:720px;
+  height:360px;
+  background-image: url('/images/BWmapBackground.jpg');
+  background-size:cover;
 }
 
 .explore-right-summary {
@@ -531,7 +561,72 @@ button.github:after, input[type=submit].github:after {
 
 .explore-table {
   width: 1192px;
+  height: 600px;
   margin: 48px auto;
   padding: 0;
   clear: both;
+}
+
+/* My Account layout */
+
+.login-buttons {
+  text-align:center;
+}
+
+.login-buttons > div {
+  margin:20px;
+}
+
+/* Welcome layout */
+
+.welcome-container {
+  text-align: center;
+  width: 1024px;
+  margin: 0 auto;
+  padding-top: 15px;
+}
+
+.welcome-announce {
+  font-size: 2.6em;
+  margin-top: 50px;
+  font-weight:500;
+}
+
+.welcome-enter {
+  font-size: 1.1em;
+  text-align: center;
+}
+
+.welcome-cta {
+  width: 150px;
+  height: 60px;
+  margin: 0 auto;
+  padding-top: 10px;
+}
+
+.welcome-signup-submit {
+  text-align: center;
+  margin: 12px auto 25px;
+  width: 400px;
+  padding: 5px;
+}
+
+.welcome-email-field {
+  display: block;
+  margin: 0 auto;
+}
+.explore-preview-sheet {
+  padding: 15px;
+  height:400px;
+}
+.explore-preview-sheet-left {
+  float:left;
+  width:500px;
+  margin-left:20px;
+  margin-top:40px;
+}
+.explore-preview-sheet-right {
+  float:right;
+  width:420px;
+  margin-right:15px;
 }
