@@ -11,7 +11,6 @@ injectTapEventPlugin();
 // My Imported Components
 import NotFound from './components/NotFound';
 import Signup from './components/Signup';
-import Browse from './components/Browse';
 import Explore from './components/Explore';
 import MyAccount from './components/MyAccount';
 import AddDataset from './components/AddDataset';

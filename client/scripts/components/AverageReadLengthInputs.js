@@ -33,7 +33,7 @@ import RaisedButton from 'material-ui/RaisedButton';
             value={this.state.minValue}
             onChange={this.handleMinValue}
           />
-          <RaisedButton secondary={true} labelStyle={{'fontSize':'11px'}}
+          <RaisedButton secondary={true}
             label="submit min"
             onTouchTap={this.handleSubmit.bind(this,"avgRdLgthMin","avg_read_length",4,this.state.minValue)}/>
           <TextField
@@ -41,7 +41,7 @@ import RaisedButton from 'material-ui/RaisedButton';
             value={this.state.maxValue}
             onChange={this.handleMaxValue}
           />
-          <RaisedButton secondary={true} labelStyle={{'fontSize':'11px'}}
+          <RaisedButton secondary={true}
           label="submit max"
           onTouchTap={this.handleSubmit.bind(this,"avgRdLgthMax","avg_read_length",3,this.state.maxValue)}/>
         </div>

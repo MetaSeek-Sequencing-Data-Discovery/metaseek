@@ -3,10 +3,10 @@ import axios from 'axios';
 import apiConfig from '../config/api.js';
 import Firebase from 'firebase';
 
-// Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import ColorPalette from './ColorPalette';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import ColorPalette from './ColorPalette';
+
 import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton';
 import SelectField from 'material-ui/SelectField';
@@ -158,14 +158,14 @@ var Explore = React.createClass({
     var mapRender = function(activeSummaryData,isProcessing) {
       if (!isProcessing) {
         if (activeSummaryData.empty) {
-          return <h3 style={{textAlign:'center'}}>Sorry, no matches!</h3>
+          return <h3>Sorry, no matches!</h3>
         } else {
           return <HeatmapChart data={activeSummaryData.latlon_map}/>
         }
       } else {
         return <div>
-          <div style={{'margin':'25px auto 0'}}>
-            <div className='uil-rolling-css' style={{'margin':'50px auto 0','transform':'scale(0.34)'}}>
+          <div>
+            <div className='uil-rolling-css component-loader'>
               <div>
                 <div></div>
                 <div></div>
@@ -180,64 +180,64 @@ var Explore = React.createClass({
     return (
       <div>
         <Header history={this.props.history}/>
-          <h2 style={{fontSize:'2.6em',fontWeight:300}}>Explore</h2>
+          <h2>Explore</h2>
           <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
-            <div style={{'width':1192,'margin':'0px auto','padding':10}}>
-              <div style={{'height':780}}>
-                <Paper style={{'height':860,'overflowY':'scroll','width':380,float:'left','margin':'0 0 0 0','padding':24}}>
-                  <div style={{'margin':'12px auto'}}>
-                    <span>{this.state.firebase.uid ? "Hi, " + this.state.firebase.name + ". Thanks for using MetaSeek!" : "Create an account or log in to save a discovery to your account."}</span>
-                    <div><img style={{'width':'150px','height':'150px','display':this.state.firebase.uid ? 'inline' : 'none'}} src={this.state.firebase.photo}/></div>
+            <div className="explore-container">
+              <Paper className="explore-filter-card">
+                <div className="profile-container">
+                  <span>
+                    {this.state.firebase.uid ? "Hi, " + this.state.firebase.name + ". Thanks for using MetaSeek!" : "Create an account or log in to save a discovery to your account."}
+                  </span>
+                  <div className="profile-image-container">
+                    <img className="profile-image" style={{'display':this.state.firebase.uid ? 'inline' : 'none'}} src={this.state.firebase.photo}/>
                   </div>
                   <RaisedButton
-                    style={{'margin':'12px 12px 0 12px'}}
+                    className="profile-button"
                     onClick={this.state.firebase.uid ? this.submitDiscovery : this.triggerGoogleLogin}
                     primary={true}
                     label={this.state.firebase.uid ? "Save Discovery" : "Log In With Google"}
                   />
                   <RaisedButton
-                    style={{'margin':'12px 12px 0 12px'}}
+                    className="profile-button"
                     label="Log Out"
                     onClick={this.triggerLogout}
                     primary={true}
                     disabled={!(this.state.firebase.uid)}
                   />
-                  <ExploreFilters
-                    style={{'margin':'12px 12px 0 12px'}}
-                    updateFilterParams={this.updateFilterParams}
-                    summaryData={this.state.activeSummaryData}
-                  />
-                </Paper>
-                <Paper style={{'float':'right','width':768,'height':408,'margin':'0 0 0 0','padding':24}}>
-                  <div>
-                    {mapRender(this.state.activeSummaryData,this.state.processing)}
-                  </div>
-                </Paper>
-                <Paper style={{'float':'right','width':768,'margin':'15px 0 0 0'}}>
-                  <div style={{'float':'left','width':300}}>
-                    <ExploreSummaryStats summaryData={this.state.activeSummaryData}/>
-                  </div>
-                </Paper>
-                <Paper style={{'float':'right','width':768,'height':320,'margin':'15px 0 0 0','padding':10}}>
-                  <div style={{'float':'right','width':760,'padding':24}}>
-                    <Histogram summaryData={this.state.activeSummaryData} histinput={this.state.histinput} style={{paddingLeft:'15px'}}/>
-                    <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
-                      {Object.keys(this.state.activeSummaryData).filter(function(value) {
-                        if (value.indexOf('summary') !== -1) {
-                          return true;
-                        } else {
-                          return false;
-                        }
-                      }).map(function(value, index) {
-                          return (
-                            <MenuItem key={index} value={value} primaryText={value} />
-                          )
-                      })}
-                    </SelectField>
-                  </div>
-                </Paper>
-              </div>
-              <Paper style={{'width':'92%','margin':'24px auto','padding':0,'clear':'both'}}>
+                </div>
+                <ExploreFilters
+                  className="explore-filters"
+                  updateFilterParams={this.updateFilterParams}
+                  summaryData={this.state.activeSummaryData}
+                />
+              </Paper>
+              <Paper className="explore-right-map">
+                <div>
+                  {mapRender(this.state.activeSummaryData,this.state.processing)}
+                </div>
+              </Paper>
+              <Paper className="explore-right-summary">
+                <div>
+                  <ExploreSummaryStats summaryData={this.state.activeSummaryData}/>
+                </div>
+              </Paper>
+              <Paper className="explore-right-histogram">
+                  <Histogram summaryData={this.state.activeSummaryData} histinput={this.state.histinput}/>
+                  <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
+                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
+                      if (value.indexOf('summary') !== -1) {
+                        return true;
+                      } else {
+                        return false;
+                      }
+                    }).map(function(value, index) {
+                        return (
+                          <MenuItem key={index} value={value} primaryText={value} />
+                        )
+                    })}
+                  </SelectField>
+              </Paper>
+              <Paper className="explore-table">
                 <ExploreTable activeData={this.state.activeData}/>
               </Paper>
             </div>

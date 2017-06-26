@@ -13,10 +13,10 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # production DB
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-35-166-20-248.us-west-2.compute.amazonaws.com/metaseek'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-35-166-20-248.us-west-2.compute.amazonaws.com/metaseek'
 
 # local DB - uncomment for local testing
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -83,6 +83,8 @@ class CreateDataset(Resource):
     def post(self):
         try:
             parser = reqparse.RequestParser()
+            # Note that any arguments added here MUST be present in the POST request or the request will fail with
+            # 400 - Bad Request as the response
             parser.add_argument('latitude', type=float, help='Email address to create user')
             parser.add_argument('longitude', type=float)
             parser.add_argument('investigation_type',type=str)

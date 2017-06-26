@@ -2,10 +2,6 @@ import React from 'react';
 import axios from 'axios';
 import apiConfig from '../config/api.js';
 
-// Material Design imports
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-
-// My component imports
 import AddDatasetForm from './AddDatasetForm';
 import Header from './Header';
 
@@ -29,7 +25,7 @@ var AddDataset = React.createClass({
         return (
           <div>
             <Header history={this.props.history}/>
-            <div >
+            <div>
               <h2>Contribute a dataset</h2>
               <AddDatasetForm addDataset={this.addDataset}/>
             </div>
