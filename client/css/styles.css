@@ -377,6 +377,21 @@ body {
   transform: translate(0, 50px) rotate(39.6deg) translate(0, -50px);
 }
 
+.loader-container {
+  width: 400px;
+  margin: 125px auto 0px;
+}
+
+.component-loader {
+  margin: 50px auto 0;
+  transform: scale(0.34);
+}
+
+.full-loader {
+  margin: 0px auto;
+  transform: scale(0.44);
+}
+
 /* Typography */
 
 html {
@@ -405,10 +420,13 @@ h2 {
   text-align: center;
   margin-top: 2rem;
   margin-bottom: 2rem;
+  font-size:2.6em;
+  font-weight:300;
 }
 
 h3 {
   font-size: 2rem;
+  text-align:center;
 }
 
 ul {
@@ -454,9 +472,66 @@ button.github:after, input[type=submit].github:after {
   display:block;
 }
 
-.summary-box {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 10px;
-  padding-left: 20px;
+/* Explore layout */
+
+.explore-container {
+  width: 1192px;
+  margin: 10px auto;
+}
+
+.explore-filter-card {
+	height: 888px;
+	overflow-y: scroll;
+	width: 380px;
+	float: left;
+	margin: 0 0 0 0;
+	padding: 24px;
+}
+
+.profile-container {
+  margin: 12px auto;
+}
+
+.profile-image {
+  width:150px;
+  height:150px;
+  display:inline;
+}
+
+.profile-button {
+  margin: 12px 12px 0 12px;
+}
+
+.explore-filters {
+  margin: 12px 12px 0 12px;
+}
+
+.explore-right-map {
+	 float: right;
+	 width: 788px;
+	 height: 408px;
+	 margin: 0;
+	 padding: 24px;
+}
+
+.explore-right-summary {
+	 float: right;
+	 width: 788px;
+	 margin-top: 24px;
+}
+
+.explore-right-histogram {
+	 float: right;
+	 width: 788px;
+	 height: 320px;
+	 margin-top: 24px;
+	 margin-bottom: 24px;
+   padding: 24px;
+}
+
+.explore-table {
+  width: 1192px;
+  margin: 48px auto;
+  padding: 0;
+  clear: both;
 }

@@ -174,12 +174,12 @@ var Signup = React.createClass({
                         <img src="./images/explore.jpeg"></img>
                       </div>
                       <div style={{float:'right',width:420,marginRight:15}}>
-                        <h2>Explore Datasets</h2>
+                        <h3>Explore Datasets</h3>
                           <p>Search and filter on the metadata you care about</p>
-                        <h2>Save and share your discovery</h2>
+                        <h3>Save and share your discovery</h3>
                           <p>Get dummy code for data download.</p>
                           <p>Browse other users’ discoveries, save ones you like or use one as a launching off point.</p>
-                        <h2>Contribute to the metadata pool</h2>
+                        <h3>Contribute to the metadata pool</h3>
                           <p>Metadata is only as good as the community it serves.</p>
                           <p>Flag or correct metadata errors, or annotate a dataset or discovery.</p>
                       </div>
