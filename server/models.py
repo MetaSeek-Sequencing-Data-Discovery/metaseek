@@ -31,8 +31,8 @@ class Dataset(db.Model):
     study_type = db.Column(db.Text)
     study_type_other = db.Column(db.Text)
     study_abstract = db.Column(db.Text)
-    study_links = db.Column(db.PickleType)
-    study_attributes = db.Column(db.PickleType)
+    study_links = db.Column(db.Text)
+    study_attributes = db.Column(db.Text)
     sample_id = db.Column(db.String(30))
     biosample_id = db.Column(db.String(40))
     sample_title = db.Column(db.Text)
@@ -41,48 +41,26 @@ class Dataset(db.Model):
     taxon_common_name = db.Column(db.Text)
     sample_description = db.Column(db.Text)
     num_runs_in_accession = db.Column(db.Integer)
-    run_ids = db.Column(db.PickleType)
     run_ids_maxrun = db.Column(db.String(30))
-    library_reads_sequenced = db.Column(db.PickleType)
     library_reads_sequenced_maxrun = = db.Column(db.BIGINT)
-    total_num_bases = db.Column(db.PickleType)
     total_num_bases_maxrun = = db.Column(db.BIGINT)
-    download_size = db.Column(db.PickleType)
     download_size_maxrun = = db.Column(db.BIGINT)
-    avg_read_length = db.Column(db.PickleType)
     avg_read_length_maxrun = db.Column(db.Float)
-    baseA_count = db.Column(db.PickleType)
     baseA_count_maxrun = = db.Column(db.BIGINT)
-    baseC_count = db.Column(db.PickleType)
     baseC_count_maxrun = = db.Column(db.BIGINT)
-    baseG_count = db.Column(db.PickleType)
     baseG_count_maxrun = = db.Column(db.BIGINT)
-    baseT_count = db.Column(db.PickleType)
     baseT_count_maxrun = = db.Column(db.BIGINT)
-    baseN_count = db.Column(db.PickleType)
     baseN_count_maxrun = = db.Column(db.BIGINT)
-    gc_percent = db.Column(db.PickleType)
     gc_percent_maxrun = db.Column(db.Float)
-    run_quality_counts = db.Column(db.PickleType)
-    run_quality_counts_maxrun = db.Column(db.PickleType)
+    run_quality_counts_maxrun = db.Column(db.Text)
     biosample_uid = db.Column(db.String(30))
-    pubmed_uids = db.Column(db.PickleType)
-    nuccore_uids = db.Column(db.PickleType)
+    nuccore_uids = db.Column(db.Text)
     biosample_link = db.Column(db.Text)
     metadata_publication_date = db.Column(db.DateTime)
     biosample_package = db.Column(db.Text)
-    biosample_models = db.Column(db.PickleType)
-    sample_attributes = db.Column(db.PickleType)
-    pubmed_link = db.Column(db.PickleType)
-    pub_publication_date = db.Column(db.PickleType)
-    pub_authors = db.Column(db.PickleType)
-    pub_title = db.Column(db.PickleType)
-    pub_volume = db.Column(db.PickleType)
-    pub_issue = db.Column(db.PickleType)
-    pub_pages = db.Column(db.PickleType)
-    pub_journal = db.Column(db.PickleType)
-    pub_doi = db.Column(db.PickleType)
-    nuccore_link = db.Column(db.PickleType)
+    biosample_models = db.Column(db.Text)
+    sample_attributes = db.Column(db.Text)
+    nuccore_link = db.Column(db.Text)
     investigation_type = db.Column(db.Text)
     env_package = db.Column(db.Text)
     project_name = db.Column(db.Text)
@@ -126,10 +104,9 @@ class Dataset(db.Model):
     submission_id=None,organization_name=None,organization_address=None,organization_contacts=None,
     study_id=None,bioproject_id=None,study_title=None,study_type=None,study_type_other=None,study_abstract=None,study_links=None,study_attributes=None,
     sample_id=None,biosample_id=None,sample_title=None,ncbi_taxon_id=None,taxon_scientific_name=None,taxon_common_name=None,sample_description=None,
-    num_runs_in_accession=None,run_ids=None,run_ids_maxrun=None,library_reads_sequenced=None,library_reads_sequenced_maxrun=None,total_num_bases=None,total_num_bases_maxrun=None,download_size=None,download_size_maxrun=None,avg_read_length=None,avg_read_length_maxrun=None,
-    baseA_count=None,baseA_count_maxrun=None,baseC_count=None,baseC_count_maxrun=None,baseG_count=None,baseG_count_maxrun=None,baseT_count=None,baseT_count_maxrun=None,baseN_count=None,baseN_count_maxrun=None,gc_percent=None,gc_percent_maxrun=None,run_quality_counts=None,run_quality_counts_maxrun=None,
-    biosample_uid=None,pubmed_uids=None,nuccore_uids=None,biosample_link=None,metadata_publication_date=None,biosample_package=None,biosample_models=None,sample_attributes=None,
-    pubmed_link=None,pub_publication_date=None,pub_authors=None,pub_title=None,pub_volume=None,pub_issue=None,pub_pages=None,pub_journal=None,pub_doi=None,nuccore_link=None,
+    num_runs_in_accession=None,run_ids_maxrun=None,library_reads_sequenced_maxrun=None,total_num_bases_maxrun=None,download_size_maxrun=None,avg_read_length_maxrun=None,
+    baseA_count_maxrun=None,baseC_count_maxrun=None,baseG_count_maxrun=None,baseT_count_maxrun=None,baseN_count_maxrun=None,gc_percent_maxrun=None,run_quality_counts_maxrun=None,
+    biosample_uid=None,nuccore_uids=None,biosample_link=None,metadata_publication_date=None,biosample_package=None,biosample_models=None,sample_attributes=None,nuccore_link=None,
     investigation_type=None,env_package=None,project_name=None,lat_lon=None,latitude=None,longitude=None,geo_loc_name=None,collection_date=None,collection_time=None,env_biome=None,env_feature=None,env_material=None,depth=None,elevation=None,altitude=None,target_gene=None,target_subfragment=None,
     ploidy=None,num_replicons=None,estimated_size=None,ref_biomaterial=None,propagation=None,assembly=None,finishing_strategy=None,isol_growth_condt=None,experimental_factor=None,specific_host=None,subspecific_genetic_lineage=None,tissue=None,sex=None,sample_type=None,age=None,dev_stage=None,biomaterial_provider=None,host_disease=None):
 
@@ -167,47 +144,25 @@ class Dataset(db.Model):
         self.taxon_common_name = taxon_common_name
         self.sample_description = sample_description
         self.num_runs_in_accession = num_runs_in_accession
-        self.run_ids = run_ids
         self.run_ids_maxrun = run_ids_maxrun
-        self.library_reads_sequenced = library_reads_sequenced
         self.library_reads_sequenced_maxrun = library_reads_sequenced_maxrun
-        self.total_num_bases = total_num_bases
         self.total_num_bases_maxrun = total_num_bases_maxrun
-        self.download_size = download_size
         self.download_size_maxrun = download_size_maxrun
-        self.avg_read_length = avg_read_length
         self.avg_read_length_maxrun = avg_read_length_maxrun
-        self.baseA_count = baseA_count
         self.baseA_count_maxrun = baseA_count_maxrun
-        self.baseC_count = baseC_count
         self.baseC_count_maxrun = baseC_count_maxrun
-        self.baseG_count = baseG_count
         self.baseG_count_maxrun = baseG_count_maxrun
-        self.baseT_count = baseT_count
         self.baseT_count_maxrun = baseT_count_maxrun
-        self.baseN_count = baseN_count
         self.baseN_count_maxrun = baseN_count_maxrun
-        self.gc_percent = gc_percent
         self.gc_percent_maxrun = gc_percent_maxrun
-        self.run_quality_counts = run_quality_counts
         self.run_quality_counts_maxrun = run_quality_counts_maxrun
         self.biosample_uid = biosample_uid
-        self.pubmed_uids = pubmed_uids
         self.nuccore_uids = nuccore_uids
         self.biosample_link = biosample_link
         self.metadata_publication_date = metadata_publication_date
         self.biosample_package = biosample_package
         self.biosample_models = biosample_models
         self.sample_attributes = sample_attributes
-        self.pubmed_link = pubmed_link
-        self.pub_publication_date = pub_publication_date
-        self.pub_authors = pub_authors
-        self.pub_title = pub_title
-        self.pub_volume = pub_volume
-        self.pub_issue = pub_issue
-        self.pub_pages = pub_pages
-        self.pub_journal = pub_journal
-        self.pub_doi = pub_doi
         self.nuccore_link = nuccore_link
         self.investigation_type = investigation_type
         self.env_package = env_package
