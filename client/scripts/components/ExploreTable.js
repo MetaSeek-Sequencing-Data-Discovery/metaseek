@@ -2,8 +2,8 @@ import React from 'react';
 
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import ColorPalette from './ColorPalette';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import ColorPalette from './ColorPalette';
 import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn}
 from 'material-ui/Table';
 
@@ -15,27 +15,10 @@ var ExploreTable = React.createClass({
     return {}
   },
   render : function() {
-    var styles = {
-      container: {
-        textAlign: 'center',
-        paddingTop: 125,
-        width: '70%',
-        margin: '0 auto',
-        maxWidth: '420px'
-      },
-      propContainer: {
-        width: 200,
-        overflow: 'hidden',
-        margin: '20px auto 0',
-      },
-      propToggleHeader: {
-        margin: '20px auto 10px',
-      }
-    };
     return (
       <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
         <div>
-            <Table bodyStyle={{overflowX: undefined, width:'2000px' }} height='600px' fixedHeader={false} fixedFooter={false} selectable={false}>
+            <Table bodyStyle={{overflowX: undefined, width:'2000px' }} fixedHeader={false} fixedFooter={false} selectable={false}>
               <TableHeader adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
                 <TableRow selectable={false}>
                   <TableHeaderColumn tooltip="id">id</TableHeaderColumn>

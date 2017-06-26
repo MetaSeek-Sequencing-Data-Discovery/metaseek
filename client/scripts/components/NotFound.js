@@ -1,19 +1,13 @@
 var React = require('react');
 import { Link } from 'react-router';
 
-// Material Design imports
 import RaisedButton from 'material-ui/RaisedButton';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import ColorPalette from './ColorPalette';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
 // My component imports
 import Header from './Header';
-
-/*
-  NotFound
-  404 page
-*/
 
 var NotFound = React.createClass({
 

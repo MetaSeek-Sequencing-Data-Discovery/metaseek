@@ -25,11 +25,11 @@ import Slider from 'material-ui/Slider';
   render : function() {
     return (
       <div>
-        <p style={{padding:0}}>
+        <p>
           <span>Longitude range is {this.state.minSlider} to {this.state.maxSlider} inclusive</span>
         </p>
         <Slider
-          style={{height:6, marginTop:-6}}
+          className="explore-filter-slider"
           min={-180}
           max={180}
           step={1}
@@ -39,7 +39,7 @@ import Slider from 'material-ui/Slider';
           onDragStop={this.handleDragStop.bind(this,"longitudeMin","longitude",4,this.state.minSlider)}
         />
         <Slider
-          style={{height:6, marginTop:-6}}
+          className="explore-filter-slider"
           min={-180}
           max={180}
           step={1}
