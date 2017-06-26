@@ -247,7 +247,7 @@ class Dataset(db.Model):
 
     # Friendly string representation
     def __repr__(self):
-        return '<Dataset %r>' % self.db_source_uid
+        return '<Dataset %r>' % self.expt_id
 
 # For a many to many database relationship, use a mapping table (no class definition directly)
 # Eg. each discovery will have many datasets, and each dataset may belong to many discoveries
