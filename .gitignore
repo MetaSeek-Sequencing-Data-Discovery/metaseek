@@ -19,3 +19,7 @@ client/build/index.html
 *.pyc
 
 server/bootstrapData/
+
+server/MetaSeek_DatasetFields.xlsx
+
+server/~$MetaSeek_DatasetFields.xlsx
