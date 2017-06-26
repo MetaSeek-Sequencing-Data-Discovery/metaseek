@@ -7,8 +7,8 @@ var Loading = React.createClass({
 
   render : function() {
     return (
-      <div style={{'width':400,'margin':'125px auto 0px'}}>
-        <div className='uil-rolling-css' style={{'margin':'0px auto','transform':'scale(0.44)'}}>
+      <div className='loader-container'>
+        <div className='uil-rolling-css full-loader'>
           <div>
             <div>
             </div>
@@ -16,7 +16,7 @@ var Loading = React.createClass({
             </div>
           </div>
         </div>
-        <h2>Loading, just one moment. . .</h2>
+        <h3>Loading, just one moment. . .</h3>
       </div>
     )
   }

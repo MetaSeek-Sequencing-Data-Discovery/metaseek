@@ -34,10 +34,10 @@ var Histogram = React.createClass({
 
     return  (
     	<BarChart
-      data={barData}
-      width={760}
-      height={250}
-      fill="#6369E0"
+        data={barData}
+        width={760}
+        height={250}
+        fill="#6369E0"
       />
   )}
 });

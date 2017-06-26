@@ -3,8 +3,8 @@ import React from 'react';
 import { Link } from 'react-router';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import ColorPalette from './ColorPalette';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import ColorPalette from './ColorPalette';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
@@ -24,7 +24,7 @@ var Header = React.createClass({
     return (
     <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
        <AppBar
-        title={<span style={{'cursor':'pointer'}}>MetaSeek</span>}
+        title={<span className="logotype">MetaSeek</span>}
         onTitleTouchTap={this.handleTitleTouch}
         iconElementLeft={<div></div>}
         iconElementRight={
@@ -35,7 +35,7 @@ var Header = React.createClass({
             targetOrigin={{horizontal: 'right', vertical: 'top'}}
             anchorOrigin={{horizontal: 'right', vertical: 'top'}}
           >
-            <Link style={{'text-decoration':'none'}} to='/myaccount'>
+            <Link className="button-link" to='/myaccount'>
               <MenuItem primaryText="My Account" />
             </Link>
           </IconMenu>
