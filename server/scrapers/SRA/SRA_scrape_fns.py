@@ -955,19 +955,8 @@ def merge_scrapes(sdict,bdict,pdict,ndict):
                                 sdict[srx][pubmed_field] = [pdict[pub][pubmed_field]]
 
         if 'nuccore_uids' in sdict[srx].keys():
-            #append nuccore metadata values to list metadata values for that field in sdict[srx]
-            for nuc in sdict[srx]['nuccore_uids']:
-                nuc = str(nuc)
-                if nuc in ndict.keys():
-                    #don't need nuccore_uid since already there - just add nuccore_link
-                    if 'nuccore_link' in ndict[nuc].keys():
-                        if 'nuccore_link' in sdict[srx].keys():
-                            sdict[srx]['nuccore_link'].append(ndict[nuc]['nuccore_link'])
-                        else:
-                            sdict[srx]['nuccore_link'] = [ndict[nuc]['nuccore_link']]
-            if 'nuccore_link' in sdict[srx].keys():
-                sdict[srx]['nuccore_link'] = str(sdict[srx]['nuccore_link']) #coerce to str for db
-            sdict[srx]['nuccore_uids'] = str(sdict[srx]['nuccore_uids']) #coerce to str for db
+            #just need coerce nuccore_uids to string value for db
+            sdict[srx]['nuccore_uids'] = str(sdict[srx]['nuccore_uids'])
     return sdict
 
 

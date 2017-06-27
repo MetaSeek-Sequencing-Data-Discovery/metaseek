@@ -159,14 +159,7 @@ if __name__ == "__main__":
             except EutilitiesConnectionError as msg:
                 print msg, "; skipping this pubmed batch"
                 continue
-        #efetch for batch/es of nuccores;
-        nuccore_batches = get_batches(uid_list=linkdict['nuccore_uids'])
-        ndict = {}
-        for n_batch_ix,n_batch in enumerate(nuccore_batches):
-            print "--processing nuccore batch %s out of %s......" % (n_batch_ix+1,len(nuccore_batches))
-            nuccore_batch_uids = map(int,linkdict['nuccore_uids'][n_batch[0]:n_batch[1]])
-            ndict = get_nuccore_metadata(batch_uid_list=nuccore_batch_uids,ndict=ndict)
-
+        
         #merge sdict with scraped biosample/pubmed/nuccore metadata - add metadata from bdict/pdict/ndict where appropriate for each srx in sdict.
         sdict = merge_scrapes(sdict=sdict,bdict=bdict,pdict=pdict,ndict=ndict)
 
