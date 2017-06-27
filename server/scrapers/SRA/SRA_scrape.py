@@ -108,14 +108,11 @@ if __name__ == "__main__":
     uid_list = get_uid_list(ret_list=retstart_list)
 
     #remove SRA IDs that have already been ingested into MetaSeek DB
-    #find existing db_source_uids
+    #find existing db_source_uids for which 'source_db' is 'SRA'
     result = db.session.query(Dataset.db_source_uid).filter(Dataset.db_source=='SRA').distinct()
     existing_uids = [r.db_source_uid for r in result]
     #subtract any uids already in db from uid_list
     uids_to_scrape = set(uid_list)-set(existing_uids)
-
-    #source_db_uid for which 'source_db' field = 'SRA'
-    ##TODO: figure out how to open db session in here?
 
     #split UIDs to scrape into batches of 500 (max number of UIDs can call with eutilities api at one time)
     batches = get_batches(uids_to_scrape)
@@ -127,7 +124,7 @@ if __name__ == "__main__":
         #scrape sra metadata, return as dictionary of dictionaries; each sdict key is the SRA UID, value is a dictionary of srx metadata key/value pairs
         print "-scraping SRX metadata..."
         try:
-            sdict = get_srx_metadata(batch_uid_list=batch_uid_list)
+            sdict, rdict = get_srx_metadata(batch_uid_list=batch_uid_list)
         except (EutilitiesConnectionError,EfetchError) as msg:
             print msg
             continue

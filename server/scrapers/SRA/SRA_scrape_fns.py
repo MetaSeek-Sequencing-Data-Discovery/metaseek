@@ -92,6 +92,7 @@ def get_srx_metadata(batch_uid_list):
     print "...scraping srx metadata..."
     s_scrape_time = datetime.now()
     sdict = {}
+    rdict = {}
 
     #if the length of sra_samples != length of batch_uid_list, then one or more of the uids did not return an efetch (maybe it's not public even though it shows up in esearch);
     #if this is the case, raise EfetchError which will skip this batch of 500
@@ -587,37 +588,41 @@ def get_srx_metadata(batch_uid_list):
 
         max_index = total_num_reads.index(max(total_num_reads))
 
-        srx_dict['run_ids'] = run_ids
+        #log every run scraped to its own rdict entry
+        srx_uids = [srx_uid]*len(run_ids)
+        n = len(run_ids)
+        if all(len(x) == n for x in [srx_uids,run_ids,total_num_reads,total_num_bases,download_size,avg_read_length,baseA_count,baseC_count,baseG_count,baseT_count,baseN_count,gc_percent,read_quality_counts]):
+            values = zip(srx_uids,run_ids,total_num_reads,total_num_bases,download_size,avg_read_length,baseA_count,baseC_count,baseG_count,baseT_count,baseN_count,gc_percent,read_quality_counts)
+            keys = ['db_source_uid','run_id','library_reads_sequenced','total_num_bases','download_size','avg_read_length','baseA_count','baseC_count','baseG_count','baseT_count','baseN_count','gc_percent','run_quality_counts']
+            for value in values:
+                #insert into to rdict with key of run_id
+                rdict[value[1]] = dict(zip(keys,value))
+        else:
+            f = open('ScrapeErrors.csv','a')
+            f.write(str(srx_uid)+",run lists of different lengths while adding to rdict,get_srx_metadata\n")
+            f.close()
+            pass
+
+        #log best run (max total_num_reads) to srx data
         srx_dict['run_ids_maxrun'] = run_ids[max_index]
-        srx_dict['library_reads_sequenced'] = total_num_reads
         srx_dict['library_reads_sequenced_maxrun'] = total_num_reads[max_index]
-        srx_dict['total_num_bases'] = total_num_bases
         srx_dict['total_num_bases_maxrun'] = total_num_bases[max_index]
-        srx_dict['download_size'] = download_size
         srx_dict['download_size_maxrun'] = download_size[max_index]
-        srx_dict['avg_read_length'] = avg_read_length
         srx_dict['avg_read_length_maxrun'] = avg_read_length[max_index]
-        srx_dict['baseA_count'] = baseA_count
         srx_dict['baseA_count_maxrun'] = baseA_count[max_index]
-        srx_dict['baseC_count'] = baseC_count
         srx_dict['baseC_count_maxrun'] = baseC_count[max_index]
-        srx_dict['baseG_count'] = baseG_count
         srx_dict['baseG_count_maxrun'] = baseG_count[max_index]
-        srx_dict['baseT_count'] = baseT_count
         srx_dict['baseT_count_maxrun'] = baseT_count[max_index]
-        srx_dict['baseN_count'] = baseN_count
         srx_dict['baseN_count_maxrun'] = baseN_count[max_index]
-        srx_dict['gc_percent'] = gc_percent
         srx_dict['gc_percent_maxrun'] = gc_percent[max_index]
-        srx_dict['run_quality_counts'] = read_quality_counts
         srx_dict['run_quality_counts_maxrun'] = str(read_quality_counts[max_index]) #coerce to str for db
 
-
+        #insert srx data into sdict with srx_uid as key
         sdict[srx_uid] = srx_dict
 
     print "...done scraping srx metadata in %s" % (datetime.now()-s_scrape_time)
 
-    return sdict
+    return sdict, rdict
 
 
 #takes list of SRX UIDs to query (batch_uid_list), and sdict into which to insert link uids;
@@ -889,7 +894,7 @@ def get_pubmed_metadata(batch_uid_list,pdict):
 
     return pdict
 
-
+###this fn is no longer used because nuccore_link field not being used, keeping just in case want it in future###
 def get_nuccore_metadata(batch_uid_list,ndict):
     print "...scraping nuccore metadata..."
     n_scrape_time = datetime.now()
