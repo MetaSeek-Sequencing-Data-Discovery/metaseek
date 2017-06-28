@@ -7,7 +7,7 @@ class Dataset(db.Model):
     # each attribute on a "Model" inherited class becomes a Column
     id = db.Column(db.Integer, primary_key=True)
 
-    db_source_uid = db.Column(db.String(50))
+    db_source_uid = db.Column(db.String(50),unique=True)
     db_source = db.Column(db.String(20))
     expt_link = db.Column(db.Text)
     expt_id = db.Column(db.String(30))
@@ -97,7 +97,7 @@ class Dataset(db.Model):
     host_disease = db.Column(db.Text)
     date_scraped = db.Column(db.DateTime)
 
-    #etc = db.Column(db.PickleType)
+    runs = db.relationship('Run', backref='dataset', lazy='dynamic')
 
     # Each class must have an init function
     def __init__(self, db_source_uid=None,db_source=None,expt_link=None,expt_id=None,expt_title=None,expt_design_description=None,library_name=None,library_strategy=None,library_source=None,library_screening_strategy=None,library_construction_method=None,library_construction_protocol=None,sequencing_method=None,instrument_model=None,
@@ -244,3 +244,37 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.firebase_id
+
+class Run(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    run_id = db.Column(db.String(30))
+    library_reads_sequenced = db.Column(db.BIGINT)
+    total_num_bases = db.Column(db.BIGINT)
+    download_size = db.Column(db.BIGINT)
+    avg_read_length = db.Column(db.Float)
+    baseA_count = db.Column(db.BIGINT)
+    baseC_count = db.Column(db.BIGINT)
+    baseG_count = db.Column(db.BIGINT)
+    baseT_count = db.Column(db.BIGINT)
+    baseN_count = db.Column(db.BIGINT)
+    gc_percent = db.Column(db.Float)
+    run_quality_counts = db.Column(db.Text)
+    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
+
+    def __init__(self, dataset_id=None, run_id=None, library_reads_sequenced=None, total_num_bases=None, download_size=None, avg_read_length=None, baseA_count=None, baseC_count=None, baseG_count=None, baseT_count=None, baseN_count=None, gc_percent=None, run_quality_counts=None):
+        self.dataset_id = dataset_id
+        self.run_id = run_id
+        self.library_reads_sequenced = library_reads_sequenced
+        self.total_num_bases = total_num_bases
+        self.download_size = download_size
+        self.avg_read_length = avg_read_length
+        self.baseA_count = baseA_count
+        self.baseC_count = baseC_count
+        self.baseG_count = baseG_count
+        self.baseT_count = baseT_count
+        self.baseN_count = baseN_count
+        self.gc_percent = gc_percent
+        self.run_quality_counts = run_quality_counts
+
+    def __repr__(self):
+        return '<Run %r>' % self.run_id

@@ -159,7 +159,7 @@ if __name__ == "__main__":
             except EutilitiesConnectionError as msg:
                 print msg, "; skipping this pubmed batch"
                 continue
-        
+
         #merge sdict with scraped biosample/pubmed/nuccore metadata - add metadata from bdict/pdict/ndict where appropriate for each srx in sdict.
         sdict = merge_scrapes(sdict=sdict,bdict=bdict,pdict=pdict,ndict=ndict)
 
@@ -179,5 +179,27 @@ if __name__ == "__main__":
         ##TODO: check whether if biosample_uids exists, and no biosample attribs added; log to scrapeerrors if so; same for pubmeds
 
         ##TODO: write metadata row by row to db
+        for srx in sdict.keys():
+            #add date scraped field as right now!
+            sdict[srx]['date_scraped'] = datetime.now()
+            #get row in correct order keys
+            row_to_write = [sdict[srx][x] if x in sdict[srx].keys() else None for x in metaseek_fields]
+            newDataset = Dataset(*row_to_write)
+            #add newdataset and commit to get new id
+            db.session.add(newDataset)
+            db.session.commit()
+
+            if "run_ids" in sdict[srx].keys():
+                for run in sdict[srx]["run_ids"]:
+                    if run is not None:
+                        args = [newDataset.id]
+                        run_data = [rdict[run][x] if x in rdict[run].keys() else None for x in run_fields]
+                        args.extend(run_data)
+                        newRun = Run(*args)
+                        db.session.add(newRun)
+                        #newDataset.runs.append(newRun)
+
+            #commit all those new runs
+            db.session.commit()
 
         ##TODO: log date and time of update, num accessions added, etc. Separate db table?

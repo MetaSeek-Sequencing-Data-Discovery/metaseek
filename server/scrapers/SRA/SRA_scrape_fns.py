@@ -584,6 +584,7 @@ def get_srx_metadata(batch_uid_list):
                     qual_count[qual.get("value")] = int(qual.get("count"))
                 except (TypeError,ValueError) as e:
                     pass
+            qual_count = str(qual_count) #coerce to string for db
             read_quality_counts.append(qual_count)
 
         max_index = total_num_reads.index(max(total_num_reads))
@@ -603,6 +604,8 @@ def get_srx_metadata(batch_uid_list):
             f.close()
             pass
 
+        #log run_ids for writing runs to db later
+        srx_dict['run_ids'] = run_ids
         #log best run (max total_num_reads) to srx data
         srx_dict['run_ids_maxrun'] = run_ids[max_index]
         srx_dict['library_reads_sequenced_maxrun'] = total_num_reads[max_index]
