@@ -31,3 +31,7 @@ server/scrapers/SRA/SRA_scrape_fns.pyc
 metaseek_schema.txt
 
 server/scrapers/SRA/SRA_AutoIngest_dev.ipynb
+
+*.pyc
+
+server/MetaSeek_DatasetFields.xlsx
