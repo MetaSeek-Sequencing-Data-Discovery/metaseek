@@ -871,7 +871,7 @@ def get_pubmed_metadata(batch_uid_list,pdict):
             authors = []
             for author in pubmed.find("Item[@Name='AuthorList']").findall("Item[@Name='Author']"):
                 authors.append(author.text)
-            pub_dict['pub_authors'] = authors
+            pub_dict['pub_authors'] = str(authors) #coerce to string for db
         except AttributeError:
             f = open('ScrapeErrors.csv','a')
             f.write(str(pub_id)+",AttributeError pub_authors,get_pubmed_metadata\n")

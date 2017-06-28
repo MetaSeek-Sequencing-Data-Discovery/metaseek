@@ -93,6 +93,32 @@ metaseek_fields = ['db_source_uid',
 'host_disease',
 'date_scraped']
 
+run_fields = ['dataset_id',
+'run_id',
+'library_reads_sequenced',
+'total_num_bases',
+'download_size',
+'avg_read_length',
+'baseA_count',
+'baseC_count',
+'baseG_count',
+'baseT_count',
+'baseN_count',
+'gc_percent',
+'run_quality_counts']
+
+pubmed_fields = ['pubmed_uid',
+'pubmed_link',
+'pub_publication_date',
+'pub_authors',
+'pub_title',
+'pub_volume',
+'pub_issue',
+'pub_pages',
+'pub_journal',
+'pub_doi',
+'datasets']
+
 if __name__ == "__main__":
     #check if error log file exists; if it doesn't, create one
     ##TODO: make table in db instead of file?
@@ -166,10 +192,10 @@ if __name__ == "__main__":
         #extract and merge MIxS fields from 'sample_attributes' field in each dict in sdict (if exists)
         sdict = extract_and_merge_mixs_fields(sdict=sdict,fieldname="sample_attributes",rules_json="rules.json")
         #coerce sample attributes field to str for db insertion
+        print "-changing sample_attributes to str field"
         for srx in sdict.keys():
-            sdict[srx]['sample_attributes'] = str(sdict[srx]['sample_attributes'])
-
-        ##TODO: cv parsing
+            if 'sample_attributes' in sdict[srx].keys():
+                sdict[srx]['sample_attributes'] = str(sdict[srx]['sample_attributes'])
 
         #clean up sdict so that any nan or na values (or values that should be na) are None
         na_values = ['NA','','Missing','missing','unspecified','not available','not given','Not available',None,[],{},'not applicable','Not applicable','Not Applicable','N/A','n/a','not provided','Not Provided','Not provided']
@@ -179,6 +205,7 @@ if __name__ == "__main__":
         ##TODO: check whether if biosample_uids exists, and no biosample attribs added; log to scrapeerrors if so; same for pubmeds
 
         ##TODO: write metadata row by row to db
+        print "-writing data to database..."
         for srx in sdict.keys():
             #add date scraped field as right now!
             sdict[srx]['date_scraped'] = datetime.now()
@@ -188,15 +215,35 @@ if __name__ == "__main__":
             #add newdataset and commit to get new id
             db.session.add(newDataset)
             db.session.commit()
+            print newDataset
+
+            if 'pubmed_uids' in sdict[srx].keys():
+                for pub in sdict[srx]["pubmed_uids"]:
+                    if pub is not None:
+                        pub = str(pub)
+                        if pub in pdict.keys():
+                            pub_data = [pdict[pub][x] if x in pdict[pub].keys() else None for x in pubmed_fields]
+                            newPub = Publication(*pub_data)
+                            print newPub
+                            newPub.datasets.append(newDataset)
+                            db.session.add(newPub)
+                            try:
+                                db.session.commit()
+                            except (exc.IntegrityError, err.IntegrityError) as e: #if pubmed already exists
+                                db.session.rollback()
+                                #db.session.expunge(newPub)
+                                existing_pub = db.session.query(Publication).filter(Publication.pubmed_uid==pub).first()
+                                existing_pub.datasets.append(newDataset)
+                                db.session.commit()
 
             if "run_ids" in sdict[srx].keys():
                 for run in sdict[srx]["run_ids"]:
                     if run is not None:
-                        args = [newDataset.id]
                         run_data = [rdict[run][x] if x in rdict[run].keys() else None for x in run_fields]
-                        args.extend(run_data)
-                        newRun = Run(*args)
+                        newRun = Run(*run_data)
+                        newDataset.runs.append(newRun)
                         db.session.add(newRun)
+                        print newRun
                         #newDataset.runs.append(newRun)
 
             #commit all those new runs

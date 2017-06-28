@@ -213,6 +213,11 @@ dataset_to_discovery = db.Table('dataset_to_discovery',
     db.Column('discovery_id', db.Integer, db.ForeignKey('discovery.id'))
 )
 
+dataset_to_publication = db.Table('dataset_to_publication',
+    db.Column('dataset_id', db.Integer, db.ForeignKey('dataset.id')),
+    db.Column('publication_id', db.Integer, db.ForeignKey('publication.id'))
+)
+
 class Discovery(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filter_params = db.Column(db.Text)
@@ -247,7 +252,7 @@ class User(db.Model):
 
 class Run(db.Model):
     id = db.Column(db.Integer,primary_key=True)
-    run_id = db.Column(db.String(30))
+    run_id = db.Column(db.String(30),unique=True)
     library_reads_sequenced = db.Column(db.BIGINT)
     total_num_bases = db.Column(db.BIGINT)
     download_size = db.Column(db.BIGINT)
@@ -278,3 +283,33 @@ class Run(db.Model):
 
     def __repr__(self):
         return '<Run %r>' % self.run_id
+
+class Publication(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    pubmed_uid = db.Column(db.String(30),unique=True)
+    pubmed_link = db.Column(db.Text)
+    pub_publication_date = db.Column(db.DateTime)
+    pub_authors = db.Column(db.Text)
+    pub_title = db.Column(db.Text)
+    pub_volume = db.Column(db.String(20))
+    pub_issue = db.Column(db.String(20))
+    pub_pages = db.Column(db.String(30))
+    pub_journal = db.Column(db.Text)
+    pub_doi = db.Column(db.Text)
+
+    datasets = db.relationship('Dataset', secondary=dataset_to_publication, backref=db.backref('publications', lazy='dynamic'))
+
+    def __init__(self, pubmed_uid=None, pubmed_link=None, pub_publication_date=None, pub_authors=None, pub_title=None, pub_volume=None, pub_issue=None, pub_pages=None, pub_journal=None, pub_doi=None, datasets=None):
+        self.pubmed_uid = pubmed_uid
+        self.pubmed_link = pubmed_link
+        self.pub_publication_date = pub_publication_date
+        self.pub_authors = pub_authors
+        self.pub_title = pub_title
+        self.pub_volume = pub_volume
+        self.pub_issue = pub_issue
+        self.pub_pages = pub_pages
+        self.pub_journal = pub_journal
+        self.pub_doi = pub_doi
+
+    def __repr__(self):
+        return '<Publication %r>' % self.pubmed_uid
