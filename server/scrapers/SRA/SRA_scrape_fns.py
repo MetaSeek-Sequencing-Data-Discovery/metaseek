@@ -696,7 +696,7 @@ def get_links(batch_uid_list, sdict):
     linkdict = {'biosample_uids':biosample_uids,'pubmed_uids':pubmed_uids,'nuccore_uids':nuccore_uids}
     print "......number of biosamples to scrape: %s" % len(linkdict['biosample_uids'])
     print "......number of pubmeds to scrape: %s" % len(linkdict['pubmed_uids'])
-    print "......number of nuccores to scrape: %s" % len(linkdict['nuccore_uids'])
+    print "......number of nuccores: %s" % len(linkdict['nuccore_uids'])
 
     return sdict,linkdict
 
@@ -937,10 +937,6 @@ def merge_scrapes(sdict,bdict,pdict):
                                 sdict[srx][pubmed_field].append(pdict[pub][pubmed_field])
                             else: #otherwise add new field with list value (length of one)
                                 sdict[srx][pubmed_field] = [pdict[pub][pubmed_field]]
-
-        if 'nuccore_uids' in sdict[srx].keys():
-            #just need coerce nuccore_uids to string value for db
-            sdict[srx]['nuccore_uids'] = str(sdict[srx]['nuccore_uids'])
 
         if 'biosample_uid' in sdict[srx].keys():
             #add biosample metadata fields and values to sdict[srx]

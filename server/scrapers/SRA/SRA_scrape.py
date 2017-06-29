@@ -51,7 +51,6 @@ metaseek_fields = ['db_source_uid',
 'gc_percent_maxrun',
 'run_quality_counts_maxrun',
 'biosample_uid',
-'nuccore_uids',
 'biosample_link',
 'metadata_publication_date',
 'biosample_package',
@@ -224,10 +223,25 @@ if __name__ == "__main__":
                                 db.session.commit()
                             except (exc.IntegrityError, err.IntegrityError) as e: #if pubmed already exists
                                 db.session.rollback()
-                                #db.session.expunge(newPub)
                                 existing_pub = db.session.query(Publication).filter(Publication.pubmed_uid==pub).first()
                                 existing_pub.datasets.append(newDataset)
                                 db.session.commit()
+
+            if 'nuccore_uids' in sdict[srx].keys():
+                for nuc in sdict[srx]["nuccore_uids"]:
+                    if nuc is not None:
+                        nuc_id = str(nuc)
+                        nuccore_link='https://www.ncbi.nlm.nih.gov/nuccore/'+nuc_id
+                        newNuc = Nuccore(nuccore_uid=nuc_id,nuccore_link=nuccore_link)
+                        newNuc.datasets.append(newDataset)
+                        db.session.add(newNuc)
+                        try:
+                            db.session.commit()
+                        except (exc.IntegrityError, err.IntegrityError) as e: #if nuccore entry already exists
+                            db.session.rollback()
+                            existing_nuc = db.session.query(Nuccore).filter(Nuccore.nuccore_uid==nuc_id).first()
+                            existing_nuc.datasets.append(newDataset)
+                            db.session.commit()
 
             if "run_ids" in sdict[srx].keys():
                 for run in sdict[srx]["run_ids"]:

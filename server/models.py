@@ -54,7 +54,6 @@ class Dataset(db.Model):
     gc_percent_maxrun = db.Column(db.Float)
     run_quality_counts_maxrun = db.Column(db.Text)
     biosample_uid = db.Column(db.String(30))
-    nuccore_uids = db.Column(db.Text)
     biosample_link = db.Column(db.Text)
     metadata_publication_date = db.Column(db.DateTime)
     biosample_package = db.Column(db.Text)
@@ -106,7 +105,7 @@ class Dataset(db.Model):
     sample_id=None,biosample_id=None,sample_title=None,ncbi_taxon_id=None,taxon_scientific_name=None,taxon_common_name=None,sample_description=None,
     num_runs_in_accession=None,run_ids_maxrun=None,library_reads_sequenced_maxrun=None,total_num_bases_maxrun=None,download_size_maxrun=None,avg_read_length_maxrun=None,
     baseA_count_maxrun=None,baseC_count_maxrun=None,baseG_count_maxrun=None,baseT_count_maxrun=None,baseN_count_maxrun=None,gc_percent_maxrun=None,run_quality_counts_maxrun=None,
-    biosample_uid=None,nuccore_uids=None,biosample_link=None,metadata_publication_date=None,biosample_package=None,biosample_models=None,sample_attributes=None,
+    biosample_uid=None,biosample_link=None,metadata_publication_date=None,biosample_package=None,biosample_models=None,sample_attributes=None,
     investigation_type=None,env_package=None,project_name=None,lat_lon=None,latitude=None,longitude=None,geo_loc_name=None,collection_date=None,collection_time=None,env_biome=None,env_feature=None,env_material=None,depth=None,elevation=None,altitude=None,target_gene=None,target_subfragment=None,
     ploidy=None,num_replicons=None,estimated_size=None,ref_biomaterial=None,propagation=None,assembly=None,finishing_strategy=None,isol_growth_condt=None,experimental_factor=None,specific_host=None,subspecific_genetic_lineage=None,tissue=None,sex=None,sample_type=None,age=None,dev_stage=None,biomaterial_provider=None,host_disease=None,
     date_scraped=None):
@@ -158,7 +157,6 @@ class Dataset(db.Model):
         self.gc_percent_maxrun = gc_percent_maxrun
         self.run_quality_counts_maxrun = run_quality_counts_maxrun
         self.biosample_uid = biosample_uid
-        self.nuccore_uids = nuccore_uids
         self.biosample_link = biosample_link
         self.metadata_publication_date = metadata_publication_date
         self.biosample_package = biosample_package
@@ -216,6 +214,11 @@ dataset_to_discovery = db.Table('dataset_to_discovery',
 dataset_to_publication = db.Table('dataset_to_publication',
     db.Column('dataset_id', db.Integer, db.ForeignKey('dataset.id')),
     db.Column('publication_id', db.Integer, db.ForeignKey('publication.id'))
+)
+
+dataset_to_nuccore = db.Table('dataset_to_nuccore',
+    db.Column('dataset_id', db.Integer, db.ForeignKey('dataset.id')),
+    db.Column('nuccore_id', db.Integer, db.ForeignKey('nuccore.id'))
 )
 
 class Discovery(db.Model):
@@ -329,3 +332,17 @@ class ScrapeError(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.error_msg
+
+class Nuccore(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    nuccore_uid = db.Column(db.String(50),unique=True)
+    nuccore_link = db.Column(db.Text)
+
+    datasets = db.relationship('Dataset', secondary=dataset_to_nuccore, backref=db.backref('nuccores', lazy='dynamic'))
+
+    def __init__(self, nuccore_uid=None, nuccore_link=None):
+        self.nuccore_uid = nuccore_uid
+        self.nuccore_link = nuccore_link
+
+    def __repr__(self):
+        return '<Nuccore %r>' % self.nuccore_uid
