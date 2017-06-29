@@ -193,7 +193,7 @@ if __name__ == "__main__":
                 sdict[srx]['sample_attributes'] = str(sdict[srx]['sample_attributes'])
 
         #clean up sdict so that any nan or na values (or values that should be na) are None
-        na_values = ['NA','','Missing','missing','unspecified','not available','not given','Not available',None,[],{},'not applicable','Not applicable','Not Applicable','N/A','n/a','not provided','Not Provided','Not provided','unidentified']
+        na_values = ['NA','','Missing','missing','unspecified','not available','not given','Not available',None,[],{},'[]','{}','not applicable','Not applicable','Not Applicable','N/A','n/a','not provided','Not Provided','Not provided','unidentified']
         for srx in sdict.keys():
             sdict[srx] = {k:sdict[srx][k] for k in sdict[srx].keys() if sdict[srx][k] not in na_values}
 
@@ -209,7 +209,15 @@ if __name__ == "__main__":
             newDataset = Dataset(*row_to_write)
             #add newdataset and commit to get new id
             db.session.add(newDataset)
-            db.session.commit()
+            try:
+                db.session.commit()
+            except (exc.DataError, err.DataError) as e:
+                db.session.rollback()
+                #if one of the columns was too long, log error and skip this srx
+                errorToWrite = ScrapeError(uid=str(srx),error_msg="DataError: "+str(e),function="writing Dataset to db",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
+                continue
 
             if 'pubmed_uids' in sdict[srx].keys():
                 for pub in sdict[srx]["pubmed_uids"]:
