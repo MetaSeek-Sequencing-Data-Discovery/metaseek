@@ -1,7 +1,8 @@
 from SRA_scrape_fns import *
 from app import db
 from models import *
-from datetime import datetime
+from pymysql import err
+from sqlalchemy import exc
 
 metaseek_fields = ['db_source_uid',
 'db_source',
@@ -120,25 +121,17 @@ pubmed_fields = ['pubmed_uid',
 'datasets']
 
 if __name__ == "__main__":
-    #check if error log file exists; if it doesn't, create one
-    ##TODO: make table in db instead of file?
-    import os
-    if not os.path.isfile('ScrapeErrors.csv'):
-        f = open('ScrapeErrors.csv','a')
-        f.write("uid_url,msg,fn_from\n")
-        f.close()
-
-
     #make list of all publicly available UIDs in SRA
     retstart_list = get_retstart_list(url='https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=public&field=ACS&rettype=count&tool=metaseq&email=metaseekcloud%40gmail.com')
     uid_list = get_uid_list(ret_list=retstart_list)
 
-    #remove SRA IDs that have already been ingested into MetaSeek DB
-    #find existing db_source_uids for which 'source_db' is 'SRA'
+    #remove SRA IDs that have already been ingested into MetaSeek DB; db_source_uids for which 'source_db' is 'SRA'
+    print "Removing uids already in MetaSeek..."
     result = db.session.query(Dataset.db_source_uid).filter(Dataset.db_source=='SRA').distinct()
     existing_uids = [r.db_source_uid for r in result]
     #subtract any uids already in db from uid_list
-    uids_to_scrape = set(uid_list)-set(existing_uids)
+    uids_to_scrape = list(set(uid_list)-set(existing_uids))
+    print "...REMAINING NUMBER OF UIDS TO SCRAPE: %s" % (len(uids_to_scrape))
 
     #split UIDs to scrape into batches of 500 (max number of UIDs can call with eutilities api at one time)
     batches = get_batches(uids_to_scrape)
@@ -147,12 +140,12 @@ if __name__ == "__main__":
         print "PROCESSING BATCH %s OUT OF %s......" % (batch_ix+1,len(batches))
         batch_uid_list = map(int,uids_to_scrape[batch[0]:batch[1]])
         print "-%s UIDs to scrape in this batch...... %s..." % (len(batch_uid_list),batch_uid_list[0:10])
-        #scrape sra metadata, return as dictionary of dictionaries; each sdict key is the SRA UID, value is a dictionary of srx metadata key/value pairs
+        #scrape sra metadata, return as dictionary of dictionaries; each sdict key is the SRA UID, value is a dictionary of srx metadata key/value pairs; rdict is for individual runs with key run_id
         print "-scraping SRX metadata..."
         try:
             sdict, rdict = get_srx_metadata(batch_uid_list=batch_uid_list)
         except (EutilitiesConnectionError,EfetchError) as msg:
-            print msg
+            print msg,"; skipping this batch"
             continue
 
         #get link uids for any links to biosample, pubmed, and nuccore databases so can go scrape those too
@@ -186,10 +179,12 @@ if __name__ == "__main__":
                 print msg, "; skipping this pubmed batch"
                 continue
 
-        #merge sdict with scraped biosample/pubmed/nuccore metadata - add metadata from bdict/pdict/ndict where appropriate for each srx in sdict.
-        sdict = merge_scrapes(sdict=sdict,bdict=bdict,pdict=pdict,ndict=ndict)
+        #merge sdict with scraped biosample/pubmed metadata - add metadata from bdict/pdict where appropriate for each srx in sdict (coerce nuccore ids to str).
+        print "-merging scrapes"
+        sdict = merge_scrapes(sdict=sdict,bdict=bdict,pdict=pdict)
 
         #extract and merge MIxS fields from 'sample_attributes' field in each dict in sdict (if exists)
+        print "-extracting and merging MIxS fields"
         sdict = extract_and_merge_mixs_fields(sdict=sdict,fieldname="sample_attributes",rules_json="rules.json")
         #coerce sample attributes field to str for db insertion
         print "-changing sample_attributes to str field"
@@ -198,7 +193,7 @@ if __name__ == "__main__":
                 sdict[srx]['sample_attributes'] = str(sdict[srx]['sample_attributes'])
 
         #clean up sdict so that any nan or na values (or values that should be na) are None
-        na_values = ['NA','','Missing','missing','unspecified','not available','not given','Not available',None,[],{},'not applicable','Not applicable','Not Applicable','N/A','n/a','not provided','Not Provided','Not provided']
+        na_values = ['NA','','Missing','missing','unspecified','not available','not given','Not available',None,[],{},'not applicable','Not applicable','Not Applicable','N/A','n/a','not provided','Not Provided','Not provided','unidentified']
         for srx in sdict.keys():
             sdict[srx] = {k:sdict[srx][k] for k in sdict[srx].keys() if sdict[srx][k] not in na_values}
 
@@ -215,7 +210,6 @@ if __name__ == "__main__":
             #add newdataset and commit to get new id
             db.session.add(newDataset)
             db.session.commit()
-            print newDataset
 
             if 'pubmed_uids' in sdict[srx].keys():
                 for pub in sdict[srx]["pubmed_uids"]:
@@ -224,7 +218,6 @@ if __name__ == "__main__":
                         if pub in pdict.keys():
                             pub_data = [pdict[pub][x] if x in pdict[pub].keys() else None for x in pubmed_fields]
                             newPub = Publication(*pub_data)
-                            print newPub
                             newPub.datasets.append(newDataset)
                             db.session.add(newPub)
                             try:
@@ -243,10 +236,10 @@ if __name__ == "__main__":
                         newRun = Run(*run_data)
                         newDataset.runs.append(newRun)
                         db.session.add(newRun)
-                        print newRun
                         #newDataset.runs.append(newRun)
 
             #commit all those new runs
             db.session.commit()
 
         ##TODO: log date and time of update, num accessions added, etc. Separate db table?
+        print "BATCH %s COMPLETE!" % (batch_ix+1)

@@ -313,3 +313,19 @@ class Publication(db.Model):
 
     def __repr__(self):
         return '<Publication %r>' % self.pubmed_uid
+
+class ScrapeError(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    uid = db.Column(db.String(30))
+    error_msg = db.Column(db.Text)
+    function = db.Column(db.String(50))
+    date_scraped = db.Column(db.DateTime)
+
+    def __init__(self, uid=None,error_msg=None,function=None,date_scraped=None):
+        self.uid = uid
+        self.error_msg = error_msg
+        self.function = function
+        self.date_scraped = date_scraped
+
+    def __repr__(self):
+        return '<User %r>' % self.error_msg
