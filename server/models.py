@@ -1,5 +1,6 @@
 from app import db
 from datetime import datetime
+from sqlalchemy.orm import validates
 
 # Declare Models - Dataset, User, Discovery
 # each class becomes a table
@@ -97,6 +98,14 @@ class Dataset(db.Model):
     date_scraped = db.Column(db.DateTime)
 
     runs = db.relationship('Run', backref='dataset', lazy='dynamic')
+
+    #if any of these fields are larger than the max allowable, will truncate to max length
+    @validates('expt_design_description', 'library_construction_protocol', 'study_abstract', 'sample_description')
+    def validate_code(self, key, value):
+        max_len = getattr(self.__class__, key).prop.columns[0].type.length
+        if value and len(value) > max_len:
+            return value[:max_len]
+        return value
 
     # Each class must have an init function
     def __init__(self, db_source_uid=None,db_source=None,expt_link=None,expt_id=None,expt_title=None,expt_design_description=None,library_name=None,library_strategy=None,library_source=None,library_screening_strategy=None,library_construction_method=None,library_construction_protocol=None,sequencing_method=None,instrument_model=None,
