@@ -216,11 +216,6 @@ dataset_to_publication = db.Table('dataset_to_publication',
     db.Column('publication_id', db.Integer, db.ForeignKey('publication.id'))
 )
 
-dataset_to_nuccore = db.Table('dataset_to_nuccore',
-    db.Column('dataset_id', db.Integer, db.ForeignKey('dataset.id')),
-    db.Column('nuccore_id', db.Integer, db.ForeignKey('nuccore.id'))
-)
-
 class Discovery(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filter_params = db.Column(db.Text)
@@ -332,17 +327,3 @@ class ScrapeError(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.error_msg
-
-class Nuccore(db.Model):
-    id = db.Column(db.Integer,primary_key=True)
-    nuccore_uid = db.Column(db.String(50),unique=True)
-    nuccore_link = db.Column(db.Text)
-
-    datasets = db.relationship('Dataset', secondary=dataset_to_nuccore, backref=db.backref('nuccores', lazy='dynamic'))
-
-    def __init__(self, nuccore_uid=None, nuccore_link=None):
-        self.nuccore_uid = nuccore_uid
-        self.nuccore_link = nuccore_link
-
-    def __repr__(self):
-        return '<Nuccore %r>' % self.nuccore_uid

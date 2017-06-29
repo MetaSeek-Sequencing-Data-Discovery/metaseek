@@ -1,3 +1,4 @@
+#test adding runs to db
 from SRA_scrape_fns import *
 from app import db
 from models import *
@@ -147,7 +148,7 @@ if __name__ == "__main__":
             print msg,"; skipping this batch"
             continue
 
-        #get link uids for any links to biosample, pubmed, and nuccore databases so can go scrape those too
+        #get link uids for any links to biosample or pubmed databases so can go scrape those too
         print "-getting elinks..."
         try:
             sdict, linkdict = get_links(batch_uid_list=batch_uid_list,sdict=sdict)
@@ -178,7 +179,7 @@ if __name__ == "__main__":
                 print msg, "; skipping this pubmed batch"
                 continue
 
-        #merge sdict with scraped biosample/pubmed metadata - add metadata from bdict/pdict where appropriate for each srx in sdict (coerce nuccore ids to str).
+        #merge sdict with scraped biosample/pubmed metadata
         print "-merging scrapes"
         sdict = merge_scrapes(sdict=sdict,bdict=bdict,pdict=pdict)
 
@@ -227,21 +228,6 @@ if __name__ == "__main__":
                                 existing_pub.datasets.append(newDataset)
                                 db.session.commit()
 
-            if 'nuccore_uids' in sdict[srx].keys():
-                for nuc in sdict[srx]["nuccore_uids"]:
-                    if nuc is not None:
-                        nuc_id = str(nuc)
-                        nuccore_link='https://www.ncbi.nlm.nih.gov/nuccore/'+nuc_id
-                        newNuc = Nuccore(nuccore_uid=nuc_id,nuccore_link=nuccore_link)
-                        newNuc.datasets.append(newDataset)
-                        db.session.add(newNuc)
-                        try:
-                            db.session.commit()
-                        except (exc.IntegrityError, err.IntegrityError) as e: #if nuccore entry already exists
-                            db.session.rollback()
-                            existing_nuc = db.session.query(Nuccore).filter(Nuccore.nuccore_uid==nuc_id).first()
-                            existing_nuc.datasets.append(newDataset)
-                            db.session.commit()
 
             if "run_ids" in sdict[srx].keys():
                 for run in sdict[srx]["run_ids"]:
