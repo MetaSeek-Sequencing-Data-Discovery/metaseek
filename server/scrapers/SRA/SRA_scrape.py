@@ -194,7 +194,7 @@ if __name__ == "__main__":
         print "-changing sample_attributes to str field"
         for srx in sdict.keys():
             if 'sample_attributes' in sdict[srx].keys():
-                sdict[srx]['sample_attributes'] = str(sdict[srx]['sample_attributes'])
+                sdict[srx]['sample_attributes'] = json.dumps(sdict[srx]['sample_attributes'])
 
         #clean up sdict so that any nan or na values (or values that should be na) are None
         na_values = ['NA','','Missing','missing','unspecified','not available','not given','Not available',None,[],{},'[]','{}','not applicable','Not applicable','Not Applicable','N/A','n/a','not provided','Not Provided','Not provided','unidentified']
