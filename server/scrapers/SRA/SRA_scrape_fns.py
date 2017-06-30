@@ -5,6 +5,9 @@ from lxml import etree
 import json
 from datetime import datetime
 import time
+import sys
+sys.path.append('../..')
+from models import *
 
 class EfetchError(Exception):
     pass
