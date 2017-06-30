@@ -4,10 +4,10 @@
 import sys
 sys.path.append('../..')
 from app import db
-from models import *
 from pymysql import err
 from sqlalchemy import exc
 from SRA_scrape_fns import *
+from models import *
 
 metaseek_fields = ['db_source_uid',
 'db_source',
