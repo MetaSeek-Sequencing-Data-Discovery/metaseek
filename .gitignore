@@ -1,9 +1,4 @@
-client/build/main.js
-client/build/css/*
-client/build/images/*
 .DS_Store
-client/node_modules/*
-DataScraping/*
 *.0000
 *.frame_idx
 *.sidx
@@ -11,31 +6,22 @@ DataScraping/*
 *.ini
 *.docx
 *.xls
+*.xlsx
 *.ipynb
 *.pem
+*.pyc
+*.bin
 
+DataScraping/*
+
+client/build/main.js
+client/build/css/*
+client/build/images/*
+client/node_modules/*
 client/build/index.html
 
-server/scrapers/SRA/subset_testdf_sframe/objects.bin
-*.pyc
-
-server/scrapers/SRA/subset_testdf.txt
 server/bootstrapData/
 
-metaseek_schema.xlsx
-server/MetaSeek_DatasetFields.xlsx
-
-*.ipynb
-
-server/scrapers/SRA/SRA_scrape_fns.pyc
-
-*.ipynb
-
+server/scrapers/SRA/subset_testdf.txt
 metaseek_schema.txt
-
-server/scrapers/SRA/SRA_AutoIngest_dev.ipynb
-
-*.pyc
-
-server/MetaSeek_DatasetFields.xlsx
-server/~$MetaSeek_DatasetFields.xlsx
+metaseek_schema.xlsx
