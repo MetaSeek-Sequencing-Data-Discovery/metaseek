@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 import urllib
 from lxml import etree
 import json
@@ -243,15 +245,15 @@ def get_srx_metadata(batch_uid_list):
                 pass
             try:
                 if len(sra_sample.find("Organization").findall("Contact"))>0:
-                    contacts = []
+                    contacts = ''
                     for contact in sra_sample.find("Organization").findall("Contact"):
                         try:
                             name = contact.find("Name").find("First").text+' '+contact.find("Name").find("Last").text
                         except AttributeError:
                             name=''
                         email = contact.get('email')
-                        contacts.append(name+', '+email)
-                    srx_dict['organization_contacts'] = str(contacts) #coerce to string for db writing
+                        contacts = contacts + name + ', ' + email + ', '
+                    srx_dict['organization_contacts'] = contacts[:-2] # remove trailing comma and space
             except AttributeError:
                 errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError organization_contacts",function="get_srx_metadata",date_scraped=datetime.now())
                 db.session.add(errorToWrite)
@@ -310,7 +312,7 @@ def get_srx_metadata(batch_uid_list):
                         study_links[study_link.find("XREF_LINK").findtext("DB")] = study_link.find("XREF_LINK").findtext("ID")
                     if study_link.find("URL_LINK") is not None:
                         study_links[study_link.find("URL_LINK").findtext("LABEL")] = study_link.find("URL_LINK").findtext("URL")
-            srx_dict['study_links'] = str(study_links) #coerce to str for db
+            srx_dict['study_links'] = json.dumps(study_links) #replaced str() coercion with JSON str for db
         except AttributeError:
             errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError study_links",function="get_srx_metadata",date_scraped=datetime.now())
             db.session.add(errorToWrite)
@@ -321,7 +323,7 @@ def get_srx_metadata(batch_uid_list):
             if sra_sample.find("STUDY").find("STUDY_ATTRIBUTES") is not None: #really common not to have this
                 for attr in sra_sample.find("STUDY").find("STUDY_ATTRIBUTES").iterchildren():
                     study_attributes[attr.findtext("TAG")] = attr.findtext("VALUE")
-            srx_dict['study_attributes'] = str(study_attributes) #coerce to str for db
+            srx_dict['study_attributes'] = json.dumps(study_attributes)  #replaced str() coercion with JSON str for db
         except AttributeError:
             errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError study_attributes",function="get_srx_metadata",date_scraped=datetime.now())
             db.session.add(errorToWrite)
@@ -586,8 +588,11 @@ def get_srx_metadata(batch_uid_list):
                     qual_count[qual.get("value")] = int(qual.get("count"))
                 except (TypeError,ValueError) as e:
                     pass
-            qual_count = str(qual_count) #coerce to string for db
-            read_quality_counts.append(qual_count)
+            if (qual_count == {}):
+                read_quality_counts.append(None)
+            else:
+                qual_count = json.dumps(qual_count) # replaced str() coercion with json dump to string for db
+                read_quality_counts.append(qual_count)
 
         max_index = total_num_reads.index(max(total_num_reads))
 
@@ -620,7 +625,7 @@ def get_srx_metadata(batch_uid_list):
         srx_dict['baseT_count_maxrun'] = baseT_count[max_index]
         srx_dict['baseN_count_maxrun'] = baseN_count[max_index]
         srx_dict['gc_percent_maxrun'] = gc_percent[max_index]
-        srx_dict['run_quality_counts_maxrun'] = str(read_quality_counts[max_index]) #coerce to str for db
+        srx_dict['run_quality_counts_maxrun'] = read_quality_counts[max_index]
 
         #insert srx data into sdict with srx_uid as key
         sdict[srx_uid] = srx_dict
@@ -772,10 +777,10 @@ def get_biosample_metadata(batch_uid_list,bdict):
         if biosample.findtext("Package") is not None:
             bio_dict['biosample_package'] = biosample.findtext("Package")
         try:
-            models = []
+            models = ''
             for model in biosample.find("Models").findall("Model"):
-                models.append(model.text)
-            bio_dict['biosample_models'] = str(models) #coerce to str for db
+                models = models + model.text + ', '
+            bio_dict['biosample_models'] = models[:-2] # remove trailing comma and space
         except AttributeError:
             errorToWrite = ScrapeError(uid=str(bio_id),error_msg="biosample_models",function="get_biosample_metadata",date_scraped=datetime.now())
             db.session.add(errorToWrite)
@@ -863,10 +868,10 @@ def get_pubmed_metadata(batch_uid_list,pdict):
                         pass
 
         try:
-            authors = []
+            authors = ''
             for author in pubmed.find("Item[@Name='AuthorList']").findall("Item[@Name='Author']"):
-                authors.append(author.text)
-            pub_dict['pub_authors'] = str(authors) #coerce to string for db
+                authors = authors + author.text + ', '
+            pub_dict['pub_authors'] = authors[:-2] # remove trailing comma and space
         except AttributeError:
             errorToWrite = ScrapeError(uid=str(pub_id),error_msg="AttributeError pub_authors",function="get_pubmed_metadata",date_scraped=datetime.now())
             db.session.add(errorToWrite)

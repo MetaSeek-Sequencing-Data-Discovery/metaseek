@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 #test adding runs to db
 import sys
 sys.path.append('../..')
