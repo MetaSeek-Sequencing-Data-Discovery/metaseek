@@ -3,8 +3,6 @@ from lxml import etree
 import json
 from datetime import datetime
 import time
-from app import db
-from models import *
 
 class EfetchError(Exception):
     pass

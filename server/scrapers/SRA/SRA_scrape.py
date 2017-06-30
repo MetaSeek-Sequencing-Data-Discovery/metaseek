@@ -1,9 +1,11 @@
 #test adding runs to db
-from SRA_scrape_fns import *
+import sys
+sys.path.append('../..')
 from app import db
 from models import *
 from pymysql import err
 from sqlalchemy import exc
+from SRA_scrape_fns import *
 
 metaseek_fields = ['db_source_uid',
 'db_source',
@@ -244,7 +246,6 @@ if __name__ == "__main__":
                         newRun = Run(*run_data)
                         newDataset.runs.append(newRun)
                         db.session.add(newRun)
-                        #newDataset.runs.append(newRun)
 
             #commit all those new runs
             db.session.commit()
