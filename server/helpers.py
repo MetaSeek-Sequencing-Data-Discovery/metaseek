@@ -55,7 +55,8 @@ def summarizeDatasets(queryObject):
                 }
             }
     else:
-        total_download_size = sum(queryResultDataframe["download_size"])
+        #total_download_size = sum(queryResultDataframe['download_size_maxrun'])
+        total_download_size = 0
 
         investigation_summary = dict(queryResultDataframe.groupby('investigation_type').size())
         if '' in investigation_summary.keys():
@@ -71,28 +72,28 @@ def summarizeDatasets(queryObject):
 
         # collection_date - keep just year for summary for now (might want month for e.g. season searches later on, but default date is 03-13 00:00:00 and need to deal with that)
         # Would really like to fill in empty values here, histogram of years without empty years is a bit odd
-        yearFrame = queryResultDataframe['collection_date'].dt.to_period("A")
-        year_summary = queryResultDataframe.groupby(yearFrame).size()
-        year_summary.index = year_summary.index.to_series().astype(str)
-        year_summary = dict(year_summary)
+        # yearFrame = queryResultDataframe['collection_date'].dt.to_period("A")
+        # year_summary = queryResultDataframe.groupby(yearFrame).size()
+        # year_summary.index = year_summary.index.to_series().astype(str)
+        # year_summary = dict(year_summary)
 
-        lat_summary = dict(queryResultDataframe.groupby('latitude').size())
-        lat_bins = Counter()
-        for k,v in lat_summary.items(): #is there a way to do this that doesn't loop through each returned value?
-            if not k:
-                next
-            else:
-                lat_bins[round(k,0)] += v
+        # lat_summary = dict(queryResultDataframe.groupby('latitude').size())
+        # lat_bins = Counter()
+        # for k,v in lat_summary.items(): #is there a way to do this that doesn't loop through each returned value?
+        #     if not k:
+        #         next
+        #     else:
+        #         lat_bins[round(k,0)] += v
+#
+        # lon_summary = dict(queryResultDataframe.groupby('longitude').size())
+        # lon_bins = Counter()
+        # for k,v in lon_summary.items(): #is there a way to do this that doesn't loop through each returned value?
+        #     if not k:
+        #         next
+        #     else:
+        #         lon_bins[round(k,0)] += v
 
-        lon_summary = dict(queryResultDataframe.groupby('longitude').size())
-        lon_bins = Counter()
-        for k,v in lon_summary.items(): #is there a way to do this that doesn't loop through each returned value?
-            if not k:
-                next
-            else:
-                lon_bins[round(k,0)] += v
-
-        read_length_summary = dict(queryResultDataframe.groupby('avg_read_length').size())
+        read_length_summary = dict(queryResultDataframe.groupby('avg_read_length_maxrun').size())
         rd_lgth_bins = Counter()
         for k,v in read_length_summary.items(): #is there a way to do this that doesn't loop through each returned value?
             if not k:
@@ -100,7 +101,7 @@ def summarizeDatasets(queryObject):
             else:
                 rd_lgth_bins[round(k,-2)] += v
 
-        total_rds_summary = dict(queryResultDataframe.groupby('total_num_reads').size())
+        total_rds_summary = dict(queryResultDataframe.groupby('library_reads_sequenced_maxrun').size())
         total_rds_bins = Counter()
         for k,v in total_rds_summary.items():
             if int(k)==0:
@@ -118,7 +119,7 @@ def summarizeDatasets(queryObject):
             else:
                 total_rds_bins[round(k,-7)] += v #above 10,000,000, count by 10M
 
-        total_bases_summary = dict(queryResultDataframe.groupby('total_num_bases').size())
+        total_bases_summary = dict(queryResultDataframe.groupby('total_num_bases_maxrun').size())
         total_bases_bins = Counter()
         for k,v in total_bases_summary.items():
             if int(k)==0:
@@ -138,7 +139,7 @@ def summarizeDatasets(queryObject):
             else:
                 total_bases_bins[round(k,-8)] += v #above 100,000,000, count by 100M
 
-        down_size_summary = dict(queryResultDataframe.groupby('download_size').size())
+        down_size_summary = dict(queryResultDataframe.groupby('download_size_maxrun').size())
         down_size_bins = Counter()
         for k,v in down_size_summary.items():
             if int(k)==0:
@@ -150,7 +151,7 @@ def summarizeDatasets(queryObject):
             else:
                 down_size_bins[round(k,-7)] += v #round every 10MB
 
-        avg_gc_summary = dict(queryResultDataframe.groupby('avg_percent_gc').size())
+        avg_gc_summary = dict(queryResultDataframe.groupby('gc_percent_maxrun').size())
         avg_gc_bins = Counter()
         for k,v in avg_gc_summary.items(): #is there a way to do this that doesn't loop through each returned value?
             if not k:
@@ -158,21 +159,21 @@ def summarizeDatasets(queryObject):
             else:
                 avg_gc_bins[round(k,2)] += v
 
-        latlon  = queryResultDataframe[['latitude','longitude']]
-        latlon = latlon[pd.notnull(latlon['latitude'])]
-        latlon = latlon[pd.notnull(latlon['longitude'])]
-        latlon_map = np.histogram2d(x=latlon['longitude'],y=latlon['latitude'],bins=[36,18], range=[[-180, 180], [-90, 90]]) #range should be flexible to rules in DatasetSearchSummary
+        #latlon  = queryResultDataframe[['latitude','longitude']]
+        #latlon = latlon[pd.notnull(latlon['latitude'])]
+        #latlon = latlon[pd.notnull(latlon['longitude'])]
+        #latlon_map = np.histogram2d(x=latlon['longitude'],y=latlon['latitude'],bins=[36,18], range=[[-180, 180], [-90, 90]]) #range should be flexible to rules in DatasetSearchSummary
         #latlon_map[0] is the lonxlat (XxY) array of counts; latlon_map[1] is the nx/lon bin starts; map[2] ny/lat bin starts
-        lonstepsize = (latlon_map[1][1]-latlon_map[1][0])/2
-        latstepsize = (latlon_map[2][1]-latlon_map[2][0])/2
-        map_data = []
-        for lon_ix,lonbin in enumerate(latlon_map[0]):
-            for lat_ix,latbin in enumerate(lonbin):
-                #[latlon_map[2][ix]+latstepsize for ix,latbin in enumerate(latlon_map[0][0])]
-                lat = latlon_map[2][lat_ix]+latstepsize
-                lon = latlon_map[1][lon_ix]+lonstepsize
-                value = latbin
-                map_data.append({"lat":lat,"lon":lon,"count":value})
+        #lonstepsize = (latlon_map[1][1]-latlon_map[1][0])/2
+        #latstepsize = (latlon_map[2][1]-latlon_map[2][0])/2
+        #map_data = []
+        #for lon_ix,lonbin in enumerate(latlon_map[0]):
+        #    for lat_ix,latbin in enumerate(lonbin):
+        #        #[latlon_map[2][ix]+latstepsize for ix,latbin in enumerate(latlon_map[0][0])]
+        #        lat = latlon_map[2][lat_ix]+latstepsize
+        #        lon = latlon_map[1][lon_ix]+lonstepsize
+        #        value = latbin
+        #        map_data.append({"lat":lat,"lon":lon,"count":value})
 
         return {
             "summary":{
@@ -181,14 +182,14 @@ def summarizeDatasets(queryObject):
                 "investigation_type_summary":investigation_summary,
                 "library_source_summary":lib_source_summary,
                 "env_package_summary":env_pkg_summary,
-                "year_collected_summary":year_summary,
-                "latitude_summary":lat_bins,
-                "longitude_summary":lon_bins,
+                #"year_collected_summary":year_summary,
+                #"latitude_summary":lat_bins,
+                #"longitude_summary":lon_bins,
                 "avg_read_length_summary":rd_lgth_bins,
                 "total_reads_summary":total_rds_bins,
                 "total_bases_summary":total_bases_bins,
                 "download_size_summary":down_size_bins,
                 "avg_percent_gc_summary":avg_gc_bins,
-                "latlon_map":map_data
+                #"latlon_map":map_data
                 }
             }
