@@ -1,9 +1,10 @@
+# -*- encoding: utf-8 -*-
+
 import urllib
 from lxml import etree
 import json
 from datetime import datetime
 import time
-import os
 
 class EfetchError(Exception):
     pass
@@ -13,6 +14,25 @@ class EutilitiesConnectionError(Exception):
 
 class MultipleBiosampleError(Exception):
     pass
+
+#fn to try to get request from eutilities (as part e.g. get_links fn); if connection error for some reason raise efetch error
+def geturl_with_retry(MaxRetry,url):
+        while(MaxRetry >= 0):
+            try:
+                base = urllib.urlopen(url)
+                base_tree = etree.parse(base)
+                base.close()
+                base_xml = base_tree.getroot()
+                return base_xml
+            except Exception:
+                print "Internet connectivity Error Retrying in 5 seconds"
+                time.sleep(5)
+                MaxRetry=MaxRetry - 1
+
+        errorToWrite = ScrapeError(uid="url",error_msg="eutilities connection error",function="geturl_with_retry",date_scraped=datetime.now())
+        db.session.add(errorToWrite)
+        db.session.commit()
+        raise EutilitiesConnectionError("eutilities connection error")
 
 def get_retstart_list(url):
     #define retstarts need for get_uid_list eutilities requests - since can only get 100,000 at a time, need to make multiple queries to get total list
@@ -32,15 +52,21 @@ def get_uid_list(ret_list):
     #scrape UIDs into list
     uid_list = []
     for retstart in ret_list:
-        f = urllib.urlopen('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=public&field=ACS&tool=metaseq&email=metaseekcloud%40gmail.com&retmax=100000&retstart='+str(retstart))
-        uid_tree = etree.parse(f)
-        f.close()
-        uid_xml = uid_tree.getroot()
-        print "appending %s accessions" % len(uid_xml.find("IdList").findall("Id"))
-        #add uids to list of accessions
-        for id in uid_xml.find("IdList").iterchildren():
-            value = id.text
-            uid_list.append(value)
+        uid_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=public&field=ACS&tool=metaseq&email=metaseekcloud%40gmail.com&retmax=100000&retstart='+str(retstart)
+        uid_xml = geturl_with_retry(MaxRetry=5,url=uid_url)
+        try:
+            print "appending %s accessions with retstart %s" % (len(uid_xml.find("IdList").findall("Id")), retstart)
+            #add uids to list of accessions
+            for id in uid_xml.find("IdList").iterchildren():
+                value = id.text
+                uid_list.append(value)
+        except Exception: #this will fail if there is no IdList (404 response)
+            errorToWrite = ScrapeError(uid="url",error_msg="eutilities connection error",function="get_uid_list",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
+            print "eutilities connection error getting batch with retstart %s; skipping to next retstart" % (retstart)
+            pass
+
     return uid_list
 
 def get_batches(uid_list):
@@ -49,25 +75,6 @@ def get_batches(uid_list):
     ends.append(len(uid_list))
     batches = [list(a) for a in zip(starts, ends)]
     return batches
-
-#fn to try to get request from eutilities (as part e.g. get_links fn); if connection error for some reason raise efetch error
-def geturl_with_retry(MaxRetry,url):
-        while(MaxRetry >= 0):
-            try:
-                base = urllib.urlopen(url)
-                base_tree = etree.parse(base)
-                base.close()
-                base_xml = base_tree.getroot()
-                return base_xml
-            except Exception:
-                print "Internet connectivity Error Retrying in 5 seconds"
-                time.sleep(5)
-                MaxRetry=MaxRetry - 1
-
-        f = open('ScrapeErrors.csv','a')
-        f.write("url,eutilities connection error,"+"geturl_with_retry\n")
-        f.close()
-        raise EutilitiesConnectionError("eutilities connection error")
 
 
 def get_srx_metadata(batch_uid_list):
@@ -83,15 +90,16 @@ def get_srx_metadata(batch_uid_list):
     try: #sometimes the url is parsed with lxml but is an error xml output from eutilities; this step fails in that case
         sra_samples = sra_xml.findall("EXPERIMENT_PACKAGE")
     except Exception:
-        f = open('ScrapeErrors.csv','a')
-        f.write("url,eutilities connection error,"+"get_srx_metadata\n")
-        f.close()
+        errorToWrite = ScrapeError(uid="url",error_msg="eutilities connection error",function="get_srx_metadata",date_scraped=datetime.now())
+        db.session.add(errorToWrite)
+        db.session.commit()
         raise EutilitiesConnectionError('eutilities connection error')
 
     print "......parsing done for %s srxs in %s" % (len(batch_uid_list),(datetime.now()-s_parse_time))
     print "...scraping srx metadata..."
     s_scrape_time = datetime.now()
     sdict = {}
+    rdict = {}
 
     #if the length of sra_samples != length of batch_uid_list, then one or more of the uids did not return an efetch (maybe it's not public even though it shows up in esearch);
     #if this is the case, raise EfetchError which will skip this batch of 500
@@ -113,82 +121,80 @@ def get_srx_metadata(batch_uid_list):
         try:
             srx_dict['expt_id'] = sra_sample.find("EXPERIMENT").find("IDENTIFIERS").findtext("PRIMARY_ID")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError expt_id,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError expt_id",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             srx_dict['expt_title'] = sra_sample.find("EXPERIMENT").findtext("TITLE")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError expt_title,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError expt_title",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             srx_dict["study_id"] = sra_sample.find("EXPERIMENT").find("STUDY_REF").find("IDENTIFIERS").findtext("PRIMARY_ID")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError study_id,"+"get_srx_metadata\n")
-            f.close()
+            #don't log error because can get it from the study identifiers anyway
             pass
         try:
             srx_dict['expt_design_description'] = sra_sample.find("EXPERIMENT").find("DESIGN").findtext("DESIGN_DESCRIPTION")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError expt_design_description,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError expt_design_description",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             srx_dict['sample_id'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("SAMPLE_DESCRIPTOR").get("accession")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError sample_id,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError sample_id",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             srx_dict['library_name'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_NAME")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError library_name,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError library_name",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             srx_dict['library_strategy'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_STRATEGY")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError library_strategy,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError library_strategy",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             srx_dict['library_source'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SOURCE").lower()
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError library_source,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError library_source",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             ###change library_selection to MIxS field library_screening_strategy (cv for SRA, not for MIxS)
             srx_dict['library_screening_strategy'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_SELECTION")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError library_screening_strategy,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError library_screening_strategy",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             ###change library_layout to MIxS field library_construction_method - cv single | paired
             layout = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").find("LIBRARY_LAYOUT").getchildren()[0].tag.lower()
             srx_dict['library_construction_method'] = layout
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError library_construction_method,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError library_construction_method",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             srx_dict['library_construction_protocol'] = sra_sample.find("EXPERIMENT").find("DESIGN").find("LIBRARY_DESCRIPTOR").findtext("LIBRARY_CONSTRUCTION_PROTOCOL")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError library_construction_protocol,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError library_construction_protocol",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             ###change platform to MIxS field sequencing_method - cv in SRA (not in MIxS)
@@ -202,80 +208,81 @@ def get_srx_metadata(batch_uid_list):
                 srx_dict['sequencing_method'] = sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].tag.lower()
                 srx_dict['instrument_model'] = sra_sample.find("EXPERIMENT").find("PLATFORM").getchildren()[0].findtext("INSTRUMENT_MODEL")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError sequencing_method or instrument_model,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError sequencing_method or instrument_model",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
 
         ###SUBMISSION - just need the submission id
         try:
             srx_dict['submission_id'] = sra_sample.find("SUBMISSION").find("IDENTIFIERS").findtext("PRIMARY_ID")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError submission_id,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError submission_id",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
 
-        ###Organization - name, address, and contact
-        try:
-            srx_dict['organization_name'] = sra_sample.find("Organization").findtext("Name")
-        except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError organization_name,"+"get_srx_metadata\n")
-            f.close()
-            pass
-        try:
-            address = ''
-            if sra_sample.find("Organization").find("Address") is not None: #really common not to have this
-                for line in sra_sample.find("Organization").find("Address").iterchildren():
-                    address = address+line.text+', '
-                address = address[:-2]
-            srx_dict['organization_address'] = address
-        except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError organization_address,"+"get_srx_metadata\n")
-            f.close()
-            pass
-        try:
-            if len(sra_sample.find("Organization").findall("Contact"))>0:
-                contacts = []
-                for contact in sra_sample.find("Organization").findall("Contact"):
-                    try:
-                        name = contact.find("Name").find("First").text+' '+contact.find("Name").find("Last").text
-                    except AttributeError:
-                        name=''
-                    email = contact.get('email')
-                    contacts.append(name+', '+email)
-                srx_dict['organization_contacts'] = contacts
-        except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError organization_contacts,"+"get_srx_metadata\n")
-            f.close()
-            pass
+        ###Organization - name, address, and contact;
+        if sra_sample.find("Organization") is not None: #this is missing fairly often so don't try unless it's there
+            try:
+                srx_dict['organization_name'] = sra_sample.find("Organization").findtext("Name")
+            except AttributeError:
+                errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError organization_name",function="get_srx_metadata",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
+                pass
+            try:
+                address = ''
+                if sra_sample.find("Organization").find("Address") is not None: #really common not to have this
+                    for line in sra_sample.find("Organization").find("Address").iterchildren():
+                        address = address+line.text+', '
+                    address = address[:-2]
+                srx_dict['organization_address'] = address
+            except AttributeError:
+                errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError organization_address",function="get_srx_metadata",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
+                pass
+            try:
+                if len(sra_sample.find("Organization").findall("Contact"))>0:
+                    contacts = ''
+                    for contact in sra_sample.find("Organization").findall("Contact"):
+                        try:
+                            name = contact.find("Name").find("First").text+' '+contact.find("Name").find("Last").text
+                        except AttributeError:
+                            name=''
+                        email = contact.get('email')
+                        contacts = contacts + name + ', ' + email + ', '
+                    srx_dict['organization_contacts'] = contacts[:-2] # remove trailing comma and space
+            except AttributeError:
+                errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError organization_contacts",function="get_srx_metadata",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
+                pass
 
         ###STUDY -
         try:
             srx_dict['study_id'] = sra_sample.find("STUDY").find("IDENTIFIERS").findtext("PRIMARY_ID")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError study_id,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError study_id",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             for external in sra_sample.find("STUDY").find("IDENTIFIERS").iterchildren("EXTERNAL_ID"):
                 if external.get("namespace")=='BioProject':
                     srx_dict['bioproject_id'] = external.text
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError bioproject_id,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError bioproject_id",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             srx_dict['study_title'] = sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_TITLE")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError study_title,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError study_title",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
         ###rename existing_study_type to study_type
@@ -286,16 +293,16 @@ def get_srx_metadata(batch_uid_list):
             else:
                 srx_dict['study_type'] = sra_sample.find("STUDY").find("DESCRIPTOR").find("STUDY_TYPE").get("existing_study_type")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError study_type or study_type_other,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError study_type or study_type_other",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             srx_dict['study_abstract'] = sra_sample.find("STUDY").find("DESCRIPTOR").findtext("STUDY_ABSTRACT")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError study_abstract,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError study_abstract",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             study_links = {}
@@ -305,22 +312,22 @@ def get_srx_metadata(batch_uid_list):
                         study_links[study_link.find("XREF_LINK").findtext("DB")] = study_link.find("XREF_LINK").findtext("ID")
                     if study_link.find("URL_LINK") is not None:
                         study_links[study_link.find("URL_LINK").findtext("LABEL")] = study_link.find("URL_LINK").findtext("URL")
-            srx_dict['study_links'] = study_links
+            srx_dict['study_links'] = json.dumps(study_links) #replaced str() coercion with JSON str for db
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError study_links,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError study_links",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             study_attributes = {}
             if sra_sample.find("STUDY").find("STUDY_ATTRIBUTES") is not None: #really common not to have this
                 for attr in sra_sample.find("STUDY").find("STUDY_ATTRIBUTES").iterchildren():
                     study_attributes[attr.findtext("TAG")] = attr.findtext("VALUE")
-            srx_dict['study_attributes'] = study_attributes
+            srx_dict['study_attributes'] = json.dumps(study_attributes)  #replaced str() coercion with JSON str for db
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError study_attributes,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError study_attributes",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
 
         ###SAMPLE - get some BioSample stuff that's in easier format here: sample id, biosample id (if exists; it should but sometimes doesn't); also title, sample name stuff, and description; rest get from biosample scraping
@@ -329,53 +336,53 @@ def get_srx_metadata(batch_uid_list):
             try:
                 srx_dict['sample_id'] = sra_sample.find("SAMPLE").find("IDENTIFIERS").findtext("PRIMARY_ID")
             except AttributeError:
-                f = open('ScrapeErrors.csv','a')
-                f.write(str(srx_uid)+",AttributeError sample_id,"+"get_srx_metadata\n")
-                f.close()
+                errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError sample_id",function="get_srx_metadata",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
                 pass
             try:
                 for external in sra_sample.find("SAMPLE").find("IDENTIFIERS").iterchildren("EXTERNAL_ID"):
                     if external.get("namespace")=='BioSample':
                         srx_dict['biosample_id'] = external.text
             except AttributeError:
-                f = open('ScrapeErrors.csv','a')
-                f.write(str(srx_uid)+",AttributeError biosample_id,"+"get_srx_metadata\n")
-                f.close()
+                errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError biosample_id",function="get_srx_metadata",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
                 pass
             try:
                 srx_dict['sample_title'] = sra_sample.find("SAMPLE").findtext("TITLE")
             except AttributeError:
-                f = open('ScrapeErrors.csv','a')
-                f.write(str(srx_uid)+",AttributeError sample_title,"+"get_srx_metadata\n")
-                f.close()
+                errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError sample_title",function="get_srx_metadata",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
                 pass
             try:
                 srx_dict['ncbi_taxon_id'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("TAXON_ID")
             except AttributeError:
-                f = open('ScrapeErrors.csv','a')
-                f.write(str(srx_uid)+",AttributeError ncbi_taxon_id,"+"get_srx_metadata\n")
-                f.close()
+                errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError ncbi_taxon_id",function="get_srx_metadata",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
                 pass
             try:
                 srx_dict['taxon_scientific_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("SCIENTIFIC_NAME")
             except AttributeError:
-                f = open('ScrapeErrors.csv','a')
-                f.write(str(srx_uid)+",AttributeError taxon_scientific_name,"+"get_srx_metadata\n")
-                f.close()
+                errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError taxon_scientific_name",function="get_srx_metadata",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
                 pass
             try:
                 srx_dict['taxon_common_name'] = sra_sample.find("SAMPLE").find("SAMPLE_NAME").findtext("COMMON_NAME")
             except AttributeError:
-                f = open('ScrapeErrors.csv','a')
-                f.write(str(srx_uid)+",AttributeError taxon_common_name,"+"get_srx_metadata\n")
-                f.close()
+                errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError taxon_common_name",function="get_srx_metadata",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
                 pass
             try:
                 srx_dict['sample_description'] = sra_sample.find("SAMPLE").findtext("DESCRIPTION")
             except AttributeError:
-                f = open('ScrapeErrors.csv','a')
-                f.write(str(srx_uid)+",AttributeError sample_description,"+"get_srx_metadata\n")
-                f.close()
+                errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError sample_description",function="get_srx_metadata",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
                 pass
 
         ###Pool - skip, redundant
@@ -396,17 +403,17 @@ def get_srx_metadata(batch_uid_list):
         try:
             srx_dict['num_runs_in_accession'] = len(sra_sample.find("RUN_SET").findall("RUN"))
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError num_runs_in_accession,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError num_runs_in_accession",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         try:
             run_list = sra_sample.find("RUN_SET").findall("RUN")
         except AttributeError:
             run_list = []
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(srx_uid)+",AttributeError prob missing run_set,"+"get_srx_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError prob missing run_set",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         for run in run_list:
             try:
@@ -415,9 +422,9 @@ def get_srx_metadata(batch_uid_list):
             except AttributeError:
                 run_id = None
                 run_ids.append(run_id)
-                f = open('ScrapeErrors.csv','a')
-                f.write(str(srx_uid)+",AttributeError run missing accession,"+"get_srx_metadata\n")
-                f.close()
+                errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="AttributeError run missing accession",function="get_srx_metadata",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
                 pass
             try:
                 if run.get("total_spots") is not None: #really common to be missing this, don't log error
@@ -426,9 +433,9 @@ def get_srx_metadata(batch_uid_list):
                     total_num_reads.append(None)
             except (TypeError, ValueError) as e: #will be typeerror if int(None); valueerror if can't make int (is string or weird characters)
                 total_num_reads.append(None)
-                f = open('ScrapeErrors.csv','a')
-                f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" library_reads_sequenced,get_srx_metadata\n")
-                f.close()
+                errorToWrite = ScrapeError(uid=str(srx_uid),error_msg=str(e.__class__.__name__)+"run "+str(run_id)+" library_reads_sequenced",function="get_srx_metadata",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
                 pass
             try:
                 if run.get("total_bases") is not None:
@@ -437,9 +444,9 @@ def get_srx_metadata(batch_uid_list):
                     total_num_bases.append(None)
             except (TypeError, ValueError) as e:
                 total_num_bases.append(None)
-                f = open('ScrapeErrors.csv','a')
-                f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" total_num_bases,get_srx_metadata\n")
-                f.close()
+                errorToWrite = ScrapeError(uid=str(srx_uid),error_msg=str(e.__class__.__name__)+"run "+str(run_id)+" total_num_bases",function="get_srx_metadata",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
                 pass
             try:
                 if run.get("size") is not None:
@@ -448,9 +455,9 @@ def get_srx_metadata(batch_uid_list):
                     download_size.append(None)
             except (TypeError, ValueError) as e:
                 download_size.append(None)
-                f = open('ScrapeErrors.csv','a')
-                f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" download_size,get_srx_metadata\n")
-                f.close()
+                errorToWrite = ScrapeError(uid=str(srx_uid),error_msg=str(e.__class__.__name__)+"run "+str(run_id)+" download_size",function="get_srx_metadata",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
                 pass
             try:
                 base_list = run.find("Bases").findall("Base")
@@ -494,9 +501,9 @@ def get_srx_metadata(batch_uid_list):
                         except (TypeError, ValueError) as e:
                             baseA_count.append(None)
                             countA=None
-                            f = open('ScrapeErrors.csv','a')
-                            f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseA_count,get_srx_metadata\n")
-                            f.close()
+                            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg=str(e.__class__.__name__)+"run "+str(run_id)+" baseA_count",function="get_srx_metadata",date_scraped=datetime.now())
+                            db.session.add(errorToWrite)
+                            db.session.commit()
                             pass
                         try:
                             if base.get("value")=="C":
@@ -505,9 +512,10 @@ def get_srx_metadata(batch_uid_list):
                         except (TypeError, ValueError) as e:
                             baseC_count.append(None)
                             countC=None
-                            f = open('ScrapeErrors.csv','a')
-                            f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseC_count,get_srx_metadata\n")
-                            f.close()
+                            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg=str(e.__class__.__name__)+"run "+str(run_id)+" baseC_count",function="get_srx_metadata",date_scraped=datetime.now())
+                            db.session.add(errorToWrite)
+                            db.session.commit()
+                            pass
                         try:
                             if base.get("value")=="G":
                                 baseG_count.append(int(base.get("count")))
@@ -515,9 +523,10 @@ def get_srx_metadata(batch_uid_list):
                         except (TypeError, ValueError) as e:
                             baseG_count.append(None)
                             countG=None
-                            f = open('ScrapeErrors.csv','a')
-                            f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseG_count,get_srx_metadata\n")
-                            f.close()
+                            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg=str(e.__class__.__name__)+"run "+str(run_id)+" baseG_count",function="get_srx_metadata",date_scraped=datetime.now())
+                            db.session.add(errorToWrite)
+                            db.session.commit()
+                            pass
                         try:
                             if base.get("value")=="T":
                                 baseT_count.append(int(base.get("count")))
@@ -525,48 +534,48 @@ def get_srx_metadata(batch_uid_list):
                         except (TypeError, ValueError) as e:
                             baseT_count.append(None)
                             countT=None
-                            f = open('ScrapeErrors.csv','a')
-                            f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseT_count,get_srx_metadata\n")
-                            f.close()
+                            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg=str(e.__class__.__name__)+"run "+str(run_id)+" baseT_count",function="get_srx_metadata",date_scraped=datetime.now())
+                            db.session.add(errorToWrite)
+                            db.session.commit()
+                            pass
                         try:
                             if base.get("value")=="N":
                                 baseN_count.append(int(base.get("count")))
                                 countN = int(base.get("count"))
                         except (TypeError, ValueError) as e:
                             baseN_count.append(None)
-                            f = open('ScrapeErrors.csv','a')
-                            f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" baseN_count,get_srx_metadata\n")
-                            f.close()
+                            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg=str(e.__class__.__name__)+"run "+str(run_id)+" baseN_count",function="get_srx_metadata",date_scraped=datetime.now())
+                            db.session.add(errorToWrite)
+                            db.session.commit()
+                            pass
                     try:
                         gc_percent.append(float(countG+countC)/float(countC+countG+countA+countT))
-                    except TypeError as e:
+                    except (TypeError, ZeroDivisionError) as e:
                         gc_percent.append(None)
-                        f = open('ScrapeErrors.csv','a')
-                        f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" gc_percent,get_srx_metadata\n")
-                        f.close()
+                        #don't log error because this is a pretty common error
                         pass
 
             #avg read length; need calculate, can come from "Run" or "Statistics" heading
             try:
                 #have to account for whether it's paired or single to calculate avg read length (bases/reads will be double the actual avg read count if it's paired)
                 avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Run").get("spot_count"))+float(run.find("Run").get("spot_count_mates"))))
-            except (TypeError, AttributeError) as e: #if one of these values doesn't exist (TypeError), or "Run" tag doesn't exist (AttributeError), try getting it from "Statistics" heading;
+            except (TypeError, AttributeError, ValueError, ZeroDivisionError) as e: #if one of these values doesn't exist (TypeError), or "Run" tag doesn't exist (AttributeError), or string value that can't be coerced to float (ValueError), try getting it from "Statistics" heading;
                 try:
                     avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Statistics").get("nreads"))*float(run.find("Statistics").get("nspots"))))
-                except (TypeError, AttributeError) as e:
+                except (TypeError, AttributeError, ValueError, ZeroDivisionError) as e:
                     try: #if statistics doesn't work, try dividing total bases by total reads and dividing by 2 if paired
                         if layout=='paired':
                             avg_read_length.append(float(run.get("total_bases"))/(float(run.get("total_spots"))*2))
                         elif layout=='single':
                             avg_read_length.append(float(run.get("total_bases"))/(float(run.get("total_spots"))))
-                    except (NameError,TypeError,AttributeError) as e:
+                    except (NameError,TypeError,AttributeError, ValueError, ZeroDivisionError) as e:
                         avg_read_length.append(None)
                         if e.__class__.__name__=='TypeError': #don't log typeerror because really common to be missing values
                             pass
                         else:
-                            f = open('ScrapeErrors.csv','a')
-                            f.write(str(srx_uid)+","+str(e.__class__.__name__)+"run "+str(run_id)+" avg_read_length,get_srx_metadata\n")
-                            f.close()
+                            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg=str(e.__class__.__name__)+"run "+str(run_id)+" avg_read_length",function="get_srx_metadata",date_scraped=datetime.now())
+                            db.session.add(errorToWrite)
+                            db.session.commit()
                             pass
             #quality count - need get from Run tag if exists
             qual_count = {}
@@ -579,49 +588,56 @@ def get_srx_metadata(batch_uid_list):
                     qual_count[qual.get("value")] = int(qual.get("count"))
                 except (TypeError,ValueError) as e:
                     pass
-            read_quality_counts.append(qual_count)
+            if (qual_count == {}):
+                read_quality_counts.append(None)
+            else:
+                qual_count = json.dumps(qual_count) # replaced str() coercion with json dump to string for db
+                read_quality_counts.append(qual_count)
 
         max_index = total_num_reads.index(max(total_num_reads))
 
+        #log every run scraped to its own rdict entry
+        srx_uids = [srx_uid]*len(run_ids)
+        n = len(run_ids)
+        if all(len(x) == n for x in [srx_uids,run_ids,total_num_reads,total_num_bases,download_size,avg_read_length,baseA_count,baseC_count,baseG_count,baseT_count,baseN_count,gc_percent,read_quality_counts]):
+            values = zip(srx_uids,run_ids,total_num_reads,total_num_bases,download_size,avg_read_length,baseA_count,baseC_count,baseG_count,baseT_count,baseN_count,gc_percent,read_quality_counts)
+            keys = ['db_source_uid','run_id','library_reads_sequenced','total_num_bases','download_size','avg_read_length','baseA_count','baseC_count','baseG_count','baseT_count','baseN_count','gc_percent','run_quality_counts']
+            for value in values:
+                #insert into to rdict with key of run_id
+                rdict[value[1]] = dict(zip(keys,value))
+        else:
+            errorToWrite = ScrapeError(uid=str(srx_uid),error_msg="run lists of different lengths while adding to rdict",function="get_srx_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
+            pass
+
+        #log run_ids for writing runs to db later
         srx_dict['run_ids'] = run_ids
+        #log best run (max total_num_reads) to srx data
         srx_dict['run_ids_maxrun'] = run_ids[max_index]
-        srx_dict['library_reads_sequenced'] = total_num_reads
         srx_dict['library_reads_sequenced_maxrun'] = total_num_reads[max_index]
-        srx_dict['total_num_bases'] = total_num_bases
         srx_dict['total_num_bases_maxrun'] = total_num_bases[max_index]
-        srx_dict['download_size'] = download_size
         srx_dict['download_size_maxrun'] = download_size[max_index]
-        srx_dict['avg_read_length'] = avg_read_length
         srx_dict['avg_read_length_maxrun'] = avg_read_length[max_index]
-        srx_dict['baseA_count'] = baseA_count
         srx_dict['baseA_count_maxrun'] = baseA_count[max_index]
-        srx_dict['baseC_count'] = baseC_count
         srx_dict['baseC_count_maxrun'] = baseC_count[max_index]
-        srx_dict['baseG_count'] = baseG_count
         srx_dict['baseG_count_maxrun'] = baseG_count[max_index]
-        srx_dict['baseT_count'] = baseT_count
         srx_dict['baseT_count_maxrun'] = baseT_count[max_index]
-        srx_dict['baseN_count'] = baseN_count
         srx_dict['baseN_count_maxrun'] = baseN_count[max_index]
-        srx_dict['gc_percent'] = gc_percent
         srx_dict['gc_percent_maxrun'] = gc_percent[max_index]
-        srx_dict['run_quality_counts'] = read_quality_counts
         srx_dict['run_quality_counts_maxrun'] = read_quality_counts[max_index]
 
-
+        #insert srx data into sdict with srx_uid as key
         sdict[srx_uid] = srx_dict
 
     print "...done scraping srx metadata in %s" % (datetime.now()-s_scrape_time)
 
-    return sdict
+    return sdict, rdict
 
 
-#takes list of SRX UIDs to query (batch_uid_list), and sdict into which to insert link uids;
-#return sdict with 'biosample_uid', 'pubmed_uids', and/or 'nuccore_uids' inserted; and link dict with lists of biosample_uids, pubmed_uids, and nuccore_uids to scrape
-#takes list of SRX UIDs to query (batch_uid_list), and sdict into which to insert link uids;
-#return sdict with 'biosample_uid', 'pubmed_uids', and/or 'nuccore_uids' inserted; and link dict with lists of biosample_uids, pubmed_uids, and nuccore_uids to scrape
+#takes list of SRX UIDs to query (batch_uid_list), and sdict into which to insert link uids; return sdict with 'biosample_uid' and 'pubmed_uids'; and link dict with lists of biosample_uids, pubmed_uids to scrape
 def get_links(batch_uid_list, sdict):
-    elink_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/elink.fcgi?dbfrom=sra&db=biosample,pubmed,nuccore&tool=metaseq&email=metaseekcloud%40gmail.com'
+    elink_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/elink.fcgi?dbfrom=sra&db=biosample,pubmed&tool=metaseq&email=metaseekcloud%40gmail.com'
     for key in batch_uid_list:
         #this makes url with end &id=###&id=###&id=### - returns a set of links in order of sra uids
         elink_url = elink_url+'&id='+str(key)
@@ -633,9 +649,9 @@ def get_links(batch_uid_list, sdict):
     try: #sometimes the url is parsed with lxml but is an error xml output from eutilities; this step fails in that case
         linksets = link_xml.findall("LinkSet")
     except Exception:
-        f = open('ScrapeErrors.csv','a')
-        f.write("url,eutilities connection error,"+"get_links\n")
-        f.close()
+        errorToWrite = ScrapeError(uid="url",error_msg="eutilities connection error",function="get_links",date_scraped=datetime.now())
+        db.session.add(errorToWrite)
+        db.session.commit()
         raise EutilitiesConnectionError('eutilities connection error')
 
     print "......parsing done in %s" % (datetime.now()-e_parse_time)
@@ -646,7 +662,6 @@ def get_links(batch_uid_list, sdict):
     #note if there's no biosample link, <LinkSetDb> with <DbTo>=='biosample' just won't exist
     biosample_uids = []
     pubmed_uids = []
-    nuccore_uids = []
 
     for linkset in linksets:
         srx_uid = linkset.find("IdList").findtext("Id")
@@ -665,21 +680,14 @@ def get_links(batch_uid_list, sdict):
                         id_set.append(int(uid.findtext("Id")))
                     pubmed_uids.extend(id_set)
                     sdict[srx_uid]['pubmed_uids'] = id_set
-                elif link.findtext("DbTo")=='nuccore':
-                    for uid in link.findall("Link"):
-                        id_set.append(int(uid.findtext("Id")))
-                    nuccore_uids.extend(id_set)
-                    sdict[srx_uid]['nuccore_uids'] = id_set
 
     biosample_uids = list(set(biosample_uids))
     pubmed_uids = list(set(pubmed_uids))
-    nuccore_uids = list(set(nuccore_uids))
     print "...done scraping links in %s" % (datetime.now()-e_scrape_time)
 
-    linkdict = {'biosample_uids':biosample_uids,'pubmed_uids':pubmed_uids,'nuccore_uids':nuccore_uids}
+    linkdict = {'biosample_uids':biosample_uids,'pubmed_uids':pubmed_uids}
     print "......number of biosamples to scrape: %s" % len(linkdict['biosample_uids'])
     print "......number of pubmeds to scrape: %s" % len(linkdict['pubmed_uids'])
-    print "......number of nuccores to scrape: %s" % len(linkdict['nuccore_uids'])
 
     return sdict,linkdict
 
@@ -694,9 +702,9 @@ def get_biosample_metadata(batch_uid_list,bdict):
     try:
         biosamples = bio_xml.findall("BioSample")
     except Exception:
-        f = open('ScrapeErrors.csv','a')
-        f.write("url,eutilities connection error,"+"get_biosample_metadata\n")
-        f.close()
+        errorToWrite = ScrapeError(uid="url",error_msg="eutilities connection error",function="get_biosample_metadata",date_scraped=datetime.now())
+        db.session.add(errorToWrite)
+        db.session.commit()
         raise EutilitiesConnectionError('eutilities connection error')
 
     print "...parsing done for %s biosamples in %s" % (len(batch_uid_list),(datetime.now()-b_parse_time))
@@ -711,9 +719,9 @@ def get_biosample_metadata(batch_uid_list,bdict):
             else:
                 raise AttributeError('no uid attribute in biosample')
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write("url,AttributeError couldnt find biosample id which "+str(which)+",get_biosample_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid="url",error_msg="AttributeError couldnt find biosample id which "+str(which),function="get_biosample_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             continue
         bio_dict['biosample_uid'] = bio_id
         bio_dict['biosample_link'] = "https://www.ncbi.nlm.nih.gov/biosample/"+str(bio_id)
@@ -725,27 +733,27 @@ def get_biosample_metadata(batch_uid_list,bdict):
             if biosample.find("Description").findtext("Title") is not None: #don't want to record as None in case this already exists in srx accession but is none in biosample
                 bio_dict['sample_title'] = biosample.find("Description").findtext("Title")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(bio_id)+",AttributeError sample_title ,get_biosample_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(bio_id),error_msg="AttributeError sample_title",function="get_biosample_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         #ncbi_taxon_id
         try:
             if biosample.find("Description").find("Organism").get("taxonomy_id") is not None:
                 bio_dict['ncbi_taxon_id'] = biosample.find("Description").find("Organism").get("taxonomy_id")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(bio_id)+",AttributeError ncbi_taxon_id ,get_biosample_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(bio_id),error_msg="AttributeError ncbi_taxon_id",function="get_biosample_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         #taxon_scientific_name
         try:
             if biosample.find("Description").find("Organism").get("taxonomy_name") is not None:
                 bio_dict['taxon_scientific_name'] = biosample.find("Description").find("Organism").get("taxonomy_name")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(bio_id)+",AttributeError taxon_scientific_name ,get_biosample_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(bio_id),error_msg="AttributeError taxon_scientific_name",function="get_biosample_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         #sample_description
         try:
@@ -753,30 +761,30 @@ def get_biosample_metadata(batch_uid_list,bdict):
                 if biosample.find("Description").find("Comment").findtext("Paragraph") is not None:
                     bio_dict['sample_description'] = biosample.find("Description").find("Comment").findtext("Paragraph")
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(bio_id)+",AttributeError sample_description ,get_biosample_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(bio_id),error_msg="AttributeError sample_description",function="get_biosample_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         #publication date
         try:
             bio_dict['metadata_publication_date'] = datetime.strptime(biosample.get('publication_date'), '%Y-%m-%dT%H:%M:%S.%f')
         except (TypeError,ValueError) as e: #if can't parse datetime (ValueError) or publication_date is none (TypeError)
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(bio_id)+","+str(e.__class__._name__)+" metadata_publication_date,"+"get_biosample_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(bio_id),error_msg=str(e.__class__._name__)+" metadata_publication_date",function="get_biosample_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
         #if Package exists, probably don't need Models (but get them anyway); from package/models will parse investigation_type and env_package
         if biosample.findtext("Package") is not None:
             bio_dict['biosample_package'] = biosample.findtext("Package")
         try:
-            models = []
+            models = ''
             for model in biosample.find("Models").findall("Model"):
-                models.append(model.text)
-            bio_dict['biosample_models'] = models
+                models = models + model.text + ', '
+            bio_dict['biosample_models'] = models[:-2] # remove trailing comma and space
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(bio_id)+",AttributeError biosample_models,get_biosample_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(bio_id),error_msg="biosample_models",function="get_biosample_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
 
         #Attributes - loop through attributes; save all as dict in single column (parse later)
@@ -790,15 +798,15 @@ def get_biosample_metadata(batch_uid_list,bdict):
                     elif attribute.get("attribute_name") is not None:
                         attr[attribute.get("attribute_name")] = attr_value
                 except AttributeError:
-                    f = open('ScrapeErrors.csv','a')
-                    f.write(str(bio_id)+",AttributeError sample_attribute,get_biosample_metadata\n")
-                    f.close()
+                    errorToWrite = ScrapeError(uid=str(bio_id),error_msg="AttributeError sample_attribute",function="get_biosample_metadata",date_scraped=datetime.now())
+                    db.session.add(errorToWrite)
+                    db.session.commit()
                     pass
             bio_dict['sample_attributes'] = attr
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(bio_id)+",AttributeError sample_attributes,get_biosample_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(bio_id),error_msg="AttributeError sample_attributes",function="get_biosample_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
 
         bdict[bio_id] = bio_dict
@@ -816,9 +824,9 @@ def get_pubmed_metadata(batch_uid_list,pdict):
     try:
         pubmeds = pub_xml.findall("DocSum")
     except Exception:
-        f = open('ScrapeErrors.csv','a')
-        f.write("url,eutilities connection error,get_pubmed_metadata\n")
-        f.close()
+        errorToWrite = ScrapeError(uid="url",error_msg="eutilities connection error",function="get_pubmed_metadata",date_scraped=datetime.now())
+        db.session.add(errorToWrite)
+        db.session.commit()
         raise EutilitiesConnectionError('eutilities connection error')
 
     print "......parsing done for %s pubmeds in %s" % (len(batch_uid_list),(datetime.now()-p_parse_time))
@@ -833,9 +841,9 @@ def get_pubmed_metadata(batch_uid_list,pdict):
             else:
                 raise AttributeError('no uid attribute in pubmed')
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write("uid,AttributeError couldnt find pubmed id which "+str(which)+",get_pubmed_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid="uid",error_msg="AttributeError couldnt find pubmed id which "+str(which),function="get_pubmed_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             continue
 
         pub_dict['pubmed_uid'] = pub_id
@@ -850,20 +858,24 @@ def get_pubmed_metadata(batch_uid_list,pdict):
                 try:
                     pub_dict['pub_publication_date'] = datetime.strptime(pubmed.find("Item[@Name='PubDate']").text,"%Y")
                 except (AttributeError,ValueError) as e:
-                    f = open('ScrapeErrors.csv','a')
-                    f.write(str(pub_id)+","+str(e.__class__.__name__)+" pub_publication_date,get_pubmed_metadata\n")
-                    f.close()
-                    pass
+                    try: #e.g. "2010 Jan-Feb" is common, just take first month
+                        pub_dict['pub_publication_date'] = datetime.strptime(str(pubmed.find("Item[@Name='PubDate']").text)[0:8],"%Y %b")
+                    except (AttributeError,ValueError) as e:
+                        ##TODO: flag error if is ValueError; is non-empty but can't parse (2010 Jan-Feb is common format, can get year
+                        errorToWrite = ScrapeError(uid=str(pub_id),error_msg=str(e.__class__.__name__)+" pub_publication_date",function="get_pubmed_metadata",date_scraped=datetime.now())
+                        db.session.add(errorToWrite)
+                        db.session.commit()
+                        pass
 
         try:
-            authors = []
+            authors = ''
             for author in pubmed.find("Item[@Name='AuthorList']").findall("Item[@Name='Author']"):
-                authors.append(author.text)
-            pub_dict['pub_authors'] = authors
+                authors = authors + author.text + ', '
+            pub_dict['pub_authors'] = authors[:-2] # remove trailing comma and space
         except AttributeError:
-            f = open('ScrapeErrors.csv','a')
-            f.write(str(pub_id)+",AttributeError pub_authors,get_pubmed_metadata\n")
-            f.close()
+            errorToWrite = ScrapeError(uid=str(pub_id),error_msg="AttributeError pub_authors",function="get_pubmed_metadata",date_scraped=datetime.now())
+            db.session.add(errorToWrite)
+            db.session.commit()
             pass
 
         if pubmed.findtext("Item[@Name='Title']") is not None: #if doesn't exist is just None, doesn't give attributeerror
@@ -885,7 +897,7 @@ def get_pubmed_metadata(batch_uid_list,pdict):
 
     return pdict
 
-
+###this fn is no longer used because nuccore_link field not being used, keeping just in case want it in future###
 def get_nuccore_metadata(batch_uid_list,ndict):
     print "...scraping nuccore metadata..."
     n_scrape_time = datetime.now()
@@ -904,32 +916,8 @@ def get_nuccore_metadata(batch_uid_list,ndict):
     return ndict
 
 
-def merge_scrapes(sdict,bdict,pdict,ndict):
+def merge_scrapes(sdict,bdict,pdict):
     for srx in sdict.keys():
-        if 'biosample_uid' in sdict[srx].keys():
-            #add biosample metadata fields and values to sdict[srx]
-
-            try:
-                if len(sdict[srx]['biosample_uid'])>1:
-                    raise MultipleBiosampleError
-            except MultipleBiosampleError:
-                #log an error with srx (uid), sdict[srx]['biosample_uid'] to file; look into it manually
-                f = open('ScrapeErrors.csv','a')
-                f.write(str(srx)+",MultipleBiosampleError"+str(sdict[srx]['biosample_uid'])+",merge_scrapes\n")
-                f.close()
-                continue
-                ##TODO: is a csv on the server fine? Should we save it somewhere else? In a new table in the db? This will be a very rare exception (a few per tens of thousands of accessions).
-
-            if len(sdict[srx]['biosample_uid'])==1:
-                bio = str(sdict[srx]['biosample_uid'][0])
-                if bio in bdict.keys(): #if bio not in bdict keys, why isn't it? biosample efetch doesn't exist yet for link that was found? biosample uid wasn't in efetch? eutilitiesconnection error during biosample scrape?
-                    ##TODO: error flag if a row has a value in biosample_uid but doesn't have anything in any of the biosample_fields
-                    #fields from biosample scrape need to add; don't need biosample_uid since already there
-                    biosample_fields = ['biosample_link','metadata_publication_date','biosample_package','biosample_models','sample_attributes','biosample_id', 'sample_title', 'ncbi_taxon_id', 'taxon_scientific_name', 'sample_description']
-                    for biosample_field in biosample_fields:
-                        if biosample_field in bdict[bio].keys():
-                            sdict[srx][biosample_field] = bdict[bio][biosample_field]
-
         if 'pubmed_uids' in sdict[srx].keys():
             #append pubmed metadata values to list metadata values for that field in sdict[srx] (if multiple pubmeds, e.g., for each field have list value for all pubmeds, like with run stuff)
             for pub in sdict[srx]['pubmed_uids']:
@@ -945,17 +933,28 @@ def merge_scrapes(sdict,bdict,pdict,ndict):
                             else: #otherwise add new field with list value (length of one)
                                 sdict[srx][pubmed_field] = [pdict[pub][pubmed_field]]
 
-        if 'nuccore_uids' in sdict[srx].keys():
-            #append nuccore metadata values to list metadata values for that field in sdict[srx]
-            for nuc in sdict[srx]['nuccore_uids']:
-                nuc = str(nuc)
-                if nuc in ndict.keys():
-                    #don't need nuccore_uid since already there - just add nuccore_link
-                    if 'nuccore_link' in ndict[nuc].keys():
-                        if 'nuccore_link' in sdict[srx].keys():
-                            sdict[srx]['nuccore_link'].append(ndict[nuc]['nuccore_link'])
-                        else:
-                            sdict[srx]['nuccore_link'] = [ndict[nuc]['nuccore_link']]
+        if 'biosample_uid' in sdict[srx].keys():
+            #add biosample metadata fields and values to sdict[srx]
+            try:
+                if len(sdict[srx]['biosample_uid'])>1:
+                    sdict[srx]['biosample_uid'] = None #might be really long string so change to none
+                    raise MultipleBiosampleError
+            except MultipleBiosampleError:
+                errorToWrite = ScrapeError(uid=str(srx),error_msg="MultipleBiosampleError",function="merge_scrapes",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
+                continue
+
+            if len(sdict[srx]['biosample_uid'])==1:
+                bio = str(sdict[srx]['biosample_uid'][0])
+                if bio in bdict.keys(): #if bio not in bdict keys, why isn't it? biosample efetch doesn't exist yet for link that was found? biosample uid wasn't in efetch? eutilitiesconnection error during biosample scrape?
+                    ##TODO: error flag if a row has a value in biosample_uid but doesn't have anything in any of the biosample_fields
+                    #fields from biosample scrape need to add; don't need biosample_uid since already there
+                    biosample_fields = ['biosample_link','metadata_publication_date','biosample_package','biosample_models','sample_attributes','biosample_id', 'sample_title', 'ncbi_taxon_id', 'taxon_scientific_name', 'sample_description']
+                    for biosample_field in biosample_fields:
+                        if biosample_field in bdict[bio].keys():
+                            sdict[srx][biosample_field] = bdict[bio][biosample_field]
+
     return sdict
 
 
@@ -980,6 +979,4 @@ def extract_and_merge_mixs_fields(sdict, fieldname, rules_json):
                     #add column (key:value field) to bio_dict with appropriate MIxS key field
                     sdict[srx][rule_set] = sdict[srx][fieldname][replacement]
 
-                    #not going to remove the replacement field in the dict, for e.g. where units are in the old field name ('age_in_years'); you'll be able to see it in the sample_attributes of the dataset details
-                    #choosing to leave any additional lower-priority matches in sample_attributes also
     return sdict

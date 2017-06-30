@@ -17,10 +17,13 @@ DataScraping/*
 client/build/index.html
 
 server/scrapers/SRA/subset_testdf_sframe/objects.bin
+*.pyc
 
 server/scrapers/SRA/subset_testdf.txt
+server/bootstrapData/
 
 metaseek_schema.xlsx
+server/MetaSeek_DatasetFields.xlsx
 
 *.ipynb
 
@@ -35,3 +38,4 @@ server/scrapers/SRA/SRA_AutoIngest_dev.ipynb
 *.pyc
 
 server/MetaSeek_DatasetFields.xlsx
+server/~$MetaSeek_DatasetFields.xlsx
