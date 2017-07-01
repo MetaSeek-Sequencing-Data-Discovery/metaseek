@@ -1,9 +1,12 @@
 from app import db
+import math
 import numpy as np
 import pandas as pd
+from models import *
+from datetime import datetime
+from decimal import Decimal
 from collections import Counter
 
-# Utility functions
 def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
     fieldattr = getattr(targetClass,field)
     if ruletype == 0:
@@ -31,45 +34,92 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
 
     return queryObject
 
-def summarizeColumn(dataFrame,columnName,totalRows):
+def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False):
     dataColumn = dataFrame[columnName].dropna()
     if len(dataColumn.unique()) == 0:
-        return {'NULL':totalRows}
+        return {'NULL':len(dataFrame.index)}
     else:
         groupedColumn = dataColumn.groupby(dataColumn)
         countedColumn = groupedColumn.size()
-        return dict(countedColumn)
+        countedColumnDict = dict(countedColumn)
+        if logBins == False:
+            if linearBins == False:
+                return countedColumnDict
+            else:
+                minValue = np.amin(dataColumn)
+                maxValue = np.amax(dataColumn)
+                roundTo = int(round(np.log10(maxValue-minValue)) * -1) + 1
+
+                binSize = 10**(-1 * roundTo)
+                rangeMin = round(np.amin(dataColumn),roundTo)
+                rangeMax = round(np.amax(dataColumn),roundTo) + binSize * 2
+
+                if binSize >= 1:
+                    binSize = int(binSize)
+                    rangeMin = int(rangeMin)
+                    rangeMax = int(rangeMax)
+                    bins = range(rangeMin,rangeMax,binSize)
+                # need to use np.arange for floats, range for ints
+                bins = np.arange(rangeMin,rangeMax,binSize)
+
+                counts, binEdges = np.histogram(dataColumn,bins=bins)
+
+                roundedCounts = {}
+                for index, count in enumerate(counts):
+                    # histogram labels should be ranges, not values
+                    # or we need to store min / max bounds for each bin and pass that to the frontend somehow
+                    histogramBinString = str(binEdges[index]) + '-' + str(binEdges[index + 1])
+                    roundedCounts[histogramBinString] = count
+                return roundedCounts
+        else:
+            minValue = np.amin(dataColumn)
+            minPowerFloor = math.floor(np.log10(minValue))
+            maxValue = np.amax(dataColumn)
+            maxPowerCeil = math.ceil(np.log10(maxValue))
+
+            numBins = maxPowerCeil - minPowerFloor + 1
+            logBins = np.logspace(minPowerFloor,maxPowerCeil,num=numBins)
+
+            counts, binEdges = np.histogram(dataColumn,bins=logBins)
+
+            logBinnedCounts = {}
+            for index, count in enumerate(counts):
+                # histogram labels should be ranges, not values
+                # or we need to store min / max bounds for each bin and pass that to the frontend somehow
+                histogramBinString = '10^' + str(int(index + minPowerFloor)) + '-' + '10^' + str(int(index + 1 + minPowerFloor))
+                # not sure whether I like the scientific notation strings more than this or not:
+                # histogramBinString = str(int(binEdges[index])) + '-' + str(int(binEdges[index + 1]))
+                logBinnedCounts[histogramBinString] = count
+            return logBinnedCounts
 
 def summarizeDatasets(queryObject):
     queryResultDataframe = pd.read_sql(queryObject.statement,db.session.bind)
     total = len(queryResultDataframe.index)
-    if total == 0:
-        return {
-            "summary":{
-                "totalDatasets":0,
-                "totalDownloadSize":0,
-                "investigation_type_summary":{},
-                "library_source_summary":{},
-                "env_package_summary":{},
-                "year_collected_summary":{},
-                "latitude_summary":{},
-                "longitude_summary":{},
-                "avg_read_length_summary":{},
-                "total_reads_summary":{},
-                "total_bases_summary":{},
-                "download_size_summary":{},
-                "avg_percent_gc_summary":{},
-                "latlon_map":{},
-                "empty":1
-                }
-            }
-    else:
-        #total_download_size = sum(queryResultDataframe['download_size_maxrun'])
-        total_download_size = 0
+    if total > 0:
+        # Simple aggregate responses
+        total_download_size = sum(queryResultDataframe['download_size_maxrun'].dropna())
+        # add more here . . .
 
-        investigation_summary = summarizeColumn(queryResultDataframe,'investigation_type',total)
-        lib_source_summary = summarizeColumn(queryResultDataframe,'library_source',total)
-        env_pkg_summary = summarizeColumn(queryResultDataframe,'env_package',total)
+        # Simple count histogram responses
+        investigation_summary = summarizeColumn(queryResultDataframe,'investigation_type')
+        lib_source_summary = summarizeColumn(queryResultDataframe,'library_source')
+        env_pkg_summary = summarizeColumn(queryResultDataframe,'env_package')
+        # add more here . . .
+
+        # Linear binned histogram responses
+        avg_read_length_maxrun_bins = summarizeColumn(queryResultDataframe,'avg_read_length_maxrun',linearBins=True)
+        gc_percent_maxrun_bins = summarizeColumn(queryResultDataframe,'gc_percent_maxrun',linearBins=True)
+        # add more here . . .
+
+        # Log binned histogram responses
+        library_reads_sequenced_maxrun_bins = summarizeColumn(queryResultDataframe,'library_reads_sequenced_maxrun',logBins=True)
+        total_bases_bins = summarizeColumn(queryResultDataframe,'total_num_bases_maxrun',logBins=True)
+        down_size_bins = summarizeColumn(queryResultDataframe,'download_size_maxrun',logBins=True)
+        # add more here . . .
+
+        # Complex / one-off responses
+
+        # Collection date summarizing is broken because column is no longer a datettime
 
         # collection_date - keep just year for summary for now (might want month for e.g. season searches later on, but default date is 03-13 00:00:00 and need to deal with that)
         # Would really like to fill in empty values here, histogram of years without empty years is a bit odd
@@ -78,6 +128,8 @@ def summarizeDatasets(queryObject):
         # year_summary.index = year_summary.index.to_series().astype(str)
         # year_summary = dict(year_summary)
 
+        # Lat summary is broken because lat is now a string
+
         # lat_summary = dict(queryResultDataframe.groupby('latitude').size())
         # lat_bins = Counter()
         # for k,v in lat_summary.items(): #is there a way to do this that doesn't loop through each returned value?
@@ -85,7 +137,9 @@ def summarizeDatasets(queryObject):
         #         next
         #     else:
         #         lat_bins[round(k,0)] += v
-#
+
+        # Lon summary is broken because lon is now a string
+
         # lon_summary = dict(queryResultDataframe.groupby('longitude').size())
         # lon_bins = Counter()
         # for k,v in lon_summary.items(): #is there a way to do this that doesn't loop through each returned value?
@@ -94,71 +148,7 @@ def summarizeDatasets(queryObject):
         #     else:
         #         lon_bins[round(k,0)] += v
 
-        read_length_summary = dict(queryResultDataframe.groupby('avg_read_length_maxrun').size())
-        rd_lgth_bins = Counter()
-        for k,v in read_length_summary.items(): #is there a way to do this that doesn't loop through each returned value?
-            if not k:
-                next
-            else:
-                rd_lgth_bins[round(k,-2)] += v
-
-        total_rds_summary = dict(queryResultDataframe.groupby('library_reads_sequenced_maxrun').size())
-        total_rds_bins = Counter()
-        for k,v in total_rds_summary.items():
-            if int(k)==0:
-                total_rds_bins['0'] += v #lotsa zeros
-            elif int(k)<1000: #if lower than 1000, count by hundreds
-                total_rds_bins[round(k,-2)] += v
-            elif int(k)<10000: #if lower than 10000, count by thousands
-                total_rds_bins[round(k,-3)] += v
-            elif int(k)<100000: #if between 10000-100,000, count by 10,000
-                total_rds_bins[round(k,-4)] += v
-            elif int(k)<1000000: #if between 100,000-1,000,000, count by 100,000
-                total_rds_bins[round(k,-5)] += v
-            elif int(k)<10000000: #if between 1,000,000-10,000,000, count by 1,000,000
-                total_rds_bins[round(k,-6)] += v
-            else:
-                total_rds_bins[round(k,-7)] += v #above 10,000,000, count by 10M
-
-        total_bases_summary = dict(queryResultDataframe.groupby('total_num_bases_maxrun').size())
-        total_bases_bins = Counter()
-        for k,v in total_bases_summary.items():
-            if int(k)==0:
-                total_bases_bins['0'] += v
-            elif int(k)<1000: #if lower than 1000, count by hundreds
-                total_bases_bins[round(k,-2)] += v
-            elif int(k)<10000: #if lower than 10000, count by thousands
-                total_bases_bins[round(k,-3)] += v
-            elif int(k)<100000: #if between 10000-100,000, count by 10,000
-                total_bases_bins[round(k,-4)] += v
-            elif int(k)<1000000: #if between 100,000-1,000,000, count by 100,000
-                total_bases_bins[round(k,-5)] += v
-            elif int(k)<10000000: #if between 1,000,000-10,000,000, count by 1,000,000
-                total_bases_bins[round(k,-6)] += v
-            elif int(k)<100000000: #if between 10,000,000-100,000,000, count by 10,000,000
-                total_bases_bins[round(k,-7)] += v
-            else:
-                total_bases_bins[round(k,-8)] += v #above 100,000,000, count by 100M
-
-        down_size_summary = dict(queryResultDataframe.groupby('download_size_maxrun').size())
-        down_size_bins = Counter()
-        for k,v in down_size_summary.items():
-            if int(k)==0:
-                down_size_bins['0'] += v #lotsa zeros
-            elif int(k)<1000000:
-                down_size_bins['0.1'] += v #many are skewed, can create long tail bin
-            elif int(k)<10000000:
-                down_size_bins['1000000'] += v
-            else:
-                down_size_bins[round(k,-7)] += v #round every 10MB
-
-        avg_gc_summary = dict(queryResultDataframe.groupby('gc_percent_maxrun').size())
-        avg_gc_bins = Counter()
-        for k,v in avg_gc_summary.items(): #is there a way to do this that doesn't loop through each returned value?
-            if not k:
-                next
-            else:
-                avg_gc_bins[round(k,2)] += v
+        # Map summary is broken because lat / lon are both strings
 
         #latlon  = queryResultDataframe[['latitude','longitude']]
         #latlon = latlon[pd.notnull(latlon['latitude'])]
@@ -177,20 +167,40 @@ def summarizeDatasets(queryObject):
         #        map_data.append({"lat":lat,"lon":lon,"count":value})
 
         return {
-            "summary":{
+            "summary":{ # to do change key names, to align with new field names (eg. total_reads vs. library_reads_sequenced)
                 "totalDatasets":int(total),
                 "totalDownloadSize":int(total_download_size),
                 "investigation_type_summary":investigation_summary,
                 "library_source_summary":lib_source_summary,
                 "env_package_summary":env_pkg_summary,
+                "avg_read_length_summary":avg_read_length_maxrun_bins,
+                "total_reads_summary":library_reads_sequenced_maxrun_bins,
+                "total_bases_summary":total_bases_bins,
+                "download_size_summary":down_size_bins,
+                "avg_percent_gc_summary":gc_percent_maxrun_bins,
                 #"year_collected_summary":year_summary,
                 #"latitude_summary":lat_bins,
                 #"longitude_summary":lon_bins,
-                "avg_read_length_summary":rd_lgth_bins,
-                "total_reads_summary":total_rds_bins,
-                "total_bases_summary":total_bases_bins,
-                "download_size_summary":down_size_bins,
-                "avg_percent_gc_summary":avg_gc_bins,
                 #"latlon_map":map_data
+                }
+            }
+    else:
+        return {
+            "summary":{
+                "totalDatasets":0,
+                "totalDownloadSize":0,
+                "investigation_type_summary":{},
+                "library_source_summary":{},
+                "env_package_summary":{},
+                "year_collected_summary":{},
+                "latitude_summary":{},
+                "longitude_summary":{},
+                "avg_read_length_summary":{},
+                "total_reads_summary":{},
+                "total_bases_summary":{},
+                "download_size_summary":{},
+                "avg_percent_gc_summary":{},
+                "latlon_map":{},
+                "empty":1
                 }
             }

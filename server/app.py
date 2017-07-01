@@ -44,8 +44,8 @@ def json_deserializer(key, value, flags):
 client = Client(('localhost', 11211), serializer=json_serializer, deserializer=json_deserializer)
 
 
-from models import *
 from helpers import *
+from models import *
 
 # Declare route functions
 # /user routes
@@ -220,8 +220,8 @@ class SearchDatasetsSummary(Resource):
                 return summary
             else:
                 # Uncomment to delete cache when pulled for testing
-                # print 'deleting cache hit'
-                # client.delete(cache_key)
+                print 'deleting cache hit'
+                client.delete(cache_key)
                 return from_cache
 
         except Exception as e:
