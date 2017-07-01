@@ -2,6 +2,7 @@ from app import db
 import math
 import numpy as np
 import pandas as pd
+from datetime import datetime
 from decimal import Decimal
 from collections import Counter
 
@@ -33,15 +34,18 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
     return queryObject
 
 def summarizeColumn(dataFrame,columnName,roundTo=None,log=False):
+    time_start = datetime.now()
     dataColumn = dataFrame[columnName].dropna()
     if len(dataColumn.unique()) == 0:
         return {'NULL':len(dataFrame.index)}
+        print 'time to summarize empty column: %s' % (datetime.now()-time_start)
     else:
         groupedColumn = dataColumn.groupby(dataColumn)
         countedColumn = groupedColumn.size()
         countedColumnDict = dict(countedColumn)
         if log == False:
             if roundTo == None:
+                print 'time to summarize simple column: %s' % (datetime.now()-time_start)
                 return countedColumnDict
             else:
                 binSize = 10**(-1 * roundTo)
@@ -64,7 +68,7 @@ def summarizeColumn(dataFrame,columnName,roundTo=None,log=False):
                     # or we need to store min / max bounds for each bin and pass that to the frontend somehow
                     histogramBinString = str(binEdges[index]) + '-' + str(binEdges[index + 1])
                     roundedCounts[histogramBinString] = count
-
+                print 'time to summarize hist bins: %s' % (datetime.now()-time_start)
                 return roundedCounts
         else:
             minPower = round(math.log(np.amin(dataColumn),10))
@@ -84,7 +88,7 @@ def summarizeColumn(dataFrame,columnName,roundTo=None,log=False):
                 # not sure whether I like the scientific notation strings more than this or not:
                 # histogramBinString = str(binEdges[index]) + '-' + str(binEdges[index + 1])
                 logBinnedCounts[histogramBinString] = count
-
+            print 'time to summarize log bins: %s' % (datetime.now()-time_start)
             return logBinnedCounts
 
 
