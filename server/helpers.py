@@ -1,6 +1,8 @@
 from app import db
+import math
 import numpy as np
 import pandas as pd
+from decimal import Decimal
 from collections import Counter
 
 def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
@@ -30,7 +32,7 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
 
     return queryObject
 
-def summarizeColumn(dataFrame,columnName,roundTo = None, log = False):
+def summarizeColumn(dataFrame,columnName,roundTo=None,log=False):
     dataColumn = dataFrame[columnName].dropna()
     if len(dataColumn.unique()) == 0:
         return {'NULL':len(dataFrame.index)}
@@ -38,30 +40,81 @@ def summarizeColumn(dataFrame,columnName,roundTo = None, log = False):
         groupedColumn = dataColumn.groupby(dataColumn)
         countedColumn = groupedColumn.size()
         countedColumnDict = dict(countedColumn)
-        if roundTo == None:
-            return countedColumnDict
+        if log == False:
+            if roundTo == None:
+                return countedColumnDict
+            else:
+                binSize = 10**(-1 * roundTo)
+                rangeMin = round(np.amin(dataColumn),roundTo)
+                rangeMax = round(np.amax(dataColumn),roundTo) + binSize * 2
+
+                if binSize >= 1:
+                    binSize = int(binSize)
+                    rangeMin = int(rangeMin)
+                    rangeMax = int(rangeMax)
+                    bins = range(rangeMin,rangeMax,binSize)
+                # need to use np.arange for floats, range for ints
+                bins = np.arange(rangeMin,rangeMax,binSize)
+
+                counts, binEdges = np.histogram(dataColumn,bins=bins)
+
+                roundedCounts = {}
+                for index, count in enumerate(counts):
+                    # histogram labels should be ranges, not values
+                    # or we need to store min / max bounds for each bin and pass that to the frontend somehow
+                    histogramBinString = str(binEdges[index]) + '-' + str(binEdges[index + 1])
+                    roundedCounts[histogramBinString] = count
+
+                return roundedCounts
         else:
-            roundedCounts = Counter()
-            for k,v in countedColumnDict.items():
-                roundedCounts[round(k,roundTo)] += v
-            return roundedCounts
+            minPower = round(math.log(np.amin(dataColumn),10))
+            if minPower < 2:
+                minPower = -1
+            maxPower = round(math.log(np.amax(dataColumn),10)) + 1
+
+            logBins = np.logspace(minPower,maxPower,num=11,endpoint=True)
+
+            counts, binEdges = np.histogram(dataColumn,bins=logBins)
+
+            logBinnedCounts = {}
+            for index, count in enumerate(counts):
+                # histogram labels should be ranges, not values
+                # or we need to store min / max bounds for each bin and pass that to the frontend somehow
+                histogramBinString = '%.2E' % Decimal(binEdges[index]) + '-' + '%.2E' % Decimal(binEdges[index + 1])
+                # not sure whether I like the scientific notation strings more than this or not:
+                # histogramBinString = str(binEdges[index]) + '-' + str(binEdges[index + 1])
+                logBinnedCounts[histogramBinString] = count
+
+            return logBinnedCounts
 
 def summarizeDatasets(queryObject):
     queryResultDataframe = pd.read_sql(queryObject.statement,db.session.bind)
     total = len(queryResultDataframe.index)
     if total > 0:
-        # Simple count histogram response
+        # Simple aggregate responses
+        total_download_size = sum(queryResultDataframe['download_size_maxrun'].dropna())
+        # add more here . . .
+
+        # Simple count histogram responses
         investigation_summary = summarizeColumn(queryResultDataframe,'investigation_type')
         lib_source_summary = summarizeColumn(queryResultDataframe,'library_source')
         env_pkg_summary = summarizeColumn(queryResultDataframe,'env_package')
+        # add more here . . .
 
-        # Rounded / binned histogram responses
-        avg_read_length_maxrun_bins = summarizeColumn(queryResultDataframe,'avg_read_length_maxrun', roundTo = -2)
-        gc_percent_maxrun_bins = summarizeColumn(queryResultDataframe,'gc_percent_maxrun', roundTo = 2)
+        # Rounded binned histogram responses
+        avg_read_length_maxrun_bins = summarizeColumn(queryResultDataframe,'avg_read_length_maxrun',roundTo=-2)
+        gc_percent_maxrun_bins = summarizeColumn(queryResultDataframe,'gc_percent_maxrun',roundTo=2)
+        # add more here . . .
 
-        #total_download_size = sum(queryResultDataframe['download_size_maxrun'])
-        total_download_size = 0
+        # Log binned histogram responses
+        library_reads_sequenced_maxrun_bins = summarizeColumn(queryResultDataframe,'library_reads_sequenced_maxrun',log=True)
+        total_bases_bins = summarizeColumn(queryResultDataframe,'total_num_bases_maxrun',log=True)
+        down_size_bins = summarizeColumn(queryResultDataframe,'download_size_maxrun',log=True)
+        # add more here . . .
 
+        # Complex / one-off responses
+
+        # Collection date summarizing is broken because column is no longer a datettime
 
         # collection_date - keep just year for summary for now (might want month for e.g. season searches later on, but default date is 03-13 00:00:00 and need to deal with that)
         # Would really like to fill in empty values here, histogram of years without empty years is a bit odd
@@ -70,6 +123,8 @@ def summarizeDatasets(queryObject):
         # year_summary.index = year_summary.index.to_series().astype(str)
         # year_summary = dict(year_summary)
 
+        # Lat summary is broken because lat is now a string
+
         # lat_summary = dict(queryResultDataframe.groupby('latitude').size())
         # lat_bins = Counter()
         # for k,v in lat_summary.items(): #is there a way to do this that doesn't loop through each returned value?
@@ -77,7 +132,9 @@ def summarizeDatasets(queryObject):
         #         next
         #     else:
         #         lat_bins[round(k,0)] += v
-#
+
+        # Lon summary is broken because lon is now a string
+
         # lon_summary = dict(queryResultDataframe.groupby('longitude').size())
         # lon_bins = Counter()
         # for k,v in lon_summary.items(): #is there a way to do this that doesn't loop through each returned value?
@@ -86,56 +143,7 @@ def summarizeDatasets(queryObject):
         #     else:
         #         lon_bins[round(k,0)] += v
 
-        total_rds_summary = dict(queryResultDataframe.groupby('library_reads_sequenced_maxrun').size())
-        total_rds_bins = Counter()
-        for k,v in total_rds_summary.items():
-            if int(k)==0:
-                total_rds_bins['0'] += v #lotsa zeros
-            elif int(k)<1000: #if lower than 1000, count by hundreds
-                total_rds_bins[round(k,-2)] += v
-            elif int(k)<10000: #if lower than 10000, count by thousands
-                total_rds_bins[round(k,-3)] += v
-            elif int(k)<100000: #if between 10000-100,000, count by 10,000
-                total_rds_bins[round(k,-4)] += v
-            elif int(k)<1000000: #if between 100,000-1,000,000, count by 100,000
-                total_rds_bins[round(k,-5)] += v
-            elif int(k)<10000000: #if between 1,000,000-10,000,000, count by 1,000,000
-                total_rds_bins[round(k,-6)] += v
-            else:
-                total_rds_bins[round(k,-7)] += v #above 10,000,000, count by 10M
-
-        total_bases_summary = dict(queryResultDataframe.groupby('total_num_bases_maxrun').size())
-        total_bases_bins = Counter()
-        for k,v in total_bases_summary.items():
-            if int(k)==0:
-                total_bases_bins['0'] += v
-            elif int(k)<1000: #if lower than 1000, count by hundreds
-                total_bases_bins[round(k,-2)] += v
-            elif int(k)<10000: #if lower than 10000, count by thousands
-                total_bases_bins[round(k,-3)] += v
-            elif int(k)<100000: #if between 10000-100,000, count by 10,000
-                total_bases_bins[round(k,-4)] += v
-            elif int(k)<1000000: #if between 100,000-1,000,000, count by 100,000
-                total_bases_bins[round(k,-5)] += v
-            elif int(k)<10000000: #if between 1,000,000-10,000,000, count by 1,000,000
-                total_bases_bins[round(k,-6)] += v
-            elif int(k)<100000000: #if between 10,000,000-100,000,000, count by 10,000,000
-                total_bases_bins[round(k,-7)] += v
-            else:
-                total_bases_bins[round(k,-8)] += v #above 100,000,000, count by 100M
-
-        down_size_summary = dict(queryResultDataframe.groupby('download_size_maxrun').size())
-        down_size_bins = Counter()
-        for k,v in down_size_summary.items():
-            if int(k)==0:
-                down_size_bins['0'] += v #lotsa zeros
-            elif int(k)<1000000:
-                down_size_bins['0.1'] += v #many are skewed, can create long tail bin
-            elif int(k)<10000000:
-                down_size_bins['1000000'] += v
-            else:
-                down_size_bins[round(k,-7)] += v #round every 10MB
-
+        # Map summary is broken because lat / lon are both strings
 
         #latlon  = queryResultDataframe[['latitude','longitude']]
         #latlon = latlon[pd.notnull(latlon['latitude'])]
@@ -154,40 +162,40 @@ def summarizeDatasets(queryObject):
         #        map_data.append({"lat":lat,"lon":lon,"count":value})
 
         return {
-            "summary":{
+            "summary":{ # to do change key names, to align with new field names (eg. total_reads vs. library_reads_sequenced)
                 "totalDatasets":int(total),
                 "totalDownloadSize":int(total_download_size),
                 "investigation_type_summary":investigation_summary,
                 "library_source_summary":lib_source_summary,
                 "env_package_summary":env_pkg_summary,
-                #"year_collected_summary":year_summary,
-                #"latitude_summary":lat_bins,
-                #"longitude_summary":lon_bins,
                 "avg_read_length_summary":avg_read_length_maxrun_bins,
-                "total_reads_summary":total_rds_bins,
+                "total_reads_summary":library_reads_sequenced_maxrun_bins,
                 "total_bases_summary":total_bases_bins,
                 "download_size_summary":down_size_bins,
                 "avg_percent_gc_summary":gc_percent_maxrun_bins,
+                #"year_collected_summary":year_summary,
+                #"latitude_summary":lat_bins,
+                #"longitude_summary":lon_bins,
                 #"latlon_map":map_data
                 }
             }
-        else:
-            return {
-                "summary":{
-                    "totalDatasets":0,
-                    "totalDownloadSize":0,
-                    "investigation_type_summary":{},
-                    "library_source_summary":{},
-                    "env_package_summary":{},
-                    "year_collected_summary":{},
-                    "latitude_summary":{},
-                    "longitude_summary":{},
-                    "avg_read_length_summary":{},
-                    "total_reads_summary":{},
-                    "total_bases_summary":{},
-                    "download_size_summary":{},
-                    "avg_percent_gc_summary":{},
-                    "latlon_map":{},
-                    "empty":1
-                    }
+    else:
+        return {
+            "summary":{
+                "totalDatasets":0,
+                "totalDownloadSize":0,
+                "investigation_type_summary":{},
+                "library_source_summary":{},
+                "env_package_summary":{},
+                "year_collected_summary":{},
+                "latitude_summary":{},
+                "longitude_summary":{},
+                "avg_read_length_summary":{},
+                "total_reads_summary":{},
+                "total_bases_summary":{},
+                "download_size_summary":{},
+                "avg_percent_gc_summary":{},
+                "latlon_map":{},
+                "empty":1
                 }
+            }
