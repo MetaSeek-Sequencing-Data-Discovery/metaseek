@@ -34,7 +34,7 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
 
     return queryObject
 
-def summarizeColumn(dataFrame,columnName,roundTo=None,log=False):
+def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False):
     time_start = datetime.now()
     dataColumn = dataFrame[columnName].dropna()
     if len(dataColumn.unique()) == 0:
@@ -44,11 +44,15 @@ def summarizeColumn(dataFrame,columnName,roundTo=None,log=False):
         groupedColumn = dataColumn.groupby(dataColumn)
         countedColumn = groupedColumn.size()
         countedColumnDict = dict(countedColumn)
-        if log == False:
-            if roundTo == None:
                 print 'N time to summarize simple column: %s' % (datetime.now()-time_start)
+        if logBins == False:
+            if linearBins == False:
                 return countedColumnDict
             else:
+                minValue = np.amin(dataColumn)
+                maxValue = np.amax(dataColumn)
+                roundTo = int(round(np.log10(maxValue-minValue)) * -1) + 1
+
                 binSize = 10**(-1 * roundTo)
                 rangeMin = round(np.amin(dataColumn),roundTo)
                 rangeMax = round(np.amax(dataColumn),roundTo) + binSize * 2
@@ -76,9 +80,10 @@ def summarizeColumn(dataFrame,columnName,roundTo=None,log=False):
             minPowerFloor = math.floor(np.log10(minValue))
             maxValue = np.amax(dataColumn)
             maxPowerCeil = math.ceil(np.log10(maxValue))
-            numBins = maxPowerCeil - minPowerFloor + 1
 
+            numBins = maxPowerCeil - minPowerFloor + 1
             logBins = np.logspace(minPowerFloor,maxPowerCeil,num=numBins)
+
             counts, binEdges = np.histogram(dataColumn,bins=logBins)
 
             logBinnedCounts = {}
@@ -162,8 +167,8 @@ def summarizeDatasets(queryObject):
         # Rounded binned histogram responses
         # roundTo -2 = round to 2 decimal places
         # roundTo 2 = round to 100s
-        avg_read_length_maxrun_bins = summarizeColumn(queryResultDataframe,'avg_read_length_maxrun',roundTo=-2)
-        gc_percent_maxrun_bins = summarizeColumn(queryResultDataframe,'gc_percent_maxrun',roundTo=1)
+        avg_read_length_maxrun_bins = summarizeColumn(queryResultDataframe,'avg_read_length_maxrun',linearBins=True)
+        gc_percent_maxrun_bins = summarizeColumn(queryResultDataframe,'gc_percent_maxrun',linearBins=True)
         # add more here . . .
         print gc_percent_maxrun_bins
         gc_percent_maxrun_bins_two = get_hist_bins(queryObject, Dataset.gc_percent_maxrun)
@@ -171,12 +176,12 @@ def summarizeDatasets(queryObject):
 
 
         # Log binned histogram responses
-        library_reads_sequenced_maxrun_bins = summarizeColumn(queryResultDataframe,'library_reads_sequenced_maxrun',log=True)
         print library_reads_sequenced_maxrun_bins
         library_reads_sequenced_maxrun_bins_two = get_hist_log_bins(queryObject, Dataset.library_reads_sequenced_maxrun)
         print library_reads_sequenced_maxrun_bins_two
-        total_bases_bins = summarizeColumn(queryResultDataframe,'total_num_bases_maxrun',log=True)
-        down_size_bins = summarizeColumn(queryResultDataframe,'download_size_maxrun',log=True)
+        library_reads_sequenced_maxrun_bins = summarizeColumn(queryResultDataframe,'library_reads_sequenced_maxrun',logBins=True)
+        total_bases_bins = summarizeColumn(queryResultDataframe,'total_num_bases_maxrun',logBins=True)
+        down_size_bins = summarizeColumn(queryResultDataframe,'download_size_maxrun',logBins=True)
         # add more here . . .
 
         # Complex / one-off responses
