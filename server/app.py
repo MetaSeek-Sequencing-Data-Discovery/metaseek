@@ -4,8 +4,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, Resource, reqparse, fields, marshal_with
 from dateutil import parser as dateparser
 import json
-
+from pyhashxx import hashxx
+from pymemcache.client.base import Client
 import os
+
 dbPass = os.environ['METASEEK_DB']
 
 # Config / initialize the app, database and api
@@ -21,6 +23,26 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metasee
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 api = Api(app)
+
+# Set up memcached
+def json_serializer(key, value):
+    if type(value) == str:
+        return value, 1
+    return json.dumps(value), 2
+
+def json_deserializer(key, value, flags):
+    if flags == 1:
+        return value
+    if flags == 2:
+        return json.loads(value)
+    raise Exception("Unknown serialization format")
+
+# production memcached
+# client = Client(('TODO set up prod memcached', 11211), serializer=json_serializer, deserializer=json_deserializer)
+
+# local memcached
+client = Client(('localhost', 11211), serializer=json_serializer, deserializer=json_deserializer)
+
 
 from models import *
 from helpers import *
@@ -180,16 +202,27 @@ class SearchDatasetsSummary(Resource):
 
             filter_params = json.loads(args['filter_params'])
             rules = filter_params['rules']
+            cache_key = str(hashxx(json.dumps(rules)))
 
-            queryObject = Dataset.query
+            from_cache = client.get(cache_key)
 
-            for rule in rules:
-                field = rule['field']
-                ruletype = rule['type']
-                value = rule['value']
-                queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+            if from_cache is None:
+                queryObject = Dataset.query
 
-            return summarizeDatasets(queryObject)
+                for rule in rules:
+                    field = rule['field']
+                    ruletype = rule['type']
+                    value = rule['value']
+                    queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+
+                summary = summarizeDatasets(queryObject)
+                client.set(cache_key, summary)
+                return summary
+            else:
+                # Uncomment to delete cache when pulled for testing
+                # print 'deleting cache hit'
+                # client.delete(cache_key)
+                return from_cache
 
         except Exception as e:
             return {'error': str(e)}
