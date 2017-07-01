@@ -35,16 +35,13 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
     return queryObject
 
 def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False):
-    time_start = datetime.now()
     dataColumn = dataFrame[columnName].dropna()
     if len(dataColumn.unique()) == 0:
         return {'NULL':len(dataFrame.index)}
-        print 'N time to summarize empty column: %s' % (datetime.now()-time_start)
     else:
         groupedColumn = dataColumn.groupby(dataColumn)
         countedColumn = groupedColumn.size()
         countedColumnDict = dict(countedColumn)
-                print 'N time to summarize simple column: %s' % (datetime.now()-time_start)
         if logBins == False:
             if linearBins == False:
                 return countedColumnDict
@@ -73,7 +70,6 @@ def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False):
                     # or we need to store min / max bounds for each bin and pass that to the frontend somehow
                     histogramBinString = str(binEdges[index]) + '-' + str(binEdges[index + 1])
                     roundedCounts[histogramBinString] = count
-                print 'N time to summarize hist bins: %s' % (datetime.now()-time_start)
                 return roundedCounts
         else:
             minValue = np.amin(dataColumn)
@@ -94,58 +90,7 @@ def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False):
                 # not sure whether I like the scientific notation strings more than this or not:
                 # histogramBinString = str(int(binEdges[index])) + '-' + str(int(binEdges[index + 1]))
                 logBinnedCounts[histogramBinString] = count
-            print 'N time to summarize log bins: %s' % (datetime.now()-time_start)
             return logBinnedCounts
-
-
-def get_hist_bins(queryObject,table_field):
-    time_start = datetime.now()
-    cat = np.array(queryObject.filter(table_field.isnot(None)).with_entities(table_field).all())
-    hist, edges = np.histogram(cat,density=False)
-
-    power = round(np.log10(edges[1]-edges[0]),0)*-1
-    labels = [] #do you want center point or bounding values? if bounding, can skip this bit and return edges
-    for x in range(0,len(edges)-1):
-        lower_bound = round(edges[x],int(power)+1)
-        step = round((edges[1]-edges[0])/2.0,int(power)+1)
-        labels.append(lower_bound + step)
-
-    print 'A time to get hist bins: %s' % (datetime.now()-time_start)
-
-    return zip(hist, labels)
-
-def get_hist_log_bins(queryObject,table_field):
-    time_start = datetime.now()
-    cat = np.array(queryObject.filter(table_field.isnot(None)).with_entities(table_field).all())
-    #adding one to the min in case there are zeros b/c log(0)=inf (shouldn't be generally, if there are will be counted in lowest bin)
-    log_bins = np.logspace(round(np.log10(round(min(cat),0)+1),0), round(np.log10(max(cat)),0), (round(np.log10(round(max(cat),0)),0)-round(np.log10(round(min(cat),0)+1),0)+1))
-    hist, edges = np.histogram(cat,bins=log_bins,density=False)
-    print 'A time to get hist bins: %s' % (datetime.now()-time_start)
-    return zip(hist, edges[:-1])
-
-def get_top_cat(queryObject, table_field, n, return_none_count=True): #maybe just do as cat and show top ten in browser?
-    time_start = datetime.now()
-
-    cat = np.array(queryObject.filter(table_field.isnot(None)).with_entities(table_field).all()) #doing .filter(table_field.isnot(None)) speeds up a lot if there are a lot of missing values, even if do return_none_count=True
-    unique, counts = np.unique(cat, return_counts=True)
-    cats = dict(zip(unique[counts.argsort()[-n:]],counts[counts.argsort()[-n:]]))
-    cats['other_categories'] = sum(counts[counts.argsort()[0:-n]])
-    if return_none_count:
-        nones = queryObject.filter(table_field==None).count()
-        cats['not_provided'] = nones
-    print 'A time to get top categories: %s' % (datetime.now()-time_start)
-    return cats
-
-def get_category_counts(queryObject, table_field, return_none_count=True):
-    time_start = datetime.now()
-    cat = np.array(queryObject.filter(table_field.isnot(None)).with_entities(table_field).all())
-    unique, counts = np.unique(cat, return_counts=True)
-    cat_dict = dict(zip(unique, counts))
-    if return_none_count:
-        nones = queryObject.filter(table_field==None).count()
-        cat_dict['not_provided'] = nones
-    print 'A time to get categories: %s' % (datetime.now()-time_start)
-    return cat_dict
 
 def summarizeDatasets(queryObject):
     queryResultDataframe = pd.read_sql(queryObject.statement,db.session.bind)
@@ -158,27 +103,15 @@ def summarizeDatasets(queryObject):
         # Simple count histogram responses
         investigation_summary = summarizeColumn(queryResultDataframe,'investigation_type')
         lib_source_summary = summarizeColumn(queryResultDataframe,'library_source')
-        print lib_source_summary
-        lib_source_summary_two = get_category_counts(queryObject, Dataset.library_source, return_none_count=True)
-        print lib_source_summary_two
         env_pkg_summary = summarizeColumn(queryResultDataframe,'env_package')
         # add more here . . .
 
-        # Rounded binned histogram responses
-        # roundTo -2 = round to 2 decimal places
-        # roundTo 2 = round to 100s
+        # Linear binned histogram responses
         avg_read_length_maxrun_bins = summarizeColumn(queryResultDataframe,'avg_read_length_maxrun',linearBins=True)
         gc_percent_maxrun_bins = summarizeColumn(queryResultDataframe,'gc_percent_maxrun',linearBins=True)
         # add more here . . .
-        print gc_percent_maxrun_bins
-        gc_percent_maxrun_bins_two = get_hist_bins(queryObject, Dataset.gc_percent_maxrun)
-        print gc_percent_maxrun_bins_two
-
 
         # Log binned histogram responses
-        print library_reads_sequenced_maxrun_bins
-        library_reads_sequenced_maxrun_bins_two = get_hist_log_bins(queryObject, Dataset.library_reads_sequenced_maxrun)
-        print library_reads_sequenced_maxrun_bins_two
         library_reads_sequenced_maxrun_bins = summarizeColumn(queryResultDataframe,'library_reads_sequenced_maxrun',logBins=True)
         total_bases_bins = summarizeColumn(queryResultDataframe,'total_num_bases_maxrun',logBins=True)
         down_size_bins = summarizeColumn(queryResultDataframe,'download_size_maxrun',logBins=True)
