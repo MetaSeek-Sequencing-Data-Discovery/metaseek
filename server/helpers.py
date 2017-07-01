@@ -43,27 +43,7 @@ def summarizeColumn(dataFrame,columnName,totalRows):
 def summarizeDatasets(queryObject):
     queryResultDataframe = pd.read_sql(queryObject.statement,db.session.bind)
     total = len(queryResultDataframe.index)
-    if total == 0:
-        return {
-            "summary":{
-                "totalDatasets":0,
-                "totalDownloadSize":0,
-                "investigation_type_summary":{},
-                "library_source_summary":{},
-                "env_package_summary":{},
-                "year_collected_summary":{},
-                "latitude_summary":{},
-                "longitude_summary":{},
-                "avg_read_length_summary":{},
-                "total_reads_summary":{},
-                "total_bases_summary":{},
-                "download_size_summary":{},
-                "avg_percent_gc_summary":{},
-                "latlon_map":{},
-                "empty":1
-                }
-            }
-    else:
+    if total > 0:
         #total_download_size = sum(queryResultDataframe['download_size_maxrun'])
         total_download_size = 0
 
@@ -194,3 +174,23 @@ def summarizeDatasets(queryObject):
                 #"latlon_map":map_data
                 }
             }
+        else:
+            return {
+                "summary":{
+                    "totalDatasets":0,
+                    "totalDownloadSize":0,
+                    "investigation_type_summary":{},
+                    "library_source_summary":{},
+                    "env_package_summary":{},
+                    "year_collected_summary":{},
+                    "latitude_summary":{},
+                    "longitude_summary":{},
+                    "avg_read_length_summary":{},
+                    "total_reads_summary":{},
+                    "total_bases_summary":{},
+                    "download_size_summary":{},
+                    "avg_percent_gc_summary":{},
+                    "latlon_map":{},
+                    "empty":1
+                    }
+                }
