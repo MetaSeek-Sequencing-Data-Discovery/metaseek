@@ -72,22 +72,22 @@ def summarizeColumn(dataFrame,columnName,roundTo=None,log=False):
                 print 'N time to summarize hist bins: %s' % (datetime.now()-time_start)
                 return roundedCounts
         else:
-            minPower = round(math.log(np.amin(dataColumn),10))
-            if minPower < 2:
-                minPower = -1
-            maxPower = round(math.log(np.amax(dataColumn),10)) + 1
+            minValue = np.amin(dataColumn)
+            minPowerFloor = math.floor(np.log10(minValue))
+            maxValue = np.amax(dataColumn)
+            maxPowerCeil = math.ceil(np.log10(maxValue))
+            numBins = maxPowerCeil - minPowerFloor + 1
 
-            logBins = np.logspace(minPower,maxPower,num=11,endpoint=True)
-
+            logBins = np.logspace(minPowerFloor,maxPowerCeil,num=numBins)
             counts, binEdges = np.histogram(dataColumn,bins=logBins)
 
             logBinnedCounts = {}
             for index, count in enumerate(counts):
                 # histogram labels should be ranges, not values
                 # or we need to store min / max bounds for each bin and pass that to the frontend somehow
-                histogramBinString = '%.2E' % Decimal(binEdges[index]) + '-' + '%.2E' % Decimal(binEdges[index + 1])
+                histogramBinString = '10^' + str(int(index + minPowerFloor)) + '-' + '10^' + str(int(index + 1 + minPowerFloor))
                 # not sure whether I like the scientific notation strings more than this or not:
-                # histogramBinString = str(binEdges[index]) + '-' + str(binEdges[index + 1])
+                # histogramBinString = str(int(binEdges[index])) + '-' + str(int(binEdges[index + 1]))
                 logBinnedCounts[histogramBinString] = count
             print 'N time to summarize log bins: %s' % (datetime.now()-time_start)
             return logBinnedCounts
