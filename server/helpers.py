@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 
-# Utility functions
 def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
     fieldattr = getattr(targetClass,field)
     if ruletype == 0:
@@ -31,25 +30,38 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
 
     return queryObject
 
-def summarizeColumn(dataFrame,columnName,totalRows):
+def summarizeColumn(dataFrame,columnName,roundTo = None, log = False):
     dataColumn = dataFrame[columnName].dropna()
     if len(dataColumn.unique()) == 0:
-        return {'NULL':totalRows}
+        return {'NULL':len(dataFrame.index)}
     else:
         groupedColumn = dataColumn.groupby(dataColumn)
         countedColumn = groupedColumn.size()
-        return dict(countedColumn)
+        countedColumnDict = dict(countedColumn)
+        if roundTo == None:
+            return countedColumnDict
+        else:
+            roundedCounts = Counter()
+            for k,v in countedColumnDict.items():
+                roundedCounts[round(k,roundTo)] += v
+            return roundedCounts
 
 def summarizeDatasets(queryObject):
     queryResultDataframe = pd.read_sql(queryObject.statement,db.session.bind)
     total = len(queryResultDataframe.index)
     if total > 0:
+        # Simple count histogram response
+        investigation_summary = summarizeColumn(queryResultDataframe,'investigation_type')
+        lib_source_summary = summarizeColumn(queryResultDataframe,'library_source')
+        env_pkg_summary = summarizeColumn(queryResultDataframe,'env_package')
+
+        # Rounded / binned histogram responses
+        avg_read_length_maxrun_bins = summarizeColumn(queryResultDataframe,'avg_read_length_maxrun', roundTo = -2)
+        gc_percent_maxrun_bins = summarizeColumn(queryResultDataframe,'gc_percent_maxrun', roundTo = 2)
+
         #total_download_size = sum(queryResultDataframe['download_size_maxrun'])
         total_download_size = 0
 
-        investigation_summary = summarizeColumn(queryResultDataframe,'investigation_type',total)
-        lib_source_summary = summarizeColumn(queryResultDataframe,'library_source',total)
-        env_pkg_summary = summarizeColumn(queryResultDataframe,'env_package',total)
 
         # collection_date - keep just year for summary for now (might want month for e.g. season searches later on, but default date is 03-13 00:00:00 and need to deal with that)
         # Would really like to fill in empty values here, histogram of years without empty years is a bit odd
@@ -73,14 +85,6 @@ def summarizeDatasets(queryObject):
         #         next
         #     else:
         #         lon_bins[round(k,0)] += v
-
-        read_length_summary = dict(queryResultDataframe.groupby('avg_read_length_maxrun').size())
-        rd_lgth_bins = Counter()
-        for k,v in read_length_summary.items(): #is there a way to do this that doesn't loop through each returned value?
-            if not k:
-                next
-            else:
-                rd_lgth_bins[round(k,-2)] += v
 
         total_rds_summary = dict(queryResultDataframe.groupby('library_reads_sequenced_maxrun').size())
         total_rds_bins = Counter()
@@ -132,13 +136,6 @@ def summarizeDatasets(queryObject):
             else:
                 down_size_bins[round(k,-7)] += v #round every 10MB
 
-        avg_gc_summary = dict(queryResultDataframe.groupby('gc_percent_maxrun').size())
-        avg_gc_bins = Counter()
-        for k,v in avg_gc_summary.items(): #is there a way to do this that doesn't loop through each returned value?
-            if not k:
-                next
-            else:
-                avg_gc_bins[round(k,2)] += v
 
         #latlon  = queryResultDataframe[['latitude','longitude']]
         #latlon = latlon[pd.notnull(latlon['latitude'])]
@@ -166,11 +163,11 @@ def summarizeDatasets(queryObject):
                 #"year_collected_summary":year_summary,
                 #"latitude_summary":lat_bins,
                 #"longitude_summary":lon_bins,
-                "avg_read_length_summary":rd_lgth_bins,
+                "avg_read_length_summary":avg_read_length_maxrun_bins,
                 "total_reads_summary":total_rds_bins,
                 "total_bases_summary":total_bases_bins,
                 "download_size_summary":down_size_bins,
-                "avg_percent_gc_summary":avg_gc_bins,
+                "avg_percent_gc_summary":gc_percent_maxrun_bins,
                 #"latlon_map":map_data
                 }
             }
