@@ -2,6 +2,7 @@ from app import db
 import math
 import numpy as np
 import pandas as pd
+from models import *
 from datetime import datetime
 from decimal import Decimal
 from collections import Counter
@@ -38,14 +39,14 @@ def summarizeColumn(dataFrame,columnName,roundTo=None,log=False):
     dataColumn = dataFrame[columnName].dropna()
     if len(dataColumn.unique()) == 0:
         return {'NULL':len(dataFrame.index)}
-        print 'time to summarize empty column: %s' % (datetime.now()-time_start)
+        print 'N time to summarize empty column: %s' % (datetime.now()-time_start)
     else:
         groupedColumn = dataColumn.groupby(dataColumn)
         countedColumn = groupedColumn.size()
         countedColumnDict = dict(countedColumn)
         if log == False:
             if roundTo == None:
-                print 'time to summarize simple column: %s' % (datetime.now()-time_start)
+                print 'N time to summarize simple column: %s' % (datetime.now()-time_start)
                 return countedColumnDict
             else:
                 binSize = 10**(-1 * roundTo)
@@ -68,7 +69,7 @@ def summarizeColumn(dataFrame,columnName,roundTo=None,log=False):
                     # or we need to store min / max bounds for each bin and pass that to the frontend somehow
                     histogramBinString = str(binEdges[index]) + '-' + str(binEdges[index + 1])
                     roundedCounts[histogramBinString] = count
-                print 'time to summarize hist bins: %s' % (datetime.now()-time_start)
+                print 'N time to summarize hist bins: %s' % (datetime.now()-time_start)
                 return roundedCounts
         else:
             minPower = round(math.log(np.amin(dataColumn),10))
@@ -88,7 +89,7 @@ def summarizeColumn(dataFrame,columnName,roundTo=None,log=False):
                 # not sure whether I like the scientific notation strings more than this or not:
                 # histogramBinString = str(binEdges[index]) + '-' + str(binEdges[index + 1])
                 logBinnedCounts[histogramBinString] = count
-            print 'time to summarize log bins: %s' % (datetime.now()-time_start)
+            print 'N time to summarize log bins: %s' % (datetime.now()-time_start)
             return logBinnedCounts
 
 
@@ -104,9 +105,9 @@ def get_hist_bins(queryObject,table_field):
         step = round((edges[1]-edges[0])/2.0,int(power)+1)
         labels.append(lower_bound + step)
 
-    print 'time to get hist bins: %s' % (datetime.now()-time_start)
+    print 'A time to get hist bins: %s' % (datetime.now()-time_start)
 
-    return hist, labels
+    return zip(hist, labels)
 
 def get_hist_log_bins(queryObject,table_field):
     time_start = datetime.now()
@@ -114,8 +115,8 @@ def get_hist_log_bins(queryObject,table_field):
     #adding one to the min in case there are zeros b/c log(0)=inf (shouldn't be generally, if there are will be counted in lowest bin)
     log_bins = np.logspace(round(np.log10(round(min(cat),0)+1),0), round(np.log10(max(cat)),0), (round(np.log10(round(max(cat),0)),0)-round(np.log10(round(min(cat),0)+1),0)+1))
     hist, edges = np.histogram(cat,bins=log_bins,density=False)
-    print 'time to get hist bins: %s' % (datetime.now()-time_start)
-    return hist, edges
+    print 'A time to get hist bins: %s' % (datetime.now()-time_start)
+    return zip(hist, edges[:-1])
 
 def get_top_cat(queryObject, table_field, n, return_none_count=True): #maybe just do as cat and show top ten in browser?
     time_start = datetime.now()
@@ -127,7 +128,7 @@ def get_top_cat(queryObject, table_field, n, return_none_count=True): #maybe jus
     if return_none_count:
         nones = queryObject.filter(table_field==None).count()
         cats['not_provided'] = nones
-    print 'time to get top categories: %s' % (datetime.now()-time_start)
+    print 'A time to get top categories: %s' % (datetime.now()-time_start)
     return cats
 
 def get_category_counts(queryObject, table_field, return_none_count=True):
@@ -138,7 +139,7 @@ def get_category_counts(queryObject, table_field, return_none_count=True):
     if return_none_count:
         nones = queryObject.filter(table_field==None).count()
         cat_dict['not_provided'] = nones
-    print 'time to get categories: %s' % (datetime.now()-time_start)
+    print 'A time to get categories: %s' % (datetime.now()-time_start)
     return cat_dict
 
 def summarizeDatasets(queryObject):
@@ -152,16 +153,28 @@ def summarizeDatasets(queryObject):
         # Simple count histogram responses
         investigation_summary = summarizeColumn(queryResultDataframe,'investigation_type')
         lib_source_summary = summarizeColumn(queryResultDataframe,'library_source')
+        print lib_source_summary
+        lib_source_summary_two = get_category_counts(queryObject, Dataset.library_source, return_none_count=True)
+        print lib_source_summary_two
         env_pkg_summary = summarizeColumn(queryResultDataframe,'env_package')
         # add more here . . .
 
         # Rounded binned histogram responses
+        # roundTo -2 = round to 2 decimal places
+        # roundTo 2 = round to 100s
         avg_read_length_maxrun_bins = summarizeColumn(queryResultDataframe,'avg_read_length_maxrun',roundTo=-2)
-        gc_percent_maxrun_bins = summarizeColumn(queryResultDataframe,'gc_percent_maxrun',roundTo=2)
+        gc_percent_maxrun_bins = summarizeColumn(queryResultDataframe,'gc_percent_maxrun',roundTo=1)
         # add more here . . .
+        print gc_percent_maxrun_bins
+        gc_percent_maxrun_bins_two = get_hist_bins(queryObject, Dataset.gc_percent_maxrun)
+        print gc_percent_maxrun_bins_two
+
 
         # Log binned histogram responses
         library_reads_sequenced_maxrun_bins = summarizeColumn(queryResultDataframe,'library_reads_sequenced_maxrun',log=True)
+        print library_reads_sequenced_maxrun_bins
+        library_reads_sequenced_maxrun_bins_two = get_hist_log_bins(queryObject, Dataset.library_reads_sequenced_maxrun)
+        print library_reads_sequenced_maxrun_bins_two
         total_bases_bins = summarizeColumn(queryResultDataframe,'total_num_bases_maxrun',log=True)
         down_size_bins = summarizeColumn(queryResultDataframe,'download_size_maxrun',log=True)
         # add more here . . .
