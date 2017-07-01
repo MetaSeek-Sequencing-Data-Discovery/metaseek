@@ -57,20 +57,27 @@ def get_hist_log_bins(queryObject,table_field):
     print 'time to get hist bins: %s' % (datetime.now()-time_start)
     return hist, edges
 
-def get_top_cat(queryObject, table_field, n):
+def get_top_cat(queryObject, table_field, n, return_none_count=True): #maybe just do as cat and show top ten in browser?
     time_start = datetime.now()
-    cat = np.array(queryObject.with_entities(table_field).all())
+
+    cat = np.array(queryObject.filter(table_field.isnot(None)).with_entities(table_field).all()) #doing .filter(table_field.isnot(None)) speeds up a lot if there are a lot of missing values, even if do return_none_count=True
     unique, counts = np.unique(cat, return_counts=True)
     cats = dict(zip(unique[counts.argsort()[-n:]],counts[counts.argsort()[-n:]]))
     cats['other_categories'] = sum(counts[counts.argsort()[0:-n]])
+    if return_none_count:
+        nones = queryObject.filter(table_field==None).count()
+        cats['not_provided'] = nones
     print 'time to get top categories: %s' % (datetime.now()-time_start)
     return cats
 
-def get_category_counts(queryObject, table_field):
+def get_category_counts(queryObject, table_field, return_none_count=True):
     time_start = datetime.now()
-    cat = np.array(queryObject.with_entities(table_field).all())
+    cat = np.array(queryObject.filter(table_field.isnot(None)).with_entities(table_field).all())
     unique, counts = np.unique(cat, return_counts=True)
     cat_dict = dict(zip(unique, counts))
+    if return_none_count:
+        nones = queryObject.filter(table_field==None).count()
+        cat_dict['not_provided'] = nones
     print 'time to get categories: %s' % (datetime.now()-time_start)
     return cat_dict
 
