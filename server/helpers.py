@@ -31,6 +31,15 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
 
     return queryObject
 
+def summarizeColumn(dataFrame,columnName,totalRows):
+    dataColumn = dataFrame[columnName].dropna()
+    if len(dataColumn.unique()) == 0:
+        return {'NULL':totalRows}
+    else:
+        groupedColumn = dataColumn.groupby(dataColumn)
+        countedColumn = groupedColumn.size()
+        return dict(countedColumn)
+
 def summarizeDatasets(queryObject):
     queryResultDataframe = pd.read_sql(queryObject.statement,db.session.bind)
     total = len(queryResultDataframe.index)
@@ -58,17 +67,9 @@ def summarizeDatasets(queryObject):
         #total_download_size = sum(queryResultDataframe['download_size_maxrun'])
         total_download_size = 0
 
-        investigation_summary = dict(queryResultDataframe.groupby('investigation_type').size())
-        if '' in investigation_summary.keys():
-            del investigation_summary['']
-
-        lib_source_summary = dict(queryResultDataframe.groupby('library_source').size())
-        if '' in lib_source_summary.keys():
-            del lib_source_summary['']
-
-        env_pkg_summary = dict(queryResultDataframe.groupby('env_package').size())
-        if '' in env_pkg_summary.keys():
-            del env_pkg_summary['']
+        investigation_summary = summarizeColumn(queryResultDataframe,'investigation_type',total)
+        lib_source_summary = summarizeColumn(queryResultDataframe,'library_source',total)
+        env_pkg_summary = summarizeColumn(queryResultDataframe,'env_package',total)
 
         # collection_date - keep just year for summary for now (might want month for e.g. season searches later on, but default date is 03-13 00:00:00 and need to deal with that)
         # Would really like to fill in empty values here, histogram of years without empty years is a bit odd
