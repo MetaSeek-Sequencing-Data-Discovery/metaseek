@@ -87,6 +87,56 @@ def summarizeColumn(dataFrame,columnName,roundTo=None,log=False):
 
             return logBinnedCounts
 
+
+def get_hist_bins(queryObject,table_field):
+    time_start = datetime.now()
+    cat = np.array(queryObject.filter(table_field.isnot(None)).with_entities(table_field).all())
+    hist, edges = np.histogram(cat,density=False)
+
+    power = round(np.log10(edges[1]-edges[0]),0)*-1
+    labels = [] #do you want center point or bounding values? if bounding, can skip this bit and return edges
+    for x in range(0,len(edges)-1):
+        lower_bound = round(edges[x],int(power)+1)
+        step = round((edges[1]-edges[0])/2.0,int(power)+1)
+        labels.append(lower_bound + step)
+
+    print 'time to get hist bins: %s' % (datetime.now()-time_start)
+
+    return hist, labels
+
+def get_hist_log_bins(queryObject,table_field):
+    time_start = datetime.now()
+    cat = np.array(queryObject.filter(table_field.isnot(None)).with_entities(table_field).all())
+    #adding one to the min in case there are zeros b/c log(0)=inf (shouldn't be generally, if there are will be counted in lowest bin)
+    log_bins = np.logspace(round(np.log10(round(min(cat),0)+1),0), round(np.log10(max(cat)),0), (round(np.log10(round(max(cat),0)),0)-round(np.log10(round(min(cat),0)+1),0)+1))
+    hist, edges = np.histogram(cat,bins=log_bins,density=False)
+    print 'time to get hist bins: %s' % (datetime.now()-time_start)
+    return hist, edges
+
+def get_top_cat(queryObject, table_field, n, return_none_count=True): #maybe just do as cat and show top ten in browser?
+    time_start = datetime.now()
+
+    cat = np.array(queryObject.filter(table_field.isnot(None)).with_entities(table_field).all()) #doing .filter(table_field.isnot(None)) speeds up a lot if there are a lot of missing values, even if do return_none_count=True
+    unique, counts = np.unique(cat, return_counts=True)
+    cats = dict(zip(unique[counts.argsort()[-n:]],counts[counts.argsort()[-n:]]))
+    cats['other_categories'] = sum(counts[counts.argsort()[0:-n]])
+    if return_none_count:
+        nones = queryObject.filter(table_field==None).count()
+        cats['not_provided'] = nones
+    print 'time to get top categories: %s' % (datetime.now()-time_start)
+    return cats
+
+def get_category_counts(queryObject, table_field, return_none_count=True):
+    time_start = datetime.now()
+    cat = np.array(queryObject.filter(table_field.isnot(None)).with_entities(table_field).all())
+    unique, counts = np.unique(cat, return_counts=True)
+    cat_dict = dict(zip(unique, counts))
+    if return_none_count:
+        nones = queryObject.filter(table_field==None).count()
+        cat_dict['not_provided'] = nones
+    print 'time to get categories: %s' % (datetime.now()-time_start)
+    return cat_dict
+
 def summarizeDatasets(queryObject):
     queryResultDataframe = pd.read_sql(queryObject.statement,db.session.bind)
     total = len(queryResultDataframe.index)
