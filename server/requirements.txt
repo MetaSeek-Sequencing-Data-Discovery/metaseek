@@ -10,4 +10,5 @@ sframe==2.1
 SQLAlchemy==1.1.6
 pymysql
 Flask-Migrate==2.0.4
-sframe==2.1
+pymemcache==1.4.3
+pyhashxx==0.1.3

@@ -4,8 +4,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, Resource, reqparse, fields, marshal_with
 from dateutil import parser as dateparser
 import json
-
+from pyhashxx import hashxx
+from pymemcache.client.base import Client
 import os
+
 dbPass = os.environ['METASEEK_DB']
 
 # Config / initialize the app, database and api
@@ -21,6 +23,26 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metasee
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 api = Api(app)
+
+# Set up memcached
+def json_serializer(key, value):
+    if type(value) == str:
+        return value, 1
+    return json.dumps(value), 2
+
+def json_deserializer(key, value, flags):
+    if flags == 1:
+        return value
+    if flags == 2:
+        return json.loads(value)
+    raise Exception("Unknown serialization format")
+
+# production memcached
+# client = Client(('TODO set up prod memcached', 11211), serializer=json_serializer, deserializer=json_deserializer)
+
+# local memcached
+client = Client(('localhost', 11211), serializer=json_serializer, deserializer=json_deserializer)
+
 
 from models import *
 from helpers import *
@@ -85,16 +107,16 @@ class CreateDataset(Resource):
             parser = reqparse.RequestParser()
             # Note that any arguments added here MUST be present in the POST request or the request will fail with
             # 400 - Bad Request as the response
-            parser.add_argument('latitude', type=float, help='Email address to create user')
-            parser.add_argument('longitude', type=float)
+            parser.add_argument('latitude', type=str)
+            parser.add_argument('longitude', type=str)
             parser.add_argument('investigation_type',type=str)
             parser.add_argument('env_package',type=str)
             parser.add_argument('library_source',type=str)
-            parser.add_argument('avg_read_length',type=float)
+            parser.add_argument('avg_read_length_maxrun',type=float)
             parser.add_argument('total_num_reads',type=int)
             parser.add_argument('total_num_bases',type=int)
-            parser.add_argument('download_size',type=int)
-            parser.add_argument('avg_percent_gc',type=float)
+            parser.add_argument('download_size_maxrun',type=int)
+            parser.add_argument('gc_percent_maxrun',type=float)
             parser.add_argument('biosample_link',type=str)
             parser.add_argument('sample_title',type=str)
             parser.add_argument('collection_date',type=str)
@@ -105,7 +127,7 @@ class CreateDataset(Resource):
             except ValueError:
                 datetimeguess = None
 
-            newDataset = Dataset(args['biosample_link'],args['sample_title'],args['investigation_type'],args['library_source'], args['env_package'],datetimeguess, args['latitude'], args['longitude'], args['avg_read_length'], args['total_num_reads'], args['total_num_bases'], args['download_size'],args['avg_percent_gc'])
+            newDataset = Dataset(args['biosample_link'],args['sample_title'],args['investigation_type'],args['library_source'], args['env_package'],datetimeguess, args['latitude'], args['longitude'], args['avg_read_length_maxrun'], args['total_num_reads'], args['total_num_bases_maxrun'], args['download_size_maxrun'],args['gc_percent_maxrun'])
             db.session.add(newDataset)
             db.session.commit()
             return {"dataset":{"id":newDataset.id,"uri":url_for('getdataset',id=newDataset.id,_external=True)}}
@@ -114,18 +136,18 @@ class CreateDataset(Resource):
             return {'error': str(e)}
 
 marshalledDatasetFields = {
-    'latitude':fields.Float,
-    'longitude':fields.Float,
+    'latitude':fields.String,
+    'longitude':fields.String,
     'investigation_type':fields.String,
     'env_package':fields.String,
     'library_source':fields.String,
-    'avg_read_length':fields.Float,
+    'avg_read_length_maxrun':fields.Float,
     'total_num_reads':fields.Integer,
-    'total_num_bases':fields.Integer,
-    'download_size':fields.Integer,
-    'avg_percent_gc':fields.Float,
+    'total_num_bases_maxrun':fields.Integer,
+    'download_size_maxrun':fields.Integer,
+    'gc_percent_maxrun':fields.Float,
     'biosample_link':fields.String,
-    'collection_date':fields.DateTime,
+    'collection_date':fields.String,
     'sample_title':fields.String,
     'id':fields.Integer,
     #this should also return the etc field for e.g. dataset details
@@ -180,16 +202,27 @@ class SearchDatasetsSummary(Resource):
 
             filter_params = json.loads(args['filter_params'])
             rules = filter_params['rules']
+            cache_key = str(hashxx(json.dumps(rules)))
 
-            queryObject = Dataset.query
+            from_cache = client.get(cache_key)
 
-            for rule in rules:
-                field = rule['field']
-                ruletype = rule['type']
-                value = rule['value']
-                queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+            if from_cache is None:
+                queryObject = Dataset.query
 
-            return summarizeDatasets(queryObject)
+                for rule in rules:
+                    field = rule['field']
+                    ruletype = rule['type']
+                    value = rule['value']
+                    queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+
+                summary = summarizeDatasets(queryObject)
+                client.set(cache_key, summary)
+                return summary
+            else:
+                # Uncomment to delete cache when pulled for testing
+                # print 'deleting cache hit'
+                # client.delete(cache_key)
+                return from_cache
 
         except Exception as e:
             return {'error': str(e)}
