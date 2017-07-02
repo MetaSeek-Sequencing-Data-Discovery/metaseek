@@ -3,7 +3,6 @@
 *.frame_idx
 *.sidx
 *.csv
-*.ini
 *.docx
 *.xls
 *.xlsx
