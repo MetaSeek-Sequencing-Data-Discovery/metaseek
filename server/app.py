@@ -190,8 +190,20 @@ class SearchDatasets(Resource):
 
 class GetDatasetSummary(Resource):
     def get(self):
-        queryObject = Dataset.query
-        return summarizeDatasets(queryObject)
+        cache_key = 'norules'
+
+        from_cache = client.get(cache_key)
+
+        if from_cache is None:
+            queryObject = Dataset.query
+            summary = summarizeDatasets(queryObject)
+            client.set(cache_key, summary)
+            return summary
+        else:
+            # Uncomment to delete cache when pulled for testing
+            # print 'deleting cache hit'
+            # client.delete(cache_key)
+            return from_cache
 
 class SearchDatasetsSummary(Resource):
     def post(self):
@@ -220,8 +232,8 @@ class SearchDatasetsSummary(Resource):
                 return summary
             else:
                 # Uncomment to delete cache when pulled for testing
-                print 'deleting cache hit'
-                client.delete(cache_key)
+                # print 'deleting cache hit'
+                # client.delete(cache_key)
                 return from_cache
 
         except Exception as e:

@@ -3,11 +3,13 @@
 #test adding runs to db
 import sys
 sys.path.append('../..')
+sys.path.append('..')
 from app import db
 from pymysql import err
 from sqlalchemy import exc
 from SRA_scrape_fns import *
 from models import *
+from shared import *
 
 metaseek_fields = ['db_source_uid',
 'db_source',
@@ -67,6 +69,8 @@ metaseek_fields = ['db_source_uid',
 'lat_lon',
 'latitude',
 'longitude',
+'meta_latitude',
+'meta_longitude',
 'geo_loc_name',
 'collection_date',
 'collection_time',
@@ -133,6 +137,7 @@ if __name__ == "__main__":
     print "Removing uids already in MetaSeek..."
     result = db.session.query(Dataset.db_source_uid).filter(Dataset.db_source=='SRA').distinct()
     existing_uids = [r.db_source_uid for r in result]
+
     #subtract any uids already in db from uid_list
     uids_to_scrape = list(set(uid_list)-set(existing_uids))
     print "...REMAINING NUMBER OF UIDS TO SCRAPE: %s" % (len(uids_to_scrape))
@@ -203,11 +208,19 @@ if __name__ == "__main__":
 
         ##TODO: check whether if biosample_uids exists, and no biosample attribs added; log to scrapeerrors if so; same for pubmeds
 
-        ##TODO: write metadata row by row to db
         print "-writing data to database..."
         for srx in sdict.keys():
             #add date scraped field as right now!
             sdict[srx]['date_scraped'] = datetime.now()
+
+            if 'lat_lon' in sdict[srx]:
+                meta_latitude, meta_longitude = parseLatLon(sdict[srx]['lat_lon'])
+                sdict[srx]['meta_latitude'] = meta_latitude
+                sdict[srx]['meta_longitude'] = meta_longitude
+            if 'latitude' in sdict[srx] and 'longitude' in sdict[srx]:
+                sdict[srx]['meta_latitude'] = parseLatitude(sdict[srx]['latitude'])
+                sdict[srx]['meta_longitude'] = parseLongitude(sdict[srx]['longitude'])
+
             #get row in correct order keys
             row_to_write = [sdict[srx][x] if x in sdict[srx].keys() else None for x in metaseek_fields]
             newDataset = Dataset(*row_to_write)
