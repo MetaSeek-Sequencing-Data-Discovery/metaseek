@@ -12,3 +12,4 @@ pymysql
 Flask-Migrate==2.0.4
 pymemcache==1.4.3
 pyhashxx==0.1.3
+lxml==3.8.0
