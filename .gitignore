@@ -21,6 +21,15 @@ client/build/index.html
 
 server/bootstrapData/
 server/secrets.py
+server/bin/
+server/include/
+server/lib/
+server/local/
+server/pip-selfcheck.json
+server/share/
+
+
+
 
 server/scrapers/SRA/subset_testdf.txt
 metaseek_schema.txt
