@@ -39,13 +39,13 @@ def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False):
     if len(dataColumn.unique()) == 0:
         return {'NULL':len(dataFrame.index)}
     else:
-        groupedColumn = dataColumn.groupby(dataColumn)
-        countedColumn = groupedColumn.size()
-        countedColumnDict = dict(countedColumn)
         if logBins == False:
-            if linearBins == False:
-                return countedColumnDict
-            else:
+            if linearBins == False or len(dataColumn)==1:
+                groupedColumn = dataColumn.groupby(dataColumn)
+                countedColumn = groupedColumn.size()
+                countedColumnDict = dict(countedColumn)
+                return countedColumnDict #categorical hist
+            else: #linear bin hist
                 minValue = np.amin(dataColumn)
                 maxValue = np.amax(dataColumn)
                 roundTo = int(round(np.log10(maxValue-minValue)) * -1) + 1
@@ -71,7 +71,7 @@ def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False):
                     histogramBinString = str(binEdges[index]) + '-' + str(binEdges[index + 1])
                     roundedCounts[histogramBinString] = count
                 return roundedCounts
-        else:
+        else: #logbin hist
             minValue = np.amin(dataColumn)
             minPowerFloor = math.floor(np.log10(minValue))
             maxValue = np.amax(dataColumn)
@@ -104,15 +104,27 @@ def summarizeDatasets(queryObject):
         investigation_summary = summarizeColumn(queryResultDataframe,'investigation_type')
         lib_source_summary = summarizeColumn(queryResultDataframe,'library_source')
         env_pkg_summary = summarizeColumn(queryResultDataframe,'env_package')
+        lib_strategy_summary = summarizeColumn(queryResultDataframe,'library_strategy')
+        lib_screening_strategy_summary = summarizeColumn(queryResultDataframe,'library_screening_strategy')
+        lib_construction_method_summary = summarizeColumn(queryResultDataframe,'library_construction_method')
+        study_type_summary = summarizeColumn(queryResultDataframe,'study_type')
+        sequencing_method_summary = summarizeColumn(queryResultDataframe,'sequencing_method')
+
+        #maybe top-10 or top-15 categorical responses
+        instrument_model_summary = summarizeColumn(queryResultDataframe,'instrument_model')
+        geo_loc_name_summary = summarizeColumn(queryResultDataframe,'geo_loc_name')
+        env_biome_summary = summarizeColumn(queryResultDataframe,'env_biome')
+        env_feature_summary = summarizeColumn(queryResultDataframe,'env_feature')
+        env_material_summary = summarizeColumn(queryResultDataframe,'env_material')
         # add more here . . .
 
         # Linear binned histogram responses
-        avg_read_length_maxrun_bins = summarizeColumn(queryResultDataframe,'avg_read_length_maxrun',linearBins=True)
-        gc_percent_maxrun_bins = summarizeColumn(queryResultDataframe,'gc_percent_maxrun',linearBins=True)
+        avg_read_length_summary = summarizeColumn(queryResultDataframe,'avg_read_length_maxrun',linearBins=True)
+        gc_percent_summary = summarizeColumn(queryResultDataframe,'gc_percent_maxrun',linearBins=True)
         # add more here . . .
 
         # Log binned histogram responses
-        library_reads_sequenced_maxrun_bins = summarizeColumn(queryResultDataframe,'library_reads_sequenced_maxrun',logBins=True)
+        library_reads_sequenced_summary = summarizeColumn(queryResultDataframe,'library_reads_sequenced_maxrun',logBins=True)
         total_bases_bins = summarizeColumn(queryResultDataframe,'total_num_bases_maxrun',logBins=True)
         down_size_bins = summarizeColumn(queryResultDataframe,'download_size_maxrun',logBins=True)
         # add more here . . .
@@ -170,37 +182,64 @@ def summarizeDatasets(queryObject):
             "summary":{ # to do change key names, to align with new field names (eg. total_reads vs. library_reads_sequenced)
                 "totalDatasets":int(total),
                 "totalDownloadSize":int(total_download_size),
-                "investigation_type_summary":investigation_summary,
+
+                "library_strategy_summary":lib_strategy_summary,
                 "library_source_summary":lib_source_summary,
-                "env_package_summary":env_pkg_summary,
-                "avg_read_length_summary":avg_read_length_maxrun_bins,
-                "total_reads_summary":library_reads_sequenced_maxrun_bins,
-                "total_bases_summary":total_bases_bins,
+                "library_screening_strategy_summary":lib_screening_strategy_summary,
+                "library_construction_method_summary":lib_construction_method_summary,
+                "sequencing_method_summary":sequencing_method_summary,
+                "library_reads_sequenced_summary":library_reads_sequenced_summary,
                 "download_size_summary":down_size_bins,
-                "avg_percent_gc_summary":gc_percent_maxrun_bins,
-                #"year_collected_summary":year_summary,
-                #"latitude_summary":lat_bins,
-                #"longitude_summary":lon_bins,
-                #"latlon_map":map_data
+                "avg_read_length_summary":avg_read_length_summary,
+                "gc_percent_summary":gc_percent_summary,
+                "investigation_type_summary":investigation_summary,
+                "env_package_summary":env_pkg_summary,
+
+                "instrument_model_summary":instrument_model_summary,
+                "study_type_summary":study_type_summary,
+                "total_num_bases_summary":total_bases_bins,
+                "geo_loc_name_summary":geo_loc_name_summary,
+                "env_biome_summary":env_biome_summary,
+                "env_feature_summary":env_feature_summary,
+                "env_material_summary":env_material_summary,
+                #"year_collected_summary":{}, #from metadata_publication_date
+
+                #latitude_summary
+                #longitude_summary
+                #lat_lon
                 }
             }
     else:
         return {
             "summary":{
                 "totalDatasets":0,
-                "totalDownloadSize":0,
-                "investigation_type_summary":{},
+                "total_download_size":0,
+
+                "library_strategy_summary":{},
                 "library_source_summary":{},
-                "env_package_summary":{},
-                "year_collected_summary":{},
-                "latitude_summary":{},
-                "longitude_summary":{},
-                "avg_read_length_summary":{},
-                "total_reads_summary":{},
-                "total_bases_summary":{},
+                "library_screening_strategy_summary":{},
+                "library_construction_method_summary":{},
+                "sequencing_method_summary":{},
+                "library_reads_sequenced_summary":{},
                 "download_size_summary":{},
-                "avg_percent_gc_summary":{},
-                "latlon_map":{},
+                "avg_read_length_summary":{},
+                "gc_percent_summary":{},
+                "investigation_type_summary":{},
+                "env_package_summary":{},
+
+                "instrument_model_summary":{},
+                "study_type_summary":{},
+                "total_num_bases_summary":{},
+                "geo_loc_name_summary":{},
+                "env_biome_summary":{},
+                "env_feature_summary":{},
+                "env_material_summary":{},
+                #"year_collected_summary":{}, #from metadata_publication_date
+
+                #latitude_summary
+                #longitude_summary
+                #lat_lon
+
                 "empty":1
                 }
             }
