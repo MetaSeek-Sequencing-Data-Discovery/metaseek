@@ -20,7 +20,7 @@ def parseLatLon(lat_lon_string):
         if split[0][3]=='W':
             lon = float(lon)*-1
         lon = float(lon)
-        if lon >= -180 and lon <= 180 and lat >= -180 and lat <= 180:
+        if lon >= -180 and lon <= 180 and lat >= -90 and lat <= 90:
             return lat, lon
         else:
             return None
@@ -37,7 +37,7 @@ def parseLatLon(lat_lon_string):
             lon = lon/100000.0
         elif lon>100000:
             lon = lon/10000.0
-        if lon >= -180 and lon <= 180 and lat >= -180 and lat <= 180:
+        if lon >= -180 and lon <= 180 and lat >= -90 and lat <= 90:
             return lat, lon
         else:
             return None
@@ -46,7 +46,7 @@ def parseLatLon(lat_lon_string):
         split4 = match4[0].split(', ')
         lat = float(split4[0])
         lon = float(split4[1])
-        if lon >= -180 and lon <= 180 and lat >= -180 and lat <= 180:
+        if lon >= -180 and lon <= 180 and lat >= -90 and lat <= 90:
             return lat, lon
         else:
             return None
@@ -75,8 +75,8 @@ def parseLatitude(lat_string):
         except:
             return None
 
-    if lon >= -180 and lon <= 180:
-        return lon
+    if lat >= -90 and lat <= 90:
+        return lat
     else:
         return None
 
