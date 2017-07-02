@@ -66,6 +66,8 @@ class Dataset(db.Model):
     lat_lon = db.Column(db.Text)
     latitude = db.Column(db.Text)
     longitude = db.Column(db.Text)
+    meta_latitude = db.Column(db.Float)
+    meta_longitude = db.Column(db.Float)
     geo_loc_name = db.Column(db.Text)
     collection_date = db.Column(db.Text)
     collection_time = db.Column(db.Text)
@@ -115,7 +117,7 @@ class Dataset(db.Model):
     num_runs_in_accession=None,run_ids_maxrun=None,library_reads_sequenced_maxrun=None,total_num_bases_maxrun=None,download_size_maxrun=None,avg_read_length_maxrun=None,
     baseA_count_maxrun=None,baseC_count_maxrun=None,baseG_count_maxrun=None,baseT_count_maxrun=None,baseN_count_maxrun=None,gc_percent_maxrun=None,run_quality_counts_maxrun=None,
     biosample_uid=None,biosample_link=None,metadata_publication_date=None,biosample_package=None,biosample_models=None,sample_attributes=None,
-    investigation_type=None,env_package=None,project_name=None,lat_lon=None,latitude=None,longitude=None,geo_loc_name=None,collection_date=None,collection_time=None,env_biome=None,env_feature=None,env_material=None,depth=None,elevation=None,altitude=None,target_gene=None,target_subfragment=None,
+    investigation_type=None,env_package=None,project_name=None,lat_lon=None,latitude=None,longitude=None,meta_latitude=None,meta_longitude=None,geo_loc_name=None,collection_date=None,collection_time=None,env_biome=None,env_feature=None,env_material=None,depth=None,elevation=None,altitude=None,target_gene=None,target_subfragment=None,
     ploidy=None,num_replicons=None,estimated_size=None,ref_biomaterial=None,propagation=None,assembly=None,finishing_strategy=None,isol_growth_condt=None,experimental_factor=None,specific_host=None,subspecific_genetic_lineage=None,tissue=None,sex=None,sample_type=None,age=None,dev_stage=None,biomaterial_provider=None,host_disease=None,
     date_scraped=None):
 
@@ -177,6 +179,8 @@ class Dataset(db.Model):
         self.lat_lon = lat_lon
         self.latitude = latitude
         self.longitude = longitude
+        self.meta_latitude = meta_latitude
+        self.meta_longitude = meta_longitude
         self.geo_loc_name = geo_loc_name
         self.collection_date = collection_date
         self.collection_time = collection_time
