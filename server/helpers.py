@@ -34,7 +34,7 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
 
     return queryObject
 
-def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False):
+def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cats=None):
     dataColumn = dataFrame[columnName].dropna()
     uniqueCount = len(dataColumn.unique())
     if uniqueCount == 0:
@@ -45,6 +45,16 @@ def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False):
                 groupedColumn = dataColumn.groupby(dataColumn)
                 countedColumn = groupedColumn.size()
                 countedColumnDict = dict(countedColumn)
+
+                if num_cats: #get top n categories, sum rest as 'other categories'
+                    countedColumn.sort()
+                    top = dict(countedColumn[-num_cats:])
+                    top['other categories'] = sum(countedColumn[:-num_cats])
+                    countedColumnDict = top
+
+                nodata_counts = len(dataFrame[columnName])-len(dataColumn)
+                if nodata_counts>0:
+                    countedColumnDict['no data'] = nodata_counts
                 return countedColumnDict #categorical hist
             else: #linear bin hist
                 minValue = np.amin(dataColumn)
@@ -125,11 +135,11 @@ def summarizeDatasets(queryObject):
         sequencing_method_summary = summarizeColumn(queryResultDataframe,'sequencing_method')
 
         #maybe top-10 or top-15 categorical responses
-        instrument_model_summary = summarizeColumn(queryResultDataframe,'instrument_model')
-        geo_loc_name_summary = summarizeColumn(queryResultDataframe,'geo_loc_name')
-        env_biome_summary = summarizeColumn(queryResultDataframe,'env_biome')
-        env_feature_summary = summarizeColumn(queryResultDataframe,'env_feature')
-        env_material_summary = summarizeColumn(queryResultDataframe,'env_material')
+        instrument_model_summary = summarizeColumn(queryResultDataframe,'instrument_model',num_cats=15)
+        geo_loc_name_summary = summarizeColumn(queryResultDataframe,'geo_loc_name',num_cats=15)
+        env_biome_summary = summarizeColumn(queryResultDataframe,'env_biome',num_cats=15)
+        env_feature_summary = summarizeColumn(queryResultDataframe,'env_feature',num_cats=15)
+        env_material_summary = summarizeColumn(queryResultDataframe,'env_material',num_cats=15)
         # add more here . . .
 
         # Linear binned histogram responses
