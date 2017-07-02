@@ -109,6 +109,8 @@ def summarizeDatasets(queryObject):
         # Linear binned histogram responses
         avg_read_length_maxrun_bins = summarizeColumn(queryResultDataframe,'avg_read_length_maxrun',linearBins=True)
         gc_percent_maxrun_bins = summarizeColumn(queryResultDataframe,'gc_percent_maxrun',linearBins=True)
+        lat_bins = summarizeColumn(queryResultDataframe,'meta_latitude',linearBins=True)
+        lon_bins = summarizeColumn(queryResultDataframe,'meta_longitude',linearBins=True)
         # add more here . . .
 
         # Log binned histogram responses
@@ -128,43 +130,24 @@ def summarizeDatasets(queryObject):
         # year_summary.index = year_summary.index.to_series().astype(str)
         # year_summary = dict(year_summary)
 
-        # Lat summary is broken because lat is now a string
-
-        # lat_summary = dict(queryResultDataframe.groupby('latitude').size())
-        # lat_bins = Counter()
-        # for k,v in lat_summary.items(): #is there a way to do this that doesn't loop through each returned value?
-        #     if not k:
-        #         next
-        #     else:
-        #         lat_bins[round(k,0)] += v
-
-        # Lon summary is broken because lon is now a string
-
-        # lon_summary = dict(queryResultDataframe.groupby('longitude').size())
-        # lon_bins = Counter()
-        # for k,v in lon_summary.items(): #is there a way to do this that doesn't loop through each returned value?
-        #     if not k:
-        #         next
-        #     else:
-        #         lon_bins[round(k,0)] += v
-
         # Map summary is broken because lat / lon are both strings
 
-        #latlon  = queryResultDataframe[['latitude','longitude']]
-        #latlon = latlon[pd.notnull(latlon['latitude'])]
-        #latlon = latlon[pd.notnull(latlon['longitude'])]
-        #latlon_map = np.histogram2d(x=latlon['longitude'],y=latlon['latitude'],bins=[36,18], range=[[-180, 180], [-90, 90]]) #range should be flexible to rules in DatasetSearchSummary
-        #latlon_map[0] is the lonxlat (XxY) array of counts; latlon_map[1] is the nx/lon bin starts; map[2] ny/lat bin starts
-        #lonstepsize = (latlon_map[1][1]-latlon_map[1][0])/2
-        #latstepsize = (latlon_map[2][1]-latlon_map[2][0])/2
-        #map_data = []
-        #for lon_ix,lonbin in enumerate(latlon_map[0]):
-        #    for lat_ix,latbin in enumerate(lonbin):
-        #        #[latlon_map[2][ix]+latstepsize for ix,latbin in enumerate(latlon_map[0][0])]
-        #        lat = latlon_map[2][lat_ix]+latstepsize
-        #        lon = latlon_map[1][lon_ix]+lonstepsize
-        #        value = latbin
-        #        map_data.append({"lat":lat,"lon":lon,"count":value})
+        latlon  = queryResultDataframe[['meta_latitude','meta_longitude']]
+        latlon = latlon[pd.notnull(latlon['meta_latitude'])]
+        latlon = latlon[pd.notnull(latlon['meta_longitude'])]
+        latlon_map = np.histogram2d(x=latlon['meta_longitude'],y=latlon['meta_latitude'],bins=[36,18], range=[[-180, 180], [-90, 90]])
+        # range should be flexible to rules in DatasetSearchSummary
+        # latlon_map[0] is the lonxlat (XxY) array of counts; latlon_map[1] is the nx/lon bin starts; map[2] ny/lat bin starts
+        lonstepsize = (latlon_map[1][1]-latlon_map[1][0])/2
+        latstepsize = (latlon_map[2][1]-latlon_map[2][0])/2
+        map_data = []
+        for lon_ix,lonbin in enumerate(latlon_map[0]):
+            for lat_ix,latbin in enumerate(lonbin):
+                #[latlon_map[2][ix]+latstepsize for ix,latbin in enumerate(latlon_map[0][0])]
+                lat = latlon_map[2][lat_ix]+latstepsize
+                lon = latlon_map[1][lon_ix]+lonstepsize
+                value = latbin
+                map_data.append({"lat":lat,"lon":lon,"count":value})
 
         return {
             "summary":{ # to do change key names, to align with new field names (eg. total_reads vs. library_reads_sequenced)
@@ -178,10 +161,10 @@ def summarizeDatasets(queryObject):
                 "total_bases_summary":total_bases_bins,
                 "download_size_summary":down_size_bins,
                 "avg_percent_gc_summary":gc_percent_maxrun_bins,
+                "latitude_summary":lat_bins,
+                "longitude_summary":lon_bins,
+                "latlon_map":map_data
                 #"year_collected_summary":year_summary,
-                #"latitude_summary":lat_bins,
-                #"longitude_summary":lon_bins,
-                #"latlon_map":map_data
                 }
             }
     else:
