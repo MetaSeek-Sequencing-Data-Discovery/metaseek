@@ -23,7 +23,7 @@ def parseLatLon(lat_lon_string):
         if lon >= -180 and lon <= 180 and lat >= -90 and lat <= 90:
             return lat, lon
         else:
-            return None
+            return None, None
 
     elif len(match3)>0:
         split3 = match3[0].split(' ')
@@ -40,7 +40,7 @@ def parseLatLon(lat_lon_string):
         if lon >= -180 and lon <= 180 and lat >= -90 and lat <= 90:
             return lat, lon
         else:
-            return None
+            return None, None
 
     elif len(match4)>0:
         split4 = match4[0].split(', ')
@@ -49,7 +49,7 @@ def parseLatLon(lat_lon_string):
         if lon >= -180 and lon <= 180 and lat >= -90 and lat <= 90:
             return lat, lon
         else:
-            return None
+            return None, None
 
     else:
         return None, None
