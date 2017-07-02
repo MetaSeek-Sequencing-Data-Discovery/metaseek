@@ -82,6 +82,16 @@ At this point you should be able to connect to the database remotely.
 mysql -h ec2-35-166-20-248.us-west-2.compute.amazonaws.com -unick -p
 `
 
+#### Setting up memcached
+
+This one was easy. Just install it, start it and restart apache.
+
+`sudo apt-get install memcached`
+
+`sudo service memcached start`
+
+`sudo apachectl restart`
+
 #### Setting up apache to serve your Flask app
 
 Go back to the Data Science Bites article http://www.datasciencebytes.com/bytes/2015/02/24/running-a-flask-app-on-aws-ec2/
