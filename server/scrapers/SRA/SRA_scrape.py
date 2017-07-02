@@ -128,16 +128,16 @@ pubmed_fields = ['pubmed_uid',
 
 if __name__ == "__main__":
     #make list of all publicly available UIDs in SRA
-    # retstart_list = get_retstart_list(url='https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=public&field=ACS&rettype=count&tool=metaseq&email=metaseekcloud%40gmail.com')
-    # uid_list = get_uid_list(ret_list=retstart_list)
-#
-    # #remove SRA IDs that have already been ingested into MetaSeek DB; db_source_uids for which 'source_db' is 'SRA'
-    # print "Removing uids already in MetaSeek..."
-    # result = db.session.query(Dataset.db_source_uid).filter(Dataset.db_source=='SRA').distinct()
-    # existing_uids = [r.db_source_uid for r in result]
-    # #subtract any uids already in db from uid_list
-    # uids_to_scrape = list(set(uid_list)-set(existing_uids))
-    uids_to_scrape = [3653287,2480653,2315029,2316180,3843017,2938110,1500565,2212704]
+    retstart_list = get_retstart_list(url='https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=public&field=ACS&rettype=count&tool=metaseq&email=metaseekcloud%40gmail.com')
+    uid_list = get_uid_list(ret_list=retstart_list)
+
+    #remove SRA IDs that have already been ingested into MetaSeek DB; db_source_uids for which 'source_db' is 'SRA'
+    print "Removing uids already in MetaSeek..."
+    result = db.session.query(Dataset.db_source_uid).filter(Dataset.db_source=='SRA').distinct()
+    existing_uids = [r.db_source_uid for r in result]
+
+    #subtract any uids already in db from uid_list
+    uids_to_scrape = list(set(uid_list)-set(existing_uids))
     print "...REMAINING NUMBER OF UIDS TO SCRAPE: %s" % (len(uids_to_scrape))
 
     #split UIDs to scrape into batches of 500 (max number of UIDs can call with eutilities api at one time)
@@ -206,7 +206,6 @@ if __name__ == "__main__":
 
         ##TODO: check whether if biosample_uids exists, and no biosample attribs added; log to scrapeerrors if so; same for pubmeds
 
-        ##TODO: write metadata row by row to db
         print "-writing data to database..."
         for srx in sdict.keys():
             #add date scraped field as right now!
@@ -224,16 +223,15 @@ if __name__ == "__main__":
             row_to_write = [sdict[srx][x] if x in sdict[srx].keys() else None for x in metaseek_fields]
             newDataset = Dataset(*row_to_write)
             #add newdataset and commit to get new id
-            # db.session.add(newDataset)
+            db.session.add(newDataset)
             try:
-                #db.session.commit()
-                print 'next'
+                db.session.commit()
             except (exc.DataError, err.DataError) as e:
                 db.session.rollback()
                 #if one of the columns was too long, log error and skip this srx
                 errorToWrite = ScrapeError(uid=str(srx),error_msg="DataError: "+str(e),function="writing Dataset to db",date_scraped=datetime.now())
                 db.session.add(errorToWrite)
-                #db.session.commit()
+                db.session.commit()
                 continue
 
             if 'pubmed_uids' in sdict[srx].keys():
@@ -246,13 +244,12 @@ if __name__ == "__main__":
                             newPub.datasets.append(newDataset)
                             db.session.add(newPub)
                             try:
-                                #db.session.commit()
-                                print 'next'
+                                db.session.commit()
                             except (exc.IntegrityError, err.IntegrityError) as e: #if pubmed already exists
                                 db.session.rollback()
                                 existing_pub = db.session.query(Publication).filter(Publication.pubmed_uid==pub).first()
                                 existing_pub.datasets.append(newDataset)
-                                #db.session.commit()
+                                db.session.commit()
 
 
             if "run_ids" in sdict[srx].keys():
@@ -264,7 +261,7 @@ if __name__ == "__main__":
                         db.session.add(newRun)
 
             #commit all those new runs
-            # db.session.commit()
+            db.session.commit()
 
         ##TODO: log date and time of update, num accessions added, etc. Separate db table?
         print "BATCH %s COMPLETE!" % (batch_ix+1)
