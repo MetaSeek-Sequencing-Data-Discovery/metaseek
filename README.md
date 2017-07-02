@@ -26,23 +26,29 @@ Deploy the bundle to Firebase (this will require you to log in with Firebase):
 
 #### Backend deploy notes
 
-Merge master into deploy branch:
+Merge master into deploy branch and push to Github:
 
 `git checkout deploy`
 
 `git merge master`
 
-Upload server directory to AWS - TODO this should obviously be a git pull instead:
-
-`scp -r -i "metaseek.pem" ./server ubuntu@ec2-35-166-20-248.us-west-2.compute.amazonaws.com:`
+`git push`
 
 SSH in:
 
 `ssh -i "metaseek.pem" ubuntu@ec2-35-166-20-248.us-west-2.compute.amazonaws.com`
 
+Open the Metaseek folder and pull the deploy branch:
+
+`cd ~/metaseek`
+
+`git checkout deploy`
+
+`git pull`
+
 Open the server folder and activate the virtualenv:
 
-`cd ~/server`
+`cd server`
 
 `source ./bin/activate`
 
