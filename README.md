@@ -30,7 +30,7 @@ Merge master into deploy branch and push to Github:
 
 `git checkout deploy`
 
-`git merge master`
+`git merge master` and resolve any conflicts
 
 `git push`
 
