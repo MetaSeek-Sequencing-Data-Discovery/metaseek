@@ -66,6 +66,8 @@ class Dataset(db.Model):
     lat_lon = db.Column(db.Text)
     latitude = db.Column(db.Text)
     longitude = db.Column(db.Text)
+    meta_latitude = db.Column(db.Float)
+    meta_longitude = db.Column(db.Float)
     geo_loc_name = db.Column(db.Text)
     collection_date = db.Column(db.Text)
     collection_time = db.Column(db.Text)
