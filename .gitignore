@@ -20,6 +20,7 @@ client/node_modules/*
 client/build/index.html
 
 server/bootstrapData/
+server/secrets.py
 
 server/scrapers/SRA/subset_testdf.txt
 metaseek_schema.txt
