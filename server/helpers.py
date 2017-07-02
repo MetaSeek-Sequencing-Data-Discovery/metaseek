@@ -89,20 +89,32 @@ def summarizeDatasets(queryObject):
             "summary":{
                 "totalDatasets":0,
                 "totalDownloadSize":0,
-                "library_strategy_summary":{},
 
-                "investigation_type_summary":{},
+                "library_strategy_summary":{},
                 "library_source_summary":{},
-                "env_package_summary":{},
-                "year_collected_summary":{},
-                "latitude_summary":{},
-                "longitude_summary":{},
-                "avg_read_length_summary":{},
-                "total_reads_summary":{},
-                "total_bases_summary":{},
+                "library_screening_strategy_summary":{},
+                "library_construction_method_summary":{},
+                "sequencing_method_summary":{},
+                "library_reads_sequenced_summary":{},
                 "download_size_summary":{},
-                "avg_percent_gc_summary":{},
-                "latlon_map":{},
+                "avg_read_length_summary":{},
+                "gc_percent_summary":{},
+                "investigation_type_summary":{},
+                "env_package_summary":{},
+
+                "instrument_model_summary":{},
+                "study_type_summary":{},
+                "total_num_bases_summary":{},
+                "geo_loc_name_summary":{},
+                "env_biome_summary":{},
+                "env_feature_summary":{},
+                "env_material_summary":{},
+                "year_collected_summary":{} #from metadata_publication_date
+
+                #"latitude_summary":{},
+                #"longitude_summary":{},
+                #"latlon_map":{},
+                
                 "empty":1
                 }
             }
