@@ -15,10 +15,10 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # production DB
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-35-166-20-248.us-west-2.compute.amazonaws.com/metaseek'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-35-166-20-248.us-west-2.compute.amazonaws.com/metaseek'
 
 # local DB - uncomment for local testing
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -37,10 +37,8 @@ def json_deserializer(key, value, flags):
         return json.loads(value)
     raise Exception("Unknown serialization format")
 
-# production memcached
-# client = Client(('TODO set up prod memcached', 11211), serializer=json_serializer, deserializer=json_deserializer)
-
-# local memcached
+# production memcached IS local memcached - this won't scale, we don't have clustering, etc. but will
+# work for now with the app talking to memcached on localhost
 client = Client(('localhost', 11211), serializer=json_serializer, deserializer=json_deserializer)
 
 
