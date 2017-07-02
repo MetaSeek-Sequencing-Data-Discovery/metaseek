@@ -11,7 +11,6 @@ def parseLatLon(lat_lon_string):
     match4 = re.findall(pattern4,   lat_lon_string)
 
     if len(match2)>0:
-        print 'matched 2'
         split = [x.split(' ') for x in match2]
         lat = split[0][0]
         lon = split[0][2]
@@ -24,7 +23,6 @@ def parseLatLon(lat_lon_string):
         return lat, lon
 
     elif len(match3)>0:
-        print 'matched 3'
         split3 = match3[0].split(' ')
         lat = float(split3[0])
         lon = float(split3[1])
@@ -39,14 +37,12 @@ def parseLatLon(lat_lon_string):
         return lat, lon
 
     elif len(match4)>0:
-        print 'matched 4'
         split4 = match4[0].split(', ')
         lat = float(split4[0])
         lon = float(split4[1])
         return lat, lon
 
     else:
-        print 'matched none'
         return None, None
 
 def parseLatitude(lat_string):
