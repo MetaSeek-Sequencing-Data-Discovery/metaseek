@@ -52,7 +52,9 @@ def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cat
                     top['other categories'] = sum(countedColumn[:-num_cats])
                     countedColumnDict = top
 
-                countedColumnDict['no data'] = len(dataFrame[columnName])-len(dataColumn)
+                nodata_counts = len(dataFrame[columnName])-len(dataColumn)
+                if nodata_counts>0:
+                    countedColumnDict['no data'] = nodata_counts
                 return countedColumnDict #categorical hist
             else: #linear bin hist
                 minValue = np.amin(dataColumn)
