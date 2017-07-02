@@ -3,7 +3,6 @@ import os
 from secrets import *
 
 os.environ['METASEEK_DB'] = METASEEK_DB
-print os.environ['METASEEK_DB']
 sys.path.insert(0, '/var/www/html/server')
 
 activate_this = '/home/ubuntu/server/bin/activate_this.py'
