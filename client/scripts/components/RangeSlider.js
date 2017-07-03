@@ -22,7 +22,10 @@ var RangeSlider = React.createClass({
     this.props.handleFilterChange(filterMax, field, filterTypeMax, event, null, value.maxSlider);
   },
 
+
+
   render : function() {
+    var {field, filterMin, filterMax, filterTypeMin, filterTypeMax, min, max, minValue, maxValue, handleFilterChange, ...other} = this.props;
     return(
       <div className='range-slider'>
         <Range
@@ -33,6 +36,7 @@ var RangeSlider = React.createClass({
           allowCross={false}
           onChange={this.handleValues}
           onAfterChange={this.handleStop.bind(this,this.props.filterMin,this.props.filterMax,this.props.field,this.props.filterTypeMin,this.props.filterTypeMax,this.state)}
+          {...other}
         />
       </div>
     );
