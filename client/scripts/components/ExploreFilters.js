@@ -9,6 +9,7 @@ import MenuItem from 'material-ui/MenuItem';
 import LatitudeSliders from './LatitudeSliders';
 import LongitudeSliders from './LongitudeSliders';
 import AverageReadLengthInputs from './AverageReadLengthInputs';
+import RangeSlider from './RangeSlider';
 
 var ExploreFilters = React.createClass({
   getInitialState : function() {
@@ -97,13 +98,17 @@ var ExploreFilters = React.createClass({
               {Object.keys(this.props.summaryData.investigation_type_summary)
                      .map(this.renderMenuItem)}
             </SelectField>
-            <LatitudeSliders handleFilterChange={this.handleFilterChange}
-              minValue={this.state.filterStates.latitudeMin.value}
-              maxValue={this.state.filterStates.latitudeMax.value}
+            <h4>Latitude</h4>
+            <RangeSlider field="meta_latitude" filterMin="latitudeMin" filterMax="latitudeMax"
+              filterTypeMin={4} filterTypeMax={3} min={-90} max={90}
+              minValue={this.state.filterStates.latitudeMin.value} maxValue={this.state.filterStates.latitudeMax.value}
+              handleFilterChange={this.handleFilterChange}
             />
-            <LongitudeSliders handleFilterChange={this.handleFilterChange}
-              minValue={this.state.filterStates.longitudeMin.value}
-              maxValue={this.state.filterStates.longitudeMax.value}
+            <h4>Longitude</h4>
+            <RangeSlider field="meta_longitude" filterMin="longitudeMin" filterMax="longitudeMax"
+              filterTypeMin={4} filterTypeMax={3} min={-180} max={180}
+              minValue={this.state.filterStates.longitudeMin.value} maxValue={this.state.filterStates.longitudeMax.value}
+              handleFilterChange={this.handleFilterChange}
             />
             <AverageReadLengthInputs handleFilterChange={this.handleFilterChange}
               minValue={this.state.filterStates.avgRdLgthMin.value}
