@@ -6,9 +6,8 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import ColorPalette from './ColorPalette';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
-import LatitudeSliders from './LatitudeSliders';
-import LongitudeSliders from './LongitudeSliders';
 import AverageReadLengthInputs from './AverageReadLengthInputs';
+
 import RangeSlider from './RangeSlider';
 
 var ExploreFilters = React.createClass({
@@ -47,6 +46,7 @@ var ExploreFilters = React.createClass({
 },
 
   handleFilterChange : function(filterName, field, filterType, event, index, value) {
+    console.log(value)
     var newRule = {
       "field":field,
       "type":filterType,
@@ -98,14 +98,15 @@ var ExploreFilters = React.createClass({
               {Object.keys(this.props.summaryData.investigation_type_summary)
                      .map(this.renderMenuItem)}
             </SelectField>
+
             <h4>Latitude</h4>
-            <RangeSlider field="meta_latitude" filterMin="latitudeMin" filterMax="latitudeMax"
+            <RangeSlider field="latitude" filterMin="latitudeMin" filterMax="latitudeMax"
               filterTypeMin={4} filterTypeMax={3} min={-90} max={90}
               minValue={this.state.filterStates.latitudeMin.value} maxValue={this.state.filterStates.latitudeMax.value}
               handleFilterChange={this.handleFilterChange}
             />
             <h4>Longitude</h4>
-            <RangeSlider field="meta_longitude" filterMin="longitudeMin" filterMax="longitudeMax"
+            <RangeSlider field="longitude" filterMin="longitudeMin" filterMax="longitudeMax"
               filterTypeMin={4} filterTypeMax={3} min={-180} max={180}
               minValue={this.state.filterStates.longitudeMin.value} maxValue={this.state.filterStates.longitudeMax.value}
               handleFilterChange={this.handleFilterChange}
