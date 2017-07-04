@@ -48,6 +48,7 @@ client = Client(('localhost', 11211), serializer=json_serializer, deserializer=j
 
 from helpers import *
 from models import *
+from marshals import *
 
 # Declare route functions
 # /user routes
@@ -137,41 +138,8 @@ class GetUserDiscoveries(Resource):
 #        except Exception as e:
 #            return {'error': str(e)}
 
-marshalledDatasetFields = {
-    # fields that are summarized in summarizeColumn
-    'investigation_type':fields.String,
-    'library_source':fields.String,
-    'env_package':fields.String,
-    'library_strategy':fields.String,
-    'library_screening_strategy':fields.String,
-    'library_construction_method':fields.String,
-    'study_type':fields.String,
-    'sequencing_method':fields.String,
-    'instrument_model':fields.String,
-    'geo_loc_name':fields.String,
-    'env_biome':fields.String,
-    'env_feature':fields.String,
-    'env_material':fields.String,
-    'avg_read_length_maxrun':fields.Float,
-    'gc_percent_maxrun':fields.Float,
-    'meta_latitude':fields.Float,
-    'meta_longitude':fields.Float,
-    'library_reads_sequenced_maxrun':fields.Integer,
-    'total_num_bases_maxrun':fields.Integer,
-    'download_size_maxrun':fields.Integer,
-    # additional important dataset-specific fields
-    'id':fields.Integer,
-    'db_source_uid':fields.String,
-    'db_source':fields.String,
-    'sample_title':fields.String,
-    'biosample_link':fields.String,
-    # TODO going to this URL right now just gives back this exact same data
-    # We need to build a way to get ALL of the data for a given dataset
-    'uri': fields.Url('getdataset')
-}
-
 class GetDataset(Resource):
-    @marshal_with(marshalledDatasetFields, envelope='dataset')
+    @marshal_with(fullDatasetFields, envelope='dataset')
     def get(self, id):
         return Dataset.query.get(id)
 
@@ -188,7 +156,7 @@ class GetAllDatasets(Resource):
         pageObject = Dataset.query.paginate(page,datasetsPerPage,False)
         paginatedDatasetResponse = {}
         paginatedDatasetResponse['currentUri'] = url_for('getalldatasets',page=page)
-        paginatedDatasetResponse['datasets'] = marshal(pageObject.items,marshalledDatasetFields)
+        paginatedDatasetResponse['datasets'] = marshal(pageObject.items,summarizedDatasetFields)
         paginatedDatasetResponse['totalCount'] = pageObject.total
         paginatedDatasetResponse['perPage'] = datasetsPerPage
         paginatedDatasetResponse['hasNext'] = pageObject.has_next
@@ -229,7 +197,7 @@ class SearchDatasets(Resource):
             pageObject = queryObject.paginate(page,datasetsPerPage,False)
             paginatedDatasetResponse = {}
             paginatedDatasetResponse['currentUri'] = url_for('searchdatasets',page=page)
-            paginatedDatasetResponse['datasets'] = marshal(pageObject.items,marshalledDatasetFields)
+            paginatedDatasetResponse['datasets'] = marshal(pageObject.items,summarizedDatasetFields)
             paginatedDatasetResponse['totalCount'] = pageObject.total
             paginatedDatasetResponse['perPage'] = datasetsPerPage
             paginatedDatasetResponse['hasNext'] = pageObject.has_next
@@ -300,7 +268,7 @@ class GetDiscovery(Resource):
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
         'uri': fields.Url('getdiscovery', absolute=True),
-        'datasets':fields.Nested(marshalledDatasetFields),
+        'datasets':fields.Nested(summarizedDatasetFields),
         'owner':fields.Nested({
             'firebase_id':fields.String,
             'uri':fields.Url('getuser', absolute=True)
@@ -314,7 +282,7 @@ class GetAllDiscoveries(Resource):
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
         'uri': fields.Url('getdiscovery', absolute=True),
-        'datasets':fields.Nested(marshalledDatasetFields),
+        'datasets':fields.Nested(summarizedDatasetFields),
         'owner':fields.Nested({
             'firebase_id':fields.String,
             'uri':fields.Url('getuser', absolute=True)
