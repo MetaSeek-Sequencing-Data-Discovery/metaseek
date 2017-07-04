@@ -3,6 +3,7 @@ from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, Resource, reqparse, fields, marshal_with
 from dateutil import parser as dateparser
+from datetime import datetime
 import json
 from pyhashxx import hashxx
 from pymemcache.client.base import Client
@@ -190,7 +191,10 @@ class SearchDatasets(Resource):
 
 class GetDatasetSummary(Resource):
     def get(self):
-        cache_key = 'norules'
+        # This is the result of:
+        # str(hashxx(json.dumps(json.loads('{"rules":[]}')['rules'])))
+        # Allows this cached value to be reused by SearchDatasetsSummary when no rules are set
+        cache_key = '2027185612'
 
         from_cache = client.get(cache_key)
 
@@ -200,9 +204,6 @@ class GetDatasetSummary(Resource):
             client.set(cache_key, summary)
             return summary
         else:
-            # Uncomment to delete cache when pulled for testing
-            # print 'deleting cache hit'
-            # client.delete(cache_key)
             return from_cache
 
 class SearchDatasetsSummary(Resource):
@@ -211,11 +212,10 @@ class SearchDatasetsSummary(Resource):
             parser = reqparse.RequestParser()
             parser.add_argument('filter_params', type=str)
             args = parser.parse_args()
-
             filter_params = json.loads(args['filter_params'])
             rules = filter_params['rules']
-            cache_key = str(hashxx(json.dumps(rules)))
 
+            cache_key = str(hashxx(json.dumps(rules)))
             from_cache = client.get(cache_key)
 
             if from_cache is None:
@@ -231,9 +231,6 @@ class SearchDatasetsSummary(Resource):
                 client.set(cache_key, summary)
                 return summary
             else:
-                # Uncomment to delete cache when pulled for testing
-                # print 'deleting cache hit'
-                # client.delete(cache_key)
                 return from_cache
 
         except Exception as e:
@@ -299,6 +296,60 @@ class CreateDiscovery(Resource):
         except Exception as e:
             return {'error': str(e)}
 
+class PurgeCache(Resource):
+    def get(self):
+        client.flush_all()
+        return client.stats()
+
+class CacheStats(Resource):
+    def get(self):
+        return client.stats()
+
+class BuildCaches(Resource):
+    def get(self):
+        # TODO actually define which ones we want here or create this list dynamically
+        priorityFilterSets = [
+            '{"rules":[]}',
+            '{"rules":[{"field":"library_source","type":5,"value":"genomic"}]}',
+            '{"rules":[{"field":"library_source","type":5,"value":"metagenomic"}]}',
+            '{"rules":[{"field":"library_source","type":5,"value":"metatranscriptomic"}]}',
+            '{"rules":[{"field":"library_source","type":5,"value":"transcriptomic"}]}'
+        ]
+
+        results = {}
+
+        for filterSet in priorityFilterSets:
+            filter_params = json.loads(filterSet)
+            rules = filter_params['rules']
+
+            cache_key = str(hashxx(json.dumps(rules)))
+            from_cache = client.get(cache_key)
+
+            results[cache_key] = {}
+            results[cache_key]['rules'] = rules
+
+            if from_cache is None:
+                start = datetime.now()
+                results[cache_key]['existing-cache'] = False
+
+                queryObject = Dataset.query
+
+                for rule in rules:
+                    field = rule['field']
+                    ruletype = rule['type']
+                    value = rule['value']
+                    queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+
+                summary = summarizeDatasets(queryObject)
+                client.set(cache_key, summary)
+                finish = datetime.now()
+                results[cache_key]['success'] = True
+                results[cache_key]['cache-load-time'] = str(round((finish - start).total_seconds(),1)) + 's'
+            else:
+                results[cache_key]['existing-cache'] = True
+
+        return results
+
 # End route functions
 
 # Declare routing
@@ -317,6 +368,10 @@ api.add_resource(SearchDatasetsSummary, '/api/datasets/search/summary')
 api.add_resource(CreateDiscovery,       '/api/discovery/create')
 api.add_resource(GetDiscovery,          '/api/discovery/<int:id>')
 api.add_resource(GetAllDiscoveries,     '/api/discoveries')
+
+api.add_resource(PurgeCache,            '/api/cache/purge')
+api.add_resource(CacheStats,            '/api/cache/stats')
+api.add_resource(BuildCaches,           '/api/cache/build')
 
 # Start the app!
 if __name__ == '__main__':

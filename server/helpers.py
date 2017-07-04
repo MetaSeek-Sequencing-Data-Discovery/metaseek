@@ -47,7 +47,7 @@ def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cat
                 countedColumnDict = dict(countedColumn)
 
                 if num_cats: #get top n categories, sum rest as 'other categories'
-                    countedColumn.sort()
+                    countedColumn.sort_values(inplace=True)
                     top = dict(countedColumn[-num_cats:])
                     top['other categories'] = sum(countedColumn[:-num_cats])
                     countedColumnDict = top
