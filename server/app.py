@@ -14,7 +14,7 @@ dbPass = os.environ['METASEEK_DB']
 
 # Config / initialize the app, database and api
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # production DB
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-35-166-20-248.us-west-2.compute.amazonaws.com/metaseek'
@@ -62,12 +62,12 @@ class CreateUser(Resource):
             existingUser = User.query.filter_by(firebase_id=args['firebase_id']).first()
 
             if (existingUser):
-                return {'error':'User already exists!','uri':url_for('getuser',id=existingUser.id,_external=True)}
+                return {'error':'User already exists!','uri':url_for('getuser',id=existingUser.id)}
             else:
                 newUser = User(args['firebase_id'],args['admin'])
                 db.session.add(newUser)
                 db.session.commit()
-                return {"user":{"uri":url_for('getuser',id=newUser.id,_external=True)}}
+                return {"user":{"uri":url_for('getuser',id=newUser.id)}}
 
         except Exception as e:
             return {'error': str(e)}
@@ -132,7 +132,7 @@ class GetUserDiscoveries(Resource):
 #            newDataset = Dataset(args['biosample_link'],args['sample_title'],args['investigation_type'],args['library_source'], args['env_package'],datetimeguess, args['latitude'], args['longitude'], args['avg_read_length_maxrun'], args['total_num_reads'], args['total_num_bases_maxrun'], args['download_size_maxrun'],args['gc_percent_maxrun'])
 #            db.session.add(newDataset)
 #            db.session.commit()
-#            return {"dataset":{"id":newDataset.id,"uri":url_for('getdataset',id=newDataset.id,_external=True)}}
+#            return {"dataset":{"id":newDataset.id,"uri":url_for('getdataset',id=newDataset.id)}}
 #
 #        except Exception as e:
 #            return {'error': str(e)}
@@ -292,7 +292,7 @@ class CreateDiscovery(Resource):
             newDiscovery = Discovery(owner.id,args['filter_params'],matchingDatasets)
             db.session.add(newDiscovery)
             db.session.commit()
-            return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id,_external=True)}}
+            return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id)}}
 
         except Exception as e:
             return {'error': str(e)}
@@ -354,26 +354,26 @@ class BuildCaches(Resource):
 # End route functions
 
 # Declare routing
-api.add_resource(CreateUser,            '/api/user/create')
-api.add_resource(GetUser,               '/api/user/<int:id>')
-api.add_resource(GetAllUsers,           '/api/users')
-api.add_resource(GetUserDiscoveries,    '/api/user/<int:id>/discoveries')
+api.add_resource(CreateUser,            '/user/create')
+api.add_resource(GetUser,               '/user/<int:id>')
+api.add_resource(GetAllUsers,           '/users')
+api.add_resource(GetUserDiscoveries,    '/user/<int:id>/discoveries')
 
 # Temporarily removed - the only way to add a dataset is through scrapers/SRA/SRA_scrape.py
-# api.add_resource(CreateDataset,         '/api/dataset/create')
-api.add_resource(GetDataset,            '/api/dataset/<int:id>')
-api.add_resource(GetAllDatasets,        '/api/datasets')
-api.add_resource(GetDatasetSummary,     '/api/datasets/summary')
-api.add_resource(SearchDatasets,        '/api/datasets/search')
-api.add_resource(SearchDatasetsSummary, '/api/datasets/search/summary')
+# api.add_resource(CreateDataset,       '/dataset/create')
+api.add_resource(GetDataset,            '/dataset/<int:id>')
+api.add_resource(GetAllDatasets,        '/datasets/<int:page>')
+api.add_resource(SearchDatasets,        '/datasets/search/<int:page>')
+api.add_resource(GetDatasetSummary,     '/datasets/summary')
+api.add_resource(SearchDatasetsSummary, '/datasets/search/summary')
 
-api.add_resource(CreateDiscovery,       '/api/discovery/create')
-api.add_resource(GetDiscovery,          '/api/discovery/<int:id>')
-api.add_resource(GetAllDiscoveries,     '/api/discoveries')
+api.add_resource(CreateDiscovery,       '/discovery/create')
+api.add_resource(GetDiscovery,          '/discovery/<int:id>')
+api.add_resource(GetAllDiscoveries,     '/discoveries')
 
-api.add_resource(PurgeCache,            '/api/cache/purge')
-api.add_resource(CacheStats,            '/api/cache/stats')
-api.add_resource(BuildCaches,           '/api/cache/build')
+api.add_resource(PurgeCache,            '/cache/purge')
+api.add_resource(CacheStats,            '/cache/stats')
+api.add_resource(BuildCaches,           '/cache/build')
 
 # Start the app!
 if __name__ == '__main__':
