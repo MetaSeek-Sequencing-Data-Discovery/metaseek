@@ -50,7 +50,7 @@ var Welcome = React.createClass({
         "admin":0
       }).then(function(response){
         console.log(response.data.uri);
-        axios.get(response.data.uri).then(function(response){
+        apiRequest.get(response.data.uri).then(function(response){
           if (response.data.user.admin) {
             self.state.firebase.admin = 1;
           }

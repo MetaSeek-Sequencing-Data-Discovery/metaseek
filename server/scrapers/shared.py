@@ -30,13 +30,13 @@ def parseLatLon(lat_lon_string):
         lat = float(split3[0])
         lon = float(split3[1])
         if lat>1000000:
-            lat = lat/100000.0 #e.g. -4510469 = -45.10469
+            lat = lat//100000.0 #e.g. -4510469 = -45.10469
         elif lat>100000:
-            lat = lat/10000.0 #e.g. -479595 = 47.7027
+            lat = lat//10000.0 #e.g. -479595 = 47.7027
         if lon>1000000:
-            lon = lon/100000.0
+            lon = lon//100000.0
         elif lon>100000:
-            lon = lon/10000.0
+            lon = lon//10000.0
         if lon >= -180 and lon <= 180 and lat >= -90 and lat <= 90:
             return lat, lon
         else:
