@@ -1,7 +1,8 @@
+from __future__ import division
 from flask import Flask, url_for
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
-from flask_restful import Api, Resource, reqparse, fields, marshal_with
+from flask_restful import Api, Resource, reqparse, fields, marshal_with, marshal
 from dateutil import parser as dateparser
 from datetime import datetime
 import json
@@ -13,7 +14,7 @@ dbPass = os.environ['METASEEK_DB']
 
 # Config / initialize the app, database and api
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # production DB
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-35-166-20-248.us-west-2.compute.amazonaws.com/metaseek'
@@ -61,12 +62,12 @@ class CreateUser(Resource):
             existingUser = User.query.filter_by(firebase_id=args['firebase_id']).first()
 
             if (existingUser):
-                return {'error':'User already exists!','uri':url_for('getuser',id=existingUser.id,_external=True)}
+                return {'error':'User already exists!','uri':url_for('getuser',id=existingUser.id)}
             else:
                 newUser = User(args['firebase_id'],args['admin'])
                 db.session.add(newUser)
                 db.session.commit()
-                return {"user":{"uri":url_for('getuser',id=newUser.id,_external=True)}}
+                return {"user":{"uri":url_for('getuser',id=newUser.id)}}
 
         except Exception as e:
             return {'error': str(e)}
@@ -101,40 +102,40 @@ class GetUserDiscoveries(Resource):
     def get(self, id):
         return Discovery.query.filter_by(owner_id=id).all()
 
-# /dataset routes
-class CreateDataset(Resource):
-    def post(self):
-        try:
-            parser = reqparse.RequestParser()
-            # Note that any arguments added here MUST be present in the POST request or the request will fail with
-            # 400 - Bad Request as the response
-            parser.add_argument('latitude', type=str)
-            parser.add_argument('longitude', type=str)
-            parser.add_argument('investigation_type',type=str)
-            parser.add_argument('env_package',type=str)
-            parser.add_argument('library_source',type=str)
-            parser.add_argument('avg_read_length_maxrun',type=float)
-            parser.add_argument('total_num_reads',type=int)
-            parser.add_argument('total_num_bases',type=int)
-            parser.add_argument('download_size_maxrun',type=int)
-            parser.add_argument('gc_percent_maxrun',type=float)
-            parser.add_argument('biosample_link',type=str)
-            parser.add_argument('sample_title',type=str)
-            parser.add_argument('collection_date',type=str)
-
-            args = parser.parse_args()
-            try:
-                datetimeguess = dateparser.parse(args['collection_date'])
-            except ValueError:
-                datetimeguess = None
-
-            newDataset = Dataset(args['biosample_link'],args['sample_title'],args['investigation_type'],args['library_source'], args['env_package'],datetimeguess, args['latitude'], args['longitude'], args['avg_read_length_maxrun'], args['total_num_reads'], args['total_num_bases_maxrun'], args['download_size_maxrun'],args['gc_percent_maxrun'])
-            db.session.add(newDataset)
-            db.session.commit()
-            return {"dataset":{"id":newDataset.id,"uri":url_for('getdataset',id=newDataset.id,_external=True)}}
-
-        except Exception as e:
-            return {'error': str(e)}
+## /dataset routes
+#class CreateDataset(Resource):
+#    def post(self):
+#        try:
+#            parser = reqparse.RequestParser()
+#            # Note that any arguments added here MUST be present in the POST request or the request will fail with
+#            # 400 - Bad Request as the response
+#            parser.add_argument('latitude', type=str)
+#            parser.add_argument('longitude', type=str)
+#            parser.add_argument('investigation_type',type=str)
+#            parser.add_argument('env_package',type=str)
+#            parser.add_argument('library_source',type=str)
+#            parser.add_argument('avg_read_length_maxrun',type=float)
+#            parser.add_argument('total_num_reads',type=int)
+#            parser.add_argument('total_num_bases',type=int)
+#            parser.add_argument('download_size_maxrun',type=int)
+#            parser.add_argument('gc_percent_maxrun',type=float)
+#            parser.add_argument('biosample_link',type=str)
+#            parser.add_argument('sample_title',type=str)
+#            parser.add_argument('collection_date',type=str)
+#
+#            args = parser.parse_args()
+#            try:
+#                datetimeguess = dateparser.parse(args['collection_date'])
+#            except ValueError:
+#                datetimeguess = None
+#
+#            newDataset = Dataset(args['biosample_link'],args['sample_title'],args['investigation_type'],args['library_source'], args['env_package'],datetimeguess, args['latitude'], args['longitude'], args['avg_read_length_maxrun'], args['total_num_reads'], args['total_num_bases_maxrun'], args['download_size_maxrun'],args['gc_percent_maxrun'])
+#            db.session.add(newDataset)
+#            db.session.commit()
+#            return {"dataset":{"id":newDataset.id,"uri":url_for('getdataset',id=newDataset.id)}}
+#
+#        except Exception as e:
+#            return {'error': str(e)}
 
 marshalledDatasetFields = {
     'latitude':fields.String,
@@ -160,14 +161,42 @@ class GetDataset(Resource):
     def get(self, id):
         return Dataset.query.get(id)
 
+datasetsPerPage = 20
+
 class GetAllDatasets(Resource):
-    @marshal_with(marshalledDatasetFields, envelope='datasets')
-    def get(self):
-        return Dataset.query.all()
+    def get(self,page):
+        try:
+            val = int(page)
+            if val < 1:
+                raise ValueError
+        except ValueError:
+            return {'error':'page must be a positive integer','page':page}
+        pageObject = Dataset.query.paginate(page,datasetsPerPage,False)
+        paginatedDatasetResponse = {}
+        paginatedDatasetResponse['currentUri'] = url_for('getalldatasets',page=page)
+        paginatedDatasetResponse['datasets'] = marshal(pageObject.items,marshalledDatasetFields)
+        paginatedDatasetResponse['totalCount'] = pageObject.total
+        paginatedDatasetResponse['perPage'] = datasetsPerPage
+        paginatedDatasetResponse['hasNext'] = pageObject.has_next
+        paginatedDatasetResponse['hasPrevious'] = pageObject.has_prev
+        if pageObject.has_prev:
+            if len(pageObject.items) == 0:
+                maxPage = int(math.ceil(pageObject.total / datasetsPerPage))
+                paginatedDatasetResponse['previousUri'] = url_for('getalldatasets',page=maxPage)
+            else:
+                paginatedDatasetResponse['previousUri'] = url_for('getalldatasets',page=page -1)
+        if pageObject.has_next:
+            paginatedDatasetResponse['nextUri'] = url_for('getalldatasets',page=page + 1)
+        return paginatedDatasetResponse
 
 class SearchDatasets(Resource):
-    @marshal_with(marshalledDatasetFields, envelope='datasets')
-    def post(self):
+    def post(self,page):
+        try:
+            val = int(page)
+            if val < 1:
+                raise ValueError
+        except ValueError:
+            return {'error':'page must be a positive integer','page':page}
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('filter_params', type=str)
@@ -183,8 +212,23 @@ class SearchDatasets(Resource):
                 value = rule['value']
                 queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
 
-            matchingDatasets = queryObject.all()
-            return matchingDatasets
+            pageObject = queryObject.paginate(page,datasetsPerPage,False)
+            paginatedDatasetResponse = {}
+            paginatedDatasetResponse['currentUri'] = url_for('searchdatasets',page=page)
+            paginatedDatasetResponse['datasets'] = marshal(pageObject.items,marshalledDatasetFields)
+            paginatedDatasetResponse['totalCount'] = pageObject.total
+            paginatedDatasetResponse['perPage'] = datasetsPerPage
+            paginatedDatasetResponse['hasNext'] = pageObject.has_next
+            paginatedDatasetResponse['hasPrevious'] = pageObject.has_prev
+            if pageObject.has_prev:
+                if len(pageObject.items) == 0:
+                    maxPage = int(math.ceil(pageObject.total / datasetsPerPage))
+                    paginatedDatasetResponse['previousUri'] = url_for('searchdatasets',page=maxPage)
+                else:
+                    paginatedDatasetResponse['previousUri'] = url_for('searchdatasets',page=page -1)
+            if pageObject.has_next:
+                paginatedDatasetResponse['nextUri'] = url_for('searchdatasets',page=page + 1)
+            return paginatedDatasetResponse
 
         except Exception as e:
             return {'error': str(e)}
@@ -291,7 +335,7 @@ class CreateDiscovery(Resource):
             newDiscovery = Discovery(owner.id,args['filter_params'],matchingDatasets)
             db.session.add(newDiscovery)
             db.session.commit()
-            return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id,_external=True)}}
+            return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id)}}
 
         except Exception as e:
             return {'error': str(e)}
@@ -353,25 +397,26 @@ class BuildCaches(Resource):
 # End route functions
 
 # Declare routing
-api.add_resource(CreateUser,            '/api/user/create')
-api.add_resource(GetUser,               '/api/user/<int:id>')
-api.add_resource(GetAllUsers,           '/api/users')
-api.add_resource(GetUserDiscoveries,    '/api/user/<int:id>/discoveries')
+api.add_resource(CreateUser,            '/user/create')
+api.add_resource(GetUser,               '/user/<int:id>')
+api.add_resource(GetAllUsers,           '/users')
+api.add_resource(GetUserDiscoveries,    '/user/<int:id>/discoveries')
 
-api.add_resource(CreateDataset,         '/api/dataset/create')
-api.add_resource(GetDataset,            '/api/dataset/<int:id>')
-api.add_resource(GetAllDatasets,        '/api/datasets')
-api.add_resource(GetDatasetSummary,     '/api/datasets/summary')
-api.add_resource(SearchDatasets,        '/api/datasets/search')
-api.add_resource(SearchDatasetsSummary, '/api/datasets/search/summary')
+# Temporarily removed - the only way to add a dataset is through scrapers/SRA/SRA_scrape.py
+# api.add_resource(CreateDataset,       '/dataset/create')
+api.add_resource(GetDataset,            '/dataset/<int:id>')
+api.add_resource(GetAllDatasets,        '/datasets/<int:page>')
+api.add_resource(SearchDatasets,        '/datasets/search/<int:page>')
+api.add_resource(GetDatasetSummary,     '/datasets/summary')
+api.add_resource(SearchDatasetsSummary, '/datasets/search/summary')
 
-api.add_resource(CreateDiscovery,       '/api/discovery/create')
-api.add_resource(GetDiscovery,          '/api/discovery/<int:id>')
-api.add_resource(GetAllDiscoveries,     '/api/discoveries')
+api.add_resource(CreateDiscovery,       '/discovery/create')
+api.add_resource(GetDiscovery,          '/discovery/<int:id>')
+api.add_resource(GetAllDiscoveries,     '/discoveries')
 
-api.add_resource(PurgeCache,            '/api/cache/purge')
-api.add_resource(CacheStats,            '/api/cache/stats')
-api.add_resource(BuildCaches,           '/api/cache/build')
+api.add_resource(PurgeCache,            '/cache/purge')
+api.add_resource(CacheStats,            '/cache/stats')
+api.add_resource(BuildCaches,           '/cache/build')
 
 # Start the app!
 if __name__ == '__main__':
