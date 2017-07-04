@@ -8,6 +8,7 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import AverageReadLengthInputs from './AverageReadLengthInputs';
 import Select from 'react-select';
+import Collapsible from 'react-collapsible';
 
 import RangeSlider from './RangeSlider';
 
@@ -15,13 +16,16 @@ var ExploreFilters = React.createClass({
   getInitialState : function() {
     return {
       "filterStates": {
+        "investigation_type":{
+          "value":"All"
+        },
         "env_package":{
           "value":"All"
         },
         "library_source":{
           "value":"All"
         },
-        "investigation_type":{
+        "study_type":{
           "value":"All"
         },
         "latitudeMin":{
@@ -45,7 +49,7 @@ var ExploreFilters = React.createClass({
         "investigationTypes":[]
     },
     "multSelectStates" :{
-      "investigationTypes":[]
+      "investigationTypes":''
     }
   }
 },
@@ -64,6 +68,7 @@ var ExploreFilters = React.createClass({
   handleMultipleFilterChange : function(filterName, field, filterType, values) {
     //get string to array list
     const newValue = this.state.multSelectStates[filterName].split(',')
+    //if length is zero
     var newRule = {
       "field":field,
       "type":filterType,
@@ -129,22 +134,39 @@ var ExploreFilters = React.createClass({
               {Object.keys(this.props.summaryData.investigation_type_summary)
                      .map(this.renderMultipleMenuItem)}
             </SelectField> */}
-            {/* use onClose handler to searchdatasetsummary when menu closes onClose={this.handleFilterChange.bind(this,)}*/}
-            <Select name="investigation_type" placeholder="Select Investigation Type(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.investigationTypes} searchPromptText='Type to search investigation types' options={investigation_options} onChange={this.handleMultSelectChange.bind(this,"investigationTypes")} onClose={this.handleMultipleFilterChange.bind(this,"investigationTypes", "investigation_type", 8, this.state.multSelectStates.investigationTypes)}/>
+            <Collapsible trigger="General Sample Info">
+              <h4>Investigation Type</h4>
+              <SelectField value={this.state.filterStates.investigation_type.value} onChange={this.handleFilterChange.bind(this,"investigation_type","investigation_type",5)}>
+                <MenuItem value={"All"} primaryText="All" />
+                {Object.keys(this.props.summaryData.investigation_type_summary)
+                       .map(this.renderMenuItem)}
+              </SelectField>
 
-            <h4>Library Source</h4>
-            <SelectField onChange={this.handleMultipleFilterChange.bind(this,"library_source","library_source",5)} multiple={true}>
-              <MenuItem value={"All"} primaryText="All" />
-              {Object.keys(this.props.summaryData.library_source_summary)
-                     .map(this.renderMenuItem)}
-            </SelectField>
+              <h4>Environmental Package</h4>
+              <SelectField value={this.state.filterStates.env_package.value} onChange={this.handleFilterChange.bind(this,"env_package","env_package",5)}>
+                <MenuItem value={"All"} primaryText="All" />
+                {Object.keys(this.props.summaryData.env_package_summary)
+                       .map(this.renderMenuItem)}
+              </SelectField>
 
-            <h4>Choose Environmental Package</h4>
-            <SelectField value={this.state.filterStates.env_package.value} onChange={this.handleFilterChange.bind(this,"env_package","env_package",5)}>
-              <MenuItem value={"All"} primaryText="All" />
-              {Object.keys(this.props.summaryData.env_package_summary)
-                     .map(this.renderMenuItem)}
-            </SelectField>
+              <h4>Library Source</h4>
+              <SelectField value={this.state.filterStates.library_source.value} onChange={this.handleFilterChange.bind(this,"library_source","library_source",5)}>
+                <MenuItem value={"All"} primaryText="All" />
+                {Object.keys(this.props.summaryData.library_source_summary)
+                       .map(this.renderMenuItem)}
+              </SelectField>
+
+              <h4>Study Type</h4>
+              <SelectField value={this.state.filterStates.study_type.value} onChange={this.handleFilterChange.bind(this,"study_type","study_type",5)}>
+                <MenuItem value={"All"} primaryText="All" />
+                {Object.keys(this.props.summaryData.study_type_summary)
+                       .map(this.renderMenuItem)}
+              </SelectField>
+            </Collapsible>
+
+
+            <h4>Investigation Type</h4>
+            <Select name="investigation_type" placeholder="Select Investigation Type(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.investigationTypes}  options={investigation_options} onChange={this.handleMultSelectChange.bind(this,"investigationTypes")} onClose={this.handleMultipleFilterChange.bind(this,"investigationTypes", "investigation_type", 8, this.state.multSelectStates.investigationTypes)}/>
 
             <h4>Latitude</h4>
             <RangeSlider field="meta_latitude" filterMin="latitudeMin" filterMax="latitudeMax"
