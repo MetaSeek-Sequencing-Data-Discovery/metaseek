@@ -16,10 +16,11 @@ var AddDataset = React.createClass({
 
     addDataset : function(dataset) {
       var self = this;
-      apiRequest.post('/dataset/create', dataset)
-      .then(function (response) {
-        self.props.history.push('/dataset/' + response.data.dataset.id);
-      });
+      console.log('Manually uploading datasets currently disabled.');
+      //apiRequest.post('/dataset/create', dataset)
+      //.then(function (response) {
+      //  self.props.history.push('/dataset/' + response.data.dataset.id);
+      //});
     },
     render: function() {
         return (
