@@ -1,3 +1,4 @@
+from __future__ import division
 from flask import Flask, url_for
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
