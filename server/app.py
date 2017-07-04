@@ -138,22 +138,36 @@ class GetUserDiscoveries(Resource):
 #            return {'error': str(e)}
 
 marshalledDatasetFields = {
-    'latitude':fields.String,
-    'longitude':fields.String,
+    # fields that are summarized in summarizeColumn
     'investigation_type':fields.String,
-    'env_package':fields.String,
     'library_source':fields.String,
+    'env_package':fields.String,
+    'library_strategy':fields.String,
+    'library_screening_strategy':fields.String,
+    'library_construction_method':fields.String,
+    'study_type':fields.String,
+    'sequencing_method':fields.String,
+    'instrument_model':fields.String,
+    'geo_loc_name':fields.String,
+    'env_biome':fields.String,
+    'env_feature':fields.String,
+    'env_material':fields.String,
     'avg_read_length_maxrun':fields.Float,
-    'total_num_reads':fields.Integer,
+    'gc_percent_maxrun':fields.Float,
+    'meta_latitude':fields.Float,
+    'meta_longitude':fields.Float,
+    'library_reads_sequenced_maxrun':fields.Integer,
     'total_num_bases_maxrun':fields.Integer,
     'download_size_maxrun':fields.Integer,
-    'gc_percent_maxrun':fields.Float,
-    'biosample_link':fields.String,
-    'collection_date':fields.String,
-    'sample_title':fields.String,
+    # additional important dataset-specific fields
     'id':fields.Integer,
-    #this should also return the etc field for e.g. dataset details
-    'uri': fields.Url('getdataset', absolute=True)
+    'db_source_uid':fields.String,
+    'db_source':fields.String,
+    'sample_title':fields.String,
+    'biosample_link':fields.String,
+    # TODO going to this URL right now just gives back this exact same data
+    # We need to build a way to get ALL of the data for a given dataset
+    'uri': fields.Url('getdataset')
 }
 
 class GetDataset(Resource):
