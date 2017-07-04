@@ -2,7 +2,7 @@ from __future__ import division
 from flask import Flask, url_for
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
-from flask_restful import Api, Resource, reqparse, fields, marshal_with
+from flask_restful import Api, Resource, reqparse, fields, marshal_with, marshal
 from dateutil import parser as dateparser
 from datetime import datetime
 import json
@@ -161,14 +161,42 @@ class GetDataset(Resource):
     def get(self, id):
         return Dataset.query.get(id)
 
+datasetsPerPage = 20
+
 class GetAllDatasets(Resource):
-    @marshal_with(marshalledDatasetFields, envelope='datasets')
-    def get(self):
-        return Dataset.query.all()
+    def get(self,page):
+        try:
+            val = int(page)
+            if val < 1:
+                raise ValueError
+        except ValueError:
+            return {'error':'page must be a positive integer','page':page}
+        pageObject = Dataset.query.paginate(page,datasetsPerPage,False)
+        paginatedDatasetResponse = {}
+        paginatedDatasetResponse['currentUri'] = url_for('getalldatasets',page=page)
+        paginatedDatasetResponse['datasets'] = marshal(pageObject.items,marshalledDatasetFields)
+        paginatedDatasetResponse['totalCount'] = pageObject.total
+        paginatedDatasetResponse['perPage'] = datasetsPerPage
+        paginatedDatasetResponse['hasNext'] = pageObject.has_next
+        paginatedDatasetResponse['hasPrevious'] = pageObject.has_prev
+        if pageObject.has_prev:
+            if len(pageObject.items) == 0:
+                maxPage = int(math.ceil(pageObject.total / datasetsPerPage))
+                paginatedDatasetResponse['previousUri'] = url_for('getalldatasets',page=maxPage)
+            else:
+                paginatedDatasetResponse['previousUri'] = url_for('getalldatasets',page=page -1)
+        if pageObject.has_next:
+            paginatedDatasetResponse['nextUri'] = url_for('getalldatasets',page=page + 1)
+        return paginatedDatasetResponse
 
 class SearchDatasets(Resource):
-    @marshal_with(marshalledDatasetFields, envelope='datasets')
-    def post(self):
+    def post(self,page):
+        try:
+            val = int(page)
+            if val < 1:
+                raise ValueError
+        except ValueError:
+            return {'error':'page must be a positive integer','page':page}
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('filter_params', type=str)
@@ -184,8 +212,23 @@ class SearchDatasets(Resource):
                 value = rule['value']
                 queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
 
-            matchingDatasets = queryObject.all()
-            return matchingDatasets
+            pageObject = queryObject.paginate(page,datasetsPerPage,False)
+            paginatedDatasetResponse = {}
+            paginatedDatasetResponse['currentUri'] = url_for('searchdatasets',page=page)
+            paginatedDatasetResponse['datasets'] = marshal(pageObject.items,marshalledDatasetFields)
+            paginatedDatasetResponse['totalCount'] = pageObject.total
+            paginatedDatasetResponse['perPage'] = datasetsPerPage
+            paginatedDatasetResponse['hasNext'] = pageObject.has_next
+            paginatedDatasetResponse['hasPrevious'] = pageObject.has_prev
+            if pageObject.has_prev:
+                if len(pageObject.items) == 0:
+                    maxPage = int(math.ceil(pageObject.total / datasetsPerPage))
+                    paginatedDatasetResponse['previousUri'] = url_for('searchdatasets',page=maxPage)
+                else:
+                    paginatedDatasetResponse['previousUri'] = url_for('searchdatasets',page=page -1)
+            if pageObject.has_next:
+                paginatedDatasetResponse['nextUri'] = url_for('searchdatasets',page=page + 1)
+            return paginatedDatasetResponse
 
         except Exception as e:
             return {'error': str(e)}
