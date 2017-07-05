@@ -30,8 +30,8 @@ var Explore = React.createClass({
     return {
       'fullData': [],
       'activeData': [],
+      'fullSummaryData':[],
       'activeSummaryData': [],
-      'summaryData':[],
       'histinput':'avg_read_length_summary',
       'filter_params':JSON.stringify({'rules':[]}),
       'loaded':false,
@@ -194,6 +194,7 @@ var Explore = React.createClass({
                   className="explore-filters"
                   updateFilterParams={this.updateFilterParams}
                   activeSummaryData={this.state.activeSummaryData}
+                  fullSummaryData={this.state.fullSummaryData}
                 />
               </Paper>
               <Paper className="explore-right-map">

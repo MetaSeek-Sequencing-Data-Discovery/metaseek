@@ -174,28 +174,28 @@ var ExploreFilters = React.createClass({
               <h4>Investigation Type</h4>
               <SelectField value={this.state.filterStates.investigation_type.value} onChange={this.handleFilterChange.bind(this,"investigation_type","investigation_type",5)}>
                 <MenuItem value={"All"} primaryText="All" />
-                {Object.keys(this.props.summaryData.investigation_type_summary)
+                {Object.keys(this.props.fullSummaryData.investigation_type_summary)
                        .map(this.renderMenuItem)}
               </SelectField>
 
               <h4>Environmental Package</h4>
               <SelectField value={this.state.filterStates.env_package.value} onChange={this.handleFilterChange.bind(this,"env_package","env_package",5)}>
                 <MenuItem value={"All"} primaryText="All" />
-                {Object.keys(this.props.summaryData.env_package_summary)
+                {Object.keys(this.props.fullSummaryData.env_package_summary)
                        .map(this.renderMenuItem)}
               </SelectField>
 
               <h4>Library Source</h4>
               <SelectField value={this.state.filterStates.library_source.value} onChange={this.handleFilterChange.bind(this,"library_source","library_source",5)}>
                 <MenuItem value={"All"} primaryText="All" />
-                {Object.keys(this.props.summaryData.library_source_summary)
+                {Object.keys(this.props.fullSummaryData.library_source_summary)
                        .map(this.renderMenuItem)}
               </SelectField>
 
               <h4>Study Type</h4>
               <SelectField value={this.state.filterStates.study_type.value} onChange={this.handleFilterChange.bind(this,"study_type","study_type",5)}>
                 <MenuItem value={"All"} primaryText="All" />
-                {Object.keys(this.props.summaryData.study_type_summary)
+                {Object.keys(this.props.fullSummaryData.study_type_summary)
                        .map(this.renderMenuItem)}
               </SelectField>
             </Collapsible>
