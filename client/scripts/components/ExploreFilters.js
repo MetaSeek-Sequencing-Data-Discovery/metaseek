@@ -9,8 +9,14 @@ import MenuItem from 'material-ui/MenuItem';
 import AverageReadLengthInputs from './AverageReadLengthInputs';
 import Select from 'react-select';
 import Collapsible from 'react-collapsible';
+import AutoComplete from 'material-ui/AutoComplete';
 
 import RangeSlider from './RangeSlider';
+import Tooltip from 'rc-tooltip';
+import Slider from 'rc-slider';
+
+const Range = Slider.createSliderWithTooltip(Slider.Range);
+
 
 var ExploreFilters = React.createClass({
   getInitialState : function() {
@@ -40,16 +46,43 @@ var ExploreFilters = React.createClass({
         "longitudeMax":{
           "value":180
         },
+        "library_strategy":[],
+        "library_screening_strategy":[],
+        "library_construction_method":{
+          "value":"All"
+        },
+        "sequencing_method":[],
+        "instrument_model":[],
+        "libRdsSqdMin":{
+          "value":0
+        },
+        "libRdsSqdMax":{
+          "value":10000000000
+        },
+        "totBasesMin":{
+          "value":0
+        },
+        "totBasesMax":{
+          "value":1000000000000
+        },
         "avgRdLgthMin":{
           "value":0
         },
         "avgRdLgthMax":{
           "value":30000
         },
-        "investigationTypes":[]
+        "gcPercentMin":{
+          "value":0
+        },
+        "gcPercentMax":{
+          "value":1
+        }
     },
     "multSelectStates" :{
-      "investigationTypes":''
+      "library_strategy":'',
+      "library_screening_strategy":'',
+      "sequencing_method":'',
+      "instrument_model":''
     }
   }
 },
@@ -112,7 +145,10 @@ var ExploreFilters = React.createClass({
 
   render : function() {
     /* define multiple select options */
-    const investigation_options = this.getMultOptions(this.props.summaryData.investigation_type_summary);
+    const libstrat_options = this.getMultOptions(this.props.summaryData.library_strategy_summary);
+    const libscreenstrat_options = this.getMultOptions(this.props.summaryData.library_screening_strategy_summary);
+    const seqmeth_options = this.getMultOptions(this.props.summaryData.sequencing_method_summary);
+    const instmod_options = this.getMultOptions(this.props.summaryData.instrument_model_summary);
 
     return (
       <div>
@@ -164,47 +200,103 @@ var ExploreFilters = React.createClass({
               </SelectField>
             </Collapsible>
 
+            <Collapsible trigger="Sequencing Info">
+              <h4>Library Strategy</h4>
+              <Select name="library_strategy" placeholder="Select Sequencing Strategie(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.library_strategy}  options={libstrat_options} onChange={this.handleMultSelectChange.bind(this,"library_strategy")} onClose={this.handleMultipleFilterChange.bind(this,"library_strategy", "library_strategy", 8, this.state.multSelectStates.library_strategy)}/>
 
-            <h4>Investigation Type</h4>
-            <Select name="investigation_type" placeholder="Select Investigation Type(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.investigationTypes}  options={investigation_options} onChange={this.handleMultSelectChange.bind(this,"investigationTypes")} onClose={this.handleMultipleFilterChange.bind(this,"investigationTypes", "investigation_type", 8, this.state.multSelectStates.investigationTypes)}/>
+              <h4>Library Screening Strategy</h4>
+              <Select name="library_screening_strategy" placeholder="Select Screening Strategie(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.library_screening_strategy}  options={libscreenstrat_options} onChange={this.handleMultSelectChange.bind(this,"library_screening_strategy")} onClose={this.handleMultipleFilterChange.bind(this,"library_screening_strategy", "library_screening_strategy", 8, this.state.multSelectStates.library_screening_strategy)}/>
 
-            <h4>Latitude</h4>
-            <RangeSlider field="meta_latitude" filterMin="latitudeMin" filterMax="latitudeMax"
-              filterTypeMin={4} filterTypeMax={3} min={-90} max={90}
-              minValue={this.state.filterStates.latitudeMin.value} maxValue={this.state.filterStates.latitudeMax.value}
-              handleFilterChange={this.handleFilterChange}
-            />
-            <h4>Longitude</h4>
-            <RangeSlider field="meta_longitude" filterMin="longitudeMin" filterMax="longitudeMax"
-              filterTypeMin={4} filterTypeMax={3} min={-180} max={180}
-              minValue={this.state.filterStates.longitudeMin.value} maxValue={this.state.filterStates.longitudeMax.value}
-              handleFilterChange={this.handleFilterChange}
-            />
-          <h4>Average Read Length</h4>
-          {/*
-            <div className='range-slider-with-text-left'>
-              <TextField
-                 style={{height:'60px'}} inputStyle={{fontSize:'70%'}}
-                 floatingLabelText="min"
-                 defaultValue={this.state.filterStates.avgRdLgthMin.value}
-                 onChange={this.handleMinText}
-               />
-            </div>
-            <div className='range-slider-with-text-center'>*/}
+              <h4>Library Construction Method</h4>
+              <SelectField value={this.state.filterStates.library_construction_method.value} onChange={this.handleFilterChange.bind(this,"library_construction_method","library_construction_method",5)}>
+                <MenuItem value={"All"} primaryText="All" />
+                {Object.keys(this.props.summaryData.library_construction_method_summary)
+                       .map(this.renderMenuItem)}
+              </SelectField>
+
+              <h4>Sequencing Method</h4>
+              <Select name="sequencing_method" placeholder="Select Sequencing Method(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.sequencing_method}  options={seqmeth_options} onChange={this.handleMultSelectChange.bind(this,"sequencing_method")} onClose={this.handleMultipleFilterChange.bind(this,"sequencing_method", "sequencing_method", 8, this.state.multSelectStates.sequencing_method)}/>
+
+              <h4>Instrument Model</h4>
+              <Select name="instrument_model" placeholder="Select Instrument Model(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.instrument_model}  options={instmod_options} onChange={this.handleMultSelectChange.bind(this,"instrument_model")} onClose={this.handleMultipleFilterChange.bind(this,"instrument_model", "instrument_model", 8, this.state.multSelectStates.instrument_model)}/>
+
+              <h4>Average Read Length</h4>
+              {/*
+              <div className='range-slider-with-text-left'>
+                <TextField
+                   style={{height:'60px'}} inputStyle={{fontSize:'70%'}}
+                   floatingLabelText="min"
+                   defaultValue={this.state.filterStates.avgRdLgthMin.value}
+                   onChange={this.handleMinText}
+                 />
+              </div>
+              <div className='range-slider-with-text-center'>*/}
               <RangeSlider field="avg_read_length_maxrun" filterMin="avgRdLgthMin" filterMax="avgRdLgthMax"
                 filterTypeMin={4} filterTypeMax={3} min={0} max={30000}
                 minValue={this.state.filterStates.avgRdLgthMin.value} maxValue={this.state.filterStates.avgRdLgthMax.value}
                 handleFilterChange={this.handleFilterChange}
                 step={this.state.filterStates.avgRdLgthMax.value/100}
               />
-            {/* </div>
-            <div className='range-slider-with-text-right'>
-              <TextField
-                 defaultValue={this.state.filterStates.avgRdLgthMax.value}
-                 floatingLabelText="max"
-                 style={{height:'60px'}} inputStyle={{fontSize:'70%'}}
-               />
-            </div> */}
+              {/* </div>
+              <div className='range-slider-with-text-right'>
+                <TextField
+                   defaultValue={this.state.filterStates.avgRdLgthMax.value}
+                   floatingLabelText="max"
+                   style={{height:'60px'}} inputStyle={{fontSize:'70%'}}
+                 />
+              </div> */}
+
+              <h4>Percent GC</h4>
+              <RangeSlider field="gc_percent_maxrun" filterMin="gcPercentMin" filterMax="gcPercentMax"
+                filterTypeMin={4} filterTypeMax={3} min={0} max={1}
+                minValue={this.state.filterStates.gcPercentMin.value} maxValue={this.state.filterStates.gcPercentMax.value}
+                handleFilterChange={this.handleFilterChange}
+                step={0.01}
+              />
+
+            <h4>Number of Reads Sequenced</h4>
+              <RangeSlider field="library_reads_sequenced_maxrun" filterMin="libRdsSqdMin" filterMax="libRdsSqdMax"
+                filterTypeMin={4} filterTypeMax={3} min={0} max={10000000000}
+                minValue={this.state.filterStates.libRdsSqdMin.value} maxValue={this.state.filterStates.libRdsSqdMax.value}
+                handleFilterChange={this.handleFilterChange}
+                step={this.state.filterStates.libRdsSqdMax.value/1000}
+              />
+              {/*
+                <h4>Library Reads Sequenced</h4>
+                <Range marks={{0:'0',1:'100',2:'10^3',3:'10^4',4:'10^5',5:'10^6'}} step={null} allowCross={false} min={0} max={5} defaultValue={[0,5]} onAfterStop={this.handlelog}/>*/}
+
+              {/*}<h4>Total Number of Bases</h4>
+              <RangeSlider field="total_num_bases_maxrun" filterMin="totBasesMin" filterMax="totBasesMax"
+                filterTypeMin={4} filterTypeMax={3} min={0} max={1000000000000}
+                minValue={this.state.filterStates.totBasesMin.value} maxValue={this.state.filterStates.totBasesMax.value}
+                handleFilterChange={this.handleFilterChange}
+                step={this.state.filterStates.totBasesMax.value/1000000000}
+              />*/}
+            </Collapsible>
+
+            <Collapsible trigger="Environmental/Contextual Info">
+              <h4>Latitude</h4>
+              <RangeSlider field="meta_latitude" filterMin="latitudeMin" filterMax="latitudeMax"
+                filterTypeMin={4} filterTypeMax={3} min={-90} max={90}
+                minValue={this.state.filterStates.latitudeMin.value} maxValue={this.state.filterStates.latitudeMax.value}
+                handleFilterChange={this.handleFilterChange}
+              />
+              <h4>Longitude</h4>
+              <RangeSlider field="meta_longitude" filterMin="longitudeMin" filterMax="longitudeMax"
+                filterTypeMin={4} filterTypeMax={3} min={-180} max={180}
+                minValue={this.state.filterStates.longitudeMin.value} maxValue={this.state.filterStates.longitudeMax.value}
+                handleFilterChange={this.handleFilterChange}
+              />
+            {/* Find a better component for this
+              <h4>Geographic Location</h4>
+              <AutoComplete
+                dataSource={["press Enter to search samples with this text in its geo_loc_name"]}
+                hintText="Search for geo_loc_name"
+                floatingLabelText="Geographic Locations containing:"
+              />
+              */}
+            </Collapsible>
+
 
           </div>
         </MuiThemeProvider>
