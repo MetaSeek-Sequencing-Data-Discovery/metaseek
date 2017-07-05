@@ -171,7 +171,10 @@ def summarizeDatasets(queryObject):
         latlon  = queryResultDataframe[['meta_latitude','meta_longitude']]
         latlon = latlon[pd.notnull(latlon['meta_latitude'])]
         latlon = latlon[pd.notnull(latlon['meta_longitude'])]
-        latlon_map = np.histogram2d(x=latlon['meta_longitude'],y=latlon['meta_latitude'],bins=[36,18], range=[[-180, 180], [-90, 90]])
+        if len(latlon) > 1:
+            latlon_map = np.histogram2d(x=latlon['meta_longitude'],y=latlon['meta_latitude'],bins=[36,18], range=[[-180, 180], [-90, 90]])
+        else:
+            latlon_map = np.histogram2d(x=[],y=[],bins=[36,18], range=[[-180, 180], [-90, 90]])
         # range should be flexible to rules in DatasetSearchSummary
         # latlon_map[0] is the lonxlat (XxY) array of counts; latlon_map[1] is the nx/lon bin starts; map[2] ny/lat bin starts
         lonstepsize = (latlon_map[1][1]-latlon_map[1][0])//2

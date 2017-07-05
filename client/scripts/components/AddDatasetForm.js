@@ -104,7 +104,7 @@ var AddDatasetForm = React.createClass({
                 floatingLabelText="Collection Date"
               />
              <FormsyText
-               name="latitude"
+               name="meta_latitude"
                validations="isNumeric"
                validationError={errorMessages.numericError}
                required
@@ -112,7 +112,7 @@ var AddDatasetForm = React.createClass({
                floatingLabelText="Latitude"
              />
              <FormsyText
-               name="longitude"
+               name="meta_longitude"
                validations="isNumeric"
                validationError={errorMessages.numericError}
                required
