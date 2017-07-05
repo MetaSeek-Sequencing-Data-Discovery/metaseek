@@ -12,7 +12,7 @@ var Histogram = React.createClass({
   },
 
   render: function() {
-    var data = this.props.summaryData[this.props.histinput];
+    var data = this.props.activeSummaryData[this.props.histinput];
 
     var values = Object.keys(data).sort(function(a, b) {
       var newkey = (parseFloat(a) - parseFloat(b));

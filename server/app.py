@@ -48,6 +48,7 @@ client = Client(('localhost', 11211), serializer=json_serializer, deserializer=j
 
 from helpers import *
 from models import *
+from marshals import *
 
 # Declare route functions
 # /user routes
@@ -137,31 +138,12 @@ class GetUserDiscoveries(Resource):
 #        except Exception as e:
 #            return {'error': str(e)}
 
-marshalledDatasetFields = {
-    'latitude':fields.String,
-    'longitude':fields.String,
-    'investigation_type':fields.String,
-    'env_package':fields.String,
-    'library_source':fields.String,
-    'avg_read_length_maxrun':fields.Float,
-    'total_num_reads':fields.Integer,
-    'total_num_bases_maxrun':fields.Integer,
-    'download_size_maxrun':fields.Integer,
-    'gc_percent_maxrun':fields.Float,
-    'biosample_link':fields.String,
-    'collection_date':fields.String,
-    'sample_title':fields.String,
-    'id':fields.Integer,
-    #this should also return the etc field for e.g. dataset details
-    'uri': fields.Url('getdataset', absolute=True)
-}
-
 class GetDataset(Resource):
-    @marshal_with(marshalledDatasetFields, envelope='dataset')
+    @marshal_with(fullDatasetFields, envelope='dataset')
     def get(self, id):
         return Dataset.query.get(id)
 
-datasetsPerPage = 20
+datasetsPerPage = 15
 
 class GetAllDatasets(Resource):
     def get(self,page):
@@ -172,17 +154,19 @@ class GetAllDatasets(Resource):
         except ValueError:
             return {'error':'page must be a positive integer','page':page}
         pageObject = Dataset.query.paginate(page,datasetsPerPage,False)
+        totalPageCount = int(math.ceil(pageObject.total / datasetsPerPage))
         paginatedDatasetResponse = {}
         paginatedDatasetResponse['currentUri'] = url_for('getalldatasets',page=page)
-        paginatedDatasetResponse['datasets'] = marshal(pageObject.items,marshalledDatasetFields)
+        paginatedDatasetResponse['page'] = page
+        paginatedDatasetResponse['datasets'] = marshal(pageObject.items,summarizedDatasetFields)
         paginatedDatasetResponse['totalCount'] = pageObject.total
         paginatedDatasetResponse['perPage'] = datasetsPerPage
+        paginatedDatasetResponse['totalPages'] = totalPageCount
         paginatedDatasetResponse['hasNext'] = pageObject.has_next
         paginatedDatasetResponse['hasPrevious'] = pageObject.has_prev
         if pageObject.has_prev:
             if len(pageObject.items) == 0:
-                maxPage = int(math.ceil(pageObject.total / datasetsPerPage))
-                paginatedDatasetResponse['previousUri'] = url_for('getalldatasets',page=maxPage)
+                paginatedDatasetResponse['previousUri'] = url_for('getalldatasets',page=totalPageCount)
             else:
                 paginatedDatasetResponse['previousUri'] = url_for('getalldatasets',page=page -1)
         if pageObject.has_next:
@@ -213,17 +197,19 @@ class SearchDatasets(Resource):
                 queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
 
             pageObject = queryObject.paginate(page,datasetsPerPage,False)
+            totalPageCount = int(math.ceil(pageObject.total / datasetsPerPage))
             paginatedDatasetResponse = {}
             paginatedDatasetResponse['currentUri'] = url_for('searchdatasets',page=page)
-            paginatedDatasetResponse['datasets'] = marshal(pageObject.items,marshalledDatasetFields)
+            paginatedDatasetResponse['page'] = page
+            paginatedDatasetResponse['datasets'] = marshal(pageObject.items,summarizedDatasetFields)
             paginatedDatasetResponse['totalCount'] = pageObject.total
             paginatedDatasetResponse['perPage'] = datasetsPerPage
+            paginatedDatasetResponse['totalPages'] = totalPageCount
             paginatedDatasetResponse['hasNext'] = pageObject.has_next
             paginatedDatasetResponse['hasPrevious'] = pageObject.has_prev
             if pageObject.has_prev:
                 if len(pageObject.items) == 0:
-                    maxPage = int(math.ceil(pageObject.total / datasetsPerPage))
-                    paginatedDatasetResponse['previousUri'] = url_for('searchdatasets',page=maxPage)
+                    paginatedDatasetResponse['previousUri'] = url_for('searchdatasets',page=totalPageCount)
                 else:
                     paginatedDatasetResponse['previousUri'] = url_for('searchdatasets',page=page -1)
             if pageObject.has_next:
@@ -286,7 +272,7 @@ class GetDiscovery(Resource):
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
         'uri': fields.Url('getdiscovery', absolute=True),
-        'datasets':fields.Nested(marshalledDatasetFields),
+        'datasets':fields.Nested(summarizedDatasetFields),
         'owner':fields.Nested({
             'firebase_id':fields.String,
             'uri':fields.Url('getuser', absolute=True)
@@ -300,7 +286,7 @@ class GetAllDiscoveries(Resource):
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
         'uri': fields.Url('getdiscovery', absolute=True),
-        'datasets':fields.Nested(marshalledDatasetFields),
+        'datasets':fields.Nested(summarizedDatasetFields),
         'owner':fields.Nested({
             'firebase_id':fields.String,
             'uri':fields.Url('getuser', absolute=True)

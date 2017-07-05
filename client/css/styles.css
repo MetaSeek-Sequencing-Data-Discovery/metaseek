@@ -561,10 +561,20 @@ button.github:after, input[type=submit].github:after {
 
 .explore-table {
   width: 1192px;
-  height: 600px;
   margin: 48px auto;
   padding: 0;
   clear: both;
+}
+
+.explore-pagination {
+  padding: 12px;
+  text-align:right;
+}
+
+.explore-pagination-count {
+  display: inline-block;
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
 /* My Account layout */

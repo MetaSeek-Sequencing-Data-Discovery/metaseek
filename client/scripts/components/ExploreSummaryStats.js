@@ -19,8 +19,8 @@ var SummaryStats = React.createClass({
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
           <div>
             <List>
-              <ListItem><span className="callout">{this.props.summaryData.total_datasets}</span> datasets.</ListItem>
-              <ListItem><span className="callout">{getReadableFileSizeString(this.props.summaryData.total_download_size)}</span> estimated download size.</ListItem>
+              <ListItem><span className="callout">{this.props.activeSummaryData.total_datasets}</span> datasets.</ListItem>
+              <ListItem><span className="callout">{getReadableFileSizeString(this.props.activeSummaryData.total_download_size)}</span> estimated download size.</ListItem>
             </List>
           </div>
         </MuiThemeProvider>
