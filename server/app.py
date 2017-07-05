@@ -143,7 +143,7 @@ class GetDataset(Resource):
     def get(self, id):
         return Dataset.query.get(id)
 
-datasetsPerPage = 20
+datasetsPerPage = 15
 
 class GetAllDatasets(Resource):
     def get(self,page):
@@ -154,17 +154,19 @@ class GetAllDatasets(Resource):
         except ValueError:
             return {'error':'page must be a positive integer','page':page}
         pageObject = Dataset.query.paginate(page,datasetsPerPage,False)
+        totalPageCount = int(math.ceil(pageObject.total / datasetsPerPage))
         paginatedDatasetResponse = {}
         paginatedDatasetResponse['currentUri'] = url_for('getalldatasets',page=page)
+        paginatedDatasetResponse['page'] = page
         paginatedDatasetResponse['datasets'] = marshal(pageObject.items,summarizedDatasetFields)
         paginatedDatasetResponse['totalCount'] = pageObject.total
         paginatedDatasetResponse['perPage'] = datasetsPerPage
+        paginatedDatasetResponse['totalPages'] = totalPageCount
         paginatedDatasetResponse['hasNext'] = pageObject.has_next
         paginatedDatasetResponse['hasPrevious'] = pageObject.has_prev
         if pageObject.has_prev:
             if len(pageObject.items) == 0:
-                maxPage = int(math.ceil(pageObject.total / datasetsPerPage))
-                paginatedDatasetResponse['previousUri'] = url_for('getalldatasets',page=maxPage)
+                paginatedDatasetResponse['previousUri'] = url_for('getalldatasets',page=totalPageCount)
             else:
                 paginatedDatasetResponse['previousUri'] = url_for('getalldatasets',page=page -1)
         if pageObject.has_next:
@@ -195,17 +197,19 @@ class SearchDatasets(Resource):
                 queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
 
             pageObject = queryObject.paginate(page,datasetsPerPage,False)
+            totalPageCount = int(math.ceil(pageObject.total / datasetsPerPage))
             paginatedDatasetResponse = {}
             paginatedDatasetResponse['currentUri'] = url_for('searchdatasets',page=page)
+            paginatedDatasetResponse['page'] = page
             paginatedDatasetResponse['datasets'] = marshal(pageObject.items,summarizedDatasetFields)
             paginatedDatasetResponse['totalCount'] = pageObject.total
             paginatedDatasetResponse['perPage'] = datasetsPerPage
+            paginatedDatasetResponse['totalPages'] = totalPageCount
             paginatedDatasetResponse['hasNext'] = pageObject.has_next
             paginatedDatasetResponse['hasPrevious'] = pageObject.has_prev
             if pageObject.has_prev:
                 if len(pageObject.items) == 0:
-                    maxPage = int(math.ceil(pageObject.total / datasetsPerPage))
-                    paginatedDatasetResponse['previousUri'] = url_for('searchdatasets',page=maxPage)
+                    paginatedDatasetResponse['previousUri'] = url_for('searchdatasets',page=totalPageCount)
                 else:
                     paginatedDatasetResponse['previousUri'] = url_for('searchdatasets',page=page -1)
             if pageObject.has_next:

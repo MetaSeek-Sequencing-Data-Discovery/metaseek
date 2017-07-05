@@ -55,8 +55,9 @@ var Explore = React.createClass({
     apiRequest.get("/datasets/summary")
     .then(function (response) {
       self.setState({"fullSummaryData": response.data.summary,"activeSummaryData": response.data.summary});
-      apiRequest.get("/datasets/1")
-      .then(function (response) {
+      apiRequest.post("/datasets/search/1", {
+        "filter_params":self.state.filter_params,
+      }).then(function (response) {
         self.setState({"dataTable":response.data,"loaded":true});
       })
     });
@@ -74,6 +75,24 @@ var Explore = React.createClass({
       }).then(function (response) {
         self.setState({"dataTable":response.data,"processing":false});
       });
+    });
+  },
+
+  getPreviousDataPage : function() {
+    var self = this;
+    apiRequest.post(self.state.dataTable.previousUri, {
+      "filter_params":self.state.filter_params
+    }).then(function (response) {
+      self.setState({"dataTable":response.data});
+    });
+  },
+
+  getNextDataPage : function() {
+    var self = this;
+    apiRequest.post(self.state.dataTable.nextUri, {
+      "filter_params":self.state.filter_params
+    }).then(function (response) {
+      self.setState({"dataTable":response.data});
     });
   },
 
@@ -232,7 +251,7 @@ var Explore = React.createClass({
                   </SelectField>
               </Paper>
               <Paper className="explore-table">
-                <ExploreTable dataTable={this.state.dataTable}/>
+                <ExploreTable getNextDataPage={this.getNextDataPage} getPreviousDataPage={this.getPreviousDataPage} dataTable={this.state.dataTable}/>
               </Paper>
             </div>
           </MuiThemeProvider>

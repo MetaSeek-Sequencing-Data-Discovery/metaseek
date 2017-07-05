@@ -1,14 +1,20 @@
 import React from 'react';
+import axios from 'axios';
+import apiConfig from '../config/api.js';
 
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import ColorPalette from './ColorPalette';
-import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn}
-from 'material-ui/Table';
+import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+import RaisedButton from 'material-ui/RaisedButton';
 
 // My component imports
 import Header from './Header';
+
+var apiRequest = axios.create({
+  baseURL: apiConfig.baseURL
+});
 
 var ExploreTable = React.createClass({
   render : function() {
@@ -79,6 +85,25 @@ var ExploreTable = React.createClass({
                   ))}
               </TableBody>
             </Table>
+            <div className="explore-pagination">
+              <RaisedButton
+                className="explore-pagination-button"
+                label="Previous"
+                onClick={this.props.getPreviousDataPage}
+                disabled={this.props.dataTable.hasPrevious ? false : true}
+                primary={true}
+              />
+              <div className="explore-pagination-count">
+                Page {this.props.dataTable.page} of {this.props.dataTable.totalPages}
+              </div>
+              <RaisedButton
+                className="explore-pagination-button"
+                label="Next"
+                onClick={this.props.getNextDataPage}
+                disabled={this.props.dataTable.hasNext ? false : true}
+                primary={true}
+              />
+            </div>
         </div>
       </MuiThemeProvider>
     )
