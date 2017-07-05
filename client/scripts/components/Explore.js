@@ -28,10 +28,9 @@ var apiRequest = axios.create({
 var Explore = React.createClass({
   getInitialState : function() {
     return {
-      'fullData': [],
-      'activeData': [],
       'fullSummaryData':[],
       'activeSummaryData': [],
+      'dataTable': {},
       'histinput':'avg_read_length_summary',
       'filter_params':JSON.stringify({'rules':[]}),
       'loaded':false,
@@ -56,6 +55,10 @@ var Explore = React.createClass({
     apiRequest.get("/datasets/summary")
     .then(function (response) {
       self.setState({"fullSummaryData": response.data.summary,"activeSummaryData": response.data.summary});
+      apiRequest.get("/datasets/1")
+      .then(function (response) {
+        self.setState({"dataTable":response.data,"loaded":true});
+      })
     });
   },
 
@@ -65,7 +68,12 @@ var Explore = React.createClass({
     apiRequest.post("/datasets/search/summary", {
       "filter_params":self.state.filter_params
     }).then(function (response) {
-      self.setState({"activeSummaryData": response.data.summary,"processing":false});
+      self.setState({"activeSummaryData": response.data.summary});
+      apiRequest.post("/datasets/search/1", {
+        "filter_params":self.state.filter_params
+      }).then(function (response) {
+        self.setState({"dataTable":response.data,"processing":false});
+      });
     });
   },
 
@@ -224,7 +232,7 @@ var Explore = React.createClass({
                   </SelectField>
               </Paper>
               <Paper className="explore-table">
-                <ExploreTable activeData={this.state.activeData}/>
+                <ExploreTable dataTable={this.state.dataTable}/>
               </Paper>
             </div>
           </MuiThemeProvider>
