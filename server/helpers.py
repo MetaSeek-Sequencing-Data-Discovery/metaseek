@@ -69,7 +69,7 @@ def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cat
                     rangeMin = rangeMin - binSize
 
                 rangeMax = round(math.ceil(maxValue),roundTo) + binSize
-                if (maxValue > rangeMax):
+                if (maxValue > (rangeMax - binSize)):
                     rangeMax = rangeMax + binSize
 
                 if binSize >= 1:
