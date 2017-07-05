@@ -152,12 +152,14 @@ button::-moz-focus-inner, input::-moz-focus-inner, legend {
   height: 0;
 }
 
+
 /* Global styles */
 
 body {
   background-color: #f1f1f7;
   background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%236369e0' fill-opacity='0.04' fill-rule='evenodd'/%3E%3C/svg%3E");
 }
+
 
 /* Rolling loader styles */
 
@@ -184,6 +186,7 @@ body {
     transform: rotate(360deg);
   }
 }
+
 @-webkit-keyframes uil-rolling-anim {
   0% {
     -ms-transform: rotate(0deg);
@@ -207,6 +210,7 @@ body {
     transform: rotate(360deg);
   }
 }
+
 @-moz-keyframes uil-rolling-anim {
   0% {
     -ms-transform: rotate(0deg);
@@ -230,6 +234,7 @@ body {
     transform: rotate(360deg);
   }
 }
+
 @-ms-keyframes uil-rolling-anim {
   0% {
     -ms-transform: rotate(0deg);
@@ -253,6 +258,7 @@ body {
     transform: rotate(360deg);
   }
 }
+
 @-moz-keyframes uil-rolling-anim {
   0% {
     -ms-transform: rotate(0deg);
@@ -276,6 +282,7 @@ body {
     transform: rotate(360deg);
   }
 }
+
 @-webkit-keyframes uil-rolling-anim {
   0% {
     -ms-transform: rotate(0deg);
@@ -299,6 +306,7 @@ body {
     transform: rotate(360deg);
   }
 }
+
 @-o-keyframes uil-rolling-anim {
   0% {
     -ms-transform: rotate(0deg);
@@ -322,6 +330,7 @@ body {
     transform: rotate(360deg);
   }
 }
+
 @keyframes uil-rolling-anim {
   0% {
     -ms-transform: rotate(0deg);
@@ -345,11 +354,13 @@ body {
     transform: rotate(360deg);
   }
 }
+
 .uil-rolling-css {
   width: 200px;
   height: 200px;
 }
-.uil-rolling-css > div {
+
+.uil-rolling-css>div {
   width: 200px;
   height: 200px;
   position: relative;
@@ -359,7 +370,8 @@ body {
   -o-animation: uil-rolling-anim 1.1s linear infinite;
   animation: uil-rolling-anim 1.1s linear infinite;
 }
-.uil-rolling-css > div div {
+
+.uil-rolling-css>div div {
   position: absolute;
   width: 200px;
   height: 100px;
@@ -369,7 +381,8 @@ body {
   border-width: 24px;
   border-bottom-width: 0;
 }
-.uil-rolling-css > div div:nth-of-type(2) {
+
+.uil-rolling-css>div div:nth-of-type(2) {
   -ms-transform: translate(0, 50px) rotate(39.6deg) translate(0, -50px);
   -moz-transform: translate(0, 50px) rotate(39.6deg) translate(0, -50px);
   -webkit-transform: translate(0, 50px) rotate(39.6deg) translate(0, -50px);
@@ -391,6 +404,7 @@ body {
   margin: 0px auto;
   transform: scale(0.44);
 }
+
 
 /* Typography */
 
@@ -420,13 +434,13 @@ h2 {
   text-align: center;
   margin-top: 2rem;
   margin-bottom: 2rem;
-  font-size:2.6em;
-  font-weight:300;
+  font-size: 2.6em;
+  font-weight: 300;
 }
 
 h3 {
   font-size: 2rem;
-  text-align:center;
+  text-align: center;
 }
 
 ul {
@@ -440,13 +454,14 @@ ul {
 }
 
 .callout {
-  color:#6369E0;
-  font-weight:700;
+  color: #6369E0;
+  font-weight: 700;
 }
 
 .button-link {
   text-decoration: none;
 }
+
 
 /* Github follow buttons */
 
@@ -467,6 +482,7 @@ button.github:after, input[type=submit].github:after {
   background: #5cc437
 }
 
+
 /* General layout */
 
 .single-sheet {
@@ -475,15 +491,17 @@ button.github:after, input[type=submit].github:after {
   padding: 30px;
 }
 
+
 /* Add Dataset layout */
 
 .submit-button {
-  margin-top:32px;
+  margin-top: 32px;
 }
 
 .block-field {
-  display:block;
+  display: block;
 }
+
 
 /* Explore layout */
 
@@ -493,12 +511,12 @@ button.github:after, input[type=submit].github:after {
 }
 
 .explore-filter-card {
-	height: 888px;
-	overflow-y: scroll;
-	width: 380px;
-	float: left;
-	margin: 0 0 0 0;
-	padding: 24px;
+  height: 888px;
+  overflow-y: scroll;
+  width: 380px;
+  float: left;
+  margin: 0 0 0 0;
+  padding: 24px;
 }
 
 .profile-container {
@@ -506,9 +524,9 @@ button.github:after, input[type=submit].github:after {
 }
 
 .profile-image {
-  width:150px;
-  height:150px;
-  display:inline;
+  width: 150px;
+  height: 150px;
+  display: inline;
 }
 
 .profile-button {
@@ -525,38 +543,38 @@ button.github:after, input[type=submit].github:after {
 }
 
 .explore-right-map {
-	 float: right;
-	 width: 788px;
-	 height: 408px;
-	 margin: 0;
-	 padding: 24px;
+  float: right;
+  width: 788px;
+  height: 408px;
+  margin: 0;
+  padding: 24px;
 }
 
 .explore-map-container {
-  width:720px;
-  margin:0 auto;
+  width: 720px;
+  margin: 0 auto;
 }
 
 .explore-map-heat-container {
-  width:720px;
-  height:360px;
+  width: 720px;
+  height: 360px;
   background-image: url('/images/BWmapBackground.jpg');
-  background-size:cover;
+  background-size: cover;
 }
 
 .explore-right-summary {
-	 float: right;
-	 width: 788px;
-	 margin-top: 24px;
+  float: right;
+  width: 788px;
+  margin-top: 24px;
 }
 
 .explore-right-histogram {
-	 float: right;
-	 width: 788px;
-	 height: 320px;
-	 margin-top: 24px;
-	 margin-bottom: 24px;
-   padding: 24px;
+  float: right;
+  width: 788px;
+  height: 320px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+  padding: 24px;
 }
 
 .explore-table {
@@ -568,7 +586,7 @@ button.github:after, input[type=submit].github:after {
 
 .explore-pagination {
   padding: 12px;
-  text-align:right;
+  text-align: right;
 }
 
 .explore-pagination-count {
@@ -577,15 +595,17 @@ button.github:after, input[type=submit].github:after {
   padding-right: 12px;
 }
 
+
 /* My Account layout */
 
 .login-buttons {
-  text-align:center;
+  text-align: center;
 }
 
-.login-buttons > div {
-  margin:20px;
+.login-buttons>div {
+  margin: 20px;
 }
+
 
 /* Welcome layout */
 
@@ -599,7 +619,7 @@ button.github:after, input[type=submit].github:after {
 .welcome-announce {
   font-size: 2.6em;
   margin-top: 50px;
-  font-weight:500;
+  font-weight: 500;
 }
 
 .welcome-enter {
@@ -625,48 +645,56 @@ button.github:after, input[type=submit].github:after {
   display: block;
   margin: 0 auto;
 }
+
 .explore-preview-sheet {
   padding: 15px;
-  height:400px;
+  height: 400px;
 }
+
 .explore-preview-sheet-left {
-  float:left;
-  width:500px;
-  margin-left:20px;
-  margin-top:40px;
+  float: left;
+  width: 500px;
+  margin-left: 20px;
+  margin-top: 40px;
 }
+
 .explore-preview-sheet-right {
-  float:right;
-  width:420px;
-  margin-right:15px;
+  float: right;
+  width: 420px;
+  margin-right: 15px;
 }
 
 .range-slider {
-  margin-top:15px;
+  margin-top: 15px;
 }
 
 .range-slider-with-text {
-  width:100%;
-  height:30px;
-  position:relative;
+  width: 100%;
+  height: 30px;
+  position: relative;
 }
+
 .range-slider-with-text-left {
   float: left;
-  display:flex;
-  width:10%;
-  margin-right:4%;
+  display: flex;
+  width: 10%;
+  margin-right: 4%;
 }
+
 .range-slider-with-text-center {
   float: left;
-  width:71%;
-  margin-top:20px;
+  width: 71%;
+  margin-top: 20px;
 }
+
 .range-slider-with-text-right {
   float: right;
   display: flex;
-  width:10%;
-  margin-left:5%;
+  width: 10%;
+  margin-left: 5%;
 }
+
+
 /* rc-slider styles */
 
 .rc-slider {
@@ -676,14 +704,16 @@ button.github:after, input[type=submit].github:after {
   width: 100%;
   border-radius: 6px;
   -ms-touch-action: none;
-      touch-action: none;
+  touch-action: none;
   box-sizing: border-box;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
+
 .rc-slider * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
+
 .rc-slider-rail {
   position: absolute;
   width: 100%;
@@ -691,6 +721,7 @@ button.github:after, input[type=submit].github:after {
   height: 4px;
   border-radius: 6px;
 }
+
 .rc-slider-track {
   position: absolute;
   left: 0;
@@ -698,6 +729,7 @@ button.github:after, input[type=submit].github:after {
   border-radius: 6px;
   background-color: #6369E0;
 }
+
 .rc-slider-handle {
   position: absolute;
   margin-left: -7px;
@@ -711,17 +743,20 @@ button.github:after, input[type=submit].github:after {
   border: solid 2px #6369E0;
   background-color: #fff;
   -ms-touch-action: pan-x;
-      touch-action: pan-x;
+  touch-action: pan-x;
 }
+
 .rc-slider-handle:hover {
   border-color: #B1B2F6;
 }
+
 .rc-slider-handle:active {
   border-color: #B1B2F6;
   box-shadow: 0 0 5px #B1B2F6;
   cursor: -webkit-grabbing;
   cursor: grabbing;
 }
+
 .rc-slider-mark {
   position: absolute;
   top: 18px;
@@ -729,6 +764,7 @@ button.github:after, input[type=submit].github:after {
   width: 100%;
   font-size: 12px;
 }
+
 .rc-slider-mark-text {
   position: absolute;
   display: inline-block;
@@ -737,15 +773,18 @@ button.github:after, input[type=submit].github:after {
   cursor: pointer;
   color: #999;
 }
+
 .rc-slider-mark-text-active {
   color: #666;
 }
+
 .rc-slider-step {
   position: absolute;
   width: 100%;
   height: 4px;
   background: transparent;
 }
+
 .rc-slider-dot {
   position: absolute;
   bottom: -2px;
@@ -758,174 +797,196 @@ button.github:after, input[type=submit].github:after {
   border-radius: 50%;
   vertical-align: middle;
 }
+
 .rc-slider-dot:first-child {
   margin-left: -4px;
 }
+
 .rc-slider-dot:last-child {
   margin-left: -4px;
 }
+
 .rc-slider-dot-active {
   border-color: #B1B2F6;
 }
+
 .rc-slider-disabled {
   background-color: #e9e9e9;
 }
+
 .rc-slider-disabled .rc-slider-track {
   background-color: #ccc;
 }
-.rc-slider-disabled .rc-slider-handle,
-.rc-slider-disabled .rc-slider-dot {
+
+.rc-slider-disabled .rc-slider-handle, .rc-slider-disabled .rc-slider-dot {
   border-color: #ccc;
   box-shadow: none;
   background-color: #fff;
   cursor: not-allowed;
 }
-.rc-slider-disabled .rc-slider-mark-text,
-.rc-slider-disabled .rc-slider-dot {
+
+.rc-slider-disabled .rc-slider-mark-text, .rc-slider-disabled .rc-slider-dot {
   cursor: not-allowed !important;
 }
+
 .rc-slider-vertical {
   width: 14px;
   height: 100%;
   padding: 0 5px;
 }
+
 .rc-slider-vertical .rc-slider-rail {
   height: 100%;
   width: 4px;
 }
+
 .rc-slider-vertical .rc-slider-track {
   left: 5px;
   bottom: 0;
   width: 4px;
 }
+
 .rc-slider-vertical .rc-slider-handle {
   margin-left: -5px;
   margin-bottom: -7px;
   -ms-touch-action: pan-y;
-      touch-action: pan-y;
+  touch-action: pan-y;
 }
+
 .rc-slider-vertical .rc-slider-mark {
   top: 0;
   left: 18px;
   height: 100%;
 }
+
 .rc-slider-vertical .rc-slider-step {
   height: 100%;
   width: 4px;
 }
+
 .rc-slider-vertical .rc-slider-dot {
   left: 2px;
   margin-bottom: -4px;
 }
+
 .rc-slider-vertical .rc-slider-dot:first-child {
   margin-bottom: -4px;
 }
+
 .rc-slider-vertical .rc-slider-dot:last-child {
   margin-bottom: -4px;
 }
-.rc-slider-tooltip-zoom-down-enter,
-.rc-slider-tooltip-zoom-down-appear {
+
+.rc-slider-tooltip-zoom-down-enter, .rc-slider-tooltip-zoom-down-appear {
   -webkit-animation-duration: .3s;
-          animation-duration: .3s;
+  animation-duration: .3s;
   -webkit-animation-fill-mode: both;
-          animation-fill-mode: both;
+  animation-fill-mode: both;
   display: block !important;
   -webkit-animation-play-state: paused;
-          animation-play-state: paused;
+  animation-play-state: paused;
 }
+
 .rc-slider-tooltip-zoom-down-leave {
   -webkit-animation-duration: .3s;
-          animation-duration: .3s;
+  animation-duration: .3s;
   -webkit-animation-fill-mode: both;
-          animation-fill-mode: both;
+  animation-fill-mode: both;
   display: block !important;
   -webkit-animation-play-state: paused;
-          animation-play-state: paused;
+  animation-play-state: paused;
 }
-.rc-slider-tooltip-zoom-down-enter.rc-slider-tooltip-zoom-down-enter-active,
-.rc-slider-tooltip-zoom-down-appear.rc-slider-tooltip-zoom-down-appear-active {
+
+.rc-slider-tooltip-zoom-down-enter.rc-slider-tooltip-zoom-down-enter-active, .rc-slider-tooltip-zoom-down-appear.rc-slider-tooltip-zoom-down-appear-active {
   -webkit-animation-name: rcSliderTooltipZoomDownIn;
-          animation-name: rcSliderTooltipZoomDownIn;
+  animation-name: rcSliderTooltipZoomDownIn;
   -webkit-animation-play-state: running;
-          animation-play-state: running;
+  animation-play-state: running;
 }
+
 .rc-slider-tooltip-zoom-down-leave.rc-slider-tooltip-zoom-down-leave-active {
   -webkit-animation-name: rcSliderTooltipZoomDownOut;
-          animation-name: rcSliderTooltipZoomDownOut;
+  animation-name: rcSliderTooltipZoomDownOut;
   -webkit-animation-play-state: running;
-          animation-play-state: running;
+  animation-play-state: running;
 }
-.rc-slider-tooltip-zoom-down-enter,
-.rc-slider-tooltip-zoom-down-appear {
+
+.rc-slider-tooltip-zoom-down-enter, .rc-slider-tooltip-zoom-down-appear {
   -webkit-transform: scale(0, 0);
-          transform: scale(0, 0);
+  transform: scale(0, 0);
   -webkit-animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
-          animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 }
+
 .rc-slider-tooltip-zoom-down-leave {
   -webkit-animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
-          animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+  animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
 }
+
 @-webkit-keyframes rcSliderTooltipZoomDownIn {
   0% {
     opacity: 0;
     -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
     -webkit-transform: scale(0, 0);
-            transform: scale(0, 0);
+    transform: scale(0, 0);
   }
   100% {
     -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
     -webkit-transform: scale(1, 1);
-            transform: scale(1, 1);
+    transform: scale(1, 1);
   }
 }
+
 @keyframes rcSliderTooltipZoomDownIn {
   0% {
     opacity: 0;
     -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
     -webkit-transform: scale(0, 0);
-            transform: scale(0, 0);
+    transform: scale(0, 0);
   }
   100% {
     -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
     -webkit-transform: scale(1, 1);
-            transform: scale(1, 1);
+    transform: scale(1, 1);
   }
 }
+
 @-webkit-keyframes rcSliderTooltipZoomDownOut {
   0% {
     -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
     -webkit-transform: scale(1, 1);
-            transform: scale(1, 1);
+    transform: scale(1, 1);
   }
   100% {
     opacity: 0;
     -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
     -webkit-transform: scale(0, 0);
-            transform: scale(0, 0);
+    transform: scale(0, 0);
   }
 }
+
 @keyframes rcSliderTooltipZoomDownOut {
   0% {
     -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
     -webkit-transform: scale(1, 1);
-            transform: scale(1, 1);
+    transform: scale(1, 1);
   }
   100% {
     opacity: 0;
     -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
+    transform-origin: 50% 100%;
     -webkit-transform: scale(0, 0);
-            transform: scale(0, 0);
+    transform: scale(0, 0);
   }
 }
+
 .rc-slider-tooltip {
   position: absolute;
   left: -9999px;
@@ -934,16 +995,20 @@ button.github:after, input[type=submit].github:after {
   box-sizing: border-box;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
+
 .rc-slider-tooltip * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
+
 .rc-slider-tooltip-hidden {
   display: none;
 }
+
 .rc-slider-tooltip-placement-top {
   padding: 4px 0 8px 0;
 }
+
 .rc-slider-tooltip-inner {
   padding: 6px 2px;
   min-width: 24px;
@@ -957,6 +1022,7 @@ button.github:after, input[type=submit].github:after {
   border-radius: 6px;
   box-shadow: 0 0 4px #9A99A6;
 }
+
 .rc-slider-tooltip-arrow {
   position: absolute;
   width: 0;
@@ -964,6 +1030,7 @@ button.github:after, input[type=submit].github:after {
   border-color: transparent;
   border-style: solid;
 }
+
 .rc-slider-tooltip-placement-top .rc-slider-tooltip-arrow {
   bottom: 4px;
   left: 50%;
@@ -972,30 +1039,33 @@ button.github:after, input[type=submit].github:after {
   border-top-color: #6c6c6c;
 }
 
+
 /* rc-select styles */
 
 .Select {
   position: relative;
 }
-.Select,
-.Select div,
-.Select input,
-.Select span {
+
+.Select, .Select div, .Select input, .Select span {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-.Select.is-disabled > .Select-control {
+
+.Select.is-disabled>.Select-control {
   background-color: #f9f9f9;
 }
-.Select.is-disabled > .Select-control:hover {
+
+.Select.is-disabled>.Select-control:hover {
   box-shadow: none;
 }
+
 .Select.is-disabled .Select-arrow-zone {
   cursor: default;
   pointer-events: none;
   opacity: 0.35;
 }
+
 .Select-control {
   background-color: #fff;
   border-color: #d9d9d9 #ccc #b3b3b3;
@@ -1012,35 +1082,42 @@ button.github:after, input[type=submit].github:after {
   position: relative;
   width: 100%;
 }
+
 .Select-control:hover {
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
 }
+
 .Select-control .Select-input:focus {
   outline: none;
 }
-.is-searchable.is-open > .Select-control {
+
+.is-searchable.is-open>.Select-control {
   cursor: text;
 }
-.is-open > .Select-control {
+
+.is-open>.Select-control {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
   background: #fff;
   border-color: #b3b3b3 #ccc #d9d9d9;
 }
-.is-open > .Select-control .Select-arrow {
+
+.is-open>.Select-control .Select-arrow {
   top: -2px;
   border-color: transparent transparent #999;
   border-width: 0 5px 5px;
 }
-.is-searchable.is-focused:not(.is-open) > .Select-control {
+
+.is-searchable.is-focused:not(.is-open)>.Select-control {
   cursor: text;
 }
-.is-focused:not(.is-open) > .Select-control {
+
+.is-focused:not(.is-open)>.Select-control {
   border-color: #8387E6;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 0 3px rgba(49,56,214, 0.8);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 0 3px rgba(49, 56, 214, 0.8);
 }
-.Select-placeholder,
-.Select--single > .Select-control .Select-value {
+
+.Select-placeholder, .Select--single>.Select-control .Select-value {
   bottom: 0;
   color: #aaa;
   left: 0;
@@ -1055,30 +1132,30 @@ button.github:after, input[type=submit].github:after {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.has-value.Select--single > .Select-control .Select-value .Select-value-label,
-.has-value.is-pseudo-focused.Select--single > .Select-control .Select-value .Select-value-label {
+
+.has-value.Select--single>.Select-control .Select-value .Select-value-label, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value .Select-value-label {
   color: #333;
 }
-.has-value.Select--single > .Select-control .Select-value a.Select-value-label,
-.has-value.is-pseudo-focused.Select--single > .Select-control .Select-value a.Select-value-label {
+
+.has-value.Select--single>.Select-control .Select-value a.Select-value-label, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value a.Select-value-label {
   cursor: pointer;
   text-decoration: none;
 }
-.has-value.Select--single > .Select-control .Select-value a.Select-value-label:hover,
-.has-value.is-pseudo-focused.Select--single > .Select-control .Select-value a.Select-value-label:hover,
-.has-value.Select--single > .Select-control .Select-value a.Select-value-label:focus,
-.has-value.is-pseudo-focused.Select--single > .Select-control .Select-value a.Select-value-label:focus {
+
+.has-value.Select--single>.Select-control .Select-value a.Select-value-label:hover, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value a.Select-value-label:hover, .has-value.Select--single>.Select-control .Select-value a.Select-value-label:focus, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value a.Select-value-label:focus {
   color: #6369E0;
   outline: none;
   text-decoration: underline;
 }
+
 .Select-input {
   height: 34px;
   padding-left: 10px;
   padding-right: 10px;
   vertical-align: middle;
 }
-.Select-input > input {
+
+.Select-input>input {
   width: 100%;
   background: none transparent;
   border: 0 none;
@@ -1095,15 +1172,19 @@ button.github:after, input[type=submit].github:after {
   /* For IE 8 compatibility */
   -webkit-appearance: none;
 }
-.is-focused .Select-input > input {
+
+.is-focused .Select-input>input {
   cursor: text;
 }
+
 .has-value.is-pseudo-focused .Select-input {
   opacity: 0;
 }
-.Select-control:not(.is-searchable) > .Select-input {
+
+.Select-control:not(.is-searchable)>.Select-input {
   outline: none;
 }
+
 .Select-loading-zone {
   cursor: pointer;
   display: table-cell;
@@ -1112,6 +1193,7 @@ button.github:after, input[type=submit].github:after {
   vertical-align: middle;
   width: 16px;
 }
+
 .Select-loading {
   -webkit-animation: Select-animation-spin 400ms infinite linear;
   -o-animation: Select-animation-spin 400ms infinite linear;
@@ -1126,6 +1208,7 @@ button.github:after, input[type=submit].github:after {
   position: relative;
   vertical-align: middle;
 }
+
 .Select-clear-zone {
   -webkit-animation: Select-animation-fadeIn 200ms;
   -o-animation: Select-animation-fadeIn 200ms;
@@ -1138,17 +1221,21 @@ button.github:after, input[type=submit].github:after {
   vertical-align: middle;
   width: 17px;
 }
+
 .Select-clear-zone:hover {
   color: #FD9981;
 }
+
 .Select-clear {
   display: inline-block;
   font-size: 18px;
   line-height: 1;
 }
+
 .Select--multi .Select-clear-zone {
   width: 17px;
 }
+
 .Select-arrow-zone {
   cursor: pointer;
   display: table-cell;
@@ -1158,6 +1245,7 @@ button.github:after, input[type=submit].github:after {
   width: 25px;
   padding-right: 5px;
 }
+
 .Select-arrow {
   border-color: #999 transparent transparent;
   border-style: solid;
@@ -1167,13 +1255,15 @@ button.github:after, input[type=submit].github:after {
   width: 0;
   position: relative;
 }
-.is-open .Select-arrow,
-.Select-arrow-zone:hover > .Select-arrow {
+
+.is-open .Select-arrow, .Select-arrow-zone:hover>.Select-arrow {
   border-top-color: #666;
 }
+
 .Select--multi .Select-multi-value-wrapper {
   display: inline-block;
 }
+
 .Select .Select-aria-only {
   display: inline-block;
   height: 1px;
@@ -1183,6 +1273,7 @@ button.github:after, input[type=submit].github:after {
   overflow: hidden;
   float: left;
 }
+
 @-webkit-keyframes Select-animation-fadeIn {
   from {
     opacity: 0;
@@ -1191,6 +1282,7 @@ button.github:after, input[type=submit].github:after {
     opacity: 1;
   }
 }
+
 @keyframes Select-animation-fadeIn {
   from {
     opacity: 0;
@@ -1199,6 +1291,7 @@ button.github:after, input[type=submit].github:after {
     opacity: 1;
   }
 }
+
 .Select-menu-outer {
   border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
@@ -1215,10 +1308,12 @@ button.github:after, input[type=submit].github:after {
   z-index: 1;
   -webkit-overflow-scrolling: touch;
 }
+
 .Select-menu {
   max-height: 198px;
   overflow-y: auto;
 }
+
 .Select-option {
   box-sizing: border-box;
   background-color: #fff;
@@ -1227,26 +1322,31 @@ button.github:after, input[type=submit].github:after {
   display: block;
   padding: 8px 10px;
 }
+
 .Select-option:last-child {
   border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
 }
+
 .Select-option.is-selected {
   background-color: #E9EAFD;
   /* Fallback color for IE 8 */
   background-color: rgba(233, 234, 253, 0.04);
   color: #333;
 }
+
 .Select-option.is-focused {
   background-color: #E9EAFD;
   /* Fallback color for IE 8 */
   background-color: rgba(233, 234, 253, 0.5);
   color: #333;
 }
+
 .Select-option.is-disabled {
   color: #cccccc;
   cursor: default;
 }
+
 .Select-noresults {
   box-sizing: border-box;
   color: #999999;
@@ -1254,14 +1354,17 @@ button.github:after, input[type=submit].github:after {
   display: block;
   padding: 8px 10px;
 }
+
 .Select--multi .Select-input {
   vertical-align: middle;
   margin-left: 10px;
   padding: 0;
 }
+
 .Select--multi.has-value .Select-input {
   margin-left: 5px;
 }
+
 .Select--multi .Select-value {
   background-color: #E1E2FC;
   /* Fallback color for IE 8 */
@@ -1269,7 +1372,7 @@ button.github:after, input[type=submit].github:after {
   border-radius: 2px;
   border: 1px solid #B1B2F6;
   /* Fallback color for IE 8 */
-  border: 1px solid rgba(177,178,246, 0.8);
+  border: 1px solid rgba(177, 178, 246, 0.8);
   color: #6369E0;
   display: inline-block;
   font-size: 0.9em;
@@ -1278,65 +1381,73 @@ button.github:after, input[type=submit].github:after {
   margin-top: 5px;
   vertical-align: top;
 }
-.Select--multi .Select-value-icon,
-.Select--multi .Select-value-label {
+
+.Select--multi .Select-value-icon, .Select--multi .Select-value-label {
   display: inline-block;
   vertical-align: middle;
 }
+
 .Select--multi .Select-value-label {
   border-bottom-right-radius: 2px;
   border-top-right-radius: 2px;
   cursor: default;
   padding: 2px 5px;
 }
+
 .Select--multi a.Select-value-label {
   color: #8387E6;
   cursor: pointer;
   text-decoration: none;
 }
+
 .Select--multi a.Select-value-label:hover {
   text-decoration: underline;
 }
+
 .Select--multi .Select-value-icon {
   cursor: pointer;
   border-bottom-left-radius: 2px;
   border-top-left-radius: 2px;
   border-right: 1px solid #B1B2F6;
   /* Fallback color for IE 8 */
-  border-right: 1px solid rgba(177,178,246, 0.8);
+  border-right: 1px solid rgba(177, 178, 246, 0.8);
   padding: 1px 5px 3px;
 }
-.Select--multi .Select-value-icon:hover,
-.Select--multi .Select-value-icon:focus {
+
+.Select--multi .Select-value-icon:hover, .Select--multi .Select-value-icon:focus {
   background-color: #E9EAFD;
   /* Fallback color for IE 8 */
   background-color: rgba(255, 255, 255, 0);
   color: #B1B2F6;
 }
+
 .Select--multi .Select-value-icon:active {
   background-color: #E9EAFD;
   /* Fallback color for IE 8 */
   background-color: rgba(255, 255, 255, 0);
 }
+
 .Select--multi.is-disabled .Select-value {
   background-color: #fcfcfc;
   border: 1px solid #e3e3e3;
   color: #333;
 }
+
 .Select--multi.is-disabled .Select-value-icon {
   cursor: not-allowed;
   border-right: 1px solid #e3e3e3;
 }
-.Select--multi.is-disabled .Select-value-icon:hover,
-.Select--multi.is-disabled .Select-value-icon:focus,
-.Select--multi.is-disabled .Select-value-icon:active {
+
+.Select--multi.is-disabled .Select-value-icon:hover, .Select--multi.is-disabled .Select-value-icon:focus, .Select--multi.is-disabled .Select-value-icon:active {
   background-color: #fcfcfc;
 }
+
 @keyframes Select-animation-spin {
   to {
     transform: rotate(1turn);
   }
 }
+
 @-webkit-keyframes Select-animation-spin {
   to {
     -webkit-transform: rotate(1turn);
@@ -1344,50 +1455,64 @@ button.github:after, input[type=submit].github:after {
 }
 
 .Collapsible {
-  background-color: white; }
+  background-color: white;
+}
 
 .Collapsible__contentInner {
   padding: 10px;
   border: 1px solid #ebebeb;
-  border-top: 0; }
-  .Collapsible__contentInner p {
-    margin-bottom: 10px;
-    font-size: 14px;
-    line-height: 20px; }
-    .Collapsible__contentInner p:last-child {
-      margin-bottom: 0; }
+  border-top: 0;
+}
+
+.Collapsible__contentInner p {
+  margin-bottom: 10px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.Collapsible__contentInner p:last-child {
+  margin-bottom: 0;
+}
 
 .Collapsible__trigger {
   display: block;
   font-weight: 400;
   text-decoration: none;
-  color: #838291;
   position: relative;
   border: 1px solid white;
   padding: 10px;
   background: #E9EAFD;
-  color: #838291; }
-  .Collapsible__trigger:after {
-    content: '';
-    position: absolute;
-    right: 10px;
-    top: 15px;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 8px 8px 0 8px;
-    border-color: #838291 transparent transparent transparent;
-    display: block;
-    transition: transform 300ms; }
-  .Collapsible__trigger.is-open:after {
-    transform: rotateZ(180deg); }
-  .Collapsible__trigger.is-disabled {
-    opacity: 0.5;
-    background-color: grey; }
+  color: #666666;
+}
+
+.Collapsible__trigger:after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 15px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 8px 0 8px;
+  border-color: #838291 transparent transparent transparent;
+  display: block;
+  transition: transform 300ms;
+}
+
+.Collapsible__trigger.is-open:after {
+  transform: rotateZ(180deg);
+}
+
+.Collapsible__trigger.is-disabled {
+  opacity: 0.5;
+  background-color: grey;
+}
 
 .CustomTriggerCSS {
   background-color: lightcoral;
-  transition: background-color 200ms ease; }
+  transition: background-color 200ms ease;
+}
 
 .CustomTriggerCSS--open {
-  background-color: darkslateblue; }
+  background-color: darkslateblue;
+}

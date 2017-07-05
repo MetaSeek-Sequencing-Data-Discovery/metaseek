@@ -38,7 +38,7 @@ var DatasetDetail = React.createClass({
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
           <div>
             <Header history={this.props.history}/>
-            <Paper className="singleSheet" zDepth={2}>
+            <Paper className="single-sheet" zDepth={2}>
               <h2>Dataset Detail</h2>
                 <List>
                   {Object.keys(this.state.dataset).map(this.renderField)}
