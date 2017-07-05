@@ -55,30 +55,15 @@ var Explore = React.createClass({
     var self = this;
     apiRequest.get("/datasets/summary")
     .then(function (response) {
-      // store the summary data response
-      self.setState({"summaryData": response.data.summary});
-      self.setState({"activeSummaryData": response.data.summary});
-
-      // if there aren't too many datasets, just get 'em all
-      if (response.data.summary.totalDatasets < 1000) {
-        apiRequest.get("/datasets")
-        .then(function (response) {
-          // store the full response and set loaded to true
-          self.setState({"fullData": response.data.datasets,"activeData" : response.data.datasets,"loaded":true});
-          self.state.activeData = self.state.fullData;
-          self.setState({ });
-        })
-      } else {
-        self.setState({"loaded":true});
-      }
+      self.setState({"fullSummaryData": response.data.summary,"activeSummaryData": response.data.summary});
     });
   },
 
   updateActiveSummaryData : function() {
     var self = this;
     self.setState({"processing":true});
-    apiRequest.post('/datasets/search/summary', {
-      "filter_params":this.state.filter_params
+    apiRequest.post("/datasets/search/summary", {
+      "filter_params":self.state.filter_params
     }).then(function (response) {
       self.setState({"activeSummaryData": response.data.summary,"processing":false});
     });
@@ -114,7 +99,7 @@ var Explore = React.createClass({
     self.state.firebase.name = user.displayName;
     self.state.firebase.uid = user.uid;
     self.state.firebase.photo = user.photoURL;
-    apiRequest.post('/user/create', {
+    apiRequest.post("/user/create", {
       "firebase_id":self.state.firebase.uid,
       "admin":0
     }).then(function(response){
@@ -124,7 +109,7 @@ var Explore = React.createClass({
 
   updateFilterParams : function(filterStates) {
     filterStates = Object.values(filterStates).filter(function(ruleObject){
-      if (ruleObject.value == "All" || ruleObject.value=='') {
+      if (ruleObject.value == "All" || ruleObject.value=="") {
         return false;
       }
       if (("field" in ruleObject) && ("value" in ruleObject) && ("type" in ruleObject)) {
@@ -140,16 +125,16 @@ var Explore = React.createClass({
 
   submitDiscovery : function() {
     var self = this;
-    apiRequest.post('/discovery/create', {
-      "owner_id":this.state.firebase.uid,
-      "filter_params":this.state.filter_params
+    apiRequest.post("/discovery/create", {
+      "owner_id":self.state.firebase.uid,
+      "filter_params":self.state.filter_params
     }).then(function (response) {
-      self.props.history.push('/discovery/' + response.data.discovery.id);
+      self.props.history.push("/discovery/" + response.data.discovery.id);
     });
   },
 
   handleHistSelect : function(event,index,value) {
-    this.setState({"histinput":value})
+    this.setState({"histinput":value});
   },
 
   render : function() {
@@ -208,7 +193,7 @@ var Explore = React.createClass({
                 <ExploreFilters
                   className="explore-filters"
                   updateFilterParams={this.updateFilterParams}
-                  summaryData={this.state.activeSummaryData}
+                  activeSummaryData={this.state.activeSummaryData}
                 />
               </Paper>
               <Paper className="explore-right-map">
@@ -218,11 +203,11 @@ var Explore = React.createClass({
               </Paper>
               <Paper className="explore-right-summary">
                 <div>
-                  <ExploreSummaryStats summaryData={this.state.activeSummaryData}/>
+                  <ExploreSummaryStats activeSummaryData={this.state.activeSummaryData}/>
                 </div>
               </Paper>
               <Paper className="explore-right-histogram">
-                  <Histogram summaryData={this.state.activeSummaryData} histinput={this.state.histinput}/>
+                  <Histogram activeSummaryData={this.state.activeSummaryData} histinput={this.state.histinput}/>
                   <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
                     {Object.keys(this.state.activeSummaryData).filter(function(value) {
                       if (value.indexOf('summary') !== -1) {
