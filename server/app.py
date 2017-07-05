@@ -1,8 +1,10 @@
+from __future__ import division
 from flask import Flask, url_for
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
-from flask_restful import Api, Resource, reqparse, fields, marshal_with
+from flask_restful import Api, Resource, reqparse, fields, marshal_with, marshal
 from dateutil import parser as dateparser
+from datetime import datetime
 import json
 from pyhashxx import hashxx
 from pymemcache.client.base import Client
@@ -12,7 +14,7 @@ dbPass = os.environ['METASEEK_DB']
 
 # Config / initialize the app, database and api
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # production DB
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@localhost/metaseek'
@@ -43,6 +45,7 @@ client = Client(('localhost', 11211), serializer=json_serializer, deserializer=j
 
 from helpers import *
 from models import *
+from marshals import *
 
 # Declare route functions
 # /user routes
@@ -57,12 +60,12 @@ class CreateUser(Resource):
             existingUser = User.query.filter_by(firebase_id=args['firebase_id']).first()
 
             if (existingUser):
-                return {'error':'User already exists!','uri':url_for('getuser',id=existingUser.id,_external=True)}
+                return {'error':'User already exists!','uri':url_for('getuser',id=existingUser.id)}
             else:
                 newUser = User(args['firebase_id'],args['admin'])
                 db.session.add(newUser)
                 db.session.commit()
-                return {"user":{"uri":url_for('getuser',id=newUser.id,_external=True)}}
+                return {"user":{"uri":url_for('getuser',id=newUser.id)}}
 
         except Exception as e:
             return {'error': str(e)}
@@ -97,73 +100,84 @@ class GetUserDiscoveries(Resource):
     def get(self, id):
         return Discovery.query.filter_by(owner_id=id).all()
 
-# /dataset routes
-class CreateDataset(Resource):
-    def post(self):
-        try:
-            parser = reqparse.RequestParser()
-            # Note that any arguments added here MUST be present in the POST request or the request will fail with
-            # 400 - Bad Request as the response
-            parser.add_argument('latitude', type=str)
-            parser.add_argument('longitude', type=str)
-            parser.add_argument('investigation_type',type=str)
-            parser.add_argument('env_package',type=str)
-            parser.add_argument('library_source',type=str)
-            parser.add_argument('avg_read_length_maxrun',type=float)
-            parser.add_argument('total_num_reads',type=int)
-            parser.add_argument('total_num_bases',type=int)
-            parser.add_argument('download_size_maxrun',type=int)
-            parser.add_argument('gc_percent_maxrun',type=float)
-            parser.add_argument('biosample_link',type=str)
-            parser.add_argument('sample_title',type=str)
-            parser.add_argument('collection_date',type=str)
-
-            args = parser.parse_args()
-            try:
-                datetimeguess = dateparser.parse(args['collection_date'])
-            except ValueError:
-                datetimeguess = None
-
-            newDataset = Dataset(args['biosample_link'],args['sample_title'],args['investigation_type'],args['library_source'], args['env_package'],datetimeguess, args['latitude'], args['longitude'], args['avg_read_length_maxrun'], args['total_num_reads'], args['total_num_bases_maxrun'], args['download_size_maxrun'],args['gc_percent_maxrun'])
-            db.session.add(newDataset)
-            db.session.commit()
-            return {"dataset":{"id":newDataset.id,"uri":url_for('getdataset',id=newDataset.id,_external=True)}}
-
-        except Exception as e:
-            return {'error': str(e)}
-
-marshalledDatasetFields = {
-    'latitude':fields.String,
-    'longitude':fields.String,
-    'investigation_type':fields.String,
-    'env_package':fields.String,
-    'library_source':fields.String,
-    'avg_read_length_maxrun':fields.Float,
-    'total_num_reads':fields.Integer,
-    'total_num_bases_maxrun':fields.Integer,
-    'download_size_maxrun':fields.Integer,
-    'gc_percent_maxrun':fields.Float,
-    'biosample_link':fields.String,
-    'collection_date':fields.String,
-    'sample_title':fields.String,
-    'id':fields.Integer,
-    #this should also return the etc field for e.g. dataset details
-    'uri': fields.Url('getdataset', absolute=True)
-}
+## /dataset routes
+#class CreateDataset(Resource):
+#    def post(self):
+#        try:
+#            parser = reqparse.RequestParser()
+#            # Note that any arguments added here MUST be present in the POST request or the request will fail with
+#            # 400 - Bad Request as the response
+#            parser.add_argument('latitude', type=str)
+#            parser.add_argument('longitude', type=str)
+#            parser.add_argument('investigation_type',type=str)
+#            parser.add_argument('env_package',type=str)
+#            parser.add_argument('library_source',type=str)
+#            parser.add_argument('avg_read_length_maxrun',type=float)
+#            parser.add_argument('total_num_reads',type=int)
+#            parser.add_argument('total_num_bases',type=int)
+#            parser.add_argument('download_size_maxrun',type=int)
+#            parser.add_argument('gc_percent_maxrun',type=float)
+#            parser.add_argument('biosample_link',type=str)
+#            parser.add_argument('sample_title',type=str)
+#            parser.add_argument('collection_date',type=str)
+#
+#            args = parser.parse_args()
+#            try:
+#                datetimeguess = dateparser.parse(args['collection_date'])
+#            except ValueError:
+#                datetimeguess = None
+#
+#            newDataset = Dataset(args['biosample_link'],args['sample_title'],args['investigation_type'],args['library_source'], args['env_package'],datetimeguess, args['latitude'], args['longitude'], args['avg_read_length_maxrun'], args['total_num_reads'], args['total_num_bases_maxrun'], args['download_size_maxrun'],args['gc_percent_maxrun'])
+#            db.session.add(newDataset)
+#            db.session.commit()
+#            return {"dataset":{"id":newDataset.id,"uri":url_for('getdataset',id=newDataset.id)}}
+#
+#        except Exception as e:
+#            return {'error': str(e)}
 
 class GetDataset(Resource):
-    @marshal_with(marshalledDatasetFields, envelope='dataset')
+    @marshal_with(fullDatasetFields, envelope='dataset')
     def get(self, id):
         return Dataset.query.get(id)
 
+datasetsPerPage = 15
+
 class GetAllDatasets(Resource):
-    @marshal_with(marshalledDatasetFields, envelope='datasets')
-    def get(self):
-        return Dataset.query.all()
+    def get(self,page):
+        try:
+            val = int(page)
+            if val < 1:
+                raise ValueError
+        except ValueError:
+            return {'error':'page must be a positive integer','page':page}
+        pageObject = Dataset.query.paginate(page,datasetsPerPage,False)
+        totalPageCount = int(math.ceil(pageObject.total / datasetsPerPage))
+        paginatedDatasetResponse = {}
+        paginatedDatasetResponse['currentUri'] = url_for('getalldatasets',page=page)
+        paginatedDatasetResponse['page'] = page
+        paginatedDatasetResponse['datasets'] = marshal(pageObject.items,summarizedDatasetFields)
+        paginatedDatasetResponse['totalCount'] = pageObject.total
+        paginatedDatasetResponse['perPage'] = datasetsPerPage
+        paginatedDatasetResponse['totalPages'] = totalPageCount
+        paginatedDatasetResponse['hasNext'] = pageObject.has_next
+        paginatedDatasetResponse['hasPrevious'] = pageObject.has_prev
+        if pageObject.has_prev:
+            if len(pageObject.items) == 0:
+                paginatedDatasetResponse['previousUri'] = url_for('getalldatasets',page=totalPageCount)
+            else:
+                paginatedDatasetResponse['previousUri'] = url_for('getalldatasets',page=page -1)
+        if pageObject.has_next:
+            paginatedDatasetResponse['nextUri'] = url_for('getalldatasets',page=page + 1)
+        return paginatedDatasetResponse
 
 class SearchDatasets(Resource):
-    @marshal_with(marshalledDatasetFields, envelope='datasets')
-    def post(self):
+    def post(self,page):
+        try:
+            val = int(page)
+            if val < 1:
+                raise ValueError
+        except ValueError:
+            return {'error':'page must be a positive integer','page':page}
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('filter_params', type=str)
@@ -179,15 +193,35 @@ class SearchDatasets(Resource):
                 value = rule['value']
                 queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
 
-            matchingDatasets = queryObject.all()
-            return matchingDatasets
+            pageObject = queryObject.paginate(page,datasetsPerPage,False)
+            totalPageCount = int(math.ceil(pageObject.total / datasetsPerPage))
+            paginatedDatasetResponse = {}
+            paginatedDatasetResponse['currentUri'] = url_for('searchdatasets',page=page)
+            paginatedDatasetResponse['page'] = page
+            paginatedDatasetResponse['datasets'] = marshal(pageObject.items,summarizedDatasetFields)
+            paginatedDatasetResponse['totalCount'] = pageObject.total
+            paginatedDatasetResponse['perPage'] = datasetsPerPage
+            paginatedDatasetResponse['totalPages'] = totalPageCount
+            paginatedDatasetResponse['hasNext'] = pageObject.has_next
+            paginatedDatasetResponse['hasPrevious'] = pageObject.has_prev
+            if pageObject.has_prev:
+                if len(pageObject.items) == 0:
+                    paginatedDatasetResponse['previousUri'] = url_for('searchdatasets',page=totalPageCount)
+                else:
+                    paginatedDatasetResponse['previousUri'] = url_for('searchdatasets',page=page -1)
+            if pageObject.has_next:
+                paginatedDatasetResponse['nextUri'] = url_for('searchdatasets',page=page + 1)
+            return paginatedDatasetResponse
 
         except Exception as e:
             return {'error': str(e)}
 
 class GetDatasetSummary(Resource):
     def get(self):
-        cache_key = 'norules'
+        # This is the result of:
+        # str(hashxx(json.dumps(json.loads('{"rules":[]}')['rules'])))
+        # Allows this cached value to be reused by SearchDatasetsSummary when no rules are set
+        cache_key = '2027185612'
 
         from_cache = client.get(cache_key)
 
@@ -197,9 +231,6 @@ class GetDatasetSummary(Resource):
             client.set(cache_key, summary)
             return summary
         else:
-            # Uncomment to delete cache when pulled for testing
-            # print 'deleting cache hit'
-            # client.delete(cache_key)
             return from_cache
 
 class SearchDatasetsSummary(Resource):
@@ -208,11 +239,10 @@ class SearchDatasetsSummary(Resource):
             parser = reqparse.RequestParser()
             parser.add_argument('filter_params', type=str)
             args = parser.parse_args()
-
             filter_params = json.loads(args['filter_params'])
             rules = filter_params['rules']
-            cache_key = str(hashxx(json.dumps(rules)))
 
+            cache_key = str(hashxx(json.dumps(rules)))
             from_cache = client.get(cache_key)
 
             if from_cache is None:
@@ -228,9 +258,6 @@ class SearchDatasetsSummary(Resource):
                 client.set(cache_key, summary)
                 return summary
             else:
-                # Uncomment to delete cache when pulled for testing
-                # print 'deleting cache hit'
-                # client.delete(cache_key)
                 return from_cache
 
         except Exception as e:
@@ -242,7 +269,7 @@ class GetDiscovery(Resource):
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
         'uri': fields.Url('getdiscovery', absolute=True),
-        'datasets':fields.Nested(marshalledDatasetFields),
+        'datasets':fields.Nested(summarizedDatasetFields),
         'owner':fields.Nested({
             'firebase_id':fields.String,
             'uri':fields.Url('getuser', absolute=True)
@@ -256,7 +283,7 @@ class GetAllDiscoveries(Resource):
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
         'uri': fields.Url('getdiscovery', absolute=True),
-        'datasets':fields.Nested(marshalledDatasetFields),
+        'datasets':fields.Nested(summarizedDatasetFields),
         'owner':fields.Nested({
             'firebase_id':fields.String,
             'uri':fields.Url('getuser', absolute=True)
@@ -291,29 +318,88 @@ class CreateDiscovery(Resource):
             newDiscovery = Discovery(owner.id,args['filter_params'],matchingDatasets)
             db.session.add(newDiscovery)
             db.session.commit()
-            return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id,_external=True)}}
+            return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id)}}
 
         except Exception as e:
             return {'error': str(e)}
 
+class PurgeCache(Resource):
+    def get(self):
+        client.flush_all()
+        return client.stats()
+
+class CacheStats(Resource):
+    def get(self):
+        return client.stats()
+
+class BuildCaches(Resource):
+    def get(self):
+        # TODO actually define which ones we want here or create this list dynamically
+        priorityFilterSets = [
+            '{"rules":[]}',
+            '{"rules":[{"field":"library_source","type":5,"value":"genomic"}]}',
+            '{"rules":[{"field":"library_source","type":5,"value":"metagenomic"}]}',
+            '{"rules":[{"field":"library_source","type":5,"value":"metatranscriptomic"}]}',
+            '{"rules":[{"field":"library_source","type":5,"value":"transcriptomic"}]}'
+        ]
+
+        results = {}
+
+        for filterSet in priorityFilterSets:
+            filter_params = json.loads(filterSet)
+            rules = filter_params['rules']
+
+            cache_key = str(hashxx(json.dumps(rules)))
+            from_cache = client.get(cache_key)
+
+            results[cache_key] = {}
+            results[cache_key]['rules'] = rules
+
+            if from_cache is None:
+                start = datetime.now()
+                results[cache_key]['existing-cache'] = False
+
+                queryObject = Dataset.query
+
+                for rule in rules:
+                    field = rule['field']
+                    ruletype = rule['type']
+                    value = rule['value']
+                    queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+
+                summary = summarizeDatasets(queryObject)
+                client.set(cache_key, summary)
+                finish = datetime.now()
+                results[cache_key]['success'] = True
+                results[cache_key]['cache-load-time'] = str(round((finish - start).total_seconds(),1)) + 's'
+            else:
+                results[cache_key]['existing-cache'] = True
+
+        return results
+
 # End route functions
 
 # Declare routing
-api.add_resource(CreateUser,            '/api/user/create')
-api.add_resource(GetUser,               '/api/user/<int:id>')
-api.add_resource(GetAllUsers,           '/api/users')
-api.add_resource(GetUserDiscoveries,    '/api/user/<int:id>/discoveries')
+api.add_resource(CreateUser,            '/user/create')
+api.add_resource(GetUser,               '/user/<int:id>')
+api.add_resource(GetAllUsers,           '/users')
+api.add_resource(GetUserDiscoveries,    '/user/<int:id>/discoveries')
 
-api.add_resource(CreateDataset,         '/api/dataset/create')
-api.add_resource(GetDataset,            '/api/dataset/<int:id>')
-api.add_resource(GetAllDatasets,        '/api/datasets')
-api.add_resource(GetDatasetSummary,     '/api/datasets/summary')
-api.add_resource(SearchDatasets,        '/api/datasets/search')
-api.add_resource(SearchDatasetsSummary, '/api/datasets/search/summary')
+# Temporarily removed - the only way to add a dataset is through scrapers/SRA/SRA_scrape.py
+# api.add_resource(CreateDataset,       '/dataset/create')
+api.add_resource(GetDataset,            '/dataset/<int:id>')
+api.add_resource(GetAllDatasets,        '/datasets/<int:page>')
+api.add_resource(SearchDatasets,        '/datasets/search/<int:page>')
+api.add_resource(GetDatasetSummary,     '/datasets/summary')
+api.add_resource(SearchDatasetsSummary, '/datasets/search/summary')
 
-api.add_resource(CreateDiscovery,       '/api/discovery/create')
-api.add_resource(GetDiscovery,          '/api/discovery/<int:id>')
-api.add_resource(GetAllDiscoveries,     '/api/discoveries')
+api.add_resource(CreateDiscovery,       '/discovery/create')
+api.add_resource(GetDiscovery,          '/discovery/<int:id>')
+api.add_resource(GetAllDiscoveries,     '/discoveries')
+
+api.add_resource(PurgeCache,            '/cache/purge')
+api.add_resource(CacheStats,            '/cache/stats')
+api.add_resource(BuildCaches,           '/cache/build')
 
 # Start the app!
 if __name__ == '__main__':

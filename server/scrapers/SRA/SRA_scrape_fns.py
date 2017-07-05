@@ -46,7 +46,7 @@ def get_retstart_list(url):
     count_xml = count_tree.getroot()
     num_uids = count_xml.findtext("Count")
     print 'number of publicly available UIDs in SRA: %s' % num_uids
-    num_queries = 1+int(num_uids)/100000  #number of queries to do, with shifting retstart
+    num_queries = 1+int(num_uids)//100000  #number of queries to do, with shifting retstart
     retstart_list = [i*100000 for i in range(num_queries)]
     print 'retstarts to use: %s' % retstart_list
     return retstart_list
@@ -552,7 +552,7 @@ def get_srx_metadata(batch_uid_list):
                             db.session.commit()
                             pass
                     try:
-                        gc_percent.append(float(countG+countC)/float(countC+countG+countA+countT))
+                        gc_percent.append(float(countG+countC)//float(countC+countG+countA+countT))
                     except (TypeError, ZeroDivisionError) as e:
                         gc_percent.append(None)
                         #don't log error because this is a pretty common error
@@ -561,16 +561,16 @@ def get_srx_metadata(batch_uid_list):
             #avg read length; need calculate, can come from "Run" or "Statistics" heading
             try:
                 #have to account for whether it's paired or single to calculate avg read length (bases/reads will be double the actual avg read count if it's paired)
-                avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Run").get("spot_count"))+float(run.find("Run").get("spot_count_mates"))))
+                avg_read_length.append(float(run.get("total_bases"))//(float(run.find("Run").get("spot_count"))+float(run.find("Run").get("spot_count_mates"))))
             except (TypeError, AttributeError, ValueError, ZeroDivisionError) as e: #if one of these values doesn't exist (TypeError), or "Run" tag doesn't exist (AttributeError), or string value that can't be coerced to float (ValueError), try getting it from "Statistics" heading;
                 try:
-                    avg_read_length.append(float(run.get("total_bases"))/(float(run.find("Statistics").get("nreads"))*float(run.find("Statistics").get("nspots"))))
+                    avg_read_length.append(float(run.get("total_bases"))//(float(run.find("Statistics").get("nreads"))*float(run.find("Statistics").get("nspots"))))
                 except (TypeError, AttributeError, ValueError, ZeroDivisionError) as e:
                     try: #if statistics doesn't work, try dividing total bases by total reads and dividing by 2 if paired
                         if layout=='paired':
-                            avg_read_length.append(float(run.get("total_bases"))/(float(run.get("total_spots"))*2))
+                            avg_read_length.append(float(run.get("total_bases"))//(float(run.get("total_spots"))*2))
                         elif layout=='single':
-                            avg_read_length.append(float(run.get("total_bases"))/(float(run.get("total_spots"))))
+                            avg_read_length.append(float(run.get("total_bases"))//(float(run.get("total_spots"))))
                     except (NameError,TypeError,AttributeError, ValueError, ZeroDivisionError) as e:
                         avg_read_length.append(None)
                         if e.__class__.__name__=='TypeError': #don't log typeerror because really common to be missing values
