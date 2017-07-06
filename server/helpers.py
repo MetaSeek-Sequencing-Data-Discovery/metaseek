@@ -117,13 +117,68 @@ def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cat
                 return logBinnedCounts
 
 def summarizeDatasets(queryObject):
-    queryResultDataframe = pd.read_sql(queryObject.statement,db.session.bind)
+    totalStart = datetime.now()
+    # singleColumnQueryObject = queryObject.with_entities(Dataset.download_size_maxrun)
+    filteredQueryObject = queryObject.with_entities(
+        Dataset.download_size_maxrun,
+        Dataset.investigation_type,
+        Dataset.library_source,
+        Dataset.env_package,
+        Dataset.library_strategy,
+        Dataset.library_screening_strategy,
+        Dataset.library_construction_method,
+        Dataset.study_type,
+        Dataset.sequencing_method,
+        Dataset.instrument_model,
+        Dataset.geo_loc_name,
+        Dataset.env_biome,
+        Dataset.env_feature,
+        Dataset.env_material,
+        Dataset.avg_read_length_maxrun,
+        Dataset.gc_percent_maxrun,
+        Dataset.meta_latitude,
+        Dataset.meta_longitude,
+        Dataset.library_reads_sequenced_maxrun,
+        Dataset.total_num_bases_maxrun,
+    )
+
+    # fullStart = datetime.now()
+    # queryResultDataframe = pd.read_sql(queryObject.statement,db.session.bind)
+    # fullEnd = datetime.now()
+    # print 'full query with pandas took ' + str((fullEnd-fullStart).total_seconds()) + ' seconds'
+
+    filteredStart = datetime.now()
+    queryResultDataframe = pd.read_sql(filteredQueryObject.statement,db.session.bind)
+    filteredEnd = datetime.now()
+    print 'filtered query with pandas took ' + str((filteredEnd-filteredStart).total_seconds()) + ' seconds'
+
+    # singleStart = datetime.now()
+    # singleQueryResultDataframe = pd.read_sql(singleColumnQueryObject.statement,db.session.bind)
+    # singleEnd = datetime.now()
+    # print 'single query with pandas took ' + str((singleEnd-singleStart).total_seconds()) + ' seconds'
+# 
+    # fullStart = datetime.now()
+    # queryResult = queryObject.all()
+    # fullEnd = datetime.now()
+    # print 'full query took ' + str((fullEnd-fullStart).total_seconds()) + ' seconds'
+# 
+    # filteredStart = datetime.now()
+    # queryResult = filteredQueryObject.all()
+    # filteredEnd = datetime.now()
+    # print 'filtered query took ' + str((filteredEnd-filteredStart).total_seconds()) + ' seconds'
+# 
+    # singleStart = datetime.now()
+    # queryResult = singleColumnQueryObject.all()
+    # singleEnd = datetime.now()
+    # print 'single query took ' + str((singleEnd-singleStart).total_seconds()) + ' seconds'
+
+    summarizerStart = datetime.now()
     total = len(queryResultDataframe.index)
     if total > 0:
         # Simple aggregate responses
         total_download_size = sum(queryResultDataframe['download_size_maxrun'].dropna())
         # add more here . . .
-
+        start = datetime.now()
         # Simple count histogram responses
         investigation_summary = summarizeColumn(queryResultDataframe,'investigation_type')
         lib_source_summary = summarizeColumn(queryResultDataframe,'library_source')
@@ -133,6 +188,9 @@ def summarizeDatasets(queryObject):
         lib_construction_method_summary = summarizeColumn(queryResultDataframe,'library_construction_method')
         study_type_summary = summarizeColumn(queryResultDataframe,'study_type')
         sequencing_method_summary = summarizeColumn(queryResultDataframe,'sequencing_method')
+        stop = datetime.now()
+        print 'simples took ' + str((stop-start).total_seconds()) + ' seconds'
+        start = datetime.now()
 
         #maybe top-10 or top-15 categorical responses
         instrument_model_summary = summarizeColumn(queryResultDataframe,'instrument_model',num_cats=15)
@@ -141,6 +199,9 @@ def summarizeDatasets(queryObject):
         env_feature_summary = summarizeColumn(queryResultDataframe,'env_feature',num_cats=15)
         env_material_summary = summarizeColumn(queryResultDataframe,'env_material',num_cats=15)
         # add more here . . .
+        stop = datetime.now()
+        print 'categories took ' + str((stop-start).total_seconds()) + ' seconds'
+        start = datetime.now()
 
         # Linear binned histogram responses
         avg_read_length_summary = summarizeColumn(queryResultDataframe,'avg_read_length_maxrun',linearBins=True)
@@ -148,12 +209,18 @@ def summarizeDatasets(queryObject):
         lat_summary = summarizeColumn(queryResultDataframe,'meta_latitude',linearBins=True)
         lon_summary = summarizeColumn(queryResultDataframe,'meta_longitude',linearBins=True)
         # add more here . . .
+        stop = datetime.now()
+        print 'linears took ' + str((stop-start).total_seconds()) + ' seconds'
+        start = datetime.now()
 
         # Log binned histogram responses
         library_reads_sequenced_summary = summarizeColumn(queryResultDataframe,'library_reads_sequenced_maxrun',logBins=True)
         total_bases_summary = summarizeColumn(queryResultDataframe,'total_num_bases_maxrun',logBins=True)
         down_size_summary = summarizeColumn(queryResultDataframe,'download_size_maxrun',logBins=True)
         # add more here . . .
+        stop = datetime.now()
+        print 'logs took ' + str((stop-start).total_seconds()) + ' seconds'
+        start = datetime.now()
 
         # Complex / one-off responses
 
@@ -187,6 +254,13 @@ def summarizeDatasets(queryObject):
                 lon = latlon_map[1][lon_ix]+lonstepsize
                 value = latbin
                 map_data.append({"lat":lat,"lon":lon,"count":value})
+
+        stop = datetime.now()
+        print 'map took ' + str((stop-start).total_seconds()) + ' seconds'
+        summarizerFinish = datetime.now()
+        print 'summarizing took ' + str((summarizerFinish-summarizerStart).total_seconds()) + ' seconds'
+        totalFinish = datetime.now()
+        print 'total took ' + str((totalFinish-totalStart).total_seconds()) + ' seconds'
 
         return {
             "summary": {
