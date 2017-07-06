@@ -14,7 +14,7 @@ dbPass = os.environ['METASEEK_DB']
 
 # Config / initialize the app, database and api
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)
 
 # production DB
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@localhost/metaseek'
