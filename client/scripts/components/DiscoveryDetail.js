@@ -32,7 +32,7 @@ var DiscoveryDetail = React.createClass({
       <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
         <div>
           <Header history={this.props.history}/>
-          <Paper className="singleSheet" zDepth={2}>
+          <Paper className="single-sheet" zDepth={2}>
             <h2>Discovery Details</h2>
             {JSON.stringify(this.state.discovery)}
           </Paper>
