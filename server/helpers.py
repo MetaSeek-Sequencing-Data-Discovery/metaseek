@@ -142,7 +142,6 @@ def summarizeDatasets(queryObject):
 
     queryResultDataframe = pd.read_sql(filteredQueryObject.statement,db.session.bind)
 
-    summarizerStart = datetime.now()
     total = len(queryResultDataframe.index)
     if total > 0:
         # Simple aggregate responses
