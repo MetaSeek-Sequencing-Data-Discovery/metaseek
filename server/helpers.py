@@ -117,7 +117,32 @@ def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cat
                 return logBinnedCounts
 
 def summarizeDatasets(queryObject):
-    queryResultDataframe = pd.read_sql(queryObject.statement,db.session.bind)
+    filteredQueryObject = queryObject.with_entities(
+        Dataset.download_size_maxrun,
+        Dataset.investigation_type,
+        Dataset.library_source,
+        Dataset.env_package,
+        Dataset.library_strategy,
+        Dataset.library_screening_strategy,
+        Dataset.library_construction_method,
+        Dataset.study_type,
+        Dataset.sequencing_method,
+        Dataset.instrument_model,
+        Dataset.geo_loc_name,
+        Dataset.env_biome,
+        Dataset.env_feature,
+        Dataset.env_material,
+        Dataset.avg_read_length_maxrun,
+        Dataset.gc_percent_maxrun,
+        Dataset.meta_latitude,
+        Dataset.meta_longitude,
+        Dataset.library_reads_sequenced_maxrun,
+        Dataset.total_num_bases_maxrun,
+    )
+
+    queryResultDataframe = pd.read_sql(filteredQueryObject.statement,db.session.bind)
+
+    summarizerStart = datetime.now()
     total = len(queryResultDataframe.index)
     if total > 0:
         # Simple aggregate responses
