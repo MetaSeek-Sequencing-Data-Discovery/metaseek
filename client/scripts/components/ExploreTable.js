@@ -26,59 +26,51 @@ var ExploreTable = React.createClass({
               <TableHeader style={{backgroundColor:'#E9EAFD'}}adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
                 <TableRow selectable={false}>
                   <TableHeaderColumn>ID</TableHeaderColumn>
-                  <TableHeaderColumn>Database UID</TableHeaderColumn>
+                  <TableHeaderColumn width="80px">Study Title</TableHeaderColumn>
+                  <TableHeaderColumn>Link</TableHeaderColumn>
                   <TableHeaderColumn>Database</TableHeaderColumn>
-                  <TableHeaderColumn>Title</TableHeaderColumn>
-                  <TableHeaderColumn>Biosample Link</TableHeaderColumn>
                   <TableHeaderColumn>Investigation Type</TableHeaderColumn>
-                  <TableHeaderColumn>Lib. Source</TableHeaderColumn>
                   <TableHeaderColumn>Env. Package</TableHeaderColumn>
+                  <TableHeaderColumn>Lib. Source</TableHeaderColumn>
+                  <TableHeaderColumn>Study Type</TableHeaderColumn>
                   <TableHeaderColumn>Lib. Strategy</TableHeaderColumn>
                   <TableHeaderColumn>Lib. Screening Strategy</TableHeaderColumn>
                   <TableHeaderColumn>Lib. Construction Method</TableHeaderColumn>
-                  <TableHeaderColumn>Study Type</TableHeaderColumn>
                   <TableHeaderColumn>Sequencing Method</TableHeaderColumn>
-                  <TableHeaderColumn>Instrument Model</TableHeaderColumn>
-                  <TableHeaderColumn>Location Name</TableHeaderColumn>
-                  <TableHeaderColumn>Latitude</TableHeaderColumn>
-                  <TableHeaderColumn>Longitude</TableHeaderColumn>
+                  <TableHeaderColumn>Reads Sequenced</TableHeaderColumn>
+                  <TableHeaderColumn>Avg. Read Length</TableHeaderColumn>
+                  <TableHeaderColumn>Geographic Location</TableHeaderColumn>
                   <TableHeaderColumn>Biome</TableHeaderColumn>
                   <TableHeaderColumn>Env. Feature</TableHeaderColumn>
                   <TableHeaderColumn>Env. Material</TableHeaderColumn>
-                  <TableHeaderColumn>Avg. Read Length (max run)</TableHeaderColumn>
-                  <TableHeaderColumn>GC % (max run)</TableHeaderColumn>
-                  <TableHeaderColumn>Lib. Reads Sequenced (max run)</TableHeaderColumn>
-                  <TableHeaderColumn>Total # Bases (max run)</TableHeaderColumn>
+                  <TableHeaderColumn>Latitude</TableHeaderColumn>
+                  <TableHeaderColumn>Longitude</TableHeaderColumn>
                   <TableHeaderColumn>Download Size (max run)</TableHeaderColumn>
                 </TableRow>
               </TableHeader>
               <TableBody showRowHover={true} stripedRows={false} displayRowCheckbox={false} preScanRows={false}>
                 {this.props.dataTable.datasets.map( (row, index) => (
                   <TableRow selectable={false} key={index}>
-                    <TableRowColumn><Link to={row.uri}><RaisedButton label={row.id} primary={true}></RaisedButton></Link></TableRowColumn>
-                    <TableRowColumn>{row.db_source_uid}</TableRowColumn>
+                    <TableRowColumn><Link to={row.uri}><RaisedButton label={"Dataset "+row.id+" Details"} primary={true}></RaisedButton></Link></TableRowColumn>
+                    <TableRowColumn>{row.study_title}</TableRowColumn>
+                    <TableRowColumn>{row.expt_link}</TableRowColumn>
                     <TableRowColumn>{row.db_source}</TableRowColumn>
-                    <TableRowColumn>{row.sample_title}</TableRowColumn>
-                    <TableRowColumn>{row.biosample_link}</TableRowColumn>
                     <TableRowColumn>{row.investigation_type}</TableRowColumn>
-                    <TableRowColumn>{row.library_source}</TableRowColumn>
                     <TableRowColumn>{row.env_package}</TableRowColumn>
+                    <TableRowColumn>{row.library_source}</TableRowColumn>
+                    <TableRowColumn>{row.study_type}</TableRowColumn>
                     <TableRowColumn>{row.library_strategy}</TableRowColumn>
                     <TableRowColumn>{row.library_screening_strategy}</TableRowColumn>
                     <TableRowColumn>{row.library_construction_method}</TableRowColumn>
-                    <TableRowColumn>{row.study_type}</TableRowColumn>
                     <TableRowColumn>{row.sequencing_method}</TableRowColumn>
-                    <TableRowColumn>{row.instrument_model}</TableRowColumn>
+                    <TableRowColumn>{row.library_reads_sequenced_maxrun}</TableRowColumn>
+                    <TableRowColumn>{row.avg_read_length_maxrun}</TableRowColumn>
                     <TableRowColumn>{row.geo_loc_name}</TableRowColumn>
-                    <TableRowColumn>{row.latitude}</TableRowColumn>
-                    <TableRowColumn>{row.longitude}</TableRowColumn>
                     <TableRowColumn>{row.env_biome}</TableRowColumn>
                     <TableRowColumn>{row.env_feature}</TableRowColumn>
                     <TableRowColumn>{row.env_material}</TableRowColumn>
-                    <TableRowColumn>{row.avg_read_length_maxrun}</TableRowColumn>
-                    <TableRowColumn>{row.gc_percent_maxrun}</TableRowColumn>
-                    <TableRowColumn>{row.library_reads_sequenced_maxrun}</TableRowColumn>
-                    <TableRowColumn>{row.total_num_bases_maxrun}</TableRowColumn>
+                    <TableRowColumn>{row.latitude}</TableRowColumn>
+                    <TableRowColumn>{row.longitude}</TableRowColumn>
                     <TableRowColumn>{row.download_size_maxrun}</TableRowColumn>
                   </TableRow>
                   ))}
