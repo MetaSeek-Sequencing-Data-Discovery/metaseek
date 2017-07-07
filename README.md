@@ -69,3 +69,17 @@ Check the server is live:
 To debug:
 
 `cat /var/log/apache2/error.log`
+
+#### Automatically generated script for downloading datasets
+
+You can download an automatically-generated script to download each run in your discovery in fasta format. After downloading the 'downloadData.py' file, run it on the command line:
+
+```
+python downloadData.py
+```
+
+You will need to have python and the ftplib library installed. If ftplib is not installed, you can install it with pip:
+
+```
+pip install ftplib
+```
