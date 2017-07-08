@@ -137,7 +137,7 @@ def summarizeDatasets(queryObject):
         Dataset.meta_latitude,
         Dataset.meta_longitude,
         Dataset.library_reads_sequenced_maxrun,
-        Dataset.total_num_bases_maxrun,
+        Dataset.total_num_bases_maxrun
     )
 
     queryResultDataframe = pd.read_sql(filteredQueryObject.statement,db.session.bind)
