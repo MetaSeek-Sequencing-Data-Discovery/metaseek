@@ -21,6 +21,7 @@ import Loading from './Loading';
 import Histogram from './Histogram';
 import HeatmapChart from './HeatmapChart';
 import HistogramVictory from './HistogramVictory';
+import AreaChart from './AreaChart';
 
 var apiRequest = axios.create({
   baseURL: apiConfig.baseURL
@@ -251,6 +252,25 @@ var Explore = React.createClass({
                     })}
                   </SelectField>
                 </div>
+                <HistogramVictory activeSummaryData={this.state.activeSummaryData} histinput={this.state.histinput}/>
+              </Paper>
+              <Paper className="explore-victory-areachart">
+                <div className="explore-select">
+                  <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
+                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
+                      if (value.indexOf('summary') !== -1) {
+                        return true;
+                      } else {
+                        return false;
+                      }
+                    }).map(function(value, index) {
+                        return (
+                          <MenuItem key={index} value={value} primaryText={value} />
+                        )
+                    })}
+                  </SelectField>
+                </div>
+                <AreaChart activeSummaryData={this.state.activeSummaryData} histinput={this.state.histinput}/>
                 <HistogramVictory activeSummaryData={this.state.activeSummaryData} histinput={this.state.histinput}/>
               </Paper>
 
