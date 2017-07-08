@@ -20,6 +20,7 @@ import ExploreSummaryStats from './ExploreSummaryStats';
 import Loading from './Loading';
 import Histogram from './Histogram';
 import HeatmapChart from './HeatmapChart';
+import HistogramVictory from './HistogramVictory';
 
 var apiRequest = axios.create({
   baseURL: apiConfig.baseURL
@@ -234,8 +235,8 @@ var Explore = React.createClass({
                   <ExploreSummaryStats activeSummaryData={this.state.activeSummaryData}/>
                 </div>
               </Paper>
-              <Paper className="explore-right-histogram">
-                  <Histogram activeSummaryData={this.state.activeSummaryData} histinput={this.state.histinput}/>
+              <Paper className="explore-victory-histogram">
+                <div className="explore-select">
                   <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
                     {Object.keys(this.state.activeSummaryData).filter(function(value) {
                       if (value.indexOf('summary') !== -1) {
@@ -249,7 +250,10 @@ var Explore = React.createClass({
                         )
                     })}
                   </SelectField>
+                </div>
+                <HistogramVictory activeSummaryData={this.state.activeSummaryData} histinput={this.state.histinput}/>
               </Paper>
+
               <Paper className="explore-table">
                 <ExploreTable getNextDataPage={this.getNextDataPage} getPreviousDataPage={this.getPreviousDataPage} dataTable={this.state.dataTable}/>
               </Paper>
