@@ -594,7 +594,15 @@ button.github:after, input[type=submit].github:after {
   margin-top: 12px;
   margin-bottom: 12px;
   margin-left: 24px;
+}
 
+.explore-wordcloud {
+  float: left;
+  width: 400px;
+  height: 390px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  margin-left: 24px;
 }
 
 .explore-select {
