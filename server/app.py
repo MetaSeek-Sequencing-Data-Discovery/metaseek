@@ -3,6 +3,7 @@ from flask import Flask, url_for
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, Resource, reqparse, fields, marshal_with, marshal
+from flask_socketio import SocketIO, send, emit
 from dateutil import parser as dateparser
 from datetime import datetime
 import json
@@ -15,6 +16,7 @@ dbPass = os.environ['METASEEK_DB']
 # Config / initialize the app, database and api
 app = Flask(__name__)
 CORS(app)
+socketio = SocketIO(app)
 
 # production DB
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-35-166-20-248.us-west-2.compute.amazonaws.com/metaseek'
@@ -404,6 +406,11 @@ api.add_resource(PurgeCache,            '/cache/purge')
 api.add_resource(CacheStats,            '/cache/stats')
 api.add_resource(BuildCaches,           '/cache/build')
 
+@socketio.on('updateFilters')
+def handle_message(json):
+    print 'received updateFilters! ' + str(json)
+    emit('updateData','test')
+
 # Start the app!
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app,debug=True)

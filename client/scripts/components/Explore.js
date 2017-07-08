@@ -21,6 +21,9 @@ import Loading from './Loading';
 import Histogram from './Histogram';
 import HeatmapChart from './HeatmapChart';
 
+import io from 'socket.io-client';
+var socket = io('http://localhost:5000');
+
 var apiRequest = axios.create({
   baseURL: apiConfig.baseURL
 });
@@ -60,6 +63,10 @@ var Explore = React.createClass({
       }).then(function (response) {
         self.setState({"dataTable":response.data,"loaded":true});
       })
+    });
+    socket.on('updateData', function(data){
+      console.log(data);
+      self.updateActiveSummaryData();
     });
   },
 
@@ -147,7 +154,8 @@ var Explore = React.createClass({
     });
     this.state.filter_params = JSON.stringify({"rules":filterStates});
     this.setState({"filter_params":JSON.stringify({"rules":filterStates})});
-    this.updateActiveSummaryData();
+    socket.emit('updateFilters',filterStates);
+    //this.updateActiveSummaryData();
   },
 
   submitDiscovery : function() {
