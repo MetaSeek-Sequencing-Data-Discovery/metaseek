@@ -24,6 +24,7 @@ import HistogramVictory from './HistogramVictory';
 import AreaChart from './AreaChart';
 import WordCloud from './WordCloud';
 import RadarChart from './RadarChart';
+import {getReadableFileSizeString} from '../helpers';
 
 var apiRequest = axios.create({
   baseURL: apiConfig.baseURL
@@ -247,90 +248,107 @@ var Explore = React.createClass({
                   fullSummaryData={this.state.fullSummaryData}
                 />
               </Paper>
+              <span className="callout">{this.state.activeSummaryData.total_datasets}</span> <span className="callout-details">Datasets</span>
+              <RaisedButton
+                className="save-discovery-button"
+                secondary={true}
+                label="Save This Discovery"
+              />
               <Paper className="explore-right-map">
                 <div>
                   {mapRender(this.state.activeSummaryData,this.state.processing)}
                 </div>
               </Paper>
-              <Paper className="explore-right-summary">
-                <div>
-                  <ExploreSummaryStats activeSummaryData={this.state.activeSummaryData}/>
-                </div>
-              </Paper>
-              <Paper className="explore-victory-histogram">
-                <div className="explore-select">
-                  <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
-                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
-                      if (value.indexOf('summary') !== -1) {
-                        return true;
-                      } else {
-                        return false;
-                      }
-                    }).map(function(value, index) {
-                        return (
-                          <MenuItem key={index} value={value} primaryText={value} />
-                        )
-                    })}
-                  </SelectField>
-                </div>
-                <HistogramVictory activeSummaryData={this.state.activeSummaryData} histinput={this.state.histinput}/>
-              </Paper>
-              <Paper className="explore-victory-areachart">
-                <div className="explore-select">
-                  <SelectField value={this.state.areainput} onChange={this.handleAreaSelect}>
-                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
-                      if (value.indexOf('summary') !== -1 && areafields.includes(value)) {
-                        return true;
-                      } else {
-                        return false;
-                      }
-                    }).map(function(value, index) {
-                        return (
-                          <MenuItem key={index} value={value} primaryText={value} />
-                        )
-                    })}
-                  </SelectField>
-                </div>
-                <AreaChart activeSummaryData={this.state.activeSummaryData} areainput={this.state.areainput}/>
-              </Paper>
+              <div className="explore-dashboard">
+                <Paper className="explore-victory-histogram">
+                  <div className="explore-select">
+                    <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
+                      {Object.keys(this.state.activeSummaryData).filter(function(value) {
+                        if (value.indexOf('summary') !== -1) {
+                          return true;
+                        } else {
+                          return false;
+                        }
+                      }).map(function(value, index) {
+                          return (
+                            <MenuItem key={index} value={value} primaryText={value} />
+                          )
+                      })}
+                    </SelectField>
+                  </div>
+                  <HistogramVictory activeSummaryData={this.state.activeSummaryData} histinput={this.state.histinput}/>
+                </Paper>
+                <Paper className="explore-victory-areachart">
+                  <div className="explore-select">
+                    <SelectField value={this.state.areainput} onChange={this.handleAreaSelect}>
+                      {Object.keys(this.state.activeSummaryData).filter(function(value) {
+                        if (value.indexOf('summary') !== -1 && areafields.includes(value)) {
+                          return true;
+                        } else {
+                          return false;
+                        }
+                      }).map(function(value, index) {
+                          return (
+                            <MenuItem key={index} value={value} primaryText={value} />
+                          )
+                      })}
+                    </SelectField>
+                  </div>
+                  <AreaChart activeSummaryData={this.state.activeSummaryData} areainput={this.state.areainput}/>
+                </Paper>
+              </div>
+              <div className="explore-dashboard">
+                <Paper className="explore-wordcloud">
+                  <div className="explore-select">
+                    <SelectField value={this.state.wordinput} onChange={this.handleWordSelect}>
+                      {Object.keys(this.state.activeSummaryData).filter(function(value) {
+                        if (value.indexOf('summary') !== -1 && wordfields.includes(value)) {
+                          return true;
+                        } else {
+                          return false;
+                        }
+                      }).map(function(value, index) {
+                          return (
+                            <MenuItem key={index} value={value} primaryText={value} />
+                          )
+                      })}
+                    </SelectField>
+                  </div>
+                  <WordCloud activeSummaryData={this.state.activeSummaryData} wordinput={this.state.wordinput}/>
+                </Paper>
 
-              <Paper className="explore-wordcloud">
-                <div className="explore-select">
-                  <SelectField value={this.state.wordinput} onChange={this.handleWordSelect}>
-                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
-                      if (value.indexOf('summary') !== -1 && wordfields.includes(value)) {
-                        return true;
-                      } else {
-                        return false;
-                      }
-                    }).map(function(value, index) {
-                        return (
-                          <MenuItem key={index} value={value} primaryText={value} />
-                        )
-                    })}
-                  </SelectField>
-                </div>
-                <WordCloud activeSummaryData={this.state.activeSummaryData} wordinput={this.state.wordinput}/>
-              </Paper>
+                <Paper className="explore-victory-radarchart">
+                  <div className="explore-select">
+                    <SelectField value={this.state.radarinput} onChange={this.handleRadarSelect}>
+                      {Object.keys(this.state.activeSummaryData).filter(function(value) {
+                        if (value.indexOf('summary') !== -1 && radarfields.includes(value)) {
+                          return true;
+                        } else {
+                          return false;
+                        }
+                      }).map(function(value, index) {
+                          return (
+                            <MenuItem key={index} value={value} primaryText={value} />
+                          )
+                      })}
+                    </SelectField>
+                  </div>
+                  <RadarChart activeSummaryData={this.state.activeSummaryData} radarinput={this.state.radarinput}/>
+                </Paper>
+              </div>
+              <div className="explore-right-summary">
+                <span className="callout-bottom">{getReadableFileSizeString(this.state.activeSummaryData.total_download_size)}</span><span className="callout-details-bottom">estimated download size.</span>
+              </div>
+              <div>
+                <RaisedButton
+                  className="download-button"
+                  primary={true}
+                  label="Download these datasets"
+                />
+              </div>
 
-              <Paper className="explore-victory-radarchart">
-                <div className="explore-select">
-                  <SelectField value={this.state.radarinput} onChange={this.handleRadarSelect}>
-                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
-                      if (value.indexOf('summary') !== -1 && radarfields.includes(value)) {
-                        return true;
-                      } else {
-                        return false;
-                      }
-                    }).map(function(value, index) {
-                        return (
-                          <MenuItem key={index} value={value} primaryText={value} />
-                        )
-                    })}
-                  </SelectField>
-                </div>
-                <RadarChart activeSummaryData={this.state.activeSummaryData} radarinput={this.state.radarinput}/>
-              </Paper>
+
+
 
               <Paper className="explore-table">
                 <ExploreTable getNextDataPage={this.getNextDataPage} getPreviousDataPage={this.getPreviousDataPage} dataTable={this.state.dataTable}/>
