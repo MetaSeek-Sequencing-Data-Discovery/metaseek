@@ -35,8 +35,10 @@ var Explore = React.createClass({
       'fullSummaryData':[],
       'activeSummaryData': [],
       'dataTable': {},
-      'histinput':'avg_read_length_summary',
+      'histinput':'env_package_summary',
+      'areainput':'avg_read_length_summary',
       'radarinput':'library_source_summary',
+      'wordinput':'env_biome_summary',
       'filter_params':JSON.stringify({'rules':[]}),
       'loaded':false,
       'processing':false,
@@ -169,14 +171,24 @@ var Explore = React.createClass({
     this.setState({"histinput":value});
   },
 
+  handleAreaSelect : function(event,index,value) {
+    this.setState({"areainput":value});
+  },
+
   handleRadarSelect : function(event,index,value) {
     this.setState({"radarinput":value});
+  },
+
+  handleWordSelect : function(event,index,value) {
+    this.setState({"wordinput":value});
   },
 
   render : function() {
     if (!this.state.loaded) return <Loading/>;
 
     const radarfields = ['env_biome_summary','env_feature_summary','env_material_summary','library_source_summary'];
+    const wordfields = ['env_biome_summary','env_feature_summary','env_material_summary','geo_loc_name_summary'];
+    const areafields = ['avg_read_length_summary','gc_percent_summary','total_bases_summary'];
 
     var mapRender = function(activeSummaryData,isProcessing) {
       if (!isProcessing) {
@@ -265,9 +277,9 @@ var Explore = React.createClass({
               </Paper>
               <Paper className="explore-victory-areachart">
                 <div className="explore-select">
-                  <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
+                  <SelectField value={this.state.areainput} onChange={this.handleAreaSelect}>
                     {Object.keys(this.state.activeSummaryData).filter(function(value) {
-                      if (value.indexOf('summary') !== -1) {
+                      if (value.indexOf('summary') !== -1 && areafields.includes(value)) {
                         return true;
                       } else {
                         return false;
@@ -279,14 +291,14 @@ var Explore = React.createClass({
                     })}
                   </SelectField>
                 </div>
-                <AreaChart activeSummaryData={this.state.activeSummaryData} histinput={this.state.histinput}/>
+                <AreaChart activeSummaryData={this.state.activeSummaryData} areainput={this.state.areainput}/>
               </Paper>
 
               <Paper className="explore-wordcloud">
                 <div className="explore-select">
-                  <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
+                  <SelectField value={this.state.wordinput} onChange={this.handleWordSelect}>
                     {Object.keys(this.state.activeSummaryData).filter(function(value) {
-                      if (value.indexOf('summary') !== -1) {
+                      if (value.indexOf('summary') !== -1 && wordfields.includes(value)) {
                         return true;
                       } else {
                         return false;
@@ -298,7 +310,7 @@ var Explore = React.createClass({
                     })}
                   </SelectField>
                 </div>
-                <WordCloud activeSummaryData={this.state.activeSummaryData} histinput={this.state.histinput}/>
+                <WordCloud activeSummaryData={this.state.activeSummaryData} wordinput={this.state.wordinput}/>
               </Paper>
 
               <Paper className="explore-victory-radarchart">

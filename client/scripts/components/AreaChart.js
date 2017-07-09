@@ -5,7 +5,7 @@ import CustomTheme from './CustomTheme';
 var AreaChart = React.createClass({
 
   render : function() {
-    var data = this.props.activeSummaryData[this.props.histinput];
+    var data = this.props.activeSummaryData[this.props.areainput];
     var chartdata = Object.keys(data).map(function(value,index) {
       return {"x":parseInt(index),"count":data[value],"label":value+" : "+data[value]};
     });

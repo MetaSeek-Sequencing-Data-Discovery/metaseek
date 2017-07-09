@@ -6,7 +6,7 @@ var WordCloud = React.createClass({
 
   render : function() {
     var colors = ["#6369E0","#8387E6","#9396E9","#A3A5EC","#C3C3F2","#FFD3C8","#FFCBBE","#FC99E8","#FCADEC","#FCC1F0","#82FFEA","#A9FFF0","#C3FFF4","#FFB3A0","#B1FEF1"]
-    var data = this.props.activeSummaryData[this.props.histinput];
+    var data = this.props.activeSummaryData[this.props.wordinput];
     var clouddata = Object.keys(data).filter(function(value, index) {
       if (value === "no data" | value === "other categories") {
         return false; // skip
