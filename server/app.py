@@ -409,7 +409,16 @@ api.add_resource(BuildCaches,           '/cache/build')
 @socketio.on('updateFilters')
 def handle_message(json):
     print 'received updateFilters! ' + str(json)
-    emit('updateData','test')
+    queryObject = Dataset.query
+
+    for rule in json:
+        field = rule['field']
+        ruletype = rule['type']
+        value = rule['value']
+        queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+
+    summary = summarizeDatasets(queryObject)
+    emit('updateData',summary)
 
 # Start the app!
 if __name__ == '__main__':

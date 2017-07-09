@@ -65,8 +65,8 @@ var Explore = React.createClass({
       })
     });
     socket.on('updateData', function(data){
-      console.log(data);
-      self.updateActiveSummaryData();
+      console.log('setting state in response to socket updateData');
+      self.setState({"activeSummaryData": data.summary});
     });
   },
 
@@ -76,7 +76,8 @@ var Explore = React.createClass({
     apiRequest.post("/datasets/search/summary", {
       "filter_params":self.state.filter_params
     }).then(function (response) {
-      self.setState({"activeSummaryData": response.data.summary});
+      console.log('not setting state in response to POST');
+      //self.setState({"activeSummaryData": response.data.summary});
       apiRequest.post("/datasets/search/1", {
         "filter_params":self.state.filter_params
       }).then(function (response) {
@@ -155,7 +156,7 @@ var Explore = React.createClass({
     this.state.filter_params = JSON.stringify({"rules":filterStates});
     this.setState({"filter_params":JSON.stringify({"rules":filterStates})});
     socket.emit('updateFilters',filterStates);
-    //this.updateActiveSummaryData();
+    this.updateActiveSummaryData();
   },
 
   submitDiscovery : function() {
