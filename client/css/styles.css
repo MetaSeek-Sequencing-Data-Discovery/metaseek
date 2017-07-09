@@ -647,6 +647,16 @@ button.github:after, input[type=submit].github:after {
   width: 385px;
   height: 390px;
   margin-bottom: 18px;
+  overflow-y:scroll;
+}
+
+.word-cloud-tag {
+  border: 2px solid rgba(177,178,246,.5);
+  border-radius: 2px;
+  background-color: rgba(233,234,253,.2);
+  display: inline-block;
+  padding: 3px;
+  margin: 3px;
 }
 
 .explore-victory-radarchart {
