@@ -67,8 +67,8 @@ var RadarChart = React.createClass({
         }
         <VictoryPolarAxis
           labelPlacement="parallel"
-          tickFormat={() => ""}
           style={{
+            tickLabels: {fill:"none"},
             axis: { stroke: "none" },
             grid: { stroke: "grey", opacity: 0.5 }
           }}
