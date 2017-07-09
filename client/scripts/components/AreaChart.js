@@ -37,6 +37,7 @@ var AreaChart = React.createClass({
           data={chartdata}
           x="x"
           y="count"
+          style={{ data: { fillOpacity: 0.5, strokeWidth: 2 } }}
         />
       </VictoryChart>
     )}

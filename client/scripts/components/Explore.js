@@ -23,6 +23,7 @@ import HeatmapChart from './HeatmapChart';
 import HistogramVictory from './HistogramVictory';
 import AreaChart from './AreaChart';
 import WordCloud from './WordCloud';
+import RadarChart from './RadarChart';
 
 var apiRequest = axios.create({
   baseURL: apiConfig.baseURL
@@ -35,6 +36,7 @@ var Explore = React.createClass({
       'activeSummaryData': [],
       'dataTable': {},
       'histinput':'avg_read_length_summary',
+      'radarinput':'library_source_summary',
       'filter_params':JSON.stringify({'rules':[]}),
       'loaded':false,
       'processing':false,
@@ -167,8 +169,14 @@ var Explore = React.createClass({
     this.setState({"histinput":value});
   },
 
+  handleRadarSelect : function(event,index,value) {
+    this.setState({"radarinput":value});
+  },
+
   render : function() {
     if (!this.state.loaded) return <Loading/>;
+
+    const radarfields = ['env_biome_summary','env_feature_summary','env_material_summary','library_source_summary'];
 
     var mapRender = function(activeSummaryData,isProcessing) {
       if (!isProcessing) {
@@ -291,6 +299,25 @@ var Explore = React.createClass({
                   </SelectField>
                 </div>
                 <WordCloud activeSummaryData={this.state.activeSummaryData} histinput={this.state.histinput}/>
+              </Paper>
+
+              <Paper className="explore-victory-radarchart">
+                <div className="explore-select">
+                  <SelectField value={this.state.radarinput} onChange={this.handleRadarSelect}>
+                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
+                      if (value.indexOf('summary') !== -1 && radarfields.includes(value)) {
+                        return true;
+                      } else {
+                        return false;
+                      }
+                    }).map(function(value, index) {
+                        return (
+                          <MenuItem key={index} value={value} primaryText={value} />
+                        )
+                    })}
+                  </SelectField>
+                </div>
+                <RadarChart activeSummaryData={this.state.activeSummaryData} radarinput={this.state.radarinput}/>
               </Paper>
 
               <Paper className="explore-table">
