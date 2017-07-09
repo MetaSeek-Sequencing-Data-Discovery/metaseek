@@ -25,27 +25,31 @@ var RadarChart = React.createClass({
     });
 
     return(
-      <VictoryChart polar
+      <VictoryChart
+        polar
         theme={CustomTheme.metaseek}
         domain={{ y: [ 0, 1 ] }}
-        containerComponent={<VictoryVoronoiContainer
-          dimension="x"
+        containerComponent=
+          {
+            <VictoryVoronoiContainer
+              dimension="x"
+              labels={(radardata) => `${radardata.label}`}
+              labelComponent={<VictoryTooltip flyoutStyle={{fill: "white"}} />}
+            />
+          }
+        >
+        <VictoryArea
+          data={radardata}
           labels={(radardata) => `${radardata.label}`}
-          labelComponent={
-            <VictoryTooltip
-              flyoutStyle={{fill: "white"}}
-            />}
-        />}
-      >
-        <VictoryArea data={radardata}
-        labels={(radardata) => `${radardata.label}`}
-        labelComponent={<VictoryTooltip style={{fontSize:9}}/>}
-        style={{ data: { fillOpacity: 0.2, strokeWidth: 1.5 } }}
+          labelComponent={<VictoryTooltip style={{fontSize:9}}/>}
+          style={{ data: { fillOpacity: 0.2, strokeWidth: 1.5 } }}
         />
         {
           Object.keys(radardata).map((key, i) => {
             return (
-              <VictoryPolarAxis key={i} dependentAxis
+              <VictoryPolarAxis
+                key={i}
+                dependentAxis
                 style={{
                   axisLabel: { padding: 10 },
                   axis: { stroke: "none" },
@@ -53,29 +57,14 @@ var RadarChart = React.createClass({
                   tickLabels: {fontSize: 9}
                 }}
                 labelPlacement="parallel"
-                axisValue={i + 1} label={radardata[key]["x"].substring(0,10)}
+                axisValue={i + 1}
+                label={radardata[key]["x"].substring(0,10)}
                 tickFormat={(t) => Math.ceil(t * countmax)}
                 tickValues={[0]}
               />
             );
           })
         }
-        {/*
-        {
-          Object.keys(data).map((cat, i) => {
-            return (
-              <VictoryPolarAxis dependentAxis
-                key={i}
-                label={cat}
-                labelPlacement="perpendicular"
-                style={{ tickLabels: { fill: "none" } }}
-                axisValue={i}
-                domain={[0, countmax]}
-              />
-            );
-          })
-        }*/}
-
         <VictoryPolarAxis
           labelPlacement="parallel"
           tickFormat={() => ""}
@@ -84,7 +73,6 @@ var RadarChart = React.createClass({
             grid: { stroke: "grey", opacity: 0.5 }
           }}
         />
-
       </VictoryChart>
     )}
   });
