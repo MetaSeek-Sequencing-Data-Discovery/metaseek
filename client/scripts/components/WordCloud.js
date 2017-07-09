@@ -1,7 +1,5 @@
 import React from 'react';
 import { TagCloud } from 'react-tagcloud';
-import {randomColor} from 'randomcolor';
-
 
 var WordCloud = React.createClass({
   getInitialState : function() {
