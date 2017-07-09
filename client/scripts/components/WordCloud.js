@@ -1,5 +1,6 @@
 import React from 'react';
 import { TagCloud } from 'react-tagcloud';
+import ReactTooltip from 'react-tooltip';
 
 var WordCloud = React.createClass({
   getInitialState : function() {
@@ -14,7 +15,7 @@ var WordCloud = React.createClass({
     // Colors from color brewer http://colorbrewer2.org/#type=sequential&scheme=PuBuGn&n=8
     // Order matters - higher values will get the later colors in this list
     // Another good option http://colorbrewer2.org/?type=sequential&scheme=BuGn&n=7
-    var colors = ['#d0d1e6','#a6bddb','#67a9cf','#3690c0','#02818a','#016450'];
+    var colors = ['#a6bddb','#67a9cf','#3690c0','#02818a','#016450'];
 
     // Min / max font sizes in pixels for words in word cloud
     var min = 8;
@@ -22,7 +23,8 @@ var WordCloud = React.createClass({
 
     // this.props.wordinput is a field name that can be changed by the user
     // pull the right summary data from activeSummaryData
-    var activeFieldData = this.props.activeSummaryData[this.props.wordinput];
+    var activeField = this.props.wordinput;
+    var activeFieldData = this.props.activeSummaryData[activeField];
 
     // remove nulls / boring values
     var activeFieldDataValidKeys = Object.keys(activeFieldData).filter(
@@ -50,12 +52,29 @@ var WordCloud = React.createClass({
       var color = colors[Math.floor(colorScaler)];
 
       // More styles in css for word-cloud-tag - only on-the-fly calculated styles go here
-      return <span key={'word-' + tag.value}
-            className='word-cloud-tag'
-            style={{
-              fontSize: size + 'px',
-              color: color
-            }}>{tag.value}</span>
+      return <div className='word-cloud-tag-wrapper'>
+              <span
+                key={activeField + '-word-' + tag.value}
+                data-tip
+                data-for={activeField + '-tip-' + tag.value}
+                className='word-cloud-tag'
+                style={{
+                  fontSize: size + 'px',
+                  color: color
+                }}>
+                {tag.value}
+              </span>
+              <ReactTooltip
+                id={activeField + '-tip-' + tag.value}
+                key={activeField + '-tip-' + tag.value}
+                place="top"
+                type="light"
+                effect="solid"
+                border={true}
+              >
+                <span>{activeFieldData[tag.value] + ' datasets'}</span>
+              </ReactTooltip>
+            </div>
     };
 
     return(
