@@ -144,7 +144,7 @@ var ExploreFilters = React.createClass({
     var newRule = {
       "field":field,
       "type":filterType,
-      "value":value
+      "value":event
     };
     this.state.filterStates[filterName] = newRule;
     this.setState(this.state);
