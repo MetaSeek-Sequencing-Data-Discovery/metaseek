@@ -6,6 +6,7 @@ from models import *
 from datetime import datetime
 from decimal import Decimal
 from collections import Counter
+from sqlalchemy import or_
 
 def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
     fieldattr = getattr(targetClass,field)
@@ -24,7 +25,8 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
     elif ruletype == 6:
         queryObject = queryObject.filter(fieldattr != value)
     elif ruletype == 7:
-        queryObject = queryObject.filter(fieldattr.like('%' + value + '%'))
+        queryObject = queryObject.filter(or_(*[fieldattr.like('%' + name + '%') for name in value]))
+        #queryObject = queryObject.filter(fieldattr.like('%' + value + '%'))
     elif ruletype == 8:
         queryObject = queryObject.filter(fieldattr.in_(value))
     elif ruletype == 9:

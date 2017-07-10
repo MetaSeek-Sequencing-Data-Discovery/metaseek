@@ -144,7 +144,7 @@ var Explore = React.createClass({
 
   updateFilterParams : function(filterStates) {
     filterStates = Object.values(filterStates).filter(function(ruleObject){
-      if (ruleObject.value == "All" || ruleObject.value=="") {
+      if (ruleObject.value == "All" || ruleObject.value=="" || ruleObject.value=="[]") {
         return false;
       }
       if (("field" in ruleObject) && ("value" in ruleObject) && ("type" in ruleObject)) {

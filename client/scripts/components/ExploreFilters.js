@@ -14,6 +14,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import RangeSlider from './RangeSlider';
 import Tooltip from 'rc-tooltip';
 import Slider from 'rc-slider';
+import ChipInput from 'material-ui-chip-input';
 
 const Range = Slider.createSliderWithTooltip(Slider.Range);
 
@@ -76,6 +77,18 @@ var ExploreFilters = React.createClass({
         },
         "gcPercentMax":{
           "value":1
+        },
+        "env_biome":{
+          "value":[]
+        },
+        "env_feature":{
+          "value":[]
+        },
+        "env_material":{
+          "value":[]
+        },
+        "geo_loc_name":{
+          "value":[]
         }
     },
     "multSelectStates" :{
@@ -83,6 +96,12 @@ var ExploreFilters = React.createClass({
       "library_screening_strategy":'',
       "sequencing_method":'',
       "instrument_model":''
+    },
+    "chipStates" :{
+      "env_biome":[],
+      "env_feature":[],
+      "env_material":[],
+      "geo_loc_name":[]
     }
   }
 },
@@ -115,6 +134,22 @@ var ExploreFilters = React.createClass({
   handleMultSelectChange : function(filterName, value) {
     this.state.multSelectStates[filterName] = value
     this.setState(this.state);
+  },
+
+  handleChipChange : function(filterName, value) {
+    this.state.chipStates[filterName] = value;
+    this.setState(this.state);
+  },
+
+  handleChipBlur : function(filterName, field, filterType, value, event) {
+    var newRule = {
+      "field":field,
+      "type":filterType,
+      "value":value
+    };
+    this.state.filterStates[filterName] = newRule;
+    this.setState(this.state);
+    this.props.updateFilterParams(this.state.filterStates);
   },
 
 /*
@@ -286,6 +321,23 @@ var ExploreFilters = React.createClass({
                 filterTypeMin={4} filterTypeMax={3} min={-180} max={180}
                 minValue={this.state.filterStates.longitudeMin.value} maxValue={this.state.filterStates.longitudeMax.value}
                 handleFilterChange={this.handleFilterChange}
+              />
+              <h4>Environmental Biome</h4>
+              <ChipInput
+                hintText={"Press enter to generate tags. Click outside the box to search MetaSeek"}
+                onChange={this.handleChipBlur.bind(this,"env_biome","env_biome",7,this.state.chipStates.env_biome)}
+              />
+              <h4>Environmental Feature</h4>
+              <ChipInput
+                onChange={this.handleChipBlur.bind(this,"env_feature","env_feature",7,this.state.chipStates.env_feature)}
+              />
+              <h4>Environmental Material</h4>
+              <ChipInput
+                onChange={this.handleChipBlur.bind(this,"env_material","env_material",7,this.state.chipStates.env_material)}
+              />
+            <h4>Geographic Location</h4>
+              <ChipInput
+                onChange={this.handleChipBlur.bind(this,"geo_loc_name","geo_loc_name",7,this.state.chipStates.geo_loc_name)}
               />
             {/* Find a better component for this
               <h4>Geographic Location</h4>
