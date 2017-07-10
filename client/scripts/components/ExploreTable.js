@@ -19,40 +19,42 @@ var apiRequest = axios.create({
 
 var ExploreTable = React.createClass({
   render : function() {
+    var tableHeaderStyles = {color:'#fff',fontFamily:'Roboto',fontSize:'18px'};
+
     return (
       <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
         <div>
             <Table bodyStyle={{overflowX: 'scroll', width:'100%' }} fixedHeader={false} fixedFooter={false} selectable={false} style={{'tableLayout':'auto'}}>
-              <TableHeader style={{backgroundColor:'#E9EAFD'}}adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
+              <TableHeader style={{backgroundColor:'#6369E0'}} adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
                 <TableRow selectable={false}>
-                  <TableHeaderColumn>ID</TableHeaderColumn>
-                  <TableHeaderColumn width="80px">Study Title</TableHeaderColumn>
-                  <TableHeaderColumn>Link</TableHeaderColumn>
-                  <TableHeaderColumn>Database</TableHeaderColumn>
-                  <TableHeaderColumn>Investigation Type</TableHeaderColumn>
-                  <TableHeaderColumn>Env. Package</TableHeaderColumn>
-                  <TableHeaderColumn>Lib. Source</TableHeaderColumn>
-                  <TableHeaderColumn>Study Type</TableHeaderColumn>
-                  <TableHeaderColumn>Lib. Strategy</TableHeaderColumn>
-                  <TableHeaderColumn>Lib. Screening Strategy</TableHeaderColumn>
-                  <TableHeaderColumn>Lib. Construction Method</TableHeaderColumn>
-                  <TableHeaderColumn>Sequencing Method</TableHeaderColumn>
-                  <TableHeaderColumn>Reads Sequenced</TableHeaderColumn>
-                  <TableHeaderColumn>Avg. Read Length</TableHeaderColumn>
-                  <TableHeaderColumn>Geographic Location</TableHeaderColumn>
-                  <TableHeaderColumn>Biome</TableHeaderColumn>
-                  <TableHeaderColumn>Env. Feature</TableHeaderColumn>
-                  <TableHeaderColumn>Env. Material</TableHeaderColumn>
-                  <TableHeaderColumn>Latitude</TableHeaderColumn>
-                  <TableHeaderColumn>Longitude</TableHeaderColumn>
-                  <TableHeaderColumn>Download Size (max run)</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}></TableHeaderColumn>
+                  <TableHeaderColumn style={{color:'#fff',fontFamily:'Roboto',fontSize:'18px',width: '300px'}}>Study Title</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Link</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Database</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Investigation Type</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Env. Package</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Lib. Source</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Study Type</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Lib. Strategy</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Lib. Screening Strategy</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Lib. Construction Method</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Sequencing Method</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Reads Sequenced</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Avg. Read Length</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Geographic Location</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Biome</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Env. Feature</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Env. Material</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Latitude</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Longitude</TableHeaderColumn>
+                  <TableHeaderColumn style={tableHeaderStyles}>Download Size (max run)</TableHeaderColumn>
                 </TableRow>
               </TableHeader>
               <TableBody showRowHover={true} stripedRows={false} displayRowCheckbox={false} preScanRows={false}>
                 {this.props.dataTable.datasets.map( (row, index) => (
                   <TableRow selectable={false} key={index}>
-                    <TableRowColumn><Link to={row.uri}><RaisedButton label={"Dataset "+row.id+" Details"} primary={true}></RaisedButton></Link></TableRowColumn>
-                    <TableRowColumn>{row.study_title}</TableRowColumn>
+                    <TableRowColumn><Link to={row.uri}><RaisedButton label={"Details"} primary={true}></RaisedButton></Link></TableRowColumn>
+                    <TableRowColumn style={{width: '300px',whiteSpace:'normal',display:'inline-block',paddingTop:'6px',paddingBottom:'6px',height:'100%'}}>{row.study_title}</TableRowColumn>
                     <TableRowColumn>{row.expt_link}</TableRowColumn>
                     <TableRowColumn>{row.db_source}</TableRowColumn>
                     <TableRowColumn>{row.investigation_type}</TableRowColumn>
