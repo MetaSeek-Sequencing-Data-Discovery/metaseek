@@ -459,7 +459,6 @@ ul {
   display: block;
   right: 16px;
   top: 28%;
-  vertical-align: middle;
   font-size: 20px;
   color:#666;
 }
@@ -469,12 +468,19 @@ ul {
   color:#333;
 }
 
-.download-button {
+.download-info {
   font-weight: 700;
-  font-size: 24px;
+  font-size: 32px;
+  color: #333;
+}
+
+.download-info-tag {
+  font-weight: 300;
+  color:#666;
+}
+
+.download-button {
   float:right;
-  margin-left: 490px;
-  margin-bottom: 18px;
 }
 
 .save-discovery-button {
@@ -601,6 +607,7 @@ button.github:after, input[type=submit].github:after {
 
 .explore-download {
   margin: 0 0 18px 0;
+  padding:16px;
 }
 
 .explore-table {

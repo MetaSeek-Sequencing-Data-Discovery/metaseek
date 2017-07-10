@@ -330,15 +330,12 @@ var Explore = React.createClass({
                 <AreaChart activeSummaryData={this.state.activeSummaryData} areainput={this.state.areainput}/>
               </Paper>
               <Paper className="explore-download card right two">
-                <span className="callout-bottom">{getReadableFileSizeString(this.state.activeSummaryData.total_download_size)}</span>
-                <span className="callout-details-bottom">estimated download size.</span>
-                <div>
-                  <RaisedButton
-                    className="download-button"
-                    primary={true}
-                    label="Download these datasets"
-                  />
-                </div>
+                <span className="download-info">{getReadableFileSizeString(this.state.activeSummaryData.total_download_size)} <span className="download-info-tag">estimated download size</span></span>
+                <RaisedButton
+                  className="download-button"
+                  primary={true}
+                  label="Download datasets"
+                />
               </Paper>
               <Paper className="explore-table card three">
                 <ExploreTable getNextDataPage={this.getNextDataPage} getPreviousDataPage={this.getPreviousDataPage} dataTable={this.state.dataTable}/>
