@@ -589,7 +589,7 @@ button.github:after, input[type=submit].github:after {
 
 .explore-histogram {
   padding:3px;
-  height:400px;
+  height:430px;
 }
 
 .explore-areachart {
@@ -602,7 +602,7 @@ button.github:after, input[type=submit].github:after {
   padding:3px;
   overflow-y:scroll;
   margin: 0 18px 18px 0;
-  height:400px;
+  height:430px;
 }
 
 .explore-radarchart {
@@ -666,6 +666,25 @@ button.github:after, input[type=submit].github:after {
 
 .word-cloud-tag {
   display:block;
+}
+
+.histogram-container {
+  width: 360px;
+  margin: 0 auto;
+  height: 360px;
+  padding-left:30px;
+  overflow:hidden;
+}
+
+.area-container {
+  width: 360px;
+  margin: 0 auto;
+  height: 320px;
+  overflow:hidden;
+}
+
+.area-container > svg > g > text > tspan {
+  fill: none !important;
 }
 
 .explore-select {

@@ -16,7 +16,6 @@ import MenuItem from 'material-ui/MenuItem';
 import Header from './Header';
 import ExploreFilters from './ExploreFilters';
 import ExploreTable from './ExploreTable';
-import ExploreSummaryStats from './ExploreSummaryStats';
 import Loading from './Loading';
 import HeatmapChart from './HeatmapChart';
 import HistogramVictory from './HistogramVictory';

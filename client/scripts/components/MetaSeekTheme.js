@@ -16,16 +16,16 @@ const colors = [
 const charcoal = "#6369E0";
 
 // Typography
-const sansSerif = "'monospace', 'serif', 'Ser­avek', 'Trebuchet MS', sans-serif";
+const sansSerif = "'Roboto','sans-serif'";
 const letterSpacing = "normal";
 const fontSize = 14;
 // *
 // * Layout
 // *
 const baseProps = {
-  width: 450,
-  height: 300,
-  padding: 50,
+  width: 360,
+  height: 360,
+  padding: 18,
   colorScale: colors
 };
 // *
