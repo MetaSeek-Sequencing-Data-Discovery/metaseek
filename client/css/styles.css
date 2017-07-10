@@ -456,7 +456,6 @@ ul {
 .callout {
   color: #6369E0;
   font-weight: 700;
-  margin-left: 290px;
   font-size: 30px;
 }
 
@@ -545,22 +544,93 @@ button.github:after, input[type=submit].github:after {
 /* Explore layout */
 
 .explore-container {
-  width: 1192px;
+  width: 1176px;
   margin: 10px auto;
 }
 
-.explore-filter-card {
-  height: 900px;
-  overflow-y: scroll;
+.right {
+  float:right;
+}
+
+.left {
+  float:left;
+}
+
+/* 3 card grid, 380px per card, 18px per gutter between cards */
+.one {
   width: 380px;
-  float: left;
-  margin: 0 0 0 0;
-  padding: 24px;
-  margin-top:105px;
+}
+
+.two {
+  width: 778px;
+}
+
+.three {
+  width: 1176px;
+  clear: both;
+}
+
+.card {
+  padding: 18px;
+}
+
+.explore-filters {
+  height:1485px;
+  margin: 0 0 18px 0;
+}
+
+.explore-headline {
+  margin: 0 0 18px 18px;
+}
+
+.explore-map {
+  margin: 0 0 18px 18px;
+}
+
+.explore-histogram {
+  padding:3px;
+  height:400px;
+}
+
+.explore-areachart {
+  padding:3px;
+  margin: 0 18px 18px 0;
+  height:400px;
+}
+
+.explore-wordcloud {
+  padding:3px;
+  overflow-y:scroll;
+  margin: 0 18px 18px 0;
+  height:400px;
+}
+
+.explore-radarchart {
+  padding:3px;
+  height:400px;
+}
+
+.explore-download {
+  margin: 0 0 18px 0;
+}
+
+.explore-table {
+  padding:0px;
+}
+
+/* More Explore styles */
+
+.explore-filter {
+  margin: 12px 12px 0 12px;
+}
+
+.explore-filter-slider {
+  height: 6px;
+  margin-top: -6px;
 }
 
 .profile-container {
-  margin: 12px auto;
+  display:inline-block;
 }
 
 .profile-image {
@@ -573,82 +643,16 @@ button.github:after, input[type=submit].github:after {
   margin: 12px 12px 0 12px;
 }
 
-.explore-filters {
-  margin: 12px 12px 0 12px;
-}
-
-.explore-filter-slider {
-  height: 6px;
-  margin-top: -6px;
-}
-
-.explore-right-map {
-  float: left;
-  width: 788px;
-  height: 408px;
-  margin: 0;
-  padding: 24px;
-  margin-left: 18px;
-  margin-top: 18px;
-}
-
 .explore-map-container {
-  width: 720px;
+  width: 742px;
   margin: 0 auto;
 }
 
 .explore-map-heat-container {
-  width: 720px;
-  height: 360px;
+  width: 742px;
+  height: 371px;
   background-image: url('/images/BWmapBackground.jpg');
   background-size: cover;
-}
-
-.explore-right-summary {
-  float: right;
-  width: 788px;
-  margin-top: 18px;
-  margin-left: 18px;
-  margin-bottom: 18px
-}
-
-.explore-right-histogram {
-  float: right;
-  width: 788px;
-  height: 600px;
-  margin-bottom: 24px;
-  padding: 24px;
-}
-
-.explore-dashboard {
-  float: left;
-  width: 788px;
-  height: 390px;
-  margin-top: 18px;
-  margin-left: 18px;
-}
-
-.explore-victory-histogram {
-  float: left;
-  width: 385px;
-  height: 390px;
-  margin-bottom: 18px;
-}
-
-.explore-victory-areachart {
-  float: right;
-  width: 385px;
-  height: 390px;
-  margin-bottom: 18px;
-}
-
-.explore-wordcloud {
-  float: left;
-  width: 385px;
-  height: 390px;
-  padding-left:3px;
-  padding-right:3px;
-  overflow-y:scroll;
 }
 
 .word-cloud-tag-wrapper {
@@ -664,22 +668,8 @@ button.github:after, input[type=submit].github:after {
   display:block;
 }
 
-.explore-victory-radarchart {
-  float: right;
-  width: 385px;
-  height: 390px;
-  margin-bottom: 18px;
-}
-
 .explore-select {
   margin-left: 80px;
-}
-
-.explore-table {
-  width: 1192px;
-  margin: 48px auto;
-  padding: 0;
-  clear: both;
 }
 
 .explore-pagination {
@@ -764,6 +754,8 @@ button.github:after, input[type=submit].github:after {
 
 .range-slider {
   margin-top: 15px;
+  width: 96%;
+  margin-left: 2%;
 }
 
 .range-slider-with-text {
@@ -1554,6 +1546,7 @@ button.github:after, input[type=submit].github:after {
 
 .Collapsible {
   background-color: white;
+  margin-top:6px;
 }
 
 .Collapsible__contentInner {

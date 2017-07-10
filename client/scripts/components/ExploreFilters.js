@@ -170,7 +170,7 @@ var ExploreFilters = React.createClass({
               {Object.keys(this.props.activeSummaryData.investigation_type_summary)
                      .map(this.renderMultipleMenuItem)}
             </SelectField> */}
-            <Collapsible trigger="General Sample Info">
+            <Collapsible trigger="General Sample Info" open={true}>
               <h4>Investigation Type</h4>
               <SelectField value={this.state.filterStates.investigation_type.value} onChange={this.handleFilterChange.bind(this,"investigation_type","investigation_type",5)}>
                 <MenuItem value={"All"} primaryText="All" />
@@ -200,7 +200,7 @@ var ExploreFilters = React.createClass({
               </SelectField>
             </Collapsible>
 
-            <Collapsible trigger="Sequencing Info">
+            <Collapsible trigger="Sequencing Info" open={true}>
               <h4>Library Strategy</h4>
               <Select name="library_strategy" placeholder="Select Sequencing Strategie(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.library_strategy}  options={libstrat_options} onChange={this.handleMultSelectChange.bind(this,"library_strategy")} onClose={this.handleMultipleFilterChange.bind(this,"library_strategy", "library_strategy", 8, this.state.multSelectStates.library_strategy)}/>
 
@@ -274,7 +274,7 @@ var ExploreFilters = React.createClass({
               />*/}
             </Collapsible>
 
-            <Collapsible trigger="Environmental/Contextual Info">
+            <Collapsible trigger="Environmental/Contextual Info" open={true}>
               <h4>Latitude</h4>
               <RangeSlider field="meta_latitude" filterMin="latitudeMin" filterMax="latitudeMax"
                 filterTypeMin={4} filterTypeMax={3} min={-90} max={90}
