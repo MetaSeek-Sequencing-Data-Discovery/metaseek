@@ -338,9 +338,19 @@ class BuildCaches(Resource):
         priorityFilterSets = [
             '{"rules":[]}',
             '{"rules":[{"field":"library_source","type":5,"value":"genomic"}]}',
+            '{"rules":[{"field":"library_source","type":5,"value":"transcriptomic"}]}',
             '{"rules":[{"field":"library_source","type":5,"value":"metagenomic"}]}',
-            '{"rules":[{"field":"library_source","type":5,"value":"metatranscriptomic"}]}',
-            '{"rules":[{"field":"library_source","type":5,"value":"transcriptomic"}]}'
+            '{"rules":[{"field":"investigation_type","type":5,"value":"metagenome"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Other"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Whole Genome Sequencing"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Transcriptome Analysis"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Metagenomics"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Population Genomics"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Other"},{"field":"library_source","type":5,"value":"genomic"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Whole Genome Sequencing"},{"field":"library_source","type":5,"value":"genomic"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Transcriptome Analysis"},{"field":"library_source","type":5,"value":"transcriptomic"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Other"},{"field":"library_source","type":5,"value":"metagenomic"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Metagenomics"},{"field":"library_source","type":5,"value":"metagenomic"}]}'
         ]
 
         results = {}
