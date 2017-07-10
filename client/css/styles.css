@@ -678,6 +678,13 @@ button.github:after, input[type=submit].github:after {
 
 .area-container {
   width: 360px;
+  margin: 20px auto 0;
+  height: 320px;
+  overflow:hidden;
+}
+
+.radar-container {
+  width: 360px;
   margin: 0 auto;
   height: 320px;
   overflow:hidden;

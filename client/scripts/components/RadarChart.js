@@ -25,55 +25,57 @@ var RadarChart = React.createClass({
     });
 
     return(
-      <VictoryChart
-        polar
-        theme={CustomTheme.metaseek}
-        domain={{ y: [ 0, 1 ] }}
-        containerComponent=
-          {
-            <VictoryVoronoiContainer
-              dimension="x"
-              labels={(radardata) => `${radardata.label}`}
-              labelComponent={<VictoryTooltip flyoutStyle={{fill: "white"}} />}
-            />
-          }
-        >
-        <VictoryArea
-          data={radardata}
-          labels={(radardata) => `${radardata.label}`}
-          labelComponent={<VictoryTooltip style={{fontSize:9}}/>}
-          style={{ data: { fillOpacity: 0.2, strokeWidth: 1.5 } }}
-        />
-        {
-          Object.keys(radardata).map((key, i) => {
-            return (
-              <VictoryPolarAxis
-                key={i}
-                dependentAxis
-                style={{
-                  axisLabel: { padding: 10 },
-                  axis: { stroke: "none" },
-                  grid: { stroke: "grey", strokeWidth: 0.25, opacity: 0.5 },
-                  tickLabels: {fontSize: 9}
-                }}
-                labelPlacement="parallel"
-                axisValue={i + 1}
-                label={radardata[key]["x"].substring(0,10)}
-                tickFormat={(t) => Math.ceil(t * countmax)}
-                tickValues={[0]}
+      <div className="radar-container">
+        <VictoryChart
+          polar
+          theme={CustomTheme.metaseek}
+          domain={{ y: [ 0, 1 ] }}
+          containerComponent=
+            {
+              <VictoryVoronoiContainer
+                dimension="x"
+                labels={(radardata) => `${radardata.label}`}
+                labelComponent={<VictoryTooltip flyoutStyle={{fill: "white"}} />}
               />
-            );
-          })
-        }
-        <VictoryPolarAxis
-          labelPlacement="parallel"
-          style={{
-            tickLabels: {fill:"none"},
-            axis: { stroke: "none" },
-            grid: { stroke: "grey", opacity: 0.5 }
-          }}
-        />
-      </VictoryChart>
+            }
+          >
+          <VictoryArea
+            data={radardata}
+            labels={(radardata) => `${radardata.label}`}
+            labelComponent={<VictoryTooltip style={{fontSize:9}}/>}
+            style={{ data: { fillOpacity: 0.2, strokeWidth: 1.5 } }}
+          />
+          {
+            Object.keys(radardata).map((key, i) => {
+              return (
+                <VictoryPolarAxis
+                  key={i}
+                  dependentAxis
+                  style={{
+                    axisLabel: { padding: 10 },
+                    axis: { stroke: "none" },
+                    grid: { stroke: "grey", strokeWidth: 0.25, opacity: 0.5 },
+                    tickLabels: {fontSize: 9}
+                  }}
+                  labelPlacement="parallel"
+                  axisValue={i + 1}
+                  label={radardata[key]["x"].substring(0,10)}
+                  tickFormat={(t) => Math.ceil(t * countmax)}
+                  tickValues={[0]}
+                />
+              );
+            })
+          }
+          <VictoryPolarAxis
+            labelPlacement="parallel"
+            style={{
+              tickLabels: {fill:"none"},
+              axis: { stroke: "none" },
+              grid: { stroke: "grey", opacity: 0.5 }
+            }}
+          />
+        </VictoryChart>
+      </div>
     )}
   });
 
