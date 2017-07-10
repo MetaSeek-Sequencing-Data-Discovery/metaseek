@@ -18,7 +18,6 @@ import ExploreFilters from './ExploreFilters';
 import ExploreTable from './ExploreTable';
 import ExploreSummaryStats from './ExploreSummaryStats';
 import Loading from './Loading';
-import Histogram from './Histogram';
 import HeatmapChart from './HeatmapChart';
 import HistogramVictory from './HistogramVictory';
 import AreaChart from './AreaChart';

@@ -6,7 +6,6 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import ColorPalette from './ColorPalette';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
-import AverageReadLengthInputs from './AverageReadLengthInputs';
 import Select from 'react-select';
 import Collapsible from 'react-collapsible';
 import AutoComplete from 'material-ui/AutoComplete';
