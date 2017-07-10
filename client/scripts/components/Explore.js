@@ -36,8 +36,8 @@ var Explore = React.createClass({
       'fullSummaryData':[],
       'activeSummaryData': [],
       'dataTable': {},
-      'histinput':'env_package_summary',
-      'areainput':'avg_read_length_summary',
+      'histinput':'investigation_type_summary',
+      'areainput':'library_reads_sequenced_summary',
       'radarinput':'library_source_summary',
       'wordinput':'env_biome_summary',
       'filter_params':JSON.stringify({'rules':[]}),
@@ -187,9 +187,10 @@ var Explore = React.createClass({
   render : function() {
     if (!this.state.loaded) return <Loading/>;
 
-    const radarfields = ['env_biome_summary','env_feature_summary','env_material_summary','library_source_summary'];
+    const radarfields = ['study_type_summary','library_source_summary','investigation_type_summary','env_package_summary'];
     const wordfields = ['env_biome_summary','env_feature_summary','env_material_summary','geo_loc_name_summary'];
-    const areafields = ['avg_read_length_summary','gc_percent_summary','total_bases_summary'];
+    const areafields = ['avg_read_length_summary', 'download_size_summary', 'gc_percent_summary', 'latitude_summary', 'longitude_summary', 'library_reads_sequenced_summary', 'total_bases_summary'];
+    const histfields = ['sequencing_method_summary', 'instrument_model_summary', 'library_strategy_summary', 'library_screening_strategy_summary', 'library_construction_method_summary', 'investigation_type_summary', 'env_package_summary', 'library_source_summary', 'study_type_summary']
 
     var mapRender = function(activeSummaryData,isProcessing) {
       if (!isProcessing) {
@@ -264,7 +265,7 @@ var Explore = React.createClass({
                   <div className="explore-select">
                     <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
                       {Object.keys(this.state.activeSummaryData).filter(function(value) {
-                        if (value.indexOf('summary') !== -1) {
+                        if (value.indexOf('summary') !== -1 && histfields.includes(value)) {
                           return true;
                         } else {
                           return false;
