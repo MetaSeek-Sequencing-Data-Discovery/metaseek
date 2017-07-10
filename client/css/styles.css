@@ -575,7 +575,7 @@ button.github:after, input[type=submit].github:after {
 }
 
 .explore-filters {
-  height:1485px;
+  min-height:1000px;
   margin: 0 0 18px 0;
 }
 
