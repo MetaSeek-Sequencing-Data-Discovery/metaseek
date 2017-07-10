@@ -19,7 +19,7 @@ var apiRequest = axios.create({
 
 var ExploreTable = React.createClass({
   render : function() {
-    var tableHeaderStyles = {color:'#fff',fontFamily:'Roboto',fontSize:'18px'};
+    var tableHeaderStyles = {color:'#fff',fontFamily:'Roboto',fontSize:'14px',fontWeight:700};
 
     return (
       <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
@@ -28,7 +28,7 @@ var ExploreTable = React.createClass({
               <TableHeader style={{backgroundColor:'#6369E0'}} adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
                 <TableRow selectable={false}>
                   <TableHeaderColumn style={tableHeaderStyles}></TableHeaderColumn>
-                  <TableHeaderColumn style={{color:'#fff',fontFamily:'Roboto',fontSize:'18px',width: '300px'}}>Study Title</TableHeaderColumn>
+                  <TableHeaderColumn style={{color:'#fff',fontFamily:'Roboto',fontSize:'14px',width: '300px',fontWeight:700}}>Study Title</TableHeaderColumn>
                   <TableHeaderColumn style={tableHeaderStyles}>Link</TableHeaderColumn>
                   <TableHeaderColumn style={tableHeaderStyles}>Database</TableHeaderColumn>
                   <TableHeaderColumn style={tableHeaderStyles}>Investigation Type</TableHeaderColumn>
@@ -54,7 +54,7 @@ var ExploreTable = React.createClass({
                 {this.props.dataTable.datasets.map( (row, index) => (
                   <TableRow selectable={false} key={index}>
                     <TableRowColumn><Link to={row.uri}><RaisedButton label={"Details"} primary={true}></RaisedButton></Link></TableRowColumn>
-                    <TableRowColumn style={{width: '300px',whiteSpace:'normal',display:'inline-block',paddingTop:'6px',paddingBottom:'6px',height:'100%'}}>{row.study_title}</TableRowColumn>
+                    <TableRowColumn style={{width: '300px',whiteSpace:'normal',display:'inline-block',paddingTop:'9px',paddingBottom:'9px',height:'100%'}}>{row.study_title}</TableRowColumn>
                     <TableRowColumn>{row.expt_link}</TableRowColumn>
                     <TableRowColumn>{row.db_source}</TableRowColumn>
                     <TableRowColumn>{row.investigation_type}</TableRowColumn>
