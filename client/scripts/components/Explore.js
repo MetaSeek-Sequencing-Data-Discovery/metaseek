@@ -228,12 +228,14 @@ var Explore = React.createClass({
               </Paper>
               <Paper className="explore-headline card right two">
                 <div className="profile-container">
-                  <span>
-                    {this.state.firebase.uid ? "Hi, " + this.state.firebase.name + ". Thanks for using MetaSeek!" : "Create an account or log in to save a discovery to your account."}
+                  <span className="welcome-message">
+                    {this.state.firebase.uid ? "Hi, " + this.state.firebase.name + ". Thanks for using MetaSeek!" : "Create an account or log in with Google to save your discoveries."}
                   </span>
-                  <div className="profile-image-container">
-                    <img className="profile-image" style={{'display':this.state.firebase.uid ? 'inline' : 'none'}} src={this.state.firebase.photo}/>
-                  </div>
+                  {//<div className="profile-image-container">
+                    //<img className="profile-image" style={{'display':this.state.firebase.uid ? 'inline' : 'none'}} src={this.state.firebase.photo}/>
+                  //</div>
+                  }
+                  <br/>
                   <RaisedButton
                     className="profile-button"
                     onClick={this.state.firebase.uid ? this.submitDiscovery : this.triggerGoogleLogin}
@@ -248,7 +250,7 @@ var Explore = React.createClass({
                     disabled={!(this.state.firebase.uid)}
                   />
                 </div>
-                <span className="callout">{this.state.activeSummaryData.total_datasets}</span> <span className="callout-details">Datasets</span>
+                <span className="callout"><span className="active">{this.state.activeSummaryData.total_datasets} datasets</span> out of <br/>{this.state.fullSummaryData.total_datasets} total datasets</span>
               </Paper>
               <Paper className="explore-map card right two">
                 <div>

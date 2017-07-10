@@ -454,31 +454,19 @@ ul {
 }
 
 .callout {
-  color: #6369E0;
-  font-weight: 700;
-  font-size: 30px;
+  font-weight: 300;
+  position: absolute;
+  display: block;
+  right: 16px;
+  top: 28%;
+  vertical-align: middle;
+  font-size: 20px;
+  color:#666;
 }
 
-.callout-details {
+.callout .active {
   font-weight: 700;
-  margin-left: 10px;
-  margin-bottom: 24px;
-  font-size: 24px;
-}
-
-.callout-bottom {
-  color: #6369E0;
-  font-weight: 700;
-  font-size: 24px;
-  text-align: right;
-  margin-left: 470px;
-}
-
-.callout-details-bottom {
-  font-weight: 700;
-  margin-left: 10px;
-  margin-bottom: 24px;
-  font-size: 18px;
+  color:#333;
 }
 
 .download-button {
@@ -581,6 +569,7 @@ button.github:after, input[type=submit].github:after {
 
 .explore-headline {
   margin: 0 0 18px 18px;
+  position: relative;
 }
 
 .explore-map {
@@ -633,6 +622,10 @@ button.github:after, input[type=submit].github:after {
   display:inline-block;
 }
 
+.welcome-message {
+  font-size:16px;
+}
+
 .profile-image {
   width: 150px;
   height: 150px;
@@ -677,10 +670,9 @@ button.github:after, input[type=submit].github:after {
 }
 
 .area-container {
-  width: 360px;
-  margin: 20px auto 0;
-  height: 320px;
-  overflow:hidden;
+  width: 400px;
+  margin: 20px 0 0 -20px;
+  height: 335px;
 }
 
 .radar-container {
