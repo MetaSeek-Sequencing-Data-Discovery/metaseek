@@ -13,8 +13,8 @@ const HeatmapChart = React.createClass({
 
   getDefaultProps() {
     return{
-      chartwidth: 720,
-      chartheight: 360,
+      chartwidth: 742,
+      chartheight: 371,
       num_y_bins: 18,
       num_x_bins: 36
     }

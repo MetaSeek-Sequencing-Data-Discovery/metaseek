@@ -82,7 +82,7 @@ img {
 }
 
 svg:not(:root) {
-  overflow: hidden;
+  overflow: visible;
 }
 
 fieldset {
@@ -454,8 +454,40 @@ ul {
 }
 
 .callout {
-  color: #6369E0;
+  font-weight: 300;
+  position: absolute;
+  display: block;
+  right: 16px;
+  top: 28%;
+  font-size: 20px;
+  color:#666;
+}
+
+.callout .active {
   font-weight: 700;
+  color:#333;
+}
+
+.download-info {
+  font-weight: 700;
+  font-size: 32px;
+  color: #333;
+}
+
+.download-info-tag {
+  font-weight: 300;
+  color:#666;
+}
+
+.download-button {
+  float:right;
+}
+
+.save-discovery-button {
+  font-weight: 700;
+  font-size: 30px;
+  margin-left: 288px;
+  margin-bottom: 18px;
 }
 
 .button-link {
@@ -506,21 +538,99 @@ button.github:after, input[type=submit].github:after {
 /* Explore layout */
 
 .explore-container {
-  width: 1192px;
+  width: 1176px;
   margin: 10px auto;
 }
 
-.explore-filter-card {
-  height: 888px;
-  overflow-y: scroll;
+.right {
+  float:right;
+}
+
+.left {
+  float:left;
+}
+
+/* 3 card grid, 380px per card, 18px per gutter between cards */
+.one {
   width: 380px;
-  float: left;
-  margin: 0 0 0 0;
-  padding: 24px;
+}
+
+.two {
+  width: 778px;
+}
+
+.three {
+  width: 1176px;
+  clear: both;
+}
+
+.card {
+  padding: 18px;
+}
+
+.explore-filters {
+  min-height:1000px;
+  margin: 0 0 18px 0;
+}
+
+.explore-headline {
+  margin: 0 0 18px 18px;
+  position: relative;
+}
+
+.explore-map {
+  margin: 0 0 18px 18px;
+}
+
+.explore-histogram {
+  padding:3px;
+  height:430px;
+}
+
+.explore-areachart {
+  padding:3px;
+  margin: 0 18px 18px 0;
+  height:400px;
+}
+
+.explore-wordcloud {
+  padding:3px;
+  overflow-y:scroll;
+  margin: 0 18px 18px 0;
+  height:430px;
+}
+
+.explore-radarchart {
+  padding:3px;
+  height:400px;
+}
+
+.explore-download {
+  margin: 0 0 18px 0;
+  padding:16px;
+}
+
+.explore-table {
+  padding:0px;
+}
+
+/* More Explore styles */
+
+.explore-filter {
+  margin: 12px 12px 0 12px;
+}
+
+.explore-filter-slider {
+  height: 6px;
+  margin-top: -6px;
 }
 
 .profile-container {
-  margin: 12px auto;
+  display:inline-block;
+}
+
+.welcome-message {
+  font-size:16px;
 }
 
 .profile-image {
@@ -533,55 +643,58 @@ button.github:after, input[type=submit].github:after {
   margin: 12px 12px 0 12px;
 }
 
-.explore-filters {
-  margin: 12px 12px 0 12px;
-}
-
-.explore-filter-slider {
-  height: 6px;
-  margin-top: -6px;
-}
-
-.explore-right-map {
-  float: right;
-  width: 788px;
-  height: 408px;
-  margin: 0;
-  padding: 24px;
-}
-
 .explore-map-container {
-  width: 720px;
+  width: 742px;
   margin: 0 auto;
 }
 
 .explore-map-heat-container {
-  width: 720px;
-  height: 360px;
+  width: 742px;
+  height: 371px;
   background-image: url('/images/BWmapBackground.jpg');
   background-size: cover;
 }
 
-.explore-right-summary {
-  float: right;
-  width: 788px;
-  margin-top: 24px;
+.word-cloud-tag-wrapper {
+  border: 2px solid rgba(177,178,246,.5);
+  border-radius: 2px;
+  background-color: rgba(233,234,253,.2);
+  display: inline-block;
+  padding: 6px;
+  margin: 3px;
 }
 
-.explore-right-histogram {
-  float: right;
-  width: 788px;
+.word-cloud-tag {
+  display:block;
+}
+
+.histogram-container {
+  width: 360px;
+  margin: 0 auto;
+  height: 360px;
+  padding-left:30px;
+  overflow:hidden;
+}
+
+.area-container {
+  width: 400px;
+  margin: 20px 0 0 -20px;
+  height: 335px;
+}
+
+.radar-container {
+  width: 360px;
+  margin: 0 auto;
   height: 320px;
-  margin-top: 24px;
-  margin-bottom: 24px;
-  padding: 24px;
+  overflow:hidden;
 }
 
-.explore-table {
-  width: 1192px;
-  margin: 48px auto;
-  padding: 0;
-  clear: both;
+.area-container > svg > g > text > tspan {
+  fill: none !important;
+}
+
+.explore-select {
+  margin-left: 80px;
 }
 
 .explore-pagination {
@@ -666,6 +779,8 @@ button.github:after, input[type=submit].github:after {
 
 .range-slider {
   margin-top: 15px;
+  width: 96%;
+  margin-left: 2%;
 }
 
 .range-slider-with-text {
@@ -1456,6 +1571,7 @@ button.github:after, input[type=submit].github:after {
 
 .Collapsible {
   background-color: white;
+  margin-top:6px;
 }
 
 .Collapsible__contentInner {
@@ -1514,5 +1630,60 @@ button.github:after, input[type=submit].github:after {
 }
 
 .CustomTriggerCSS--open {
-  background-color: darkslateblue;
+  background-color: #B3B4EF;
+}
+
+.chips {
+  min-height: 36px;
+  border-bottom: 1px solid rgb(224, 224, 224);
+  line-height: 1;
+  font-size: 1em;
+}
+
+.chips-input {
+  display: inline-block;
+  width: 33% !important;
+  min-height: 36px;
+  margin: 0 0 5px 10px !important;
+  border: 0;
+  outline: none;
+  font-size: 0.9rem;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+.chip {
+  display: inline-block;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 5px;
+  margin-right: 25px;
+  position: relative;
+  padding: 0;
+  height: 32px;
+}
+
+.chip .chip-value {
+  display: inline-block;
+  padding-left: 15px;
+  padding-right: 7.5px;
+  background: #555;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 15px 0 0 15px;
+}
+
+.chip .chip-delete-button {
+  background: #555;
+  color: #fff;
+  border: 0;
+  border-radius: 0 15px 15px 0;
+  padding: 5px 10px;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -25px;
+  line-height: 0.5;
+  font-weight: bold;
 }
