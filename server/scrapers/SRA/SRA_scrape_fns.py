@@ -597,7 +597,10 @@ def get_srx_metadata(batch_uid_list):
                 qual_count = json.dumps(qual_count) # replaced str() coercion with json dump to string for db
                 read_quality_counts.append(qual_count)
 
-        max_index = total_num_reads.index(max(total_num_reads))
+        if len(total_num_reads)>0:
+            max_index = total_num_reads.index(max(total_num_reads))
+        else:
+            max_index = None
 
         #log every run scraped to its own rdict entry
         srx_uids = [srx_uid]*len(run_ids)
@@ -616,19 +619,20 @@ def get_srx_metadata(batch_uid_list):
 
         #log run_ids for writing runs to db later
         srx_dict['run_ids'] = run_ids
-        #log best run (max total_num_reads) to srx data
-        srx_dict['run_ids_maxrun'] = run_ids[max_index]
-        srx_dict['library_reads_sequenced_maxrun'] = total_num_reads[max_index]
-        srx_dict['total_num_bases_maxrun'] = total_num_bases[max_index]
-        srx_dict['download_size_maxrun'] = download_size[max_index]
-        srx_dict['avg_read_length_maxrun'] = avg_read_length[max_index]
-        srx_dict['baseA_count_maxrun'] = baseA_count[max_index]
-        srx_dict['baseC_count_maxrun'] = baseC_count[max_index]
-        srx_dict['baseG_count_maxrun'] = baseG_count[max_index]
-        srx_dict['baseT_count_maxrun'] = baseT_count[max_index]
-        srx_dict['baseN_count_maxrun'] = baseN_count[max_index]
-        srx_dict['gc_percent_maxrun'] = gc_percent[max_index]
-        srx_dict['run_quality_counts_maxrun'] = read_quality_counts[max_index]
+        if max_index is not None:
+            #log best run (max total_num_reads) to srx data
+            srx_dict['run_ids_maxrun'] = run_ids[max_index]
+            srx_dict['library_reads_sequenced_maxrun'] = total_num_reads[max_index]
+            srx_dict['total_num_bases_maxrun'] = total_num_bases[max_index]
+            srx_dict['download_size_maxrun'] = download_size[max_index]
+            srx_dict['avg_read_length_maxrun'] = avg_read_length[max_index]
+            srx_dict['baseA_count_maxrun'] = baseA_count[max_index]
+            srx_dict['baseC_count_maxrun'] = baseC_count[max_index]
+            srx_dict['baseG_count_maxrun'] = baseG_count[max_index]
+            srx_dict['baseT_count_maxrun'] = baseT_count[max_index]
+            srx_dict['baseN_count_maxrun'] = baseN_count[max_index]
+            srx_dict['gc_percent_maxrun'] = gc_percent[max_index]
+            srx_dict['run_quality_counts_maxrun'] = read_quality_counts[max_index]
 
         #insert srx data into sdict with srx_uid as key
         sdict[srx_uid] = srx_dict
