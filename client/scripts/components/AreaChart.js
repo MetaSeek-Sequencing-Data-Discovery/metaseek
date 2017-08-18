@@ -1,6 +1,7 @@
 import React from 'react';
 import { VictoryChart, VictoryVoronoiContainer, VictoryArea, VictoryAxis, VictoryTooltip} from 'victory';
 import CustomTheme from './CustomTheme';
+import {getReadableFileSizeString} from '../helpers';
 
 var AreaChart = React.createClass({
 
@@ -35,7 +36,16 @@ var AreaChart = React.createClass({
     var chartData = activeFieldSorted.map(
       function(value,index) {
         var count = activeFieldData[value];
-        return {"x":parseInt(index),"count":count,"label":value + " : " + count};
+        if (activeField=="download_size_summary") {
+          var match = value.match(/\d+/g);
+          var first = getReadableFileSizeString(Math.pow(match[0],match[1]));
+          var second = getReadableFileSizeString(Math.pow(match[2],match[3]));
+          var newfield = first + " - " + second;
+        }
+        else {
+          var newfield = value;
+        }
+        return {"x":parseInt(index),"count":count,"label":newfield + " : " + count};
       }
     );
 
