@@ -55,7 +55,7 @@ def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cat
                     countedColumnDict = top
 
                 nodata_counts = len(dataFrame[columnName])-len(dataColumn)
-                if nodata_counts>0: 
+                if nodata_counts>0:
                     countedColumnDict['no data'] = nodata_counts
                 return countedColumnDict #categorical hist
             else: #linear bin hist
@@ -162,10 +162,10 @@ def summarizeDatasets(queryObject):
 
         #maybe top-10 or top-15 categorical responses
         instrument_model_summary = summarizeColumn(queryResultDataframe,'instrument_model',num_cats=15)
-        geo_loc_name_summary = summarizeColumn(queryResultDataframe,'geo_loc_name',num_cats=15)
-        env_biome_summary = summarizeColumn(queryResultDataframe,'env_biome',num_cats=15)
-        env_feature_summary = summarizeColumn(queryResultDataframe,'env_feature',num_cats=15)
-        env_material_summary = summarizeColumn(queryResultDataframe,'env_material',num_cats=15)
+        geo_loc_name_summary = summarizeColumn(queryResultDataframe,'geo_loc_name',num_cats=20)
+        env_biome_summary = summarizeColumn(queryResultDataframe,'env_biome',num_cats=20)
+        env_feature_summary = summarizeColumn(queryResultDataframe,'env_feature',num_cats=20)
+        env_material_summary = summarizeColumn(queryResultDataframe,'env_material',num_cats=20)
         # add more here . . .
 
         # Linear binned histogram responses
