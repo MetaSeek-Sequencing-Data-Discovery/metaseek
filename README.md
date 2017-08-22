@@ -30,7 +30,7 @@ Merge master into deploy branch and push to Github:
 
 `git checkout deploy`
 
-`git merge master`
+`git merge master` and resolve any conflicts
 
 `git push`
 
@@ -64,7 +64,7 @@ Restart Apache:
 
 Check the server is live:
 
-`curl https://api.metaseek.cloud/api/users`
+`curl https://api.metaseek.cloud/users`
 
 To debug:
 

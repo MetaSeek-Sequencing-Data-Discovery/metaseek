@@ -1,0 +1,18 @@
+{
+  "investigation_rules":{
+    "miens-survey":"mimarks-survey",
+    "miens-culture":"mimarks-specimen",
+    "metatranscriptome":"metagenome",
+    "MiMARKS survey":"mimarks-survey",
+    "MIMARKS survey":"mimarks-survey",
+    "MIMARKS_Survey":"mimarks-survey",
+    "Metagenome":"metagenome",
+    "mimarks-culture":"mimarks-specimen",
+    "Non-selective Metatranscriptome":"metagenome",
+    "MIENS_Survey":"mimarks-survey",
+    "MIMARKS-survey":"mimarks-survey"
+  },
+  "env_package_rules":{
+
+  }
+}
