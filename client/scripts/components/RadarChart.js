@@ -30,19 +30,12 @@ var RadarChart = React.createClass({
           polar
           theme={CustomTheme.metaseek}
           domain={{ y: [ 0, 1 ] }}
-          containerComponent=
-            {
-              <VictoryVoronoiContainer
-                dimension="x"
-                labels={(radardata) => `${radardata.label}`}
-                labelComponent={<VictoryTooltip flyoutStyle={{fill: "white"}} />}
-              />
-            }
+          containerComponent={<VictoryVoronoiContainer/>}
           >
           <VictoryArea
             data={radardata}
             labels={(radardata) => `${radardata.label}`}
-            labelComponent={<VictoryTooltip style={{fontSize:9}}/>}
+            labelComponent={<VictoryTooltip flyoutStyle={{fill: "white"}}/>}
             style={{ data: { fillOpacity: 0.2, strokeWidth: 1.5 } }}
           />
           {
