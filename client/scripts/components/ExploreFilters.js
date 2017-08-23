@@ -9,6 +9,7 @@ import MenuItem from 'material-ui/MenuItem';
 import Select from 'react-select';
 import Collapsible from 'react-collapsible';
 import AutoComplete from 'material-ui/AutoComplete';
+import FlatButton from 'material-ui/FlatButton';
 
 import RangeSlider from './RangeSlider';
 import Tooltip from 'rc-tooltip';
@@ -104,6 +105,12 @@ var ExploreFilters = React.createClass({
     }
   }
 },
+
+  resetFilters : function(event,index,value) {
+    this.state = this.getInitialState();
+    this.setState(this.state);
+    this.props.updateFilterParams(this.state.filterStates);
+  },
 
   handleFilterChange : function(filterName, field, filterType, event, index, value) {
     var newRule = {
@@ -204,6 +211,7 @@ var ExploreFilters = React.createClass({
               {Object.keys(this.props.activeSummaryData.investigation_type_summary)
                      .map(this.renderMultipleMenuItem)}
             </SelectField> */}
+            <FlatButton label="Reset Filters" primary={true} onClick={this.resetFilters}/>
             <Collapsible trigger="General Sample Info" open={true}>
               <h4>Investigation Type</h4>
               <SelectField value={this.state.filterStates.investigation_type.value} onChange={this.handleFilterChange.bind(this,"investigation_type","investigation_type",5)}>
