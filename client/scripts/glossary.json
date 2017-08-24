@@ -1,0 +1,3 @@
+{"investigation_type":"Nucleic Acid Sequence Report is the root element of all MIGS/MIMS compliant reports as standardized by Genomic Standards Consortium. This is a controlled vocabulary. The possible terms are: eukaryote (for eukaryotic genomes or transcriptomes),bacteria_archaea (for bacterial or archaeal genomes/transcriptomes), virus (for viral DNA or RNA), plasmid, organelle, metagenome (for whole-community metagenomes or metatranscriptomes), mimarks-survey (for marker genes from a community or environmental sample), or mimarks-specimen (for marker genes from a single organism)",
+"env_package":"insert"
+}

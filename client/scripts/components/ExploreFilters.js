@@ -15,6 +15,8 @@ import RangeSlider from './RangeSlider';
 import Tooltip from 'rc-tooltip';
 import Slider from 'rc-slider';
 import ChipInput from 'material-ui-chip-input';
+import IconButton from 'material-ui/IconButton';
+import ActionHelp from 'material-ui/svg-icons/action/help';
 
 const Range = Slider.createSliderWithTooltip(Slider.Range);
 
@@ -191,6 +193,9 @@ var ExploreFilters = React.createClass({
     const seqmeth_options = this.getMultOptions(this.props.activeSummaryData.sequencing_method_summary);
     const instmod_options = this.getMultOptions(this.props.activeSummaryData.instrument_model_summary);
 
+    const glossary = require('../glossary.json');
+    console.log(glossary["investigation_type"]);
+
     return (
       <div>
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
@@ -214,11 +219,18 @@ var ExploreFilters = React.createClass({
             <FlatButton label="Reset Filters" primary={true} onClick={this.resetFilters}/>
             <Collapsible trigger="General Sample Info" open={true}>
               <h4>Investigation Type</h4>
-              <SelectField value={this.state.filterStates.investigation_type.value} onChange={this.handleFilterChange.bind(this,"investigation_type","investigation_type",5)}>
-                <MenuItem value={"All"} primaryText="All" />
-                {Object.keys(this.props.fullSummaryData.investigation_type_summary)
-                       .map(this.renderMenuItem)}
-              </SelectField>
+              <div>
+                <SelectField value={this.state.filterStates.investigation_type.value} onChange={this.handleFilterChange.bind(this,"investigation_type","investigation_type",5)}>
+                  <MenuItem value={"All"} primaryText="All" />
+                  {Object.keys(this.props.fullSummaryData.investigation_type_summary)
+                         .map(this.renderMenuItem)}
+                </SelectField>
+                <IconButton tooltip="Nucleic Acid Sequence Report is the root element of all MIGS/MIMS compliant reports as standardized by Genomic Standards Consortium. This is a controlled vocabulary." href="/glossary#investigation_type">
+                  <ActionHelp />
+                </IconButton>
+
+              </div>
+
 
               <h4>Environmental Package</h4>
               <SelectField value={this.state.filterStates.env_package.value} onChange={this.handleFilterChange.bind(this,"env_package","env_package",5)}>
