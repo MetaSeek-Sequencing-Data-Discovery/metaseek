@@ -16,7 +16,7 @@ import Tooltip from 'rc-tooltip';
 import Slider from 'rc-slider';
 import ChipInput from 'material-ui-chip-input';
 import IconButton from 'material-ui/IconButton';
-import ActionHelp from 'material-ui/svg-icons/action/help';
+import ActionHelpOutline from 'material-ui/svg-icons/action/help-outline';
 
 const Range = Slider.createSliderWithTooltip(Slider.Range);
 
@@ -225,41 +225,70 @@ var ExploreFilters = React.createClass({
                   {Object.keys(this.props.fullSummaryData.investigation_type_summary)
                          .map(this.renderMenuItem)}
                 </SelectField>
-                <IconButton tooltip="Nucleic Acid Sequence Report is the root element of all MIGS/MIMS compliant reports as standardized by Genomic Standards Consortium. This is a controlled vocabulary." href="/glossary#investigation_type">
-                  <ActionHelp />
+                <IconButton tooltip="The root element of all MIGS/MIMS compliant reports as standardized by Genomic Standards Consortium. This is a controlled vocabulary."  href="/glossary#investigation_type" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"-15px"}} >
+                  <ActionHelpOutline />
                 </IconButton>
 
               </div>
 
 
               <h4>Environmental Package</h4>
-              <SelectField value={this.state.filterStates.env_package.value} onChange={this.handleFilterChange.bind(this,"env_package","env_package",5)}>
-                <MenuItem value={"All"} primaryText="All" />
-                {Object.keys(this.props.fullSummaryData.env_package_summary)
-                       .map(this.renderMenuItem)}
-              </SelectField>
+              <div>
+                <SelectField value={this.state.filterStates.env_package.value} onChange={this.handleFilterChange.bind(this,"env_package","env_package",5)}>
+                  <MenuItem value={"All"} primaryText="All" />
+                  {Object.keys(this.props.fullSummaryData.env_package_summary)
+                         .map(this.renderMenuItem)}
+                </SelectField>
+                <IconButton tooltip="Environment from which the sample was obtained."  href="/glossary#env_package" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"-15px"}} >
+                  <ActionHelpOutline />
+                </IconButton>
+              </div>
+
 
               <h4>Library Source</h4>
-              <SelectField value={this.state.filterStates.library_source.value} onChange={this.handleFilterChange.bind(this,"library_source","library_source",5)}>
-                <MenuItem value={"All"} primaryText="All" />
-                {Object.keys(this.props.fullSummaryData.library_source_summary)
-                       .map(this.renderMenuItem)}
-              </SelectField>
+              <div>
+                <SelectField value={this.state.filterStates.library_source.value} onChange={this.handleFilterChange.bind(this,"library_source","library_source",5)}>
+                  <MenuItem value={"All"} primaryText="All" />
+                  {Object.keys(this.props.fullSummaryData.library_source_summary)
+                         .map(this.renderMenuItem)}
+                </SelectField>
+                <IconButton tooltip="The type of source material that is being sequenced."  href="/glossary#library_source" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"-15px"}} >
+                  <ActionHelpOutline />
+                </IconButton>
+              </div>
+
 
               <h4>Study Type</h4>
-              <SelectField value={this.state.filterStates.study_type.value} onChange={this.handleFilterChange.bind(this,"study_type","study_type",5)}>
-                <MenuItem value={"All"} primaryText="All" />
-                {Object.keys(this.props.fullSummaryData.study_type_summary)
-                       .map(this.renderMenuItem)}
-              </SelectField>
+              <div>
+                <SelectField value={this.state.filterStates.study_type.value} onChange={this.handleFilterChange.bind(this,"study_type","study_type",5)}>
+                  <MenuItem value={"All"} primaryText="All" />
+                  {Object.keys(this.props.fullSummaryData.study_type_summary)
+                         .map(this.renderMenuItem)}
+                </SelectField>
+                <IconButton tooltip="SRA controlled vocabulary for type of study."  href="/glossary#study_type" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"-15px"}} >
+                  <ActionHelpOutline />
+                </IconButton>
+              </div>
+
             </Collapsible>
 
             <Collapsible trigger="Sequencing Info" open={true}>
               <h4>Library Strategy</h4>
-              <Select name="library_strategy" placeholder="Select Sequencing Strategie(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.library_strategy}  options={libstrat_options} onChange={this.handleMultSelectChange.bind(this,"library_strategy")} onClose={this.handleMultipleFilterChange.bind(this,"library_strategy", "library_strategy", 8, this.state.multSelectStates.library_strategy)}/>
+              <div>
+                <Select name="library_strategy" placeholder="Select Sequencing Strategie(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.library_strategy}  options={libstrat_options} onChange={this.handleMultSelectChange.bind(this,"library_strategy")} onClose={this.handleMultipleFilterChange.bind(this,"library_strategy", "library_strategy", 8, this.state.multSelectStates.library_strategy)}/>
+                  <IconButton tooltip="Sequencing technique intended for this library."  href="/glossary#library_strategy" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"-15px"}} >
+                    <ActionHelpOutline />
+                  </IconButton>
+              </div>
 
               <h4>Library Screening Strategy</h4>
-              <Select name="library_screening_strategy" placeholder="Select Screening Strategie(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.library_screening_strategy}  options={libscreenstrat_options} onChange={this.handleMultSelectChange.bind(this,"library_screening_strategy")} onClose={this.handleMultipleFilterChange.bind(this,"library_screening_strategy", "library_screening_strategy", 8, this.state.multSelectStates.library_screening_strategy)}/>
+              <div>
+                <Select name="library_screening_strategy" placeholder="Select Screening Strategie(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.library_screening_strategy}  options={libscreenstrat_options} onChange={this.handleMultSelectChange.bind(this,"library_screening_strategy")} onClose={this.handleMultipleFilterChange.bind(this,"library_screening_strategy", "library_screening_strategy", 8, this.state.multSelectStates.library_screening_strategy)}/>
+                  <IconButton tooltip="Whether any method was used to select for or against, enrich, or screen the material being sequenced."  href="/glossary#library_screening_strategy" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"-15px"}} >
+                    <ActionHelpOutline />
+                  </IconButton>
+              </div>
+
 
               <h4>Library Construction Method</h4>
               <SelectField value={this.state.filterStates.library_construction_method.value} onChange={this.handleFilterChange.bind(this,"library_construction_method","library_construction_method",5)}>
