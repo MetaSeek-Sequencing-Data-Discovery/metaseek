@@ -573,6 +573,10 @@ button.github:after, input[type=submit].github:after {
   margin: 0 0 18px 0;
 }
 
+.filter-field-with-help {
+  float: left;
+}
+
 .explore-headline {
   margin: 0 0 18px 18px;
   position: relative;
