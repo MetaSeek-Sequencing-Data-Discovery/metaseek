@@ -185,16 +185,12 @@ var ExploreFilters = React.createClass({
     )
   },
 
-
   render : function() {
     /* define multiple select options */
     const libstrat_options = this.getMultOptions(this.props.activeSummaryData.library_strategy_summary);
     const libscreenstrat_options = this.getMultOptions(this.props.activeSummaryData.library_screening_strategy_summary);
     const seqmeth_options = this.getMultOptions(this.props.activeSummaryData.sequencing_method_summary);
     const instmod_options = this.getMultOptions(this.props.activeSummaryData.instrument_model_summary);
-
-    const glossary = require('../glossary.json');
-    //console.log(glossary["investigation_type"]);
 
     return (
       <div>

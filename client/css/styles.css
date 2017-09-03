@@ -719,10 +719,26 @@ button.github:after, input[type=submit].github:after {
   text-align: center;
 }
 
-.login-buttons>div {
+.login-buttons {
   margin: 20px;
 }
 
+/* Glossary layout */
+.glossary-paper {
+  margin: 0 15% 0 15%;
+}
+
+.glossary-item {
+  margin: 0 15% 0 15%;
+  text-align: "justify";
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.1em;
+}
+
+.glossary-term {
+  padding: 0 0 0 15%;
+  text-align: "left";
+}
 
 /* Welcome layout */
 
