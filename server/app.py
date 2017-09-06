@@ -9,8 +9,6 @@ import json
 from pyhashxx import hashxx
 from pymemcache.client.base import Client
 import os
-from celery import Celery
-import tasks
 
 dbPass = os.environ['METASEEK_DB']
 
@@ -44,7 +42,7 @@ def json_deserializer(key, value, flags):
 # work for now with the app talking to memcached on localhost
 client = Client(('localhost', 11211), serializer=json_serializer, deserializer=json_deserializer)
 
-
+import tasks
 from helpers import *
 from models import *
 from marshals import *
