@@ -119,7 +119,7 @@ def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cat
                 return logBinnedCounts
 
 def summarizeDatasets(queryObject):
-    filteredQueryObject = queryObject.with_entities(
+    priorityOneFilteredQueryObject = queryObject.with_entities(
         Dataset.download_size_maxrun,
         Dataset.investigation_type,
         Dataset.library_source,
@@ -128,12 +128,18 @@ def summarizeDatasets(queryObject):
         Dataset.library_screening_strategy,
         Dataset.library_construction_method,
         Dataset.study_type,
-        Dataset.sequencing_method,
+        Dataset.sequencing_method
+    )
+
+    priorityTwoFilteredQueryObject = queryObject.with_entities(
         Dataset.instrument_model,
         Dataset.geo_loc_name,
         Dataset.env_biome,
         Dataset.env_feature,
-        Dataset.env_material,
+        Dataset.env_material
+    )
+
+    priorityThreeFilteredQueryObject = queryObject.with_entities(
         Dataset.avg_read_length_maxrun,
         Dataset.gc_percent_maxrun,
         Dataset.meta_latitude,
@@ -142,43 +148,48 @@ def summarizeDatasets(queryObject):
         Dataset.total_num_bases_maxrun
     )
 
-    queryResultDataframe = pd.read_sql(filteredQueryObject.statement,db.session.bind)
+    print 'starting query one'
+    priorityOneQueryResultDataframe = pd.read_sql(priorityOneFilteredQueryObject.statement,db.session.bind)
+    print 'starting query two'
+    priorityTwoQueryResultDataframe = pd.read_sql(priorityTwoFilteredQueryObject.statement,db.session.bind)
+    print 'starting query three'
+    priorityThreeQueryResultDataframe = pd.read_sql(priorityThreeFilteredQueryObject.statement,db.session.bind)
 
-    total = len(queryResultDataframe.index)
+    total = len(priorityOneQueryResultDataframe.index)
     if total > 0:
         # Simple aggregate responses
-        total_download_size = sum(queryResultDataframe['download_size_maxrun'].dropna())
+        total_download_size = sum(priorityOneQueryResultDataframe['download_size_maxrun'].dropna())
         # add more here . . .
 
         # Simple count histogram responses
-        investigation_summary = summarizeColumn(queryResultDataframe,'investigation_type')
-        lib_source_summary = summarizeColumn(queryResultDataframe,'library_source')
-        env_pkg_summary = summarizeColumn(queryResultDataframe,'env_package')
-        lib_strategy_summary = summarizeColumn(queryResultDataframe,'library_strategy')
-        lib_screening_strategy_summary = summarizeColumn(queryResultDataframe,'library_screening_strategy')
-        lib_construction_method_summary = summarizeColumn(queryResultDataframe,'library_construction_method')
-        study_type_summary = summarizeColumn(queryResultDataframe,'study_type')
-        sequencing_method_summary = summarizeColumn(queryResultDataframe,'sequencing_method')
+        investigation_summary = summarizeColumn(priorityOneQueryResultDataframe,'investigation_type')
+        lib_source_summary = summarizeColumn(priorityOneQueryResultDataframe,'library_source')
+        env_pkg_summary = summarizeColumn(priorityOneQueryResultDataframe,'env_package')
+        lib_strategy_summary = summarizeColumn(priorityOneQueryResultDataframe,'library_strategy')
+        lib_screening_strategy_summary = summarizeColumn(priorityOneQueryResultDataframe,'library_screening_strategy')
+        lib_construction_method_summary = summarizeColumn(priorityOneQueryResultDataframe,'library_construction_method')
+        study_type_summary = summarizeColumn(priorityOneQueryResultDataframe,'study_type')
+        sequencing_method_summary = summarizeColumn(priorityOneQueryResultDataframe,'sequencing_method')
 
         #maybe top-10 or top-15 categorical responses
-        instrument_model_summary = summarizeColumn(queryResultDataframe,'instrument_model',num_cats=15)
-        geo_loc_name_summary = summarizeColumn(queryResultDataframe,'geo_loc_name',num_cats=15)
-        env_biome_summary = summarizeColumn(queryResultDataframe,'env_biome',num_cats=15)
-        env_feature_summary = summarizeColumn(queryResultDataframe,'env_feature',num_cats=15)
-        env_material_summary = summarizeColumn(queryResultDataframe,'env_material',num_cats=15)
+        instrument_model_summary = summarizeColumn(priorityTwoQueryResultDataframe,'instrument_model',num_cats=15)
+        geo_loc_name_summary = summarizeColumn(priorityTwoQueryResultDataframe,'geo_loc_name',num_cats=15)
+        env_biome_summary = summarizeColumn(priorityTwoQueryResultDataframe,'env_biome',num_cats=15)
+        env_feature_summary = summarizeColumn(priorityTwoQueryResultDataframe,'env_feature',num_cats=15)
+        env_material_summary = summarizeColumn(priorityTwoQueryResultDataframe,'env_material',num_cats=15)
         # add more here . . .
 
         # Linear binned histogram responses
-        avg_read_length_summary = summarizeColumn(queryResultDataframe,'avg_read_length_maxrun',linearBins=True)
-        gc_percent_summary = summarizeColumn(queryResultDataframe,'gc_percent_maxrun',linearBins=True)
-        lat_summary = summarizeColumn(queryResultDataframe,'meta_latitude',linearBins=True)
-        lon_summary = summarizeColumn(queryResultDataframe,'meta_longitude',linearBins=True)
+        avg_read_length_summary = summarizeColumn(priorityThreeQueryResultDataframe,'avg_read_length_maxrun',linearBins=True)
+        gc_percent_summary = summarizeColumn(priorityThreeQueryResultDataframe,'gc_percent_maxrun',linearBins=True)
+        lat_summary = summarizeColumn(priorityThreeQueryResultDataframe,'meta_latitude',linearBins=True)
+        lon_summary = summarizeColumn(priorityThreeQueryResultDataframe,'meta_longitude',linearBins=True)
         # add more here . . .
 
         # Log binned histogram responses
-        library_reads_sequenced_summary = summarizeColumn(queryResultDataframe,'library_reads_sequenced_maxrun',logBins=True)
-        total_bases_summary = summarizeColumn(queryResultDataframe,'total_num_bases_maxrun',logBins=True)
-        down_size_summary = summarizeColumn(queryResultDataframe,'download_size_maxrun',logBins=True)
+        library_reads_sequenced_summary = summarizeColumn(priorityThreeQueryResultDataframe,'library_reads_sequenced_maxrun',logBins=True)
+        total_bases_summary = summarizeColumn(priorityThreeQueryResultDataframe,'total_num_bases_maxrun',logBins=True)
+        down_size_summary = summarizeColumn(priorityOneQueryResultDataframe,'download_size_maxrun',logBins=True)
         # add more here . . .
 
         # Complex / one-off responses
@@ -194,7 +205,7 @@ def summarizeDatasets(queryObject):
 
         # Map summary is broken because lat / lon are both strings
 
-        latlon  = queryResultDataframe[['meta_latitude','meta_longitude']]
+        latlon  = priorityThreeQueryResultDataframe[['meta_latitude','meta_longitude']]
         latlon = latlon[pd.notnull(latlon['meta_latitude'])]
         latlon = latlon[pd.notnull(latlon['meta_longitude'])]
         if len(latlon) > 1:
