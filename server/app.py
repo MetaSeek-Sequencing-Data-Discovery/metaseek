@@ -9,6 +9,8 @@ import json
 from pyhashxx import hashxx
 from pymemcache.client.base import Client
 import os
+from celery import Celery
+import tasks
 
 dbPass = os.environ['METASEEK_DB']
 
@@ -366,22 +368,8 @@ class BuildCaches(Resource):
             results[cache_key]['rules'] = rules
 
             if from_cache is None:
-                start = datetime.now()
+                tasks.buildCache.delay(cache_key,rules)
                 results[cache_key]['existing-cache'] = False
-
-                queryObject = Dataset.query
-
-                for rule in rules:
-                    field = rule['field']
-                    ruletype = rule['type']
-                    value = rule['value']
-                    queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
-
-                summary = summarizeDatasets(queryObject)
-                client.set(cache_key, summary)
-                finish = datetime.now()
-                results[cache_key]['success'] = True
-                results[cache_key]['cache-load-time'] = str(round((finish - start).total_seconds(),1)) + 's'
             else:
                 results[cache_key]['existing-cache'] = True
 
