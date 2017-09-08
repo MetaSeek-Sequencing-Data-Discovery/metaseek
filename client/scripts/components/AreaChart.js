@@ -1,6 +1,7 @@
 import React from 'react';
 import { VictoryChart, VictoryVoronoiContainer, VictoryArea, VictoryAxis, VictoryTooltip} from 'victory';
 import CustomTheme from './CustomTheme';
+import {getReadableFileSizeString} from '../helpers';
 
 var AreaChart = React.createClass({
 
@@ -13,7 +14,7 @@ var AreaChart = React.createClass({
     // remove nulls / boring values
     var activeFieldDataValidKeys = Object.keys(activeFieldData).filter(
       function(value, index) {
-        if (value == "no data" || value == "other categories" || value == "Other") {
+        if (value == "no data" || value == "other categories") {
           return false; // skip
         } else {
           return true;
@@ -21,11 +22,30 @@ var AreaChart = React.createClass({
       }
     );
 
+    var activeFieldSorted = activeFieldDataValidKeys.sort(function(a, b) {
+      if (a.includes("^")) {
+        var match_a = a.match(/\d+/g); //find all the integers, for 10^2-10^3 will return [10,2,10,3]
+        var match_b = b.match(/\d+/g);
+        return (Math.pow(match_a[0],match_a[1]) - Math.pow(match_b[0],match_b[1]));
+      }
+      else {
+        return (parseInt(a) - parseInt(b))}
+      });
+
     // Format data the way VictoryChart / VictoryArea wants it
-    var chartData = activeFieldDataValidKeys.map(
+    var chartData = activeFieldSorted.map(
       function(value,index) {
         var count = activeFieldData[value];
-        return {"x":parseInt(index),"count":count,"label":value + " : " + count};
+        if (activeField=="download_size_summary") {
+          var match = value.match(/\d+/g);
+          var first = getReadableFileSizeString(Math.pow(match[0],match[1]));
+          var second = getReadableFileSizeString(Math.pow(match[2],match[3]));
+          var newfield = first + " - " + second;
+        }
+        else {
+          var newfield = value;
+        }
+        return {"x":parseInt(index),"count":count,"label":newfield + " : " + count};
       }
     );
 

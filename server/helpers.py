@@ -151,21 +151,21 @@ def summarizeDatasets(queryObject):
         # add more here . . .
 
         # Simple count histogram responses
-        investigation_summary = summarizeColumn(queryResultDataframe,'investigation_type')
+        investigation_summary = summarizeColumn(queryResultDataframe,'investigation_type', num_cats=15)
         lib_source_summary = summarizeColumn(queryResultDataframe,'library_source')
-        env_pkg_summary = summarizeColumn(queryResultDataframe,'env_package')
-        lib_strategy_summary = summarizeColumn(queryResultDataframe,'library_strategy')
-        lib_screening_strategy_summary = summarizeColumn(queryResultDataframe,'library_screening_strategy')
+        env_pkg_summary = summarizeColumn(queryResultDataframe,'env_package', num_cats=15)
+        lib_strategy_summary = summarizeColumn(queryResultDataframe,'library_strategy', num_cats=20)
+        lib_screening_strategy_summary = summarizeColumn(queryResultDataframe,'library_screening_strategy', num_cats=20)
         lib_construction_method_summary = summarizeColumn(queryResultDataframe,'library_construction_method')
         study_type_summary = summarizeColumn(queryResultDataframe,'study_type')
-        sequencing_method_summary = summarizeColumn(queryResultDataframe,'sequencing_method')
+        sequencing_method_summary = summarizeColumn(queryResultDataframe,'sequencing_method', num_cats=10)
 
         #maybe top-10 or top-15 categorical responses
         instrument_model_summary = summarizeColumn(queryResultDataframe,'instrument_model',num_cats=15)
-        geo_loc_name_summary = summarizeColumn(queryResultDataframe,'geo_loc_name',num_cats=15)
-        env_biome_summary = summarizeColumn(queryResultDataframe,'env_biome',num_cats=15)
-        env_feature_summary = summarizeColumn(queryResultDataframe,'env_feature',num_cats=15)
-        env_material_summary = summarizeColumn(queryResultDataframe,'env_material',num_cats=15)
+        geo_loc_name_summary = summarizeColumn(queryResultDataframe,'geo_loc_name',num_cats=20)
+        env_biome_summary = summarizeColumn(queryResultDataframe,'env_biome',num_cats=20)
+        env_feature_summary = summarizeColumn(queryResultDataframe,'env_feature',num_cats=20)
+        env_material_summary = summarizeColumn(queryResultDataframe,'env_material',num_cats=20)
         # add more here . . .
 
         # Linear binned histogram responses
