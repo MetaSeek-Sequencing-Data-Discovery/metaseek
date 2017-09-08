@@ -22,7 +22,7 @@ import HistogramVictory from './HistogramVictory';
 import AreaChart from './AreaChart';
 import WordCloud from './WordCloud';
 import RadarChart from './RadarChart';
-import MapLatLon from './MapLatLon';
+import MapDeckGL from './MapDeckGL';
 import {getReadableFileSizeString} from '../helpers';
 
 var apiRequest = axios.create({
@@ -255,7 +255,7 @@ var Explore = React.createClass({
               </Paper>
               <Paper className="explore-map card right two">
                 <div>
-                  <MapLatLon mapdata={this.state.activeSummaryData.latlon_map}/>
+                  <MapDeckGL />
                 </div>
               </Paper>
               <Paper className="explore-histogram card right one">
