@@ -21,8 +21,7 @@ var MapOverlay = React.createClass({
         'longitude': 0,
         'zoom': 0,
         'maxZoom': 16,
-        'pitch': 10,
-        'bearing': 0
+        'pitch': 0
       }
     }
   },
@@ -52,6 +51,7 @@ var MapOverlay = React.createClass({
       getElevation: f => f.elevation*100,
       lightSettings: LIGHT_SETTINGS,
       pickable: true,
+      onHover: info => console.log('Hovered:', info)
     });
     return (
       <DeckGL {...viewport} layers={ [layer] } onWebGLInitialized={this._initialize} />

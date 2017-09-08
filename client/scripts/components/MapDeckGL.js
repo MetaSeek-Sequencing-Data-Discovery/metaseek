@@ -10,19 +10,19 @@ const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibWV0YXNlZWsiLCJhIjoiY2o3YjQ4anVrMG5vaDMy
 // Source data GeoJSON
 // const DATA_URL = 'https://raw.githubusercontent.com/uber-common/deck.gl-data/master/examples/geojson/vancouver-blocks.json'; // eslint-disable-line
 const data = [
-  {elevation:45,
-  polygon:[[0,0],[0,89.999],[10,89.999],[10,0],[0,0]],
+  {count:45,
+  polygon:[[0,0],[0,50],[10,50],[10,0],[0,0]],
   fillColor: [255, 0, 0]
   },
-  {elevation:16,
+  {count:16,
   polygon:[[0,0],[0,-89.999],[10,-89.999],[10,0],[0,0]],
   fillColor: [128, 255, 0]
   },
-  {elevation:80,
+  {count:80,
   polygon:[[-180,-80],[-180,-70],[-170,-70],[-170,-80],[-180,-80]],
   fillColor: [0, 255, 255]
   },
-  {elevation:25,
+  {count:25,
   polygon:[[-170,-80],[-170,-70],[-160,-70],[-160,-80],[-170,-80]],
   fillColor: [128, 0, 255]
 }];
@@ -36,14 +36,14 @@ var MapDeckGL = React.createClass({
   getInitialState : function() {
     return {
       viewport: {
-        'width': 720,
-        'height': 360,
+        'width': 520,
+        'height': 400,
         'latitude': 0,
         'longitude': 0,
         'zoom': 0,
         'maxZoom': 16,
-        'pitch': 10,
-        'bearing': 0
+        'pitch': 0,
+        'fov':100
       },
       'data': data
     }
@@ -56,14 +56,13 @@ var MapDeckGL = React.createClass({
   },
 
   render : function() {
-    const {viewport, data} = this.state;
     return (
       <MapGL
-        {...viewport}
+        {...this.state.viewport}
         onViewportChange={this._onViewportChange}
         mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}>
         <MapOverlay viewport={this.state.viewport}
-          data={data}
+          data={this.state.data}
           colorScale={colorScale} />
       </MapGL>
     );
