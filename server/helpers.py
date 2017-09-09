@@ -8,6 +8,18 @@ from decimal import Decimal
 from collections import Counter
 from sqlalchemy import or_
 
+#function to get color gradient from max to white
+def getFillColor(count, maxCount, r,g,b):
+    #e.g. [99, 105, 224] is #6369e0; compared to #FFFFFF is [255,255,255]
+    proportion = float(count)/float(maxCount)
+    newr = r + ((255-r)*(1-proportion))
+    newg = g + ((255-g)*(1-proportion))
+    newb = b + ((255-b)*(1-proportion))
+    if newr==255 & newg==255 & newb==255:
+        return 'transparent'
+    else:
+        return [newr, newg, newb]
+
 def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
     fieldattr = getattr(targetClass,field)
     if ruletype == 0:
@@ -197,14 +209,19 @@ def summarizeDatasets(queryObject):
         latlon  = queryResultDataframe[['meta_latitude','meta_longitude']]
         latlon = latlon[pd.notnull(latlon['meta_latitude'])]
         latlon = latlon[pd.notnull(latlon['meta_longitude'])]
+        minLat = np.amin(latlon['meta_latitude'])
+        maxLat = np.amax(latlon['meta_latitude'])
+        minLon = np.amin(latlon['meta_longitude'])
+        maxLon = np.amax(latlon['meta_longitude'])
         if len(latlon) > 1:
-            latlon_map = np.histogram2d(x=latlon['meta_longitude'],y=latlon['meta_latitude'],bins=[36,18], range=[[-180, 180], [-90, 90]])
+            latlon_map = np.histogram2d(x=latlon['meta_longitude'],y=latlon['meta_latitude'],bins=[36,18], range=[[minLon, maxLon], [minLat, maxLat]])
         else:
             latlon_map = np.histogram2d(x=[],y=[],bins=[36,18], range=[[-180, 180], [-90, 90]])
         # range should be flexible to rules in DatasetSearchSummary
         # latlon_map[0] is the lonxlat (XxY) array of counts; latlon_map[1] is the nx/lon bin starts; map[2] ny/lat bin starts
-        lonstepsize = (latlon_map[1][1]-latlon_map[1][0])//2
-        latstepsize = (latlon_map[2][1]-latlon_map[2][0])//2
+        lonstepsize = (latlon_map[1][1]-latlon_map[1][0])/2
+        latstepsize = (latlon_map[2][1]-latlon_map[2][0])/2
+        maxMapCount = np.amax(latlon_map[0])
         map_data = []
         for lon_ix,lonbin in enumerate(latlon_map[0]):
             for lat_ix,latbin in enumerate(lonbin):
@@ -212,7 +229,11 @@ def summarizeDatasets(queryObject):
                 lat = latlon_map[2][lat_ix]+latstepsize
                 lon = latlon_map[1][lon_ix]+lonstepsize
                 value = latbin
-                map_data.append({"lat":lat,"lon":lon,"count":value})
+                #left-bottom, left-top, right-top, right-bottom, left-bottom
+                polygon = [[lon-lonstepsize,lat-latstepsize], [lon-lonstepsize,lat+latstepsize], [lon+lonstepsize,lat+latstepsize], [lon+lonstepsize,lat-latstepsize], [lon-lonstepsize,lat-latstepsize]]
+                fillColor = getFillColor(count=value, maxCount=maxMapCount, r=99, g=105, b=224)
+
+                map_data.append({"lat":lat,"lon":lon,"count":value,"polygon":polygon, "fillColor":fillColor})
 
         return {
             "summary": {

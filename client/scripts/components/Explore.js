@@ -255,7 +255,7 @@ var Explore = React.createClass({
               </Paper>
               <Paper className="explore-map card right two">
                 <div>
-                  <MapDeckGL />
+                  <MapDeckGL mapdata={this.state.activeSummaryData.latlon_map}/>
                 </div>
               </Paper>
               <Paper className="explore-histogram card right one">

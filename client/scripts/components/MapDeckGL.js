@@ -27,16 +27,11 @@ const data = [
   fillColor: [128, 0, 255]
 }];
 
-// const colorScale = r => [r * 255, 140, 200 * (1 - r)];
-const colorScale = d3.scale.linear()
-                         .domain([0, d3.max(data, function(d) {return d.count; })])
-                         .range(["#FFFFFF", "#151174"]);
-
 var MapDeckGL = React.createClass({
   getInitialState : function() {
     return {
       viewport: {
-        'width': 520,
+        'width': 510,
         'height': 400,
         'latitude': 0,
         'longitude': 0,
@@ -45,7 +40,7 @@ var MapDeckGL = React.createClass({
         'pitch': 0,
         'fov':100
       },
-      'data': data
+      mapdata: null
     }
   },
 
@@ -62,8 +57,7 @@ var MapDeckGL = React.createClass({
         onViewportChange={this._onViewportChange}
         mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}>
         <MapOverlay viewport={this.state.viewport}
-          data={this.state.data}
-          colorScale={colorScale} />
+          data={this.props.mapdata} />
       </MapGL>
     );
   }
