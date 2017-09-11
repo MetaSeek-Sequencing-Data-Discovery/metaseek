@@ -40,10 +40,8 @@ var MapOverlay = React.createClass({
     const layer = new PolygonLayer({
       id: 'square',
       data,
-      opacity: 0.6,
-      stroked: false,
       filled: true,
-      extruded: true,
+      extruded: false,
       pickable: true,
       onHover: info => this.showHover(info)
     });

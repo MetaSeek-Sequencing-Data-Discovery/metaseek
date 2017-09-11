@@ -7,18 +7,44 @@ from datetime import datetime
 from decimal import Decimal
 from collections import Counter
 from sqlalchemy import or_
+import scipy.stats as sp
 
 #function to get color gradient from max to white
 def getFillColor(count, maxCount, r,g,b):
     #e.g. [99, 105, 224] is #6369e0; compared to #FFFFFF is [255,255,255]
+    #use rgb provided, make varying opacity from 25-225
     proportion = float(count)/float(maxCount)
-    newr = r + ((255-r)*(1-proportion))
-    newg = g + ((255-g)*(1-proportion))
-    newb = b + ((255-b)*(1-proportion))
-    if newr==255 & newg==255 & newb==255:
-        return 'transparent'
-    else:
-        return [newr, newg, newb]
+    alpha = (200*proportion)+25
+    #newr = r + ((255-r)*(1-proportion))
+    #newg = g + ((255-g)*(1-proportion))
+    #newb = b + ((255-b)*(1-proportion))
+    rgb = [r, g, b, alpha]
+    #if rgb==[255, 255, 255]:
+    #    rgb.append(15)
+    #else:
+    #    rgb.append(175)
+    return rgb
+#function to get color from full opacity to transparent with a set number of bins spanning even percentiles of a range of values
+def getMapBins(map_counts, num_bins): #e.g. latlon_map[0]
+    #find upper limit of percentile for 0 count (for all data is something like 30th)
+    bottom = sp.percentileofscore(map_counts.flatten(), 0.0, kind='weak')
+    #define 10 percentile bins, evenly divide rest of bins above 0 count into nine chunks
+    step = (100-bottom)/(num_bins-1)
+    percentiles = [0]
+    for ix in xrange(0,num_bins-1):
+        percentiles.append(bottom+(ix*step))
+    #find counts that bound each bin
+    countRanges = []
+    for bin in percentiles:
+        countRanges.append(round(np.percentile(map_counts,bin),0))
+    countRanges.append(round(np.amax(map_counts),0))
+    #define fill colors for each of the bins
+    fillColors = []
+    for ix in xrange(0,num_bins):
+        #the 255*0.8 is the max opacity
+        fillColors.append([99, 105, 224, (255*0.7)*(ix/float(num_bins-1))])
+    return percentiles, countRanges, fillColors
+
 
 def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
     fieldattr = getattr(targetClass,field)
@@ -217,6 +243,8 @@ def summarizeDatasets(queryObject):
             latlon_map = np.histogram2d(x=latlon['meta_longitude'],y=latlon['meta_latitude'],bins=[36,18], range=[[minLon, maxLon], [minLat, maxLat]])
         else:
             latlon_map = np.histogram2d(x=[],y=[],bins=[36,18], range=[[-180, 180], [-90, 90]])
+        #define latlon map color bin info
+        percentiles, countRanges, fillColors = getMapBins(latlon_map[0], num_bins=10)
         # range should be flexible to rules in DatasetSearchSummary
         # latlon_map[0] is the lonxlat (XxY) array of counts; latlon_map[1] is the nx/lon bin starts; map[2] ny/lat bin starts
         lonstepsize = (latlon_map[1][1]-latlon_map[1][0])/2
@@ -229,12 +257,14 @@ def summarizeDatasets(queryObject):
                 lat = latlon_map[2][lat_ix]+latstepsize
                 lon = latlon_map[1][lon_ix]+lonstepsize
                 value = latbin
+                buffer=0.0001
                 #left-bottom, left-top, right-top, right-bottom, left-bottom
-                polygon = [[lon-lonstepsize,lat-latstepsize], [lon-lonstepsize,lat+latstepsize], [lon+lonstepsize,lat+latstepsize], [lon+lonstepsize,lat-latstepsize], [lon-lonstepsize,lat-latstepsize]]
-                fillColor = getFillColor(count=value, maxCount=maxMapCount, r=99, g=105, b=224)
+                polygon = [[lon-lonstepsize+buffer,lat-latstepsize+buffer], [lon-lonstepsize+buffer,lat+latstepsize-buffer], [lon+lonstepsize-buffer,lat+latstepsize-buffer], [lon+lonstepsize-buffer,lat-latstepsize+buffer], [lon-lonstepsize,lat-latstepsize]]
+                bin_ix = np.amax(np.argwhere(np.array(percentiles)<=sp.percentileofscore(latlon_map[0].flatten(), value)))
+                fillColor = fillColors[bin_ix]
 
                 map_data.append({"lat":lat,"lon":lon,"count":value,"polygon":polygon, "fillColor":fillColor})
-
+        map_legend_info = {"ranges":countRanges, "fills":fillColors}
         return {
             "summary": {
                 "avg_read_length_summary":avg_read_length_summary,
@@ -249,6 +279,7 @@ def summarizeDatasets(queryObject):
                 "instrument_model_summary":instrument_model_summary,
                 "latitude_summary":lat_summary,
                 "latlon_map":map_data,
+                "map_legend_info":map_legend_info,
                 "library_construction_method_summary":lib_construction_method_summary,
                 "library_reads_sequenced_summary":library_reads_sequenced_summary,
                 "library_screening_strategy_summary":lib_screening_strategy_summary,
@@ -278,6 +309,7 @@ def summarizeDatasets(queryObject):
                 "instrument_model_summary":{},
                 "latitude_summary":{},
                 "latlon_map":{},
+                "map_legend_info":{},
                 "library_construction_method_summary":{},
                 "library_reads_sequenced_summary":{},
                 "library_screening_strategy_summary":{},
