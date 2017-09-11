@@ -254,10 +254,10 @@ var Explore = React.createClass({
                 </div>
                 <span className="callout"><span className="active">{this.state.activeSummaryData.total_datasets} datasets</span> out of <br/>{this.state.fullSummaryData.total_datasets} total datasets</span>
               </Paper>
-              <Paper className="explore-map card right two">
+              <Paper className="explore-map card right four">
                 <div>
-                  <MapDeckGL mapdata={this.state.activeSummaryData.latlon_map}/>
-                  <MapLegend/>
+                  <MapDeckGL className="explore-map-render" mapdata={this.state.activeSummaryData.latlon_map}/>
+                  <MapLegend fills={this.state.activeSummaryData.map_legend_info.fills} ranges={this.state.activeSummaryData.map_legend_info.ranges}/>
                 </div>
               </Paper>
               <Paper className="explore-histogram card right one">

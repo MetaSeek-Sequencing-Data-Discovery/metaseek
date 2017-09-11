@@ -3,22 +3,34 @@ import React from 'react';
 var MapLegend = React.createClass({
   getInitialState : function() {
     return {
-      'alpha0': '0.25',
-      'alpha1': '0.5',
-      'alpha2': '0.75'
+      'fills': null,
+      'countRanges': null
     }
   },
 
-  render : function() {
-
+  renderRect : function(rgb, index) {
     return (
-      <svg width='100' height='500'>
-        <rect x='0' y='0' width='50' height='50' fill='rgb(99,105,224)' opacity={this.state.alpha0} strokeWidth='1' stroke='rgba(0,0,0,255)' />
-        <rect x='0' y='50' width='50' height='50' fill='rgb(99,105,224)' opacity={this.state.alpha1} strokeWidth='1' stroke='rgba(0,0,0,255)' />
-        <rect x='0' y='100' width='50' height='50' fill='rgb(99,105,224)' opacity={this.state.alpha2} strokeWidth='1' stroke='rgba(0,0,0,255)' />
-        <text x='50' y='5'>0</text>
-        <text x='50' y='55'>10.0</text>
-      </svg>
+      <rect x='4' y={110+(30*index)} width='50' height='30' fill='rgb(99,105,224)' fillOpacity={rgb[3]/225} stroke='rgb(125,125,125)' strokeOpacity='1' key={index} />
+    )
+  },
+
+  renderText : function(count, index) {
+    return (
+      <text x='59' y={(index*30)+115} stroke="none" fill='rgb(125,125,125)' fontFamily='Roboto' fontSize='14' key={index}>{count}</text>
+    )
+  },
+
+  render : function() {
+    const fills = this.props.fills;
+    const ranges = this.props.ranges;
+    return (
+      <div className="map-legend">
+        <svg width='100' height='500'>
+          <text x='0' y='90' stroke='none' fill='rgb(125,125,125)' fontFamily='Roboto' fontSize='16'>Dataset Count</text>
+          {fills.map(this.renderRect)};
+          {ranges.map(this.renderText)};
+        </svg>
+      </div>
     );
   }
 });
