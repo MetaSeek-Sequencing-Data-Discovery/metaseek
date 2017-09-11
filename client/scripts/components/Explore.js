@@ -25,6 +25,8 @@ import RadarChart from './RadarChart';
 import MapDeckGL from './MapDeckGL';
 import MapLegend from './MapLegend';
 import {getReadableFileSizeString} from '../helpers';
+import ContentForward from 'material-ui/svg-icons/content/forward';
+import IconButton from 'material-ui/IconButton';
 
 var apiRequest = axios.create({
   baseURL: apiConfig.baseURL
@@ -47,7 +49,8 @@ var Explore = React.createClass({
         'uid':null,
         'name':null,
         'photo':null
-      }
+      },
+      'filtersOpen': true
     }
   },
 
@@ -184,6 +187,10 @@ var Explore = React.createClass({
     this.setState({"wordinput":value});
   },
 
+  toggleFilters : function() {
+    this.setState({filtersOpen: !this.state.filtersOpen});
+  },
+
   render : function() {
     if (!this.state.loaded) return <Loading/>;
 
@@ -220,14 +227,18 @@ var Explore = React.createClass({
           <h2>Explore</h2>
           <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
             <div className="explore-container">
-              <Paper className="explore-filters card left one">
-                <ExploreFilters
-                  className="explore-filter"
-                  updateFilterParams={this.updateFilterParams}
-                  activeSummaryData={this.state.activeSummaryData}
-                  fullSummaryData={this.state.fullSummaryData}
-                />
-              </Paper>
+              <IconButton  iconStyle={{color:"rgb(175,175,175)", width: "100px", height:"60px", position:"fixed", top: "100px", left:"-25px"}} onClick={this.toggleFilters}>
+                  <ContentForward />
+              </IconButton>
+              <text style={{position:"fixed",top:"160px", left:"5px", color:"rgb(175,175,175)", fontFamily:"Roboto"}}>Edit Filters</text>
+              <ExploreFilters
+                className="explore-filter"
+                updateFilterParams={this.updateFilterParams}
+                activeSummaryData={this.state.activeSummaryData}
+                fullSummaryData={this.state.fullSummaryData}
+                open={this.state.filtersOpen}
+                toggleFilters={this.toggleFilters}
+              />
               <Paper className="explore-headline card right two">
                 <div className="profile-container">
                   <span className="welcome-message">

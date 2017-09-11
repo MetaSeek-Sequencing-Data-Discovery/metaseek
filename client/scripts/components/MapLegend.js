@@ -10,7 +10,7 @@ var MapLegend = React.createClass({
 
   renderRect : function(rgb, index) {
     return (
-      <rect x='4' y={110+(30*index)} width='50' height='30' fill='rgb(99,105,224)' fillOpacity={rgb[3]/225} stroke='rgb(125,125,125)' strokeOpacity='1' key={index} />
+      <rect x='4' y={110+(30*index)} width='50' height='30' fill='rgb(99,105,224)' fillOpacity={rgb[3]/255} stroke='rgb(125,125,125)' strokeOpacity='1' key={index} />
     )
   },
 

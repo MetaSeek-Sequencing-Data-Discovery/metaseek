@@ -6,15 +6,6 @@ import DeckGL, {PolygonLayer} from 'deck.gl';
 var MapOverlay = React.createClass({
   getInitialState : function() {
     return {
-      'defaultViewport': {
-        'width': 720,
-        'height': 360,
-        'latitude': 0,
-        'longitude': 0,
-        'zoom': 0,
-        'maxZoom': 16,
-        'pitch': 0
-      },
       hoverInfo : null
     }
   },
@@ -28,7 +19,7 @@ var MapOverlay = React.createClass({
 
   showHover: function(info) {
     this.setState({hoverInfo: info});
-    console.log(this.state.hoverInfo.object.count, this.state.hoverInfo.x, this.state.hoverInfo.y);
+    console.log(this.state.hoverInfo.object.count, this.state.hoverInfo.object.fillColor);
   },
 
   renderTooltip: function() {
