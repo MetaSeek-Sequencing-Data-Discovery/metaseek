@@ -564,6 +564,10 @@ button.github:after, input[type=submit].github:after {
   clear: both;
 }
 
+.four {
+  width: 670px;
+}
+
 .card {
   padding: 18px;
 }
@@ -584,6 +588,19 @@ button.github:after, input[type=submit].github:after {
 
 .explore-map {
   margin: 0 0 18px 18px;
+}
+
+.explore-map-contents {
+  position: absolute;
+  margin: 0 0 0 0;
+}
+
+.map-legend{
+  float: right;
+}
+
+.explore-map-render {
+  margin: 0 0 0 0;
 }
 
 .explore-histogram {
@@ -658,6 +675,7 @@ button.github:after, input[type=submit].github:after {
   background-image: url('/images/BWmapBackground.jpg');
   background-size: cover;
 }
+
 
 .word-cloud-tag-wrapper {
   border: 2px solid rgba(177,178,246,.5);

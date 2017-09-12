@@ -6,15 +6,7 @@ import DeckGL, {PolygonLayer} from 'deck.gl';
 var MapOverlay = React.createClass({
   getInitialState : function() {
     return {
-      'defaultViewport': {
-        'width': 720,
-        'height': 360,
-        'latitude': 0,
-        'longitude': 0,
-        'zoom': 0,
-        'maxZoom': 16,
-        'pitch': 0
-      }
+      hoverInfo : null
     }
   },
 
@@ -26,8 +18,18 @@ var MapOverlay = React.createClass({
   },
 
   showHover: function(info) {
-    console.log(info)
+    this.setState({hoverInfo: info});
+    console.log(this.state.hoverInfo.object.count, this.state.hoverInfo.object.fillColor);
+  },
 
+  renderTooltip: function() {
+    const hoverInfo = this.state.hoverInfo;
+    return hoverInfo && (
+      <div className="tooltipMap" style={{top:hoverInfo.y, left:hoverInfo.x}}>
+        <div><b>{hoverInfo.object.count}</b></div>
+        <div><b>Datasets</b></div>
+      </div>
+    );
   },
 
   render : function() {
@@ -43,10 +45,19 @@ var MapOverlay = React.createClass({
       filled: true,
       extruded: false,
       pickable: true,
-      onHover: info => this.showHover(info)
     });
+
+    const tooltipStyle = {
+      display: this.state.hover ? 'block' : 'none',
+      fill: 'rgb(80,80,80)',
+      opacity: 0.5
+    };
+
     return (
-      <DeckGL {...viewport} layers={ [layer] } onWebGLInitialized={this._initialize} />
+      <div>
+        <DeckGL {...viewport} layers={ [layer] } onWebGLInitialized={this._initialize} onLayerHover={this.showHover}/>
+        {this.renderTooltip}
+      </div>
     );
   }
 });
