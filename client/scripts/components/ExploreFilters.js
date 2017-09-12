@@ -198,13 +198,15 @@ var ExploreFilters = React.createClass({
     const seqmeth_options = this.getMultOptions(this.props.activeSummaryData.sequencing_method_summary);
     const instmod_options = this.getMultOptions(this.props.activeSummaryData.instrument_model_summary);
 
+    const tooltipStyle = { width: 200, whiteSpace: 'normal', textAlign: 'left' };
+
     return (
       <div>
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
           <div>
             <Drawer
               docked={false}
-              width={380}
+              width={340}
               open={this.props.open}
               onRequestChange={this.clickawayFilters}
             >
@@ -228,7 +230,7 @@ var ExploreFilters = React.createClass({
               <Collapsible trigger="General Sample Info" open={true}>
                 <div>
                   <h4 className="filter-field-with-help">Investigation Type</h4>
-                  <IconButton tooltip="The root element of all MIGS/MIMS compliant reports as standardized by Genomic Standards Consortium. This is a controlled vocabulary."  href="/glossary#investigation_type" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                  <IconButton tooltip=<div style={tooltipStyle}>The root element of all MIGS/MIMS compliant reports as standardized by Genomic Standards Consortium. This is a controlled vocabulary.</div> href="/glossary#investigation_type" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                     <ActionHelpOutline />
                   </IconButton>
                 </div>
@@ -240,7 +242,7 @@ var ExploreFilters = React.createClass({
 
                 <div>
                   <h4 className="filter-field-with-help">Environmental Package</h4>
-                  <IconButton tooltip="Environment from which the sample was obtained."  href="/glossary#env_package" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                  <IconButton tooltip=<div style={tooltipStyle}>Environment from which the sample was obtained.</div> href="/glossary#env_package" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                     <ActionHelpOutline />
                   </IconButton>
                 </div>
@@ -252,7 +254,7 @@ var ExploreFilters = React.createClass({
 
                 <div>
                   <h4 className="filter-field-with-help">Library Source</h4>
-                  <IconButton tooltip="The type of source material that is being sequenced."  href="/glossary#library_source" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                  <IconButton tooltip=<div style={tooltipStyle}>The type of source material that is being sequenced.</div> href="/glossary#library_source" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                     <ActionHelpOutline />
                   </IconButton>
                 </div>
@@ -264,7 +266,7 @@ var ExploreFilters = React.createClass({
 
                 <div>
                   <h4 className="filter-field-with-help">Study Type</h4>
-                  <IconButton tooltip="SRA controlled vocabulary for type of study."  href="/glossary#study_type" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                  <IconButton tooltip=<div style={tooltipStyle}>SRA controlled vocabulary for type of study.</div> href="/glossary#study_type" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                     <ActionHelpOutline />
                   </IconButton>
                 </div>
@@ -278,7 +280,7 @@ var ExploreFilters = React.createClass({
               <Collapsible trigger="Sequencing Info" open={false}>
                 <div>
                   <h4 className="filter-field-with-help">Library Strategy</h4>
-                  <IconButton tooltip="Sequencing technique intended for this library."  href="/glossary#library_strategy" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                  <IconButton tooltip=<div style={tooltipStyle}>Sequencing technique intended for this library.</div> href="/glossary#library_strategy" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                     <ActionHelpOutline />
                   </IconButton>
                 </div>
@@ -286,7 +288,7 @@ var ExploreFilters = React.createClass({
 
                 <div>
                   <h4 className="filter-field-with-help">Library Screening Strategy</h4>
-                  <IconButton tooltip="Whether any method was used to select for or against, enrich, or screen the material being sequenced."  href="/glossary#library_screening_strategy" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                  <IconButton tooltip=<div style={tooltipStyle}>Whether any method was used to select for or against, enrich, or screen the material being sequenced.</div> href="/glossary#library_screening_strategy" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                     <ActionHelpOutline />
                   </IconButton>
                 </div>
@@ -294,7 +296,7 @@ var ExploreFilters = React.createClass({
 
                 <div>
                   <h4 className="filter-field-with-help">Library Construction Method</h4>
-                  <IconButton tooltip="Whether to expect single or paired-end reads."  href="/glossary#library_construction_method" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                  <IconButton tooltip=<div style={tooltipStyle}>Whether to expect single or paired-end reads.</div> href="/glossary#library_construction_method" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                     <ActionHelpOutline />
                   </IconButton>
                 </div>
@@ -306,7 +308,7 @@ var ExploreFilters = React.createClass({
 
                 <div>
                   <h4 className="filter-field-with-help">Sequencing Method</h4>
-                  <IconButton tooltip="Sequencing platform used for sequencing. This is a controlled vocabulary."  href="/glossary#sequencing_method" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                  <IconButton tooltip=<div style={tooltipStyle}>Sequencing platform used for sequencing. This is a controlled vocabulary.</div> href="/glossary#sequencing_method" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                     <ActionHelpOutline />
                   </IconButton>
                 </div>
@@ -314,7 +316,7 @@ var ExploreFilters = React.createClass({
 
                 <div>
                   <h4 className="filter-field-with-help">Instrument Model</h4>
-                    <IconButton tooltip="Model of instrument used for sequencing."  href="/glossary#instrument_model" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                    <IconButton tooltip=<div style={tooltipStyle}>Model of instrument used for sequencing.</div> href="/glossary#instrument_model" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                       <ActionHelpOutline />
                     </IconButton>
                 </div>
@@ -322,7 +324,7 @@ var ExploreFilters = React.createClass({
 
                 <div>
                   <h4 className="filter-field-with-help">Average Read Length</h4>
-                    <IconButton tooltip="Average number of nucleotides per sequencing read."  href="/glossary#avg_read_length" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                    <IconButton tooltip=<div style={tooltipStyle}>Average number of nucleotides per sequencing read.</div> href="/glossary#avg_read_length" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                       <ActionHelpOutline />
                     </IconButton>
                 </div>
@@ -353,7 +355,7 @@ var ExploreFilters = React.createClass({
 
                 <div>
                   <h4 className="filter-field-with-help">Percent GC</h4>
-                    <IconButton tooltip="Percent of G or C nucleotides sequenced."  href="/glossary#percent_gc" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                    <IconButton tooltip=<div style={tooltipStyle}>Percent of G or C nucleotides sequenced.</div> href="/glossary#percent_gc" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                       <ActionHelpOutline />
                     </IconButton>
                 </div>
@@ -366,7 +368,7 @@ var ExploreFilters = React.createClass({
 
                 <div>
                   <h4 className="filter-field-with-help">Number of Reads Sequenced</h4>
-                    <IconButton tooltip="Total number of reads sequenced."  href="/glossary#library_reads_sequenced" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                    <IconButton tooltip=<div style={tooltipStyle}>Total number of reads sequenced.</div> href="/glossary#library_reads_sequenced" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                         <ActionHelpOutline />
                       </IconButton>
                 </div>
@@ -404,7 +406,7 @@ var ExploreFilters = React.createClass({
                 />
                 <div>
                   <h4 className="filter-field-with-help">Environmental Biome</h4>
-                  <IconButton tooltip="The broad ecological context of a sample. From the EnvO ontology."  href="/glossary#env_biome" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                  <IconButton tooltip=<div style={tooltipStyle}>The broad ecological context of a sample. From the EnvO ontology.</div> href="/glossary#env_biome" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                     <ActionHelpOutline />
                   </IconButton>
                 </div>
@@ -414,7 +416,7 @@ var ExploreFilters = React.createClass({
                 />
                 <div>
                   <h4 className="filter-field-with-help">Environmental Feature</h4>
-                  <IconButton tooltip="A descriptor of the more local environment. From the EnvO ontology."  href="/glossary#env_feature" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                  <IconButton tooltip=<div style={tooltipStyle}>A descriptor of the more local environment. From the EnvO ontology.</div> href="/glossary#env_feature" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                     <ActionHelpOutline />
                   </IconButton>
                 </div>
@@ -423,7 +425,7 @@ var ExploreFilters = React.createClass({
                 />
                 <div>
                   <h4 className="filter-field-with-help">Environmental Material</h4>
-                    <IconButton tooltip="The material in which a sample was embedded prior to the sampling event. From the EnvO ontology."  href="/glossary#env_material" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                    <IconButton tooltip=<div style={tooltipStyle}>The material in which a sample was embedded prior to the sampling event. From the EnvO ontology.</div> href="/glossary#env_material" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                       <ActionHelpOutline />
                     </IconButton>
                 </div>
@@ -432,7 +434,7 @@ var ExploreFilters = React.createClass({
                 />
                 <div>
                   <h4 className="filter-field-with-help">Geographic Location</h4>
-                    <IconButton tooltip="Geographical origin of the sample as defined by the country or sea name followed by specific region name. Ontology field."  href="/glossary#geo_loc_name" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
+                    <IconButton tooltip=<div style={tooltipStyle}>Geographical origin of the sample as defined by the country or sea name followed by specific region name. Ontology field.</div> href="/glossary#geo_loc_name" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                       <ActionHelpOutline />
                     </IconButton>
                 </div>
