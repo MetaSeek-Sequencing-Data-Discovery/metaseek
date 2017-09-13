@@ -189,6 +189,7 @@ var Explore = React.createClass({
 
   toggleFilters : function() {
     this.setState({filtersOpen: !this.state.filtersOpen});
+
   },
 
   render : function() {
@@ -227,6 +228,15 @@ var Explore = React.createClass({
           <h2>Explore</h2>
           <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
             <div className="explore-container">
+              <div className="save-discovery-button-container">
+                <RaisedButton
+                  className="save-discovery-button"
+                  onClick={this.state.firebase.uid ? this.submitDiscovery : this.triggerGoogleLogin}
+                  primary={true}
+                  label="Save Discovery"
+                />
+              </div>
+
               <IconButton  iconStyle={{color:"rgb(175,175,175)", width: "100px", height:"60px", position:"fixed", top: "100px", left:"-25px"}} onClick={this.toggleFilters}>
                   <ContentForward />
               </IconButton>
@@ -239,32 +249,53 @@ var Explore = React.createClass({
                 open={this.state.filtersOpen}
                 toggleFilters={this.toggleFilters}
               />
-              <Paper className="explore-headline card right two">
+
+            <Paper className="explore-headline card left overview-size">
                 <div className="profile-container">
-                  <span className="welcome-message">
-                    {this.state.firebase.uid ? "Hi, " + this.state.firebase.name + ". Thanks for using MetaSeek!" : "Create an account or log in with Google to save your discoveries."}
-                  </span>
-                  {//<div className="profile-image-container">
-                    //<img className="profile-image" style={{'display':this.state.firebase.uid ? 'inline' : 'none'}} src={this.state.firebase.photo}/>
-                  //</div>
-                  }
+                  <span className="overview-title">Number of Datasets</span>
                   <br/>
-                  <RaisedButton
-                    className="profile-button"
-                    onClick={this.state.firebase.uid ? this.submitDiscovery : this.triggerGoogleLogin}
-                    primary={true}
-                    label={this.state.firebase.uid ? "Save Discovery" : "Log In With Google"}
-                  />
-                  <RaisedButton
-                    className="profile-button"
-                    label="Log Out"
-                    onClick={this.triggerLogout}
-                    primary={true}
-                    disabled={!(this.state.firebase.uid)}
-                  />
+                  <svg width="100%" height="10">
+                    <line x1="0" y1="5" x2="100%" y2="5" stroke="gray" stroke-width="5"  />
+                  </svg>
+                  <br/>
+                  <span className="overview-content"><span className="active">{this.state.activeSummaryData.total_datasets} datasets</span> <br className="big-br" /> out of {this.state.fullSummaryData.total_datasets} total datasets</span>
                 </div>
-                <span className="callout"><span className="active">{this.state.activeSummaryData.total_datasets} datasets</span> out of <br/>{this.state.fullSummaryData.total_datasets} total datasets</span>
               </Paper>
+              <Paper className="explore-headline card left overview-size">
+                <div className="profile-container">
+                  <span className="overview-title">Estimated Total Download Size</span>
+                  <br/>
+                  <svg width="100%" height="10">
+                    <line x1="0" y1="5" x2="100%" y2="5" stroke="gray" stroke-width="5"  />
+                  </svg>
+                  <br/>
+                  <span className="overview-content-download"> {getReadableFileSizeString(this.state.activeSummaryData.total_download_size)} </span>
+                </div>
+              </Paper>
+              <Paper className="explore-headline card left overview-size">
+                <div className="profile-container">
+                  <span className="overview-title">User</span>
+                  <br/>
+                  <svg width="100%" height="10">
+                    <line x1="0" y1="5" x2="100%" y2="5" stroke="gray" stroke-width="5"  />
+                  </svg>
+                  <br/>
+                  <div className="overview-content-user">
+                    <span >
+                      {this.state.firebase.uid ? "Hi, " + this.state.firebase.name + ". Thanks for using MetaSeek!" : "Create an account or log in with Google to save your discoveries."}
+                    </span>
+                    <br className="big-br"/>
+                    <RaisedButton
+                      className="profile-button"
+                      onClick={this.state.firebase.uid ?  this.triggerLogout : this.triggerGoogleLogin }
+                      primary={this.state.firebase.uid ? false : true}
+                      label={this.state.firebase.uid ? "Log Out" : "Log In With Google" }
+                    />
+                  </div>
+
+                </div>
+              </Paper>
+
               <Paper className="explore-map card right four">
                 <div>
                   <MapDeckGL className="explore-map-render" mapdata={this.state.activeSummaryData.latlon_map}/>

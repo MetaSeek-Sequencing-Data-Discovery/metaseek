@@ -419,6 +419,14 @@ body {
   font-size: 1.4rem;
 }
 
+br {
+  line-height: 22px;
+}
+
+.big-br {
+  line-height: 36px;
+}
+
 h1 {
   font-family: 'Roboto', sans-serif;
   font-weight: 300;
@@ -483,11 +491,67 @@ ul {
   float:right;
 }
 
+.save-discovery-button-container {
+  margin: 0 auto;
+  position: relative;
+}
+
 .save-discovery-button {
+  width: 200px;
+  margin: 18px 0 18px -100px;
+  left: 50%;
+  position: relative;
+}
+
+.overview-layer {
+  margin: 18px;
+  padding: 18px;
+}
+
+.overview-content {
+  font-weight: 300;
+  position: relative;
+  display: block;
+  top: 28%;
+  font-size: 18px;
+  color:#666;
+  margin: 44px 0 44px 0;
+  text-align: center;
+}
+
+.overview-content .active {
   font-weight: 700;
-  font-size: 30px;
-  margin-left: 288px;
-  margin-bottom: 18px;
+  font-size: 38px;
+  color: rgb(99, 105, 224);
+}
+
+.overview-content-download {
+  font-weight: 700;
+  position: relative;
+  display: block;
+  top: 28%;
+  font-size: 38px;
+  color: rgb(99, 105, 224);
+  margin: 62px 0 62px 0;
+  text-align: center;
+}
+
+.overview-content-user {
+  font-weight: 300;
+  position: relative;
+  display: block;
+  top: 28%;
+  font-size: 18px;
+  color:#666;
+  margin: 36px 0 36px 0;
+  padding: 0 20px 0 20px;
+  text-align: center;
+}
+
+.overview-title {
+  font-size:18px;
+  font-weight: bold;
+  color: rgb(60,60,60);
 }
 
 .button-link {
@@ -538,7 +602,7 @@ button.github:after, input[type=submit].github:after {
 /* Explore layout */
 
 .explore-container {
-  width: 1176px;
+  width: 1200px;
   margin: 10px auto;
 }
 
@@ -553,6 +617,11 @@ button.github:after, input[type=submit].github:after {
 /* 3 card grid, 380px per card, 18px per gutter between cards */
 .one {
   width: 380px;
+}
+
+.overview-size {
+  width: 380px;
+  height: 250px;
 }
 
 .two {
@@ -647,7 +716,7 @@ button.github:after, input[type=submit].github:after {
 }
 
 .profile-container {
-  display:inline-block;
+  display:block;
 }
 
 .welcome-message {
@@ -661,8 +730,11 @@ button.github:after, input[type=submit].github:after {
 }
 
 .profile-button {
-  margin: 12px 12px 0 12px;
+  width: 180px;
+  position: relative;
 }
+
+
 
 .explore-map-container {
   width: 742px;
