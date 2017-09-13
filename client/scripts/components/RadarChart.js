@@ -1,7 +1,5 @@
 import React from 'react';
 import {VictoryChart, VictoryArea, VictoryPolarAxis, VictoryVoronoiContainer, VictoryLabel, VictoryTooltip} from 'victory';
-import CustomTheme from './CustomTheme';
-
 
 var RadarChart = React.createClass({
 
@@ -28,7 +26,7 @@ var RadarChart = React.createClass({
       <div className="radar-container">
         <VictoryChart
           polar
-          theme={CustomTheme.metaseek}
+          theme={this.props.colortheme}
           domain={{ y: [ 0, 1 ] }}
           containerComponent={<VictoryVoronoiContainer/>}
           >
@@ -52,7 +50,7 @@ var RadarChart = React.createClass({
                   }}
                   labelPlacement="parallel"
                   axisValue={i + 1}
-                  label={radardata[key]["x"].substring(0,10)}
+                  label={radardata[key]["x"]}
                   tickFormat={(t) => Math.ceil(t * countmax)}
                   tickValues={[0]}
                 />

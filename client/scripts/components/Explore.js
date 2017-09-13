@@ -17,7 +17,6 @@ import Header from './Header';
 import ExploreFilters from './ExploreFilters';
 import ExploreTable from './ExploreTable';
 import Loading from './Loading';
-import HeatmapChart from './HeatmapChart';
 import HistogramVictory from './HistogramVictory';
 import AreaChart from './AreaChart';
 import WordCloud from './WordCloud';
@@ -27,6 +26,9 @@ import MapLegend from './MapLegend';
 import {getReadableFileSizeString} from '../helpers';
 import ContentForward from 'material-ui/svg-icons/content/forward';
 import IconButton from 'material-ui/IconButton';
+
+import BPTheme from './CustomVictoryTheme_BP';
+import TurquoiseTheme from './CustomVictoryTheme_turquoise';
 
 var apiRequest = axios.create({
   baseURL: apiConfig.baseURL
@@ -41,6 +43,7 @@ var Explore = React.createClass({
       'histinput':'investigation_type_summary',
       'areainput':'library_reads_sequenced_summary',
       'radarinput':'library_source_summary',
+      'generalinfo_radarinput': 'investigation_type_summary',
       'wordinput':'env_biome_summary',
       'filter_params':JSON.stringify({'rules':[]}),
       'loaded':false,
@@ -183,6 +186,10 @@ var Explore = React.createClass({
     this.setState({"radarinput":value});
   },
 
+  handleGeneralRadarSelect : function(event,index,value) {
+    this.setState({"generalinfo_radarinput":value});
+  },
+
   handleWordSelect : function(event,index,value) {
     this.setState({"wordinput":value});
   },
@@ -196,6 +203,7 @@ var Explore = React.createClass({
     if (!this.state.loaded) return <Loading/>;
 
     const radarfields = ['study_type_summary','library_source_summary','investigation_type_summary','env_package_summary'];
+    const generalinfo_radarfields = ['library_source_summary','investigation_type_summary'];
     const wordfields = ['env_biome_summary','env_feature_summary','env_material_summary','geo_loc_name_summary'];
     const areafields = ['avg_read_length_summary', 'download_size_summary', 'gc_percent_summary', 'latitude_summary', 'longitude_summary', 'library_reads_sequenced_summary', 'total_bases_summary'];
     const histfields = ['sequencing_method_summary', 'instrument_model_summary', 'library_strategy_summary', 'library_screening_strategy_summary', 'library_construction_method_summary', 'investigation_type_summary', 'env_package_summary', 'library_source_summary', 'study_type_summary']
@@ -258,7 +266,7 @@ var Explore = React.createClass({
                   <span className="overview-title">Number of Datasets</span>
                   <br/>
                   <svg width="100%" height="10">
-                    <line x1="0" y1="5" x2="100%" y2="5" stroke="gray" stroke-width="5"  />
+                    <line x1="0" y1="5" x2="100%" y2="5" stroke="gray"  />
                   </svg>
                   <br/>
                   <span className="overview-content"><span className="active">{this.state.activeSummaryData.total_datasets} datasets</span> <br className="big-br" /> out of {this.state.fullSummaryData.total_datasets} total datasets</span>
@@ -269,7 +277,7 @@ var Explore = React.createClass({
                   <span className="overview-title">Estimated Total Download Size</span>
                   <br/>
                   <svg width="100%" height="10">
-                    <line x1="0" y1="5" x2="100%" y2="5" stroke="gray" stroke-width="5"  />
+                    <line x1="0" y1="5" x2="100%" y2="5" stroke="gray"  />
                   </svg>
                   <br/>
                   <span className="overview-content-download"> {getReadableFileSizeString(this.state.activeSummaryData.total_download_size)} </span>
@@ -280,7 +288,7 @@ var Explore = React.createClass({
                   <span className="overview-title">User</span>
                   <br/>
                   <svg width="100%" height="10">
-                    <line x1="0" y1="5" x2="100%" y2="5" stroke="gray" stroke-width="5"  />
+                    <line x1="0" y1="5" x2="100%" y2="5" stroke="gray" />
                   </svg>
                   <br/>
                   <div className="overview-content-user">
@@ -295,8 +303,26 @@ var Explore = React.createClass({
                       label={this.state.firebase.uid ? "Log Out" : "Log In With Google" }
                     />
                   </div>
-
                 </div>
+              </Paper>
+
+              <Paper className="explore-radarchart card left one">
+                <div className="explore-select">
+                  <SelectField value={this.state.generalinfo_radarinput} onChange={this.handleGeneralRadarSelect}>
+                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
+                      if (value.indexOf('summary') !== -1 && generalinfo_radarfields.includes(value)) {
+                        return true;
+                      } else {
+                        return false;
+                      }
+                    }).map(function(value, index) {
+                      return (
+                        <MenuItem key={index} value={value} primaryText={value} />
+                      )
+                    })}
+                  </SelectField>
+                </div>
+                <RadarChart activeSummaryData={this.state.activeSummaryData} radarinput={this.state.generalinfo_radarinput} colortheme={TurquoiseTheme.metaseek}/>
               </Paper>
 
               <Paper className="explore-map card right four">
@@ -356,7 +382,7 @@ var Explore = React.createClass({
                     })}
                   </SelectField>
                 </div>
-                <RadarChart activeSummaryData={this.state.activeSummaryData} radarinput={this.state.radarinput}/>
+                <RadarChart activeSummaryData={this.state.activeSummaryData} radarinput={this.state.radarinput} colortheme={BPTheme.metaseek}/>
               </Paper>
               <Paper className="explore-areachart card right one">
                 <div className="explore-select">
