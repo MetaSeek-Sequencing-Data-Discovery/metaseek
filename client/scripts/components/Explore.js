@@ -205,7 +205,10 @@ var Explore = React.createClass({
         if (activeSummaryData.empty) {
           return <h3>Sorry, no matches!</h3>
         } else {
-          return <HeatmapChart data={activeSummaryData.latlon_map}/>
+          return <div>
+            <MapDeckGL className="explore-map-render" mapdata={activeSummaryData.latlon_map}/>
+            <MapLegend fills={activeSummaryData.map_legend_info.fills} ranges={activeSummaryData.map_legend_info.ranges}/>
+          </div>
         }
       } else {
         return <div>
@@ -298,8 +301,7 @@ var Explore = React.createClass({
 
               <Paper className="explore-map card right four">
                 <div>
-                  <MapDeckGL className="explore-map-render" mapdata={this.state.activeSummaryData.latlon_map}/>
-                  <MapLegend fills={this.state.activeSummaryData.map_legend_info.fills} ranges={this.state.activeSummaryData.map_legend_info.ranges}/>
+                  {mapRender(this.state.activeSummaryData,this.state.processing)}
                 </div>
               </Paper>
               <Paper className="explore-histogram card right one">
