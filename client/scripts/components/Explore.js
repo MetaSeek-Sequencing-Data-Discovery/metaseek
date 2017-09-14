@@ -447,26 +447,7 @@ var Explore = React.createClass({
                 </div>
                 <AreaChart activeSummaryData={this.state.activeSummaryData} areainput={this.state.seqinfo_areainput} colortheme={YellowTheme.metaseek}/>
               </Paper>
-
-              <Paper className="explore-histogram card right one">
-                <div className="explore-select">
-                  <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>
-                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
-                      if (value.indexOf('summary') !== -1 && histfields.includes(value)) {
-                        return true;
-                      } else {
-                        return false;
-                      }
-                    }).map(function(value, index) {
-                        return (
-                          <MenuItem key={index} value={value} primaryText={value} />
-                        )
-                    })}
-                  </SelectField>
-                </div>
-                <HistogramVictory activeSummaryData={this.state.activeSummaryData} histinput={this.state.histinput}/>
-              </Paper>
-              <Paper className="explore-wordcloud card right one">
+              <Paper className="explore-wordcloud card left six">
                 <div className="explore-select">
                   <SelectField value={this.state.wordinput} onChange={this.handleWordSelect}>
                     {Object.keys(this.state.activeSummaryData).filter(function(value) {
@@ -484,50 +465,7 @@ var Explore = React.createClass({
                 </div>
                 <WordCloud activeSummaryData={this.state.activeSummaryData} wordinput={this.state.wordinput}/>
               </Paper>
-              <Paper className="explore-radarchart card right one">
-                <div className="explore-select">
-                  <SelectField value={this.state.radarinput} onChange={this.handleRadarSelect}>
-                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
-                      if (value.indexOf('summary') !== -1 && radarfields.includes(value)) {
-                        return true;
-                      } else {
-                        return false;
-                      }
-                    }).map(function(value, index) {
-                      return (
-                        <MenuItem key={index} value={value} primaryText={value} />
-                      )
-                    })}
-                  </SelectField>
-                </div>
-                <RadarChart activeSummaryData={this.state.activeSummaryData} radarinput={this.state.radarinput} colortheme={BPTheme.metaseek}/>
-              </Paper>
-              <Paper className="explore-areachart card right one">
-                <div className="explore-select">
-                  <SelectField value={this.state.areainput} onChange={this.handleAreaSelect}>
-                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
-                      if (value.indexOf('summary') !== -1 && areafields.includes(value)) {
-                        return true;
-                      } else {
-                        return false;
-                      }
-                    }).map(function(value, index) {
-                        return (
-                          <MenuItem key={index} value={value} primaryText={value} />
-                        )
-                    })}
-                  </SelectField>
-                </div>
-                <AreaChart activeSummaryData={this.state.activeSummaryData} areainput={this.state.areainput}/>
-              </Paper>
-              <Paper className="explore-download card right two">
-                <span className="download-info">{getReadableFileSizeString(this.state.activeSummaryData.total_download_size)} <span className="download-info-tag">estimated download size</span></span>
-                <RaisedButton
-                  className="download-button"
-                  primary={true}
-                  label="Download datasets"
-                />
-              </Paper>
+
               <Paper className="explore-table card three">
                 <ExploreTable getNextDataPage={this.getNextDataPage} getPreviousDataPage={this.getPreviousDataPage} dataTable={this.state.dataTable}/>
               </Paper>

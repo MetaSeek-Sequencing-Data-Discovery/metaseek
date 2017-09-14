@@ -53,7 +53,6 @@ var PieVictory = React.createClass({
           data={pieData}
           x="x"
           y="count"
-          labels="label"
           theme={this.props.colortheme}
           padAngle={3}
           innerRadius={100}

@@ -52,6 +52,9 @@ var AreaChart = React.createClass({
       <div className="area-container">
         <VictoryChart
           theme={this.props.colortheme}
+          width={380}
+          height={240}
+          padding={{top: 20, right: 10, bottom: 10, left: 10 }}
           containerComponent={
             <VictoryVoronoiContainer
               dimension="x"
