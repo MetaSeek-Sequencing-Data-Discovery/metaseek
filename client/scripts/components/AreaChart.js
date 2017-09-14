@@ -1,6 +1,5 @@
 import React from 'react';
 import { VictoryChart, VictoryVoronoiContainer, VictoryArea, VictoryAxis, VictoryTooltip} from 'victory';
-import CustomTheme from './CustomTheme';
 import {getReadableFileSizeString} from '../helpers';
 
 var AreaChart = React.createClass({
@@ -52,7 +51,10 @@ var AreaChart = React.createClass({
     return(
       <div className="area-container">
         <VictoryChart
-          theme={CustomTheme.metaseek}
+          theme={this.props.colortheme}
+          width={380}
+          height={240}
+          padding={{top: 20, right: 10, bottom: 10, left: 10 }}
           containerComponent={
             <VictoryVoronoiContainer
               dimension="x"
@@ -74,7 +76,8 @@ var AreaChart = React.createClass({
             x="x"
             y="count"
             style={{
-              data: { fillOpacity: 0.5, strokeWidth: 2 }
+              data: { fillOpacity: 0.5, strokeWidth: 2 },
+              labels: { fill: "#333",fontSize: 12 }
             }}
           />
         </VictoryChart>

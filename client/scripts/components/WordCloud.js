@@ -16,7 +16,14 @@ var WordCloud = React.createClass({
     // Order matters - higher values will get the later colors in this list
     // Another good option http://colorbrewer2.org/?type=sequential&scheme=BuGn&n=7
     // var colors = ['#a6bddb','#67a9cf','#3690c0','#02818a','#016450'];
-    var colors = ["#6369E0","#8387E6","#9396E9","#C3C3F2","#FFD3C8","#FFCBBE","#FC99E8","#FCADEC","#FCC1F0","#82FFEA","#A9FFF0","#C3FFF4","#FFB3A0","#B1FEF1","#88D7FF","#A0DFFF","#B8E7FF"];
+
+    var colors = [
+      "#6369E0",
+      "#F79C6F",
+      "#F2C160",
+      "#23BEC6",
+      "#f26f63"
+    ];
 
     // Min / max font sizes in pixels for words in word cloud
     var min = 8;

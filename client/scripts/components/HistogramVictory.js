@@ -1,6 +1,5 @@
 import React from 'react';
 import { VictoryBar, VictoryChart, VictoryVoronoiContainer, VictoryAxis, VictoryLabel, VictoryTooltip} from 'victory';
-import CustomTheme from './CustomTheme';
 
 
 var HistogramVictory = React.createClass({
@@ -38,7 +37,9 @@ var HistogramVictory = React.createClass({
     return(
       <div className="histogram-container">
         <VictoryChart
-          theme={CustomTheme.metaseek}
+          theme={this.props.colortheme}
+          width={778}
+          padding={{top: 0, right: 25, bottom: 5, left: 65 }}
           // domainPadding will add space to each side of VictoryBar to
           // prevent it from overlapping the axis
           domainPadding={50}
