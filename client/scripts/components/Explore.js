@@ -290,7 +290,7 @@ var Explore = React.createClass({
                     <line x1="0" y1="5" x2="100%" y2="5" stroke="gray"  />
                   </svg>
                   <br/>
-                  <span className="overview-content"><span className="active">{this.state.activeSummaryData.total_datasets} datasets</span> <br className="big-br" /> out of {this.state.fullSummaryData.total_datasets} total datasets</span>
+                  <span className="overview-content">currently showing <br className="big-br" /><span className="active">{this.state.activeSummaryData.total_datasets} datasets</span> <br className="big-br" /> out of {this.state.fullSummaryData.total_datasets} total datasets</span>
                 </div>
               </Paper>
               <Paper className="explore-headline card left overview-size">
@@ -313,9 +313,17 @@ var Explore = React.createClass({
                   </svg>
                   <br/>
                   <div className="overview-content-user">
-                    <span >
-                      {this.state.firebase.uid ? "Hi, " + this.state.firebase.name + ". Thanks for using MetaSeek!" : "Create an account or log in with Google to save your discoveries."}
-                    </span>
+                    {this.state.firebase.uid ?
+                    <div className="overview-content-user-active">
+                      <div className="user-photo">
+                        <img src={this.state.firebase.photo} alt="" width="75px" height="75px"/>
+                      </div>
+                      <div className="user-active-message">
+                        <span>{"Hi, " + this.state.firebase.name + ". Thanks for using MetaSeek!"}</span>
+                      </div>
+                    </div>
+                    : <span className="overview-content-user-inactive">Create an account or log in with Google to save your discoveries.</span>
+                    }
                     <br className="big-br"/>
                     <RaisedButton
                       className="profile-button"

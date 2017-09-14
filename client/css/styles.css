@@ -514,7 +514,7 @@ ul {
   top: 28%;
   font-size: 18px;
   color:#666;
-  margin: 44px 0 44px 0;
+  margin: 26px 0 26px 0;
   text-align: center;
 }
 
@@ -542,9 +542,28 @@ ul {
   top: 28%;
   font-size: 18px;
   color:#666;
-  margin: 36px 0 36px 0;
-  padding: 0 20px 0 20px;
   text-align: center;
+  margin: 36px 0 0 0;
+  padding: 0 20px 0 20px;
+}
+
+.overview-content-user-inactive {
+  margin: 18px 0 36px 0;
+  text-align: center;
+}
+
+.overview-content-user-active {
+  text-align: center;
+  margin: -20px 0 0 0;
+}
+
+.user-photo {
+  float: left;
+}
+
+.user-active-message {
+  text-align: right;
+  padding: 18px 0 10px 0;
 }
 
 .overview-title {
