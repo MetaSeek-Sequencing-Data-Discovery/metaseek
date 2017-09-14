@@ -21,14 +21,17 @@ import HistogramVictory from './HistogramVictory';
 import AreaChart from './AreaChart';
 import WordCloud from './WordCloud';
 import RadarChart from './RadarChart';
+import PieVictory from './PieVictory';
 import MapDeckGL from './MapDeckGL';
 import MapLegend from './MapLegend';
 import {getReadableFileSizeString} from '../helpers';
 import ContentForward from 'material-ui/svg-icons/content/forward';
 import IconButton from 'material-ui/IconButton';
+import ActionHelpOutline from 'material-ui/svg-icons/action/help-outline';
 
 import BPTheme from './CustomVictoryTheme_BP';
 import TurquoiseTheme from './CustomVictoryTheme_turquoise';
+import YellowTheme from './CustomVictoryTheme_Y';
 
 var apiRequest = axios.create({
   baseURL: apiConfig.baseURL
@@ -41,6 +44,8 @@ var Explore = React.createClass({
       'activeSummaryData': [],
       'dataTable': {},
       'histinput':'investigation_type_summary',
+      'generalinfo_histinput':'env_package_summary',
+      'seqinfo_histinput': 'library_strategy_summary',
       'areainput':'library_reads_sequenced_summary',
       'radarinput':'library_source_summary',
       'generalinfo_radarinput': 'investigation_type_summary',
@@ -178,6 +183,14 @@ var Explore = React.createClass({
     this.setState({"histinput":value});
   },
 
+  handleGeneralHistSelect : function(event,index,value) {
+    this.setState({"generalinfo_histinput":value});
+  },
+
+  handleSeqHistSelect : function(event, index, value) {
+    this.setState({"seqinfo_histinput":value});
+  },
+
   handleAreaSelect : function(event,index,value) {
     this.setState({"areainput":value});
   },
@@ -206,7 +219,9 @@ var Explore = React.createClass({
     const generalinfo_radarfields = ['library_source_summary','investigation_type_summary'];
     const wordfields = ['env_biome_summary','env_feature_summary','env_material_summary','geo_loc_name_summary'];
     const areafields = ['avg_read_length_summary', 'download_size_summary', 'gc_percent_summary', 'latitude_summary', 'longitude_summary', 'library_reads_sequenced_summary', 'total_bases_summary'];
-    const histfields = ['sequencing_method_summary', 'instrument_model_summary', 'library_strategy_summary', 'library_screening_strategy_summary', 'library_construction_method_summary', 'investigation_type_summary', 'env_package_summary', 'library_source_summary', 'study_type_summary']
+    const histfields = ['sequencing_method_summary', 'instrument_model_summary', 'library_strategy_summary', 'library_screening_strategy_summary', 'library_construction_method_summary', 'investigation_type_summary', 'env_package_summary', 'library_source_summary', 'study_type_summary'];
+    const generalinfo_histfields = ['env_package_summary', 'study_type_summary'];
+    const seqinfo_histfields = ['library_strategy_summary', 'library_screening_strategy_summary'];
 
     var mapRender = function(activeSummaryData,isProcessing) {
       if (!isProcessing) {
@@ -307,6 +322,13 @@ var Explore = React.createClass({
               </Paper>
 
               <Paper className="explore-radarchart card left one">
+                <div className="figure-hint-container">
+                  <span className="figure-hint-label">General Sample Info</span>
+                  <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for each controlled vocabulary value for some General Sample Info fields. Use the select field to change the input value</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                  <br/>
+                </div>
                 <div className="explore-select">
                   <SelectField value={this.state.generalinfo_radarinput} onChange={this.handleGeneralRadarSelect}>
                     {Object.keys(this.state.activeSummaryData).filter(function(value) {
@@ -325,11 +347,75 @@ var Explore = React.createClass({
                 <RadarChart activeSummaryData={this.state.activeSummaryData} radarinput={this.state.generalinfo_radarinput} colortheme={TurquoiseTheme.metaseek}/>
               </Paper>
 
-              <Paper className="explore-map card right four">
+              <Paper className="explore-histogram card left two">
+                <div className="figure-hint-container">
+                  <span className="figure-hint-label">General Sample Info</span>
+                  <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for each controlled vocabulary value for some General Sample Info fields. Use the select field to change the input value</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                  <br/>
+                </div>
+                <div className="explore-select">
+                  <SelectField value={this.state.generalinfo_histinput} onChange={this.handleGeneralHistSelect}>
+                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
+                      if (value.indexOf('summary') !== -1 && generalinfo_histfields.includes(value)) {
+                        return true;
+                      } else {
+                        return false;
+                      }
+                    }).map(function(value, index) {
+                        return (
+                          <MenuItem key={index} value={value} primaryText={value} />
+                        )
+                    })}
+                  </SelectField>
+                </div>
+                <HistogramVictory activeSummaryData={this.state.activeSummaryData} histinput={this.state.generalinfo_histinput} colortheme={TurquoiseTheme.metaseek}/>
+              </Paper>
+
+              <Paper className="explore-histogram card left one">
+                <div className="figure-hint-container">
+                  <span className="figure-hint-label">Library Construction Method Summary</span>
+                  <IconButton tooltip=<div className="figure-hint-tooltip">Library construction method used for clone libraries.</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                  <br/>
+                </div>
+                <PieVictory activeSummaryData={this.state.activeSummaryData} pieinput="library_construction_method_summary" colortheme={YellowTheme.metaseek}/>
+              </Paper>
+
+              <Paper className="explore-histogram card left two">
+                <div className="figure-hint-container">
+                  <span className="figure-hint-label">Sequencing Info</span>
+                  <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for each controlled vocabulary value for some Sequencing Info fields. Use the select field to change the input value.</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                  <br/>
+                </div>
+                <div className="explore-select">
+                  <SelectField value={this.state.seqinfo_histinput} onChange={this.handleSeqHistSelect}>
+                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
+                      if (value.indexOf('summary') !== -1 && seqinfo_histfields.includes(value)) {
+                        return true;
+                      } else {
+                        return false;
+                      }
+                    }).map(function(value, index) {
+                        return (
+                          <MenuItem key={index} value={value} primaryText={value} />
+                        )
+                    })}
+                  </SelectField>
+                </div>
+                <HistogramVictory activeSummaryData={this.state.activeSummaryData} histinput={this.state.seqinfo_histinput} colortheme={YellowTheme.metaseek}/>
+              </Paper>
+
+              <Paper className="explore-map card left two">
                 <div>
                   {mapRender(this.state.activeSummaryData,this.state.processing)}
                 </div>
               </Paper>
+
               <Paper className="explore-histogram card right one">
                 <div className="explore-select">
                   <SelectField value={this.state.histinput} onChange={this.handleHistSelect}>

@@ -554,6 +554,22 @@ ul {
   color: rgb(60,60,60);
 }
 
+.figure-hint-tooltip {
+  width: 200px;
+  white-space: normal;
+  text-align: left;
+}
+
+.figure-hint-label {
+  color: rgb(180,180,180);
+  font-size: 14px;
+  padding-left: 10px;
+}
+
+.figure-hint-container {
+  display: block;
+}
+
 .button-link {
   text-decoration: none;
 }
@@ -637,6 +653,10 @@ button.github:after, input[type=submit].github:after {
   width: 670px;
 }
 
+.five {
+  width: 250px;
+}
+
 .card {
   padding: 18px;
 }
@@ -674,7 +694,8 @@ button.github:after, input[type=submit].github:after {
 
 .explore-histogram {
   padding:3px;
-  height:430px;
+  height:400px;
+  margin: 0 0 18px 18px;
 }
 
 .explore-areachart {
@@ -693,6 +714,7 @@ button.github:after, input[type=submit].github:after {
 .explore-radarchart {
   padding:3px;
   height:400px;
+  margin: 0 0 18px 18px;
 }
 
 .explore-download {
@@ -763,10 +785,16 @@ button.github:after, input[type=submit].github:after {
 }
 
 .histogram-container {
+  width: 778px;
+  margin: 0 0 0 0;
+  height: 320px;
+  overflow:hidden;
+}
+
+.pie-container {
   width: 360px;
-  margin: 0 auto;
-  height: 360px;
-  padding-left:30px;
+  margin: 0 0 0 0;
+  height: 320px;
   overflow:hidden;
 }
 
@@ -788,7 +816,8 @@ button.github:after, input[type=submit].github:after {
 }
 
 .explore-select {
-  margin-left: 80px;
+  margin-left: 60px;
+  height: 50px;
 }
 
 .explore-pagination {

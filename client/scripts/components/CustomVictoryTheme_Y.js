@@ -5,13 +5,13 @@ import { assign } from "lodash";
 // *
 const colors = [
   "#6369E0",
-  "#6DF2ED",
-  "#FCDB99",
   "#FEB28D",
+  "#EDC77D",
+  "#6DF2ED",
   "#F8A39B"
 ];
 
-const charcoal = "#1AD8D2";
+const charcoal = "#EDC77D";
 
 // Typography
 const sansSerif = "'Roboto','sans-serif'";
