@@ -657,6 +657,11 @@ button.github:after, input[type=submit].github:after {
   width: 250px;
 }
 
+.six {
+  width: 380px;
+  height: 320px;
+}
+
 .card {
   padding: 18px;
 }
@@ -677,6 +682,7 @@ button.github:after, input[type=submit].github:after {
 
 .explore-map {
   margin: 0 0 18px 18px;
+  height: 656px;
 }
 
 .explore-map-contents {
@@ -700,7 +706,7 @@ button.github:after, input[type=submit].github:after {
 
 .explore-areachart {
   padding:3px;
-  margin: 0 18px 18px 0;
+  margin: 0 0 18px 18px;
   height:400px;
 }
 

@@ -46,7 +46,6 @@ var PieVictory = React.createClass({
     );
 
     var centerLabel = pieData.map(function(value, index) {return value.x+" : "+value.count+" datasets"});
-    console.log(centerLabel[0], centerLabel[1]);
 
     return(
       <svg viewBox="0 0 350 350">

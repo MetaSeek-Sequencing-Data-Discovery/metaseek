@@ -47,6 +47,7 @@ var Explore = React.createClass({
       'generalinfo_histinput':'env_package_summary',
       'seqinfo_histinput': 'library_strategy_summary',
       'areainput':'library_reads_sequenced_summary',
+      'seqinfo_areainput':'avg_read_length_summary',
       'radarinput':'library_source_summary',
       'generalinfo_radarinput': 'investigation_type_summary',
       'wordinput':'env_biome_summary',
@@ -195,6 +196,10 @@ var Explore = React.createClass({
     this.setState({"areainput":value});
   },
 
+  handleSeqAreaSelect : function(event, index, value) {
+    this.setState({"seqinfo_areainput":value});
+  },
+
   handleRadarSelect : function(event,index,value) {
     this.setState({"radarinput":value});
   },
@@ -221,7 +226,8 @@ var Explore = React.createClass({
     const areafields = ['avg_read_length_summary', 'download_size_summary', 'gc_percent_summary', 'latitude_summary', 'longitude_summary', 'library_reads_sequenced_summary', 'total_bases_summary'];
     const histfields = ['sequencing_method_summary', 'instrument_model_summary', 'library_strategy_summary', 'library_screening_strategy_summary', 'library_construction_method_summary', 'investigation_type_summary', 'env_package_summary', 'library_source_summary', 'study_type_summary'];
     const generalinfo_histfields = ['env_package_summary', 'study_type_summary'];
-    const seqinfo_histfields = ['library_strategy_summary', 'library_screening_strategy_summary'];
+    const seqinfo_histfields = ['library_strategy_summary', 'library_screening_strategy_summary', 'sequencing_method_summary', 'instrument_model_summary'];
+    const seqinfo_areafields = ['avg_read_length_summary', 'library_reads_sequenced_summary', 'gc_percent_summary', 'total_bases_summary'];
 
     var mapRender = function(activeSummaryData,isProcessing) {
       if (!isProcessing) {
@@ -410,10 +416,36 @@ var Explore = React.createClass({
                 <HistogramVictory activeSummaryData={this.state.activeSummaryData} histinput={this.state.seqinfo_histinput} colortheme={YellowTheme.metaseek}/>
               </Paper>
 
-              <Paper className="explore-map card left two">
+              <Paper className="explore-map card left two ">
                 <div>
                   {mapRender(this.state.activeSummaryData,this.state.processing)}
                 </div>
+              </Paper>
+
+              <Paper className="explore-areachart card left six">
+                <div className="figure-hint-container">
+                  <span className="figure-hint-label">Sequencing Info</span>
+                  <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for each controlled vocabulary value for some Sequencing Info fields. Use the select field to change the input value.</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                  <br/>
+                </div>
+                <div className="explore-select">
+                  <SelectField value={this.state.seqinfo_areainput} onChange={this.handleSeqAreaSelect}>
+                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
+                      if (value.indexOf('summary') !== -1 && seqinfo_areafields.includes(value)) {
+                        return true;
+                      } else {
+                        return false;
+                      }
+                    }).map(function(value, index) {
+                        return (
+                          <MenuItem key={index} value={value} primaryText={value} />
+                        )
+                    })}
+                  </SelectField>
+                </div>
+                <AreaChart activeSummaryData={this.state.activeSummaryData} areainput={this.state.seqinfo_areainput} colortheme={YellowTheme.metaseek}/>
               </Paper>
 
               <Paper className="explore-histogram card right one">

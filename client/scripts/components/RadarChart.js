@@ -33,8 +33,8 @@ var RadarChart = React.createClass({
           <VictoryArea
             data={radardata}
             labels={(radardata) => `${radardata.label}`}
-            labelComponent={<VictoryTooltip flyoutStyle={{fill: "white"}}/>}
-            style={{ data: { fillOpacity: 0.2, strokeWidth: 1.5 } }}
+            labelComponent={<VictoryTooltip flyoutStyle={{fill: "white", stroke:this.props.colortheme.area.style.data.fill}}/>}
+            style={{ data: { fillOpacity: 0.2, strokeWidth: 1.5 }, labels: { fill: "#333",fontSize: 12 } }}
           />
           {
             Object.keys(radardata).map((key, i) => {
