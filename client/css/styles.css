@@ -446,7 +446,7 @@ h2 {
 }
 
 h3 {
-  font-size: 2rem;
+  font-size: 2.5rem;
   text-align: center;
 }
 
@@ -620,9 +620,7 @@ button.github:after, input[type=submit].github:after {
 /* General layout */
 
 .single-sheet {
-  width: 1024px;
-  margin: 15px auto;
-  padding: 30px;
+  margin: 36px 0 36px 18px;
 }
 
 
