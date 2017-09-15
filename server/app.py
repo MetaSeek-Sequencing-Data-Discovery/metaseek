@@ -10,7 +10,7 @@ from pyhashxx import hashxx
 from pymemcache.client.base import Client
 import os
 from celery import Celery
-import tasks
+#import tasks
 
 dbPass = os.environ['METASEEK_DB']
 
@@ -273,8 +273,8 @@ class GetDiscovery(Resource):
     @marshal_with({
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
+        'discovery_title':fields.String,
         'uri': fields.Url('getdiscovery', absolute=True),
-        'datasets':fields.Nested(summarizedDatasetFields),
         'owner':fields.Nested({
             'firebase_id':fields.String,
             'uri':fields.Url('getuser', absolute=True)
@@ -287,8 +287,8 @@ class GetAllDiscoveries(Resource):
     @marshal_with({
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
+        'discovery_title':fields.String,
         'uri': fields.Url('getdiscovery', absolute=True),
-        'datasets':fields.Nested(summarizedDatasetFields),
         'owner':fields.Nested({
             'firebase_id':fields.String,
             'uri':fields.Url('getuser', absolute=True)
@@ -306,22 +306,9 @@ class CreateDiscovery(Resource):
             parser.add_argument('discovery_title', type=str)
             args = parser.parse_args()
 
-            filter_params = json.loads(args['filter_params'])
-            rules = filter_params['rules']
-
-            queryObject = Dataset.query
-
-            for rule in rules:
-                field = rule['field']
-                ruletype = rule['type']
-                value = rule['value']
-                queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
-
-            matchingDatasets = queryObject.all()
-
             owner = User.query.filter_by(firebase_id=args['owner_id']).first()
 
-            newDiscovery = Discovery(owner.id,args['filter_params'],args['discovery_title'],matchingDatasets)
+            newDiscovery = Discovery(owner.id,args['filter_params'],args['discovery_title'])
             db.session.add(newDiscovery)
             db.session.commit()
             return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id)}}

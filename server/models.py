@@ -217,13 +217,8 @@ class Dataset(db.Model):
         return '<Dataset %r>' % self.expt_id
 
 # For a many to many database relationship, use a mapping table (no class definition directly)
-# Eg. each discovery will have many datasets, and each dataset may belong to many discoveries
-# Each row in this table is one "dataset in discovery" membership
-dataset_to_discovery = db.Table('dataset_to_discovery',
-    db.Column('dataset_id', db.Integer, db.ForeignKey('dataset.id')),
-    db.Column('discovery_id', db.Integer, db.ForeignKey('discovery.id'))
-)
-
+# Eg. each publication may have many datasets, and each dataset may belong to many publications
+# Each row in this table is one "dataset in publication" membership
 dataset_to_publication = db.Table('dataset_to_publication',
     db.Column('dataset_id', db.Integer, db.ForeignKey('dataset.id')),
     db.Column('publication_id', db.Integer, db.ForeignKey('publication.id'))
@@ -234,21 +229,19 @@ class Discovery(db.Model):
     filter_params = db.Column(db.Text)
     timestamp = db.Column(db.DateTime)
     discovery_title = db.Column(db.Text)
-    datasets = db.relationship('Dataset', secondary=dataset_to_discovery, backref=db.backref('discoveries', lazy='dynamic'))
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     owner = db.relationship('User',backref=db.backref('myDiscoveries',lazy='dynamic'))
 
-    def __init__(self, owner_id, filter_params, discovery_title, datasets, timestamp=None, ):
+    def __init__(self, owner_id, filter_params, discovery_title, timestamp=None, ):
         self.owner_id = owner_id
         self.filter_params = filter_params
         self.discovery_title = discovery_title
-        self.datasets = datasets
         if timestamp is None:
             timestamp = datetime.utcnow()
         self.timestamp = timestamp
 
     def __repr__(self):
-        return '<Discovery %r>' % self.filter_params
+        return '<Discovery %r>' % self.discovery_title
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)

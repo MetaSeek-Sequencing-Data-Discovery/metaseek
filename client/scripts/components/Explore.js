@@ -186,7 +186,8 @@ var Explore = React.createClass({
     var self = this;
     apiRequest.post("/discovery/create", {
       "owner_id":self.state.firebase.uid,
-      "filter_params":self.state.filter_params
+      "filter_params":self.state.filter_params,
+      "discovery_title":self.state.discoveryTitle
     }).then(function (response) {
       self.props.history.push("/discovery/" + response.data.discovery.id);
     });
