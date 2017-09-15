@@ -9,6 +9,9 @@ import ColorPalette from './ColorPalette';
 
 import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
+import Dialog from 'material-ui/Dialog';
+import TextField from 'material-ui/TextField';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 
@@ -59,7 +62,10 @@ var Explore = React.createClass({
         'name':null,
         'photo':null
       },
-      'filtersOpen': true
+      'filtersOpen': true,
+      'submitDiscoveryOpen': false,
+      'discoveryTitle': null,
+      'promptLoginOpen': false
     }
   },
 
@@ -117,6 +123,7 @@ var Explore = React.createClass({
   },
 
   triggerGoogleLogin : function() {
+    this.setState({"promptLoginOpen":false});
     var successfulLogin = this.successfulLogin;
     var provider = new Firebase.auth.GoogleAuthProvider();
     var auth = Firebase.auth().signInWithPopup(provider).then(function(result) {
@@ -141,6 +148,7 @@ var Explore = React.createClass({
     });
   },
 
+
   successfulLogin : function(user) {
     var self = this;
     self.state.firebase.name = user.displayName;
@@ -152,6 +160,37 @@ var Explore = React.createClass({
     }).then(function(response){
       self.setState({"firebase": self.state.firebase});
     });
+  },
+
+  promptGoogleLoginOpen: function() {
+    this.setState({'promptLoginOpen':true});
+  },
+
+  promptGoggleLoginClose : function() {
+    this.setState({'promptLoginOpen':false})
+  },
+
+  discoveryDialogOpen : function() {
+    this.setState({'submitDiscoveryOpen': true});
+  },
+
+  discoveryDialogClose : function () {
+    this.setState({'submitDiscoveryOpen': false, 'discoveryTitle': null});
+  },
+
+  updateDiscoveryTitle : function(event, newValue) {
+    this.setState({'discoveryTitle':newValue});
+  },
+
+  submitDiscovery : function() {
+    var self = this;
+    apiRequest.post("/discovery/create", {
+      "owner_id":self.state.firebase.uid,
+      "filter_params":self.state.filter_params
+    }).then(function (response) {
+      self.props.history.push("/discovery/" + response.data.discovery.id);
+    });
+    this.setState({'submitDiscoveryOpen': false});
   },
 
   updateFilterParams : function(filterStates) {
@@ -168,16 +207,6 @@ var Explore = React.createClass({
     this.state.filter_params = JSON.stringify({"rules":filterStates});
     this.setState({"filter_params":JSON.stringify({"rules":filterStates})});
     this.updateActiveSummaryData();
-  },
-
-  submitDiscovery : function() {
-    var self = this;
-    apiRequest.post("/discovery/create", {
-      "owner_id":self.state.firebase.uid,
-      "filter_params":self.state.filter_params
-    }).then(function (response) {
-      self.props.history.push("/discovery/" + response.data.discovery.id);
-    });
   },
 
   handleHistSelect : function(event,index,value) {
@@ -229,6 +258,28 @@ var Explore = React.createClass({
     const seqinfo_histfields = ['library_strategy_summary', 'library_screening_strategy_summary', 'sequencing_method_summary', 'instrument_model_summary'];
     const seqinfo_areafields = ['avg_read_length_summary', 'library_reads_sequenced_summary', 'gc_percent_summary', 'total_bases_summary'];
 
+    const discoveryDialog_actions = [
+      <FlatButton
+        label="Cancel"
+        primary={true}
+        onClick={this.discoveryDialogClose}
+      />,
+    <RaisedButton
+        label="Submit Discovery"
+        primary={true}
+        onClick={this.submitDiscovery}
+        disabled={this.state.discoveryTitle ? false : true}
+      />
+    ];
+
+    const loginPrompt_actions = [
+      <RaisedButton
+        label="Log in with Google"
+        primary={true}
+        onClick={this.triggerGoogleLogin}
+      />
+    ];
+
     var mapRender = function(activeSummaryData,isProcessing) {
       if (!isProcessing) {
         if (activeSummaryData.empty) {
@@ -270,10 +321,36 @@ var Explore = React.createClass({
               <div className="save-discovery-button-container">
                 <RaisedButton
                   className="save-discovery-button"
-                  onClick={this.state.firebase.uid ? this.submitDiscovery : this.triggerGoogleLogin}
+                  onClick={this.state.firebase.uid ? this.discoveryDialogOpen : this.promptGoogleLoginOpen}
                   primary={true}
                   label="Save Discovery"
                 />
+                <Dialog
+                  title="Title Your Discovery"
+                  actions={discoveryDialog_actions}
+                  modal={false}
+                  open={this.state.submitDiscoveryOpen}
+                  onRequestClose={this.discoveryDialogClose}
+                >
+                  <TextField
+                    hintText="give your discovery a title!"
+                    errorText="This field is required."
+                    errorStyle={{color:"#FEB28D"}}
+                    underlineFocusStyle={{color:"#979CF2"}}
+                    onChange={this.updateDiscoveryTitle}
+                    fullWidth={true}
+                  />
+                </Dialog>
+                <Dialog
+                  actions={loginPrompt_actions}
+                  modal={false}
+                  open={this.state.promptLoginOpen}
+                  onRequestClose={this.promptGoggleLoginClose}
+                  contentStyle={{width:"380px", textAlign:"center"}}
+                  actionsContainerStyle={{textAlign:"center"}}
+                >
+                  Please log in with Google to save your discovery.
+                </Dialog>
               </div>
 
               <IconButton  iconStyle={{color:"rgb(175,175,175)", width: "100px", height:"60px", position:"fixed", top: "100px", left:"-25px"}} onClick={this.toggleFilters}>
