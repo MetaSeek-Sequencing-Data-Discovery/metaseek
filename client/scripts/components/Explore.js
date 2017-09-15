@@ -235,6 +235,13 @@ var Explore = React.createClass({
           return <h3>Sorry, no matches!</h3>
         } else {
           return <div>
+            <div className="figure-hint-container-map">
+              <span className="figure-hint-label">Environmental Info</span>
+              <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets within latitude and longitude bins. There are 36 longitude bins and 18 latitude bins within the range specified by your filters. Scroll or double click to zoom in on the map. To see higher resolution bins, edit lon/lat filters in the filter bar to the side.</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
+                <ActionHelpOutline />
+              </IconButton>
+              <br/>
+            </div>
             <MapDeckGL className="explore-map-render" mapdata={activeSummaryData.latlon_map}/>
             <MapLegend fills={activeSummaryData.map_legend_info.fills} ranges={activeSummaryData.map_legend_info.ranges}/>
           </div>
@@ -335,32 +342,6 @@ var Explore = React.createClass({
                 </div>
               </Paper>
 
-              <Paper className="explore-radarchart card left one">
-                <div className="figure-hint-container">
-                  <span className="figure-hint-label">General Sample Info</span>
-                  <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for each controlled vocabulary value for some General Sample Info fields. Use the select field to change the input value</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
-                    <ActionHelpOutline />
-                  </IconButton>
-                  <br/>
-                </div>
-                <div className="explore-select">
-                  <SelectField value={this.state.generalinfo_radarinput} onChange={this.handleGeneralRadarSelect}>
-                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
-                      if (value.indexOf('summary') !== -1 && generalinfo_radarfields.includes(value)) {
-                        return true;
-                      } else {
-                        return false;
-                      }
-                    }).map(function(value, index) {
-                      return (
-                        <MenuItem key={index} value={value} primaryText={value} />
-                      )
-                    })}
-                  </SelectField>
-                </div>
-                <RadarChart activeSummaryData={this.state.activeSummaryData} radarinput={this.state.generalinfo_radarinput} colortheme={TurquoiseTheme.metaseek}/>
-              </Paper>
-
               <Paper className="explore-histogram card left two">
                 <div className="figure-hint-container">
                   <span className="figure-hint-label">General Sample Info</span>
@@ -385,6 +366,31 @@ var Explore = React.createClass({
                   </SelectField>
                 </div>
                 <HistogramVictory activeSummaryData={this.state.activeSummaryData} histinput={this.state.generalinfo_histinput} colortheme={TurquoiseTheme.metaseek}/>
+              </Paper>
+              <Paper className="explore-radarchart card left one">
+                <div className="figure-hint-container">
+                  <span className="figure-hint-label">General Sample Info</span>
+                  <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for each controlled vocabulary value for some General Sample Info fields. Use the select field to change the input value</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                  <br/>
+                </div>
+                <div className="explore-select">
+                  <SelectField value={this.state.generalinfo_radarinput} onChange={this.handleGeneralRadarSelect}>
+                    {Object.keys(this.state.activeSummaryData).filter(function(value) {
+                      if (value.indexOf('summary') !== -1 && generalinfo_radarfields.includes(value)) {
+                        return true;
+                      } else {
+                        return false;
+                      }
+                    }).map(function(value, index) {
+                      return (
+                        <MenuItem key={index} value={value} primaryText={value} />
+                      )
+                    })}
+                  </SelectField>
+                </div>
+                <RadarChart activeSummaryData={this.state.activeSummaryData} radarinput={this.state.generalinfo_radarinput} colortheme={TurquoiseTheme.metaseek}/>
               </Paper>
 
               <Paper className="explore-histogram card left one">
@@ -429,7 +435,6 @@ var Explore = React.createClass({
                   {mapRender(this.state.activeSummaryData,this.state.processing)}
                 </div>
               </Paper>
-
               <Paper className="explore-areachart card left six">
                 <div className="figure-hint-container">
                   <span className="figure-hint-label">Sequencing Info</span>
@@ -456,6 +461,13 @@ var Explore = React.createClass({
                 <AreaChart activeSummaryData={this.state.activeSummaryData} areainput={this.state.seqinfo_areainput} colortheme={YellowTheme.metaseek}/>
               </Paper>
               <Paper className="explore-wordcloud card left six">
+                <div className="figure-hint-container">
+                  <span className="figure-hint-label">Environmental Info</span>
+                  <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for environmental metadata from the ENVO ontology. Use the select field to change the input value. Scroll to see more fields.</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                  <br/>
+                </div>
                 <div className="explore-select">
                   <SelectField value={this.state.wordinput} onChange={this.handleWordSelect}>
                     {Object.keys(this.state.activeSummaryData).filter(function(value) {

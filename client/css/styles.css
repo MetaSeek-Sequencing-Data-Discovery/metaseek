@@ -588,6 +588,10 @@ ul {
   display: block;
 }
 
+.figure-hint-container-map {
+  margin: -18px 0 0 0;
+}
+
 .button-link {
   text-decoration: none;
 }
@@ -746,6 +750,7 @@ button.github:after, input[type=submit].github:after {
 
 .explore-table {
   padding:0px;
+  margin: 0 0 18px 18px;
 }
 
 /* More Explore styles */
