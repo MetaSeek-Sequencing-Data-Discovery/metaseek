@@ -303,6 +303,7 @@ class CreateDiscovery(Resource):
             parser = reqparse.RequestParser()
             parser.add_argument('owner_id', type=str)
             parser.add_argument('filter_params', type=str)
+            parser.add_argument('discovery_title', type=str)
             args = parser.parse_args()
 
             filter_params = json.loads(args['filter_params'])
@@ -320,7 +321,7 @@ class CreateDiscovery(Resource):
 
             owner = User.query.filter_by(firebase_id=args['owner_id']).first()
 
-            newDiscovery = Discovery(owner.id,args['filter_params'],matchingDatasets)
+            newDiscovery = Discovery(owner.id,args['filter_params'],args['discovery_title'],matchingDatasets)
             db.session.add(newDiscovery)
             db.session.commit()
             return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id)}}

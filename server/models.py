@@ -233,13 +233,15 @@ class Discovery(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filter_params = db.Column(db.Text)
     timestamp = db.Column(db.DateTime)
+    discovery_title = db.Column(db.Text)
     datasets = db.relationship('Dataset', secondary=dataset_to_discovery, backref=db.backref('discoveries', lazy='dynamic'))
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     owner = db.relationship('User',backref=db.backref('myDiscoveries',lazy='dynamic'))
 
-    def __init__(self, owner_id, filter_params, datasets, timestamp=None, ):
+    def __init__(self, owner_id, filter_params, discovery_title, datasets, timestamp=None, ):
         self.owner_id = owner_id
         self.filter_params = filter_params
+        self.discovery_title = discovery_title
         self.datasets = datasets
         if timestamp is None:
             timestamp = datetime.utcnow()
