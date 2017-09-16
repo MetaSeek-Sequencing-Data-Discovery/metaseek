@@ -19,7 +19,7 @@ CORS(app)
 socketio = SocketIO(app)
 
 # production DB
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-35-166-20-248.us-west-2.compute.amazonaws.com/metaseek'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-52-33-134-115.us-west-2.compute.amazonaws.com/metaseek'
 
 # local DB - uncomment for local testing
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
@@ -47,7 +47,7 @@ def json_deserializer(key, value, flags):
 # local memcached
 client = Client(('localhost', 11211), serializer=json_serializer, deserializer=json_deserializer)
 
-
+import tasks
 from helpers import *
 from models import *
 from marshals import *
@@ -343,9 +343,19 @@ class BuildCaches(Resource):
         priorityFilterSets = [
             '{"rules":[]}',
             '{"rules":[{"field":"library_source","type":5,"value":"genomic"}]}',
+            '{"rules":[{"field":"library_source","type":5,"value":"transcriptomic"}]}',
             '{"rules":[{"field":"library_source","type":5,"value":"metagenomic"}]}',
-            '{"rules":[{"field":"library_source","type":5,"value":"metatranscriptomic"}]}',
-            '{"rules":[{"field":"library_source","type":5,"value":"transcriptomic"}]}'
+            '{"rules":[{"field":"investigation_type","type":5,"value":"metagenome"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Other"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Whole Genome Sequencing"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Transcriptome Analysis"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Metagenomics"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Population Genomics"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Other"},{"field":"library_source","type":5,"value":"genomic"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Whole Genome Sequencing"},{"field":"library_source","type":5,"value":"genomic"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Transcriptome Analysis"},{"field":"library_source","type":5,"value":"transcriptomic"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Other"},{"field":"library_source","type":5,"value":"metagenomic"}]}',
+            '{"rules":[{"field":"study_type","type":5,"value":"Metagenomics"},{"field":"library_source","type":5,"value":"metagenomic"}]}'
         ]
 
         results = {}
@@ -361,22 +371,8 @@ class BuildCaches(Resource):
             results[cache_key]['rules'] = rules
 
             if from_cache is None:
-                start = datetime.now()
+                tasks.buildCache.delay(cache_key,rules)
                 results[cache_key]['existing-cache'] = False
-
-                queryObject = Dataset.query
-
-                for rule in rules:
-                    field = rule['field']
-                    ruletype = rule['type']
-                    value = rule['value']
-                    queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
-
-                summary = summarizeDatasets(queryObject)
-                client.set(cache_key, summary)
-                finish = datetime.now()
-                results[cache_key]['success'] = True
-                results[cache_key]['cache-load-time'] = str(round((finish - start).total_seconds(),1)) + 's'
             else:
                 results[cache_key]['existing-cache'] = True
 
