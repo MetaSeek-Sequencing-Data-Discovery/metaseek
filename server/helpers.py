@@ -177,7 +177,7 @@ def checkpoint(start, n):
 
 def summarizeDatasets(queryObject):
     start = time.time()
-    n = 1
+    n = checkpoint(start,0)
     print 'started summarizing at ' + str(start)
     print queryObject
     total = queryObject.count()
