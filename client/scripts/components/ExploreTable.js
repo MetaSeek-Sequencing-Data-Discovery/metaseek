@@ -25,7 +25,7 @@ var ExploreTable = React.createClass({
       <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
         <div>
             <Table bodyStyle={{overflowX: 'scroll', width:'100%' }} fixedHeader={false} fixedFooter={false} selectable={false} style={{'tableLayout':'auto'}}>
-              <TableHeader style={{backgroundColor:'#6369E0'}} adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
+              <TableHeader style={{backgroundColor:'#7075E0'}} adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
                 <TableRow selectable={false}>
                   <TableHeaderColumn style={tableHeaderStyles}></TableHeaderColumn>
                   <TableHeaderColumn style={{color:'#fff',fontFamily:'Roboto',fontSize:'14px',width: '300px',fontWeight:700}}>Study Title</TableHeaderColumn>
@@ -53,7 +53,7 @@ var ExploreTable = React.createClass({
               <TableBody showRowHover={true} stripedRows={false} displayRowCheckbox={false} preScanRows={false}>
                 {this.props.dataTable.datasets.map( (row, index) => (
                   <TableRow selectable={false} key={index}>
-                    <TableRowColumn><Link to={row.uri}><RaisedButton label={"Details"} primary={true}></RaisedButton></Link></TableRowColumn>
+                    <TableRowColumn><Link to={row.uri}><RaisedButton label={"Details"} buttonStyle={{backgroundColor:"#979CF2"}} labelStyle={{color:"#FFFFFF"}}></RaisedButton></Link></TableRowColumn>
                     <TableRowColumn style={{width: '300px',whiteSpace:'normal',display:'inline-block',paddingTop:'9px',paddingBottom:'9px',height:'100%'}}>{row.study_title}</TableRowColumn>
                     <TableRowColumn>{row.expt_link}</TableRowColumn>
                     <TableRowColumn>{row.db_source}</TableRowColumn>
@@ -84,7 +84,7 @@ var ExploreTable = React.createClass({
                 label="Previous"
                 onClick={this.props.getPreviousDataPage}
                 disabled={this.props.dataTable.hasPrevious ? false : true}
-                primary={true}
+                secondary={true}
               />
               <div className="explore-pagination-count">
                 Page {this.props.dataTable.page} of {this.props.dataTable.totalPages}
@@ -94,7 +94,7 @@ var ExploreTable = React.createClass({
                 label="Next"
                 onClick={this.props.getNextDataPage}
                 disabled={this.props.dataTable.hasNext ? false : true}
-                primary={true}
+                secondary={true}
               />
             </div>
         </div>

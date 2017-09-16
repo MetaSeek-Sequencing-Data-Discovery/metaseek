@@ -15,7 +15,15 @@ var WordCloud = React.createClass({
     // Colors from color brewer http://colorbrewer2.org/#type=sequential&scheme=PuBuGn&n=8
     // Order matters - higher values will get the later colors in this list
     // Another good option http://colorbrewer2.org/?type=sequential&scheme=BuGn&n=7
-    var colors = ['#a6bddb','#67a9cf','#3690c0','#02818a','#016450'];
+    // var colors = ['#a6bddb','#67a9cf','#3690c0','#02818a','#016450'];
+
+    var colors = [
+      "#6369E0",
+      "#F79C6F",
+      "#F2C160",
+      "#23BEC6",
+      "#f26f63"
+    ];
 
     // Min / max font sizes in pixels for words in word cloud
     var min = 8;
@@ -49,7 +57,8 @@ var WordCloud = React.createClass({
     var customRenderer = function(tag, size) {
       // Find how far in between min and max the tag size is, find the right color for that slot
       var colorScaler = ((size - min) / (max - min)) * (colors.length - 1);
-      var color = colors[Math.floor(colorScaler)];
+      var color = colors[Math.floor(Math.random() * colors.length)];
+      // var color = colors[Math.floor(colorScaler)];
 
       // More styles in css for word-cloud-tag - only on-the-fly calculated styles go here
       return <div className='word-cloud-tag-wrapper'>
@@ -72,7 +81,7 @@ var WordCloud = React.createClass({
                 effect="solid"
                 border={true}
               >
-                <span>{activeFieldData[tag.value] + ' datasets'}</span>
+                <span>{tag.value + " : " + activeFieldData[tag.value] + ' datasets'}</span>
               </ReactTooltip>
             </div>
     };

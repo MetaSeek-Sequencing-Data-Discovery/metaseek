@@ -36,7 +36,7 @@ Merge master into deploy branch and push to Github:
 
 SSH in:
 
-`ssh -i "metaseek.pem" ubuntu@ec2-35-166-20-248.us-west-2.compute.amazonaws.com`
+`ssh -i "metaseek_shared.pem" ubuntu@ec2-52-33-134-115.us-west-2.compute.amazonaws.com`
 
 Open the Metaseek folder and pull the deploy branch:
 
