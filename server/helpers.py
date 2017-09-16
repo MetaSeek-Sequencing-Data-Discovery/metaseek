@@ -8,6 +8,7 @@ from decimal import Decimal
 from collections import Counter
 from sqlalchemy import or_
 import scipy.stats as sp
+import time
 
 #function to get color gradient from max to white
 def getFillColor(count, maxCount, r,g,b):
@@ -168,41 +169,73 @@ def sumColumn(queryObject,columnName):
     total = sum(dataFrame[columnName].dropna())
     return total
 
+def checkpoint(start, n):
+    checkpoint = time.time()
+    print 'checkpoint ' + str(n) + ':'
+    print str(checkpoint - start) + ' since start'
+    return n + 1
+
 def summarizeDatasets(queryObject):
+    start = time.time()
+    n = 1
+    print 'started summarizing at ' + str(start)
+    print queryObject
     total = queryObject.count()
+    n = checkpoint(start,n)
     if total > 0:
         # Simple numeric sum responses
         total_download_size = sumColumn(queryObject,'download_size_maxrun')
+        n = checkpoint(start,n)
 
         # Simple count histogram responses
         investigation_summary = summarizeColumn(queryObject,'investigation_type', num_cats=15)
+        n = checkpoint(start,n)
         lib_source_summary = summarizeColumn(queryObject,'library_source')
+        n = checkpoint(start,n)
         env_pkg_summary = summarizeColumn(queryObject,'env_package', num_cats=15)
+        n = checkpoint(start,n)
         lib_strategy_summary = summarizeColumn(queryObject,'library_strategy', num_cats=20)
+        n = checkpoint(start,n)
         lib_screening_strategy_summary = summarizeColumn(queryObject,'library_screening_strategy', num_cats=20)
+        n = checkpoint(start,n)
         lib_construction_method_summary = summarizeColumn(queryObject,'library_construction_method')
+        n = checkpoint(start,n)
         study_type_summary = summarizeColumn(queryObject,'study_type')
+        n = checkpoint(start,n)
         sequencing_method_summary = summarizeColumn(queryObject,'sequencing_method', num_cats=10)
+        n = checkpoint(start,n)
 
         #maybe top-10 or top-15 categorical responses
         instrument_model_summary = summarizeColumn(queryObject,'instrument_model',num_cats=15)
+        n = checkpoint(start,n)
         geo_loc_name_summary = summarizeColumn(queryObject,'geo_loc_name',num_cats=20)
+        n = checkpoint(start,n)
         env_biome_summary = summarizeColumn(queryObject,'env_biome',num_cats=20)
+        n = checkpoint(start,n)
         env_feature_summary = summarizeColumn(queryObject,'env_feature',num_cats=20)
+        n = checkpoint(start,n)
         env_material_summary = summarizeColumn(queryObject,'env_material',num_cats=20)
+        n = checkpoint(start,n)
         # add more here . . .
 
         # Linear binned histogram responses
         avg_read_length_summary = summarizeColumn(queryObject,'avg_read_length_maxrun',linearBins=True)
+        n = checkpoint(start,n)
         gc_percent_summary = summarizeColumn(queryObject,'gc_percent_maxrun',linearBins=True)
+        n = checkpoint(start,n)
         lat_summary = summarizeColumn(queryObject,'meta_latitude',linearBins=True)
+        n = checkpoint(start,n)
         lon_summary = summarizeColumn(queryObject,'meta_longitude',linearBins=True)
+        n = checkpoint(start,n)
         # add more here . . .
 
         # Log binned histogram responses
         library_reads_sequenced_summary = summarizeColumn(queryObject,'library_reads_sequenced_maxrun',logBins=True)
+        n = checkpoint(start,n)
         total_bases_summary = summarizeColumn(queryObject,'total_num_bases_maxrun',logBins=True)
+        n = checkpoint(start,n)
         down_size_summary = summarizeColumn(queryObject,'download_size_maxrun',logBins=True)
+        n = checkpoint(start,n)
         # add more here . . .
 
         # Complex / one-off responses
@@ -223,6 +256,7 @@ def summarizeDatasets(queryObject):
             Dataset.meta_longitude
         )
         mapDataframe = pd.read_sql(mapQueryObject.statement,db.session.bind)
+        n = checkpoint(start,n)
         latlon  = mapDataframe[['meta_latitude','meta_longitude']]
         latlon = latlon[pd.notnull(latlon['meta_latitude'])]
         latlon = latlon[pd.notnull(latlon['meta_longitude'])]
@@ -256,6 +290,7 @@ def summarizeDatasets(queryObject):
 
                 map_data.append({"lat":lat,"lon":lon,"count":value,"polygon":polygon, "fillColor":fillColor})
         map_legend_info = {"ranges":countRanges, "fills":fillColors}
+        n = checkpoint(start,n)
         return {
             "summary": {
                 "avg_read_length_summary":avg_read_length_summary,
