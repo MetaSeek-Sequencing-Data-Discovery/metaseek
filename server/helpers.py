@@ -74,7 +74,11 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
 
     return queryObject
 
-def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cats=None):
+def summarizeColumn(queryObject,columnName,linearBins=False,logBins=False, num_cats=None):
+    columnQueryObject = queryObject.with_entities(
+        getattr(Dataset,columnName)
+    )
+    dataFrame = pd.read_sql(columnQueryObject.statement,db.session.bind)
     dataColumn = dataFrame[columnName].dropna()
     uniqueCount = len(dataColumn.unique())
     if uniqueCount == 0:
@@ -182,41 +186,41 @@ def summarizeDatasets(queryObject):
 
     queryResultDataframe = pd.read_sql(filteredQueryObject.statement,db.session.bind)
 
-    total = len(queryResultDataframe.index)
+    total = queryObject.count()
     if total > 0:
         # Simple aggregate responses
         total_download_size = sum(queryResultDataframe['download_size_maxrun'].dropna())
         # add more here . . .
 
         # Simple count histogram responses
-        investigation_summary = summarizeColumn(queryResultDataframe,'investigation_type', num_cats=15)
-        lib_source_summary = summarizeColumn(queryResultDataframe,'library_source')
-        env_pkg_summary = summarizeColumn(queryResultDataframe,'env_package', num_cats=15)
-        lib_strategy_summary = summarizeColumn(queryResultDataframe,'library_strategy', num_cats=20)
-        lib_screening_strategy_summary = summarizeColumn(queryResultDataframe,'library_screening_strategy', num_cats=20)
-        lib_construction_method_summary = summarizeColumn(queryResultDataframe,'library_construction_method')
-        study_type_summary = summarizeColumn(queryResultDataframe,'study_type')
-        sequencing_method_summary = summarizeColumn(queryResultDataframe,'sequencing_method', num_cats=10)
+        investigation_summary = summarizeColumn(queryObject,'investigation_type', num_cats=15)
+        lib_source_summary = summarizeColumn(queryObject,'library_source')
+        env_pkg_summary = summarizeColumn(queryObject,'env_package', num_cats=15)
+        lib_strategy_summary = summarizeColumn(queryObject,'library_strategy', num_cats=20)
+        lib_screening_strategy_summary = summarizeColumn(queryObject,'library_screening_strategy', num_cats=20)
+        lib_construction_method_summary = summarizeColumn(queryObject,'library_construction_method')
+        study_type_summary = summarizeColumn(queryObject,'study_type')
+        sequencing_method_summary = summarizeColumn(queryObject,'sequencing_method', num_cats=10)
 
         #maybe top-10 or top-15 categorical responses
-        instrument_model_summary = summarizeColumn(queryResultDataframe,'instrument_model',num_cats=15)
-        geo_loc_name_summary = summarizeColumn(queryResultDataframe,'geo_loc_name',num_cats=20)
-        env_biome_summary = summarizeColumn(queryResultDataframe,'env_biome',num_cats=20)
-        env_feature_summary = summarizeColumn(queryResultDataframe,'env_feature',num_cats=20)
-        env_material_summary = summarizeColumn(queryResultDataframe,'env_material',num_cats=20)
+        instrument_model_summary = summarizeColumn(queryObject,'instrument_model',num_cats=15)
+        geo_loc_name_summary = summarizeColumn(queryObject,'geo_loc_name',num_cats=20)
+        env_biome_summary = summarizeColumn(queryObject,'env_biome',num_cats=20)
+        env_feature_summary = summarizeColumn(queryObject,'env_feature',num_cats=20)
+        env_material_summary = summarizeColumn(queryObject,'env_material',num_cats=20)
         # add more here . . .
 
         # Linear binned histogram responses
-        avg_read_length_summary = summarizeColumn(queryResultDataframe,'avg_read_length_maxrun',linearBins=True)
-        gc_percent_summary = summarizeColumn(queryResultDataframe,'gc_percent_maxrun',linearBins=True)
-        lat_summary = summarizeColumn(queryResultDataframe,'meta_latitude',linearBins=True)
-        lon_summary = summarizeColumn(queryResultDataframe,'meta_longitude',linearBins=True)
+        avg_read_length_summary = summarizeColumn(queryObject,'avg_read_length_maxrun',linearBins=True)
+        gc_percent_summary = summarizeColumn(queryObject,'gc_percent_maxrun',linearBins=True)
+        lat_summary = summarizeColumn(queryObject,'meta_latitude',linearBins=True)
+        lon_summary = summarizeColumn(queryObject,'meta_longitude',linearBins=True)
         # add more here . . .
 
         # Log binned histogram responses
-        library_reads_sequenced_summary = summarizeColumn(queryResultDataframe,'library_reads_sequenced_maxrun',logBins=True)
-        total_bases_summary = summarizeColumn(queryResultDataframe,'total_num_bases_maxrun',logBins=True)
-        down_size_summary = summarizeColumn(queryResultDataframe,'download_size_maxrun',logBins=True)
+        library_reads_sequenced_summary = summarizeColumn(queryObject,'library_reads_sequenced_maxrun',logBins=True)
+        total_bases_summary = summarizeColumn(queryObject,'total_num_bases_maxrun',logBins=True)
+        down_size_summary = summarizeColumn(queryObject,'download_size_maxrun',logBins=True)
         # add more here . . .
 
         # Complex / one-off responses
@@ -232,7 +236,12 @@ def summarizeDatasets(queryObject):
 
         # Map summary is broken because lat / lon are both strings
 
-        latlon  = queryResultDataframe[['meta_latitude','meta_longitude']]
+        mapQueryObject = queryObject.with_entities(
+            Dataset.meta_latitude,
+            Dataset.meta_longitude
+        )
+        mapDataframe = pd.read_sql(mapQueryObject.statement,db.session.bind)
+        latlon  = mapDataframe[['meta_latitude','meta_longitude']]
         latlon = latlon[pd.notnull(latlon['meta_latitude'])]
         latlon = latlon[pd.notnull(latlon['meta_longitude'])]
         minLat = np.amin(latlon['meta_latitude'])
