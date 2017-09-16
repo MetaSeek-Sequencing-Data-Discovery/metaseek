@@ -64,17 +64,40 @@ var MyAccount = React.createClass({
   },
 
   render : function() {
-    var headline = "You're not logged in. Want to log in?";
-    if (this.state.firebase.uid) {
-      var headline = "Hey, you're logged in as " + this.state.firebase.name;
-    }
+    if (!this.state.firebase.uid) return (
+      <div>
+        <Header history={this.props.history}/>
+        <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
+          <Paper className="single-sheet" >
+            <h2>Log in with Google to view your MetaSeek account.</h2>
+            <div>
+               <img className="profile-image" style={{'display':this.state.firebase.uid ? 'inline' : 'none'}} src={this.state.firebase.photo}/>
+            </div>
+            <div className="login-buttons">
+              <RaisedButton
+                label="Log In"
+                onClick={this.triggerLogin}
+                primary={true}
+                disabled={this.state.firebase.uid}
+              />
+              <RaisedButton
+                label="Log Out"
+                onClick={this.triggerLogout}
+                primary={true}
+                disabled={!(this.state.firebase.uid)}
+              />
+          </div>
+          </Paper>
+        </MuiThemeProvider>
+      </div>
+    );
 
     return (
       <div>
         <Header history={this.props.history}/>
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
-          <Paper className="single-sheet" zDepth={2}>
-            <h2>{headline}</h2>
+          <Paper className="single-sheet" >
+            <h2>{"Hey, you're logged in as " + this.state.firebase.name}</h2>
             <div>
                <img className="profile-image" style={{'display':this.state.firebase.uid ? 'inline' : 'none'}} src={this.state.firebase.photo}/>
             </div>
