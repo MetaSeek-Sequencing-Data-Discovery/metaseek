@@ -867,6 +867,7 @@ button.github:after, input[type=submit].github:after {
 
 .myacct-loggedin {
   margin: 48px auto;
+  margin-bottom: 15px;
   width: 1170px;
   height: 200px;
 }
@@ -879,6 +880,12 @@ button.github:after, input[type=submit].github:after {
 .myacct-logout-button {
   float: right;
   margin: 32px 540px 0 0;
+}
+
+.myacct-discoveryhead {
+  margin: 0 auto;
+  width: 1170px;
+  height: 100px;
 }
 
 .profile-image-myacct {

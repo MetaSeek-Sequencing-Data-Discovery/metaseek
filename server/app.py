@@ -101,7 +101,8 @@ class GetUserDiscoveries(Resource):
     }, envelope='discoveries')
 
     def get(self, id):
-        return Discovery.query.filter_by(owner_id=id).all()
+        owner = User.query.filter_by(firebase_id=id).first()
+        return Discovery.query.filter_by(owner_id=owner.id).all()
 
 ## /dataset routes
 #class CreateDataset(Resource):
@@ -370,7 +371,7 @@ class BuildCaches(Resource):
 api.add_resource(CreateUser,            '/user/create')
 api.add_resource(GetUser,               '/user/<int:id>')
 api.add_resource(GetAllUsers,           '/users')
-api.add_resource(GetUserDiscoveries,    '/user/<int:id>/discoveries')
+api.add_resource(GetUserDiscoveries,    '/user/<string:id>/discoveries')
 
 # Temporarily removed - the only way to add a dataset is through scrapers/SRA/SRA_scrape.py
 # api.add_resource(CreateDataset,       '/dataset/create')

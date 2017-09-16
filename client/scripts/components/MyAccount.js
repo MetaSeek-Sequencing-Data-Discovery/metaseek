@@ -1,5 +1,7 @@
 import React from 'react';
 import Firebase from 'firebase';
+import axios from 'axios';
+import apiConfig from '../config/api.js';
 
 // Material Design stuff
 import RaisedButton from 'material-ui/RaisedButton';
@@ -11,6 +13,10 @@ import Paper from 'material-ui/Paper';
 
 import Header from './Header';
 
+var apiRequest = axios.create({
+  baseURL: apiConfig.baseURL
+});
+
 var MyAccount = React.createClass({
   getInitialState: function() {
       return {
@@ -18,7 +24,8 @@ var MyAccount = React.createClass({
           'uid':null,
           'name':null,
           'photo':null
-        }
+        },
+        'discoveries': []
       }
   },
 
@@ -62,6 +69,11 @@ var MyAccount = React.createClass({
     this.state.firebase.uid = user.uid;
     this.state.firebase.photo = user.photoURL;
     this.setState(this.state.firebase);
+    var self = this;
+    apiRequest.get("/user/"+self.state.firebase.uid+"/discoveries")
+    .then(function (response) {
+      self.setState({"discoveries": response.data.discoveries});
+    });
   },
 
   render : function() {
@@ -78,7 +90,7 @@ var MyAccount = React.createClass({
                 primary={true}
                 disabled={this.state.firebase.uid}
               />
-          </div>
+            </div>
           </Paper>
         </MuiThemeProvider>
       </div>
@@ -88,19 +100,24 @@ var MyAccount = React.createClass({
       <div>
         <Header history={this.props.history}/>
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
-          <Paper className="myacct-loggedin" >
-            <div>
-               <img className="profile-image-myacct" src={this.state.firebase.photo}/>
-            </div>
-            <h2 className="myacct-name">{this.state.firebase.name}</h2>
-            <div className="myacct-logout-button">
-              <FlatButton
-                label="Log Out"
-                onClick={this.triggerLogout}
-                primary={true}
-              />
-            </div>
-          </Paper>
+          <div>
+            <Paper className="myacct-loggedin" >
+              <div>
+                 <img className="profile-image-myacct" src={this.state.firebase.photo}/>
+              </div>
+              <h2 className="myacct-name">{this.state.firebase.name}</h2>
+              <div className="myacct-logout-button">
+                <FlatButton
+                  label="Log Out"
+                  onClick={this.triggerLogout}
+                  primary={true}
+                />
+              </div>
+            </Paper>
+            <Paper className="myacct-discoveryhead">
+              {JSON.stringify(this.state.discoveries)}
+            </Paper>
+          </div>
         </MuiThemeProvider>
       </div>
     )
