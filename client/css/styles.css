@@ -154,10 +154,9 @@ button::-moz-focus-inner, input::-moz-focus-inner, legend {
 
 
 /* Global styles */
-
+/*background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%236369e0' fill-opacity='0.04' fill-rule='evenodd'/%3E%3C/svg%3E");*/
 body {
-  background-color: #f1f1f7;
-  background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%236369e0' fill-opacity='0.04' fill-rule='evenodd'/%3E%3C/svg%3E");
+  background-color: #F5F6F7;
 }
 
 
@@ -419,6 +418,14 @@ body {
   font-size: 1.4rem;
 }
 
+br {
+  line-height: 22px;
+}
+
+.big-br {
+  line-height: 36px;
+}
+
 h1 {
   font-family: 'Roboto', sans-serif;
   font-weight: 300;
@@ -483,11 +490,106 @@ ul {
   float:right;
 }
 
+.save-discovery-button-container {
+  margin: 0 auto;
+  position: relative;
+}
+
 .save-discovery-button {
+  width: 200px;
+  margin: 18px 0 18px -100px;
+  left: 50%;
+  position: relative;
+}
+
+.overview-layer {
+  margin: 18px;
+  padding: 18px;
+}
+
+.overview-content {
+  font-weight: 300;
+  position: relative;
+  display: block;
+  top: 28%;
+  font-size: 18px;
+  color:#666;
+  margin: 26px 0 26px 0;
+  text-align: center;
+}
+
+.overview-content .active {
   font-weight: 700;
-  font-size: 30px;
-  margin-left: 288px;
-  margin-bottom: 18px;
+  font-size: 38px;
+  color: rgb(99, 105, 224);
+}
+
+.overview-content-download {
+  font-weight: 700;
+  position: relative;
+  display: block;
+  top: 28%;
+  font-size: 38px;
+  color: rgb(99, 105, 224);
+  margin: 62px 0 62px 0;
+  text-align: center;
+}
+
+.overview-content-user {
+  font-weight: 300;
+  position: relative;
+  display: block;
+  top: 28%;
+  font-size: 18px;
+  color:#666;
+  text-align: center;
+  margin: 36px 0 0 0;
+  padding: 0 20px 0 20px;
+}
+
+.overview-content-user-inactive {
+  margin: 18px 0 36px 0;
+  text-align: center;
+}
+
+.overview-content-user-active {
+  text-align: center;
+  margin: -20px 0 0 0;
+}
+
+.user-photo {
+  float: left;
+}
+
+.user-active-message {
+  text-align: right;
+  padding: 18px 0 10px 0;
+}
+
+.overview-title {
+  font-size:18px;
+  font-weight: bold;
+  color: rgb(60,60,60);
+}
+
+.figure-hint-tooltip {
+  width: 200px;
+  white-space: normal;
+  text-align: left;
+}
+
+.figure-hint-label {
+  color: rgb(180,180,180);
+  font-size: 14px;
+  padding-left: 10px;
+}
+
+.figure-hint-container {
+  display: block;
+}
+
+.figure-hint-container-map {
+  margin: -18px 0 0 0;
 }
 
 .button-link {
@@ -538,7 +640,7 @@ button.github:after, input[type=submit].github:after {
 /* Explore layout */
 
 .explore-container {
-  width: 1176px;
+  width: 1200px;
   margin: 10px auto;
 }
 
@@ -555,6 +657,11 @@ button.github:after, input[type=submit].github:after {
   width: 380px;
 }
 
+.overview-size {
+  width: 380px;
+  height: 250px;
+}
+
 .two {
   width: 778px;
 }
@@ -562,6 +669,19 @@ button.github:after, input[type=submit].github:after {
 .three {
   width: 1176px;
   clear: both;
+}
+
+.four {
+  width: 670px;
+}
+
+.five {
+  width: 250px;
+}
+
+.six {
+  width: 380px;
+  height: 320px;
 }
 
 .card {
@@ -573,6 +693,10 @@ button.github:after, input[type=submit].github:after {
   margin: 0 0 18px 0;
 }
 
+.filter-field-with-help {
+  float: left;
+}
+
 .explore-headline {
   margin: 0 0 18px 18px;
   position: relative;
@@ -580,29 +704,43 @@ button.github:after, input[type=submit].github:after {
 
 .explore-map {
   margin: 0 0 18px 18px;
+  height: 656px;
+}
+
+.explore-map-contents {
+  position: absolute;
+  margin: 0 0 0 0;
+}
+
+.map-legend{
+  float: right;
+}
+
+.explore-map-render {
+  margin: 0 0 0 0;
 }
 
 .explore-histogram {
   padding:3px;
-  height:430px;
+  height:400px;
+  margin: 0 0 18px 18px;
 }
 
 .explore-areachart {
   padding:3px;
-  margin: 0 18px 18px 0;
-  height:400px;
+  margin: 0 0 18px 18px;
 }
 
 .explore-wordcloud {
   padding:3px;
   overflow-y:scroll;
-  margin: 0 18px 18px 0;
-  height:430px;
+  margin: 0 0 18px 18px;
 }
 
 .explore-radarchart {
   padding:3px;
   height:400px;
+  margin: 0 0 18px 18px;
 }
 
 .explore-download {
@@ -612,6 +750,7 @@ button.github:after, input[type=submit].github:after {
 
 .explore-table {
   padding:0px;
+  margin: 0 0 18px 18px;
 }
 
 /* More Explore styles */
@@ -626,7 +765,7 @@ button.github:after, input[type=submit].github:after {
 }
 
 .profile-container {
-  display:inline-block;
+  display:block;
 }
 
 .welcome-message {
@@ -640,8 +779,11 @@ button.github:after, input[type=submit].github:after {
 }
 
 .profile-button {
-  margin: 12px 12px 0 12px;
+  width: 180px;
+  position: relative;
 }
+
+
 
 .explore-map-container {
   width: 742px;
@@ -655,10 +797,11 @@ button.github:after, input[type=submit].github:after {
   background-size: cover;
 }
 
+
 .word-cloud-tag-wrapper {
   border: 2px solid rgba(177,178,246,.5);
   border-radius: 2px;
-  background-color: rgba(233,234,253,.2);
+  background-color: rgba(248,248,254,.1);
   display: inline-block;
   padding: 6px;
   margin: 3px;
@@ -669,17 +812,22 @@ button.github:after, input[type=submit].github:after {
 }
 
 .histogram-container {
+  width: 778px;
+  margin: 0 0 0 0;
+  height: 320px;
+  overflow:hidden;
+}
+
+.pie-container {
   width: 360px;
-  margin: 0 auto;
-  height: 360px;
-  padding-left:30px;
+  margin: 0 0 0 0;
+  height: 320px;
   overflow:hidden;
 }
 
 .area-container {
-  width: 400px;
-  margin: 20px 0 0 -20px;
-  height: 335px;
+  width: 380px;
+  height: 240px;
 }
 
 .radar-container {
@@ -694,7 +842,8 @@ button.github:after, input[type=submit].github:after {
 }
 
 .explore-select {
-  margin-left: 80px;
+  margin-left: 60px;
+  height: 50px;
 }
 
 .explore-pagination {
@@ -715,10 +864,26 @@ button.github:after, input[type=submit].github:after {
   text-align: center;
 }
 
-.login-buttons>div {
+.login-buttons {
   margin: 20px;
 }
 
+/* Glossary layout */
+.glossary-paper {
+  margin: 0 15% 0 15%;
+}
+
+.glossary-item {
+  margin: 0 15% 0 15%;
+  text-align: "justify";
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.1em;
+}
+
+.glossary-term {
+  padding: 0 0 0 15%;
+  text-align: "left";
+}
 
 /* Welcome layout */
 
