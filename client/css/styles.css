@@ -448,6 +448,7 @@ h2 {
 h3 {
   font-size: 2.5rem;
   text-align: center;
+  font-weight: 300;
 }
 
 ul {
@@ -857,6 +858,34 @@ button.github:after, input[type=submit].github:after {
 
 
 /* My Account layout */
+
+.myacct-loggedout {
+  margin: 48px 20% 0 20%;
+  height: 300px;
+  padding: 50px 20px 50px 20px;
+}
+
+.myacct-loggedin {
+  margin: 48px auto;
+  width: 1170px;
+  height: 200px;
+}
+
+.myacct-name {
+  float: left;
+  margin: 20px 0 0 20px;
+}
+
+.myacct-logout-button {
+  float: right;
+  margin: 32px 540px 0 0;
+}
+
+.profile-image-myacct {
+  width: 200px;
+  height: 200px;
+  float: left;
+}
 
 .login-buttons {
   text-align: center;

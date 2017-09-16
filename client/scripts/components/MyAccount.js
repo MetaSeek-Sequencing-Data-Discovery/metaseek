@@ -3,6 +3,7 @@ import Firebase from 'firebase';
 
 // Material Design stuff
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import ColorPalette from './ColorPalette';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
@@ -68,23 +69,14 @@ var MyAccount = React.createClass({
       <div>
         <Header history={this.props.history}/>
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
-          <Paper className="single-sheet" >
-            <h2>Log in with Google to view your MetaSeek account.</h2>
-            <div>
-               <img className="profile-image" style={{'display':this.state.firebase.uid ? 'inline' : 'none'}} src={this.state.firebase.photo}/>
-            </div>
+          <Paper className="myacct-loggedout" >
+            <h3>Log in with Google to view your MetaSeek account.</h3>
             <div className="login-buttons">
               <RaisedButton
                 label="Log In"
                 onClick={this.triggerLogin}
                 primary={true}
                 disabled={this.state.firebase.uid}
-              />
-              <RaisedButton
-                label="Log Out"
-                onClick={this.triggerLogout}
-                primary={true}
-                disabled={!(this.state.firebase.uid)}
               />
           </div>
           </Paper>
@@ -96,25 +88,18 @@ var MyAccount = React.createClass({
       <div>
         <Header history={this.props.history}/>
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
-          <Paper className="single-sheet" >
-            <h2>{"Hey, you're logged in as " + this.state.firebase.name}</h2>
+          <Paper className="myacct-loggedin" >
             <div>
-               <img className="profile-image" style={{'display':this.state.firebase.uid ? 'inline' : 'none'}} src={this.state.firebase.photo}/>
+               <img className="profile-image-myacct" src={this.state.firebase.photo}/>
             </div>
-            <div className="login-buttons">
-              <RaisedButton
-                label="Log In"
-                onClick={this.triggerLogin}
-                primary={true}
-                disabled={this.state.firebase.uid}
-              />
-              <RaisedButton
+            <h2 className="myacct-name">{this.state.firebase.name}</h2>
+            <div className="myacct-logout-button">
+              <FlatButton
                 label="Log Out"
                 onClick={this.triggerLogout}
                 primary={true}
-                disabled={!(this.state.firebase.uid)}
               />
-          </div>
+            </div>
           </Paper>
         </MuiThemeProvider>
       </div>
