@@ -160,37 +160,19 @@ def summarizeColumn(queryObject,columnName,linearBins=False,logBins=False, num_c
                     logBinnedCounts[histogramBinString] = count
                 return logBinnedCounts
 
-def summarizeDatasets(queryObject):
-    filteredQueryObject = queryObject.with_entities(
-        Dataset.download_size_maxrun,
-        Dataset.investigation_type,
-        Dataset.library_source,
-        Dataset.env_package,
-        Dataset.library_strategy,
-        Dataset.library_screening_strategy,
-        Dataset.library_construction_method,
-        Dataset.study_type,
-        Dataset.sequencing_method,
-        Dataset.instrument_model,
-        Dataset.geo_loc_name,
-        Dataset.env_biome,
-        Dataset.env_feature,
-        Dataset.env_material,
-        Dataset.avg_read_length_maxrun,
-        Dataset.gc_percent_maxrun,
-        Dataset.meta_latitude,
-        Dataset.meta_longitude,
-        Dataset.library_reads_sequenced_maxrun,
-        Dataset.total_num_bases_maxrun
+def sumColumn(queryObject,columnName):
+    columnQueryObject = queryObject.with_entities(
+        getattr(Dataset,columnName)
     )
+    dataFrame = pd.read_sql(columnQueryObject.statement,db.session.bind)
+    total = sum(dataFrame[columnName].dropna())
+    return total
 
-    queryResultDataframe = pd.read_sql(filteredQueryObject.statement,db.session.bind)
-
+def summarizeDatasets(queryObject):
     total = queryObject.count()
     if total > 0:
-        # Simple aggregate responses
-        total_download_size = sum(queryResultDataframe['download_size_maxrun'].dropna())
-        # add more here . . .
+        # Simple numeric sum responses
+        total_download_size = sumColumn(queryObject,'download_size_maxrun')
 
         # Simple count histogram responses
         investigation_summary = summarizeColumn(queryObject,'investigation_type', num_cats=15)
