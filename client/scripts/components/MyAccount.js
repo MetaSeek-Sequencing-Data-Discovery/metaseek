@@ -1,14 +1,21 @@
 import React from 'react';
 import Firebase from 'firebase';
+import axios from 'axios';
+import apiConfig from '../config/api.js';
 
 // Material Design stuff
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import ColorPalette from './ColorPalette';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import Paper from 'material-ui/Paper';
 
 import Header from './Header';
+
+var apiRequest = axios.create({
+  baseURL: apiConfig.baseURL
+});
 
 var MyAccount = React.createClass({
   getInitialState: function() {
@@ -17,7 +24,8 @@ var MyAccount = React.createClass({
           'uid':null,
           'name':null,
           'photo':null
-        }
+        },
+        'discoveries': []
       }
   },
 
@@ -61,6 +69,11 @@ var MyAccount = React.createClass({
     this.state.firebase.uid = user.uid;
     this.state.firebase.photo = user.photoURL;
     this.setState(this.state.firebase);
+    var self = this;
+    apiRequest.get("/user/"+self.state.firebase.uid+"/discoveries")
+    .then(function (response) {
+      self.setState({"discoveries": response.data.discoveries});
+    });
   },
 
   render : function() {
@@ -68,11 +81,8 @@ var MyAccount = React.createClass({
       <div>
         <Header history={this.props.history}/>
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
-          <Paper className="single-sheet" >
-            <h2>Log in with Google to view your MetaSeek account.</h2>
-            <div>
-               <img className="profile-image" style={{'display':this.state.firebase.uid ? 'inline' : 'none'}} src={this.state.firebase.photo}/>
-            </div>
+          <Paper className="myacct-loggedout" >
+            <h3>Log in with Google to view your MetaSeek account.</h3>
             <div className="login-buttons">
               <RaisedButton
                 label="Log In"
@@ -80,13 +90,7 @@ var MyAccount = React.createClass({
                 primary={true}
                 disabled={this.state.firebase.uid}
               />
-              <RaisedButton
-                label="Log Out"
-                onClick={this.triggerLogout}
-                primary={true}
-                disabled={!(this.state.firebase.uid)}
-              />
-          </div>
+            </div>
           </Paper>
         </MuiThemeProvider>
       </div>
@@ -96,26 +100,24 @@ var MyAccount = React.createClass({
       <div>
         <Header history={this.props.history}/>
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
-          <Paper className="single-sheet" >
-            <h2>{"Hey, you're logged in as " + this.state.firebase.name}</h2>
-            <div>
-               <img className="profile-image" style={{'display':this.state.firebase.uid ? 'inline' : 'none'}} src={this.state.firebase.photo}/>
-            </div>
-            <div className="login-buttons">
-              <RaisedButton
-                label="Log In"
-                onClick={this.triggerLogin}
-                primary={true}
-                disabled={this.state.firebase.uid}
-              />
-              <RaisedButton
-                label="Log Out"
-                onClick={this.triggerLogout}
-                primary={true}
-                disabled={!(this.state.firebase.uid)}
-              />
+          <div>
+            <Paper className="myacct-loggedin" >
+              <div>
+                 <img className="profile-image-myacct" src={this.state.firebase.photo}/>
+              </div>
+              <h2 className="myacct-name">{this.state.firebase.name}</h2>
+              <div className="myacct-logout-button">
+                <FlatButton
+                  label="Log Out"
+                  onClick={this.triggerLogout}
+                  primary={true}
+                />
+              </div>
+            </Paper>
+            <Paper className="myacct-discoveryhead">
+              {JSON.stringify(this.state.discoveries)}
+            </Paper>
           </div>
-          </Paper>
         </MuiThemeProvider>
       </div>
     )
