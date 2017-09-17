@@ -171,22 +171,14 @@ def sumColumn(queryObject,columnName):
     total = sum(dataFrame[columnName].dropna())
     return total
 
+# utility function so you can drop these one-liners through the code
+# n = checkpoint(start,n,'Ready to respond to POST')
 def checkpoint(start, n, message=''):
     checkpoint = time.time()
     print 'checkpoint ' + str(n) + ' - ' + message + ':'
     print str(checkpoint - start) + ' since start'
     return n + 1
 
-def summarizeDatasets(queryObject,rules):
-    # queryObject is a filtered (including all "where's") Dataset.query object
-    start = time.time()
-    print queryObject
-
-    # this is the count of records that match all of the current where's
-    # this is the first thing that will be returned to the front-end in the
-    # POST to /datasets/search/summary
-    total = queryObject.count()
-    n = checkpoint(start,1,'have the total')
 def filterDatasetQueryObjectWithRules(queryObject,rules):
     for rule in rules:
         field = rule['field']
@@ -195,69 +187,80 @@ def filterDatasetQueryObjectWithRules(queryObject,rules):
         queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
     return queryObject
 
-    # 3 categories of tasks: above fold, on screen, off screen - we are going to kick off
-    # separate queries for each category, summarize them (ideally mostly inside SQL), then return
-    # each item over the socket
+def groupByCategoryAndCount(queryObject,columnName,sampleRate=0.1,numCats=10):
+    columnObject = getattr(Dataset,columnName)
+    return (
+        dict((key,val * (1/sampleRate)) for key, val in # rescale sampled columns to approx. results on full dataset
+            queryObject.with_entities(columnObject) # choose only the column we care about
+            .filter(columnObject.isnot(None)) # filter out NULLs
+            .filter(func.rand() < sampleRate) # grab random sample of rows
+            .add_columns(func.count(1).label('count')) # add count to response
+            .group_by(columnName) # group by
+            .order_by(desc('count')) # order by the largest first
+            .limit(numCats) # show the top N results
+            .all() # actually run the query
+        )
+    )
+
+def createNumericBinCaseStatement(dbSession,columnObject,bins,sumLabel):
+    cases = []
+    for i, threshold in enumerate(bins):
+        if i == 0:
+            low = 0
+        else:
+            low = bins[i-1]
+        high = bins[i]
+        caseLabel = str(low) + '-' + str(high)
+        addCase = columnObject < threshold,literal_column("'" + caseLabel + "'")
+        cases.append(addCase)
+    return dbSession(
+        case(cases, else_=literal_column("'> " + str(bins[-1]) + "'"))
+        .label(sumLabel),func.count(1)
+    )
+
+# TODO this is getting huge, maybe break it up
+def summarizeDatasets(queryObject,rules,sampleRate=1):
+    # filter queryObject by adding all "where's" to the Dataset.query object
+    # this can be used for categorical group by's, basic counts, etc.
+    # we have to construct a custom query object off of db.session.query and filterDatasetQueryObjectWithRules
+    # for any function returning fields that aren't columns in the Dataset db (eg. sums on groups or other func.blah() calls)
+    rootQueryObject = filterDatasetQueryObjectWithRules(queryObject,rules)
+
+    print 'Summarizing for rules:'
+    print rules
+
+    start = time.time()
+    n = checkpoint(start,1,'Started')
+
+    # this is the count of records that match all of the current where's
+    # and the download size for that slice of the DB
+    # this is the first thing that will be returned to the front-end in the
+    # POST to /datasets/search/summary
+    total = rootQueryObject.count()
+    n = checkpoint(start,n,'Have the total')
+
+    # this is an example of a query that can't use rootQueryObject, because the item returned
+    # isn't a Dataset._______ field, but instead func.sum(Dataset.download_size_maxrun)
+    total_download_size = (
+        filterDatasetQueryObjectWithRules(
+            db.session.query(func.sum(Dataset.download_size_maxrun)
+            .label('total_download_size')),rules)
+        .first()
+    )
+    n = checkpoint(start,n,'Ready to respond to POST')
+
+    # 3 categories of background tasks: above fold, on screen, off screen - we are going to kick off
+    # separate queries for each category, summarize them (ideally mostly inside SQL, not by retrieving full datasets),
+    # then return each item over the socket
 
     # Above the fold summary calculations -
-
-    n = checkpoint(start,n,'starting data frame ######')
-    aboveFoldDataFrame = getSampledColumns(queryObject,['download_size_maxrun','env_package','investigation_type','download_size_maxrun'],sampleRate=0.1)
-    total_download_size = sum(aboveFoldDataFrame['download_size_maxrun'].dropna())
-    env_pkg_summary = summarizeColumn(aboveFoldDataFrame,'env_package', num_cats=10)
-    investigation_summary = summarizeColumn(aboveFoldDataFrame,'investigation_type', num_cats=10)
-    down_size_summary = summarizeColumn(aboveFoldDataFrame,'download_size_maxrun',logBins=True)
-    print env_pkg_summary
-    print investigation_summary
-    print down_size_summary
-    n = checkpoint(start,n,'finished data frame #######')
-
-
-
-    n = checkpoint(start,n,'started grouping in query $$$$$$$')
-    env_pkg_summary = (
-        dict((x,y * 10) for x, y in
-            queryObject.with_entities(Dataset.env_package)
-            .filter(Dataset.env_package.isnot(None))
-            .filter(func.rand() < 0.1)
-            .add_columns(func.count(1).label('count'))
-            .group_by('env_package')
-            .order_by(desc('count'))
-            .limit(10)
-            .all()
-        )
-    )
-    investigation_summary = (
-        dict((x,y * 10) for x, y in
-            queryObject.with_entities(Dataset.investigation_type)
-            .filter(Dataset.investigation_type.isnot(None))
-            .filter(func.rand() < 0.1)
-            .add_columns(func.count(1).label('count'))
-            .group_by('investigation_type')
-            .order_by(desc('count'))
-            .limit(10)
-            .all()
-        )
-    )
-
-    histQuery = db.session.query(
-        case ([
-            (Dataset.download_size_maxrun < 10,literal_column("'0-10'")),
-            (Dataset.download_size_maxrun < 100,literal_column("'10-100'")),
-            (Dataset.download_size_maxrun < 1000,literal_column("'100-1000'")),
-            (Dataset.download_size_maxrun < 10000,literal_column("'1000-10000'")),
-            (Dataset.download_size_maxrun < 100000,literal_column("'10000-100000'")),
-            (Dataset.download_size_maxrun < 1000000,literal_column("'100000-1000000'")),
-            (Dataset.download_size_maxrun < 10000000,literal_column("'1000000-1000000'")),
-            ], else_=literal_column("'> 1000000'")
-        )
-        .label("download_size_hist"),func.count(1))
-
-    for rule in rules:
-        field = rule['field']
-        ruletype = rule['type']
-        value = rule['value']
-        histQuery = filterQueryByRule(Dataset,histQuery,field,ruletype,value)
+    n = checkpoint(start,n,'Starting above the fold')
+    env_pkg_summary = groupByCategoryAndCount(rootQueryObject,'env_package',sampleRate=sampleRate,numCats=10)
+    investigation_summary = groupByCategoryAndCount(rootQueryObject,'investigation_type',sampleRate=sampleRate,numCats=10)
+    histQuery = createNumericBinCaseStatement(db.session.query,Dataset.download_size_maxrun,[10,100,1000,10000,100000],"download_size_hist")
+    print histQuery
+    histQuery = filterDatasetQueryObjectWithRules(histQuery,rules)
+    print histQuery
 
     down_size_summary = (
         dict((x,y * 10) for x, y in
@@ -268,14 +271,11 @@ def filterDatasetQueryObjectWithRules(queryObject,rules):
             .all()
         )
     )
-    print env_pkg_summary
-    print investigation_summary
-    print down_size_summary
     # down_size_summary = summarizeColumn(aboveFoldDataFrame,'download_size_maxrun',logBins=True)
     n = checkpoint(start,n,'done grouping in query $$$$$')
 
     # On screen summary calculations -
-    onScreenDataFrame = getSampledColumns(queryObject,['meta_latitude','meta_longitude','library_construction_method','library_strategy','env_biome','avg_read_length_maxrun'],sampleRate=0.001)
+    onScreenDataFrame = getSampledColumns(rootQueryObject,['meta_latitude','meta_longitude','library_construction_method','library_strategy','env_biome','avg_read_length_maxrun'],sampleRate=0.001)
     lib_construction_method_summary = summarizeColumn(onScreenDataFrame,'library_construction_method')
     lib_strategy_summary = summarizeColumn(onScreenDataFrame,'library_strategy', num_cats=20)
     env_biome_summary = summarizeColumn(onScreenDataFrame,'env_biome',num_cats=20)
@@ -317,7 +317,7 @@ def filterDatasetQueryObjectWithRules(queryObject,rules):
     n = checkpoint(start,n,'map done')
 
     # Off screen summary calculations -
-    offScreenDataFrame = getSampledColumns(queryObject,['library_source','library_screening_strategy','study_type','sequencing_method','instrument_model','geo_loc_name','env_feature','env_material','gc_percent_maxrun','library_reads_sequenced_maxrun','total_num_bases_maxrun'],sampleRate=0.001)
+    offScreenDataFrame = getSampledColumns(rootQueryObject,['library_source','library_screening_strategy','study_type','sequencing_method','instrument_model','geo_loc_name','env_feature','env_material','gc_percent_maxrun','library_reads_sequenced_maxrun','total_num_bases_maxrun'],sampleRate=0.001)
     lib_source_summary = summarizeColumn(offScreenDataFrame,'library_source')
     lib_screening_strategy_summary = summarizeColumn(offScreenDataFrame,'library_screening_strategy', num_cats=20)
     study_type_summary = summarizeColumn(offScreenDataFrame,'study_type')
