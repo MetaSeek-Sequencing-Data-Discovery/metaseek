@@ -2,6 +2,7 @@ import React from 'react';
 import Firebase from 'firebase';
 import axios from 'axios';
 import apiConfig from '../config/api.js';
+import { Link } from 'react-router';
 
 // Material Design stuff
 import RaisedButton from 'material-ui/RaisedButton';
@@ -10,6 +11,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import ColorPalette from './ColorPalette';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import Paper from 'material-ui/Paper';
+import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 
 import Header from './Header';
 
@@ -31,7 +33,12 @@ var MyAccount = React.createClass({
 
   componentWillMount: function() {
     var user = Firebase.auth().currentUser;
+    var self = this;
     if (user) {
+      apiRequest.get("/user/"+user.uid+"/discoveries")
+      .then(function (response) {
+        self.setState({"discoveries": response.data.discoveries});
+      });
       this.state.firebase.name = user.displayName;
       this.state.firebase.uid = user.uid;
       this.state.firebase.photo = user.photoURL;
@@ -65,15 +72,16 @@ var MyAccount = React.createClass({
   },
 
   successfulLogin : function(user) {
+    var self = this;
+    apiRequest.get("/user/"+user.uid+"/discoveries")
+    .then(function (response) {
+      self.setState({"discoveries": response.data.discoveries});
+    });
     this.state.firebase.name = user.displayName;
     this.state.firebase.uid = user.uid;
     this.state.firebase.photo = user.photoURL;
     this.setState(this.state.firebase);
-    var self = this;
-    apiRequest.get("/user/"+self.state.firebase.uid+"/discoveries")
-    .then(function (response) {
-      self.setState({"discoveries": response.data.discoveries});
-    });
+
   },
 
   render : function() {
@@ -96,6 +104,8 @@ var MyAccount = React.createClass({
       </div>
     );
 
+    var tableHeaderStyles = {color:'#fff',fontFamily:'Roboto',fontSize:'20px',fontWeight:600};
+
     return (
       <div>
         <Header history={this.props.history}/>
@@ -105,18 +115,46 @@ var MyAccount = React.createClass({
               <div>
                  <img className="profile-image-myacct" src={this.state.firebase.photo}/>
               </div>
-              <h2 className="myacct-name">{this.state.firebase.name}</h2>
-              <div className="myacct-logout-button">
-                <FlatButton
-                  label="Log Out"
-                  onClick={this.triggerLogout}
-                  primary={true}
-                />
+              <div className="myacct-user">
+                <h2 className="myacct-name">{this.state.firebase.name}</h2>
+                <div className="myacct-logout-button">
+                  <FlatButton
+                    label="Log Out"
+                    onClick={this.triggerLogout}
+                    primary={true}
+                  />
+                </div>
+              </div>
+              <div className="num-discoveries">
+                <span className="discovery-header-user">{this.state.discoveries.length + " saved discoveries"}</span>
               </div>
             </Paper>
-            <Paper className="myacct-discoveryhead">
-              {JSON.stringify(this.state.discoveries)}
+
+            <Paper className="user-discoveries-table">
+              <Table bodyStyle={{overflowX: 'scroll', width:'100%' }} fixedHeader={false} fixedFooter={false} selectable={false} style={{'tableLayout':'auto'}}>
+                <TableHeader style={{backgroundColor:'#979CF2'}} adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
+                  <TableRow selectable={false}>
+                    <TableHeaderColumn style={tableHeaderStyles}>{this.state.discoveries.length + " Discoveries"}</TableHeaderColumn>
+                    <TableHeaderColumn style={tableHeaderStyles}>Date Created</TableHeaderColumn>
+                    <TableHeaderColumn style={tableHeaderStyles}></TableHeaderColumn>
+                  </TableRow>
+                </TableHeader>
+                <TableBody showRowHover={false} stripedRows={false} displayRowCheckbox={false} preScanRows={false}>
+                  {this.state.discoveries.map( (discovery, index) => (
+                    <TableRow selectable={false} key={index}>
+                      <TableRowColumn style={{fontSize: "18px", width: "85%"}} >{discovery.discovery_title}</TableRowColumn>
+                      <TableRowColumn>{discovery.timestamp.substr(0, 25)}</TableRowColumn>
+                      <TableRowColumn style={{textAlign: "center"}}>
+                        <Link to={discovery.uri}>
+                        <RaisedButton label={"Details"} secondary={true} />
+                        </Link>
+                      </TableRowColumn>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </Paper>
+
           </div>
         </MuiThemeProvider>
       </div>

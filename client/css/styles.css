@@ -875,12 +875,10 @@ button.github:after, input[type=submit].github:after {
 
 .discovery-filterparam-table-container {
   overflow: visible;
-  width: 40%;
 }
 
 .filterparam-table {
   margin: 10px 18px 12px 18px;
-  float: left;
   overflow: visible;
 }
 
@@ -898,12 +896,24 @@ button.github:after, input[type=submit].github:after {
 }
 
 .discovery-header-summary {
-  float: right;
+  display: block;
+}
+.discovery-header-summary-left {
   margin: 0 18px 0 0;
+  width: 550px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.discovery-header-summary-right {
+  margin: 0 0 0 150px;
+  padding-top: 36px;
+  display: inline-block;
+  vertical-align: top;
 }
 
 .discovery-header-first {
-  margin: 60px 0 14px 0;
+  margin: 0 0 14px 0;
   font-weight: 300;
   position: relative;
   display: block;
@@ -927,16 +937,19 @@ button.github:after, input[type=submit].github:after {
   font-size: 38px;
   color: rgb(99, 105, 224);
   margin: 0 0 30px 0;
-  text-align: center;
+  text-align: right;
 }
 
 .discovery-header-user {
-  float: right;
   color: rgb(150,150,150);
   font-size: 18px;
   font-weight: 500;
   font-family: 'Roboto', sans-serif;
   margin: 0 0 18px 0;
+  text-align: right;
+  position: relative;
+  display: block;
+  top: 28%;
 }
 
 .discovery-datasets-title-container {
@@ -965,18 +978,22 @@ button.github:after, input[type=submit].github:after {
 .myacct-loggedin {
   margin: 48px auto;
   margin-bottom: 15px;
-  width: 1170px;
+  width: 1176px;
   height: 200px;
+}
+
+.myacct-user {
+  margin: 24px 0 0 220px;
+  position: absolute;
 }
 
 .myacct-name {
   float: left;
-  margin: 20px 0 0 20px;
 }
 
 .myacct-logout-button {
-  float: right;
-  margin: 32px 540px 0 0;
+  float: left;
+  margin: 36px 0 0 0;
 }
 
 .myacct-discoveryhead {
@@ -997,6 +1014,18 @@ button.github:after, input[type=submit].github:after {
 
 .login-buttons {
   margin: 20px;
+}
+
+.num-discoveries {
+  float: left;
+  margin: 130px 0 0 20px
+}
+
+.user-discoveries-table {
+  padding:0px;
+  margin: 36px auto;
+  width: 1176px;
+  clear: both;
 }
 
 /* Glossary layout */

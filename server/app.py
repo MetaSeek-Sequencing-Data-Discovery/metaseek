@@ -97,7 +97,8 @@ class GetUserDiscoveries(Resource):
     @marshal_with({
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
-        'uri': fields.Url('getdiscovery', absolute=True)
+        'uri': fields.Url('getdiscovery', absolute=True),
+        'discovery_title': fields.String
     }, envelope='discoveries')
 
     def get(self, id):
