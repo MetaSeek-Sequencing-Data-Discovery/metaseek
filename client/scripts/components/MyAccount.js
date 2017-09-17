@@ -143,10 +143,10 @@ var MyAccount = React.createClass({
                   {this.state.discoveries.map( (discovery, index) => (
                     <TableRow selectable={false} key={index}>
                       <TableRowColumn style={{fontSize: "18px", width: "85%"}} >{discovery.discovery_title}</TableRowColumn>
-                      <TableRowColumn>{discovery.timestamp.substr(0, 25)}</TableRowColumn>
+                      <TableRowColumn>{discovery.timestamp.substr(5, 20)}</TableRowColumn>
                       <TableRowColumn style={{textAlign: "center"}}>
                         <Link to={discovery.uri}>
-                        <RaisedButton label={"Details"} secondary={true} />
+                        <RaisedButton label={"discovery details"} secondary={true} />
                         </Link>
                       </TableRowColumn>
                     </TableRow>
