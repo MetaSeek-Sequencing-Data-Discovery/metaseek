@@ -6,7 +6,7 @@ from models import *
 from datetime import datetime
 from decimal import Decimal
 from collections import Counter
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, case, literal_column, desc
 import scipy.stats as sp
 import time
 
@@ -75,7 +75,7 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
 
     return queryObject
 
-def getSampledColumns(queryObject,columnNames,sampleRate=0.0001):
+def getSampledColumns(queryObject,columnNames,sampleRate=0.33):
     columnQueryObject = queryObject.with_entities(*[getattr(Dataset,c) for c in columnNames])
     sampledColumns = columnQueryObject.filter(func.rand() < sampleRate)
     dataFrame = pd.read_sql(sampledColumns.statement,db.session.bind)
@@ -177,7 +177,7 @@ def checkpoint(start, n, message=''):
     print str(checkpoint - start) + ' since start'
     return n + 1
 
-def summarizeDatasets(queryObject):
+def summarizeDatasets(queryObject,rules):
     # queryObject is a filtered (including all "where's") Dataset.query object
     start = time.time()
     print queryObject
@@ -193,12 +193,79 @@ def summarizeDatasets(queryObject):
     # each item over the socket
 
     # Above the fold summary calculations -
-    aboveFoldDataFrame = getSampledColumns(queryObject,['download_size_maxrun','env_package','investigation_type','download_size_maxrun'],sampleRate=0.001)
+
+    n = checkpoint(start,n,'starting data frame ######')
+    aboveFoldDataFrame = getSampledColumns(queryObject,['download_size_maxrun','env_package','investigation_type','download_size_maxrun'],sampleRate=0.1)
     total_download_size = sum(aboveFoldDataFrame['download_size_maxrun'].dropna())
-    env_pkg_summary = summarizeColumn(aboveFoldDataFrame,'env_package', num_cats=15)
-    investigation_summary = summarizeColumn(aboveFoldDataFrame,'investigation_type', num_cats=15)
+    env_pkg_summary = summarizeColumn(aboveFoldDataFrame,'env_package', num_cats=10)
+    investigation_summary = summarizeColumn(aboveFoldDataFrame,'investigation_type', num_cats=10)
     down_size_summary = summarizeColumn(aboveFoldDataFrame,'download_size_maxrun',logBins=True)
-    n = checkpoint(start,n,'above the fold done')
+    print env_pkg_summary
+    print investigation_summary
+    print down_size_summary
+    n = checkpoint(start,n,'finished data frame #######')
+
+
+
+    n = checkpoint(start,n,'started grouping in query $$$$$$$')
+    env_pkg_summary = (
+        dict((x,y * 10) for x, y in
+            queryObject.with_entities(Dataset.env_package)
+            .filter(Dataset.env_package.isnot(None))
+            .filter(func.rand() < 0.1)
+            .add_columns(func.count(1).label('count'))
+            .group_by('env_package')
+            .order_by(desc('count'))
+            .limit(10)
+            .all()
+        )
+    )
+    investigation_summary = (
+        dict((x,y * 10) for x, y in
+            queryObject.with_entities(Dataset.investigation_type)
+            .filter(Dataset.investigation_type.isnot(None))
+            .filter(func.rand() < 0.1)
+            .add_columns(func.count(1).label('count'))
+            .group_by('investigation_type')
+            .order_by(desc('count'))
+            .limit(10)
+            .all()
+        )
+    )
+
+    histQuery = db.session.query(
+        case ([
+            (Dataset.download_size_maxrun < 10,literal_column("'0-10'")),
+            (Dataset.download_size_maxrun < 100,literal_column("'10-100'")),
+            (Dataset.download_size_maxrun < 1000,literal_column("'100-1000'")),
+            (Dataset.download_size_maxrun < 10000,literal_column("'1000-10000'")),
+            (Dataset.download_size_maxrun < 100000,literal_column("'10000-100000'")),
+            (Dataset.download_size_maxrun < 1000000,literal_column("'100000-1000000'")),
+            (Dataset.download_size_maxrun < 10000000,literal_column("'1000000-1000000'")),
+            ], else_=literal_column("'> 1000000'")
+        )
+        .label("download_size_hist"),func.count(1))
+
+    for rule in rules:
+        field = rule['field']
+        ruletype = rule['type']
+        value = rule['value']
+        histQuery = filterQueryByRule(Dataset,histQuery,field,ruletype,value)
+
+    down_size_summary = (
+        dict((x,y * 10) for x, y in
+            histQuery
+            .filter(Dataset.download_size_maxrun.isnot(None))
+            .filter(func.rand() < 0.1)
+            .group_by("download_size_hist")
+            .all()
+        )
+    )
+    print env_pkg_summary
+    print investigation_summary
+    print down_size_summary
+    # down_size_summary = summarizeColumn(aboveFoldDataFrame,'download_size_maxrun',logBins=True)
+    n = checkpoint(start,n,'done grouping in query $$$$$')
 
     # On screen summary calculations -
     onScreenDataFrame = getSampledColumns(queryObject,['meta_latitude','meta_longitude','library_construction_method','library_strategy','env_biome','avg_read_length_maxrun'],sampleRate=0.001)
