@@ -187,6 +187,13 @@ def summarizeDatasets(queryObject,rules):
     # POST to /datasets/search/summary
     total = queryObject.count()
     n = checkpoint(start,1,'have the total')
+def filterDatasetQueryObjectWithRules(queryObject,rules):
+    for rule in rules:
+        field = rule['field']
+        ruletype = rule['type']
+        value = rule['value']
+        queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+    return queryObject
 
     # 3 categories of tasks: above fold, on screen, off screen - we are going to kick off
     # separate queries for each category, summarize them (ideally mostly inside SQL), then return

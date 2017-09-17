@@ -186,15 +186,8 @@ class SearchDatasets(Resource):
             parser.add_argument('filter_params', type=str)
             args = parser.parse_args()
             filter_params = json.loads(args['filter_params'])
-            rules = filter_params['rules']
 
-            queryObject = Dataset.query
-
-            for rule in rules:
-                field = rule['field']
-                ruletype = rule['type']
-                value = rule['value']
-                queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+            queryObject = filterDatasetQueryObjectWithRules(Dataset.query,filter_params['rules'])
 
             pageObject = queryObject.paginate(page,datasetsPerPage,False)
             totalPageCount = int(math.ceil(pageObject.total / datasetsPerPage))
@@ -225,12 +218,13 @@ class GetDatasetSummary(Resource):
         # str(hashxx(json.dumps(json.loads('{"rules":[]}')['rules'])))
         # Allows this cached value to be reused by SearchDatasetsSummary when no rules are set
         cache_key = '2027185612'
+        rules = []
 
         from_cache = client.get(cache_key)
 
         if from_cache is None:
             queryObject = Dataset.query
-            summary = summarizeDatasets(queryObject)
+            summary = summarizeDatasets(queryObject,rules)
             client.set(cache_key, summary)
             return summary
         else:
@@ -249,15 +243,7 @@ class SearchDatasetsSummary(Resource):
             from_cache = client.get(cache_key)
 
             if from_cache is None:
-                queryObject = Dataset.query
-
-                for rule in rules:
-                    field = rule['field']
-                    ruletype = rule['type']
-                    value = rule['value']
-                    queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
-
-                summary = summarizeDatasets(queryObject,rules)
+                summary = summarizeDatasets(Dataset.query,rules)
                 client.set(cache_key, summary)
                 return summary
             else:
