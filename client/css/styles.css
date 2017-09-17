@@ -871,6 +871,73 @@ button.github:after, input[type=submit].github:after {
   padding-right: 12px;
 }
 
+/* Discovery Details */
+
+.discovery-filterparam-table-container {
+  overflow: visible;
+  width: 40%;
+}
+
+.filterparam-table {
+  margin: 10px 18px 12px 18px;
+  float: left;
+  overflow: visible;
+}
+
+.filterparam-table-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: rgb(150,150,150);
+  margin-left: 12px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.discovery-header {
+  margin: 36px 0 36px 18px;
+  overflow: visible;
+}
+
+.discovery-header-summary {
+  float: right;
+  margin: 0 18px 0 0;
+}
+
+.discovery-header-first {
+  margin: 60px 0 14px 0;
+  font-weight: 300;
+  position: relative;
+  display: block;
+  top: 28%;
+  font-size: 18px;
+  color:#666;
+  text-align: right;
+}
+
+.discovery-header-first .active {
+  font-weight: 700;
+  font-size: 38px;
+  color: rgb(99, 105, 224);
+}
+
+.discovery-header-second {
+  font-weight: 700;
+  position: relative;
+  display: block;
+  top: 28%;
+  font-size: 38px;
+  color: rgb(99, 105, 224);
+  margin: 0 0 30px 0;
+  text-align: center;
+}
+
+.discovery-header-user {
+  float: right;
+  color: rgb(150,150,150);
+  font-size: 18px;
+  font-weight: 500;
+  font-family: 'Roboto', sans-serif;
+  margin: 0 0 18px 0;
+}
 
 /* My Account layout */
 
