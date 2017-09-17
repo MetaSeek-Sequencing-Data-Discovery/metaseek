@@ -13,6 +13,7 @@ import Header from './Header';
 import VizDashboard from './VizDashboard';
 import Loading from './Loading';
 import {getReadableFileSizeString} from '../helpers';
+import ExploreTable from './ExploreTable';
 
 var apiRequest = axios.create({
   baseURL: apiConfig.baseURL
@@ -24,7 +25,12 @@ var DiscoveryDetail = React.createClass({
       'discovery':{},
       'summaryData': [],
       'loaded': false,
-      'dataTable': []
+      'dataTable': {
+        'datasets': [],
+        'hasNext': false,
+        'hasPrevious' : false,
+        'nextUri' : "/datasets/search/2"
+      }
     }
   },
   componentWillMount: function() {
@@ -35,17 +41,41 @@ var DiscoveryDetail = React.createClass({
       apiRequest.post("/datasets/search/summary", {
         "filter_params":response.data.discovery.filter_params
       }).then(function (response) {
-        self.setState({"summaryData": response.data.summary, "loaded":true})
+        self.setState({"summaryData": response.data.summary, "loaded":true});
+        apiRequest.post("/datasets/search/1", {
+          "filter_params":self.state.discovery.filter_params,
+        }).then(function (response) {
+          self.setState({"dataTable":response.data,"loaded":true});
+        })
       });
 
     });
   },
+
+  getPreviousDataPage : function() {
+    var self = this;
+    apiRequest.post(self.state.dataTable.previousUri, {
+      "filter_params":self.state.discovery.filter_params
+    }).then(function (response) {
+      self.setState({"dataTable":response.data});
+    });
+  },
+
+  getNextDataPage : function() {
+    var self = this;
+    apiRequest.post(self.state.dataTable.nextUri, {
+      "filter_params":self.state.discovery.filter_params
+    }).then(function (response) {
+      self.setState({"dataTable":response.data});
+    });
+  },
+
   render: function() {
     if (!this.state.loaded) return <Loading/>;
     var tableHeaderStyles = {color:'#fff',fontFamily:'Roboto',fontSize:'14px',fontWeight:700};
 
-    const ruletypes = JSON.parse("{\"0\":\"=\", \"1\":\"<\", \"2\":\">\", \"3\":\"<=\", \"4\":\">=\", \"5\":\"=\", \"6\":\"!=\", \"7\":\"contains one of\", \"10\":\"is not none\"}");
-    console.log(ruletypes);
+    const ruletypes = JSON.parse("{\"0\":\"=\", \"1\":\"<\", \"2\":\">\", \"3\":\"<=\", \"4\":\">=\", \"5\":\"=\", \"6\":\"!=\", \"7\":\"contains\", \"10\":\"is not none\"}");
+    console.log(this.state.dataTable);
     return (
       <div>
         <Header history={this.props.history}/>
@@ -67,7 +97,7 @@ var DiscoveryDetail = React.createClass({
                     <TableHeader style={{backgroundColor:'#7075E0'}} adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
                       <TableRow selectable={false}>
                         <TableHeaderColumn style={tableHeaderStyles}>Field</TableHeaderColumn>
-                        <TableHeaderColumn style={tableHeaderStyles}></TableHeaderColumn>
+                        <TableHeaderColumn style={tableHeaderStyles}>Filter Type</TableHeaderColumn>
                         <TableHeaderColumn style={tableHeaderStyles}>Value</TableHeaderColumn>
                       </TableRow>
                     </TableHeader>
@@ -82,6 +112,12 @@ var DiscoveryDetail = React.createClass({
                     </TableBody>
                   </Table>
                 </div>
+              </Paper>
+              <Paper className="explore-table card three">
+                <div className="discovery-datasets-title-container">
+                    <span className="discovery-datasets-title">Datasets in This Discovery</span>
+                </div>
+                <ExploreTable getNextDataPage={this.getNextDataPage} getPreviousDataPage={this.getPreviousDataPage} dataTable={this.state.dataTable}/>
               </Paper>
               <VizDashboard activeSummaryData={this.state.summaryData}/>
             </div>

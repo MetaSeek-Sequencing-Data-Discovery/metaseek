@@ -939,6 +939,21 @@ button.github:after, input[type=submit].github:after {
   margin: 0 0 18px 0;
 }
 
+.discovery-datasets-title-container {
+    width: 100%;
+    height: 45px;
+    background-color: rgb(225,225,225);
+    padding: 12px;
+}
+
+.discovery-datasets-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: rgb(150,150,150);
+  font-family: 'Roboto', sans-serif;
+  height: 50px;
+}
+
 /* My Account layout */
 
 .myacct-loggedout {
