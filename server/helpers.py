@@ -12,12 +12,13 @@ import time
 
 # Utilities
 # Simple timing function so you can drop these one-liners through the code
-# n = checkpoint(start,n,'Ready to respond to POST')
-def checkpoint(start, n, message=''):
-    checkpoint = time.time()
-    print 'checkpoint ' + str(n) + ' - ' + message + ':'
-    print str(checkpoint - start) + ' since start'
-    return n + 1
+# (start,last,n) = checkpoint(start,last,n,'Ready to respond to POST')
+def checkpoint(start, last, n, message):
+    current = time.time()
+    elapsed = float(int((current-last) * 10))/10
+    totalElapsed = float(int((current-start) * 10))/10
+    print '| ' + str(n).ljust(4) + ' | ' + (str(elapsed) + 's').rjust(9) + ' | ' + (str(totalElapsed) + 's').rjust(8) + ' | ' + message.ljust(60) + ' |'
+    return (start,current,n+1)
 
 ### Map Helpers
 # Get color gradient from max to white
@@ -195,90 +196,7 @@ def getSampledColumns(queryObject,columnNames,sampleRate=0.2):
     dataFrame = pd.read_sql(sampledColumns.statement,db.session.bind)
     return dataFrame
 
-# Old summarization code - to summarize a column fully loaded into memory, goal is to remove this
-def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cats=None):
-    dataColumn = dataFrame[columnName].dropna()
-    uniqueCount = len(dataColumn.unique())
-    if uniqueCount == 0:
-        return {'NULL':len(dataFrame.index)}
-    else:
-        if logBins == False:
-            if linearBins == False or uniqueCount == 1:
-                groupedColumn = dataColumn.groupby(dataColumn)
-                countedColumn = groupedColumn.size()
-                countedColumnDict = dict(countedColumn)
-
-                if num_cats: #get top n categories, sum rest as 'other categories'
-                    countedColumn.sort_values(inplace=True)
-                    top = dict(countedColumn[-num_cats:])
-                    top['other categories'] = sum(countedColumn[:-num_cats])
-                    countedColumnDict = top
-
-                nodata_counts = len(dataFrame[columnName])-len(dataColumn)
-                if nodata_counts>0:
-                    countedColumnDict['no data'] = nodata_counts
-                return countedColumnDict #categorical hist
-            else: #linear bin hist
-                minValue = np.amin(dataColumn)
-                maxValue = np.amax(dataColumn)
-
-                roundTo = int(round(np.log10(maxValue-minValue)) * -1) + 1
-                binSize = 10**(-1 * roundTo)
-
-                # protect against weird rounding issues by expanding range if needed
-                rangeMin = round(math.floor(minValue),roundTo)
-                if (minValue < rangeMin):
-                    rangeMin = rangeMin - binSize
-
-                rangeMax = round(math.ceil(maxValue),roundTo) + binSize
-                if (maxValue > (rangeMax - binSize)):
-                    rangeMax = rangeMax + binSize
-
-                if binSize >= 1:
-                    binSize = int(binSize)
-                    rangeMin = int(rangeMin)
-                    rangeMax = int(rangeMax)
-                    bins = range(rangeMin,rangeMax,binSize)
-                # need to use np.arange for floats, range for ints
-                bins = np.arange(rangeMin,rangeMax,binSize)
-
-                counts, binEdges = np.histogram(dataColumn,bins=bins)
-
-                roundedCounts = {}
-                for index, count in enumerate(counts):
-                    # histogram labels should be ranges, not values
-                    # or we need to store min / max bounds for each bin and pass that to the frontend somehow
-                    histogramBinString = str(binEdges[index]) + ' - ' + str(binEdges[index + 1])
-                    roundedCounts[histogramBinString] = count
-                return roundedCounts
-        else: #logbin hist
-            dataColumn = dataColumn[dataColumn > 0]
-            if len(dataColumn) == 0:
-                return {}
-            else:
-                minValue = np.amin(dataColumn)
-                minPowerFloor = math.floor(np.log10(minValue))
-                maxValue = np.amax(dataColumn)
-                maxPowerCeil = math.ceil(np.log10(maxValue))
-
-                numBins = maxPowerCeil - minPowerFloor + 1
-                if minPowerFloor == maxPowerCeil:
-                    maxPowerCeil = maxPowerCeil + 1
-                logBins = np.logspace(minPowerFloor,maxPowerCeil,num=numBins)
-
-                counts, binEdges = np.histogram(dataColumn,bins=logBins)
-
-                logBinnedCounts = {}
-                for index, count in enumerate(counts):
-                    # histogram labels should be ranges, not values
-                    # or we need to store min / max bounds for each bin and pass that to the frontend somehow
-                    histogramBinString = '10^' + str(int(index + minPowerFloor)) + ' - ' + '10^' + str(int(index + 1 + minPowerFloor))
-                    # not sure whether I like the scientific notation strings more than this or not:
-                    # histogramBinString = str(int(binEdges[index])) + '-' + str(int(binEdges[index + 1]))
-                    logBinnedCounts[histogramBinString] = count
-                return logBinnedCounts
-
-# TODO this is getting huge, maybe time to break it up, move to its own file?
+# Run all 4 summarization steps in series - get the POST response, above the fold, on screen and off screen summaries
 def summarizeDatasets(queryObject,rules,sampleRate=0.2):
     # filter queryObject by adding all "where's" to the Dataset.query object
     # this can be used for categorical group by's, basic counts, etc.
@@ -286,18 +204,20 @@ def summarizeDatasets(queryObject,rules,sampleRate=0.2):
     # for any function returning fields that aren't columns in the Dataset db (eg. sums on groups or other func.blah() calls)
     rootQueryObject = filterDatasetQueryObjectWithRules(queryObject,rules)
 
-    print 'Summarizing for rules:'
-    print rules
+    print 'Summarizing for rules: ' + str(rules)
+    print 'Sample rate: ' + str(sampleRate)
+    print '------------------------------------------------------------------------------------------'
+    print '| ' + "Step".ljust(4) + ' | ' + "Time (s)".rjust(8) + ' | ' + "Total (s)".rjust(9) + ' | ' + "Message".ljust(60) + ' |'
 
     start = time.time()
-    n = checkpoint(start,1,'Started')
+    (start,last,n) = checkpoint(start,start,1,'Started')
 
     # this is the count of records that match all of the current where's
     # and the download size for that slice of the DB
     # this is the first thing that will be returned to the front-end in the
     # POST to /datasets/search/summary
     total = rootQueryObject.count()
-    n = checkpoint(start,n,'Have the total')
+    (start,last,n) = checkpoint(start,last,n,'Total: ' + str(total))
 
     # this is an example of a query that can't use rootQueryObject, because the item returned
     # isn't a Dataset._______ field, but instead func.sum(Dataset.download_size_maxrun)
@@ -307,34 +227,30 @@ def summarizeDatasets(queryObject,rules,sampleRate=0.2):
             .label('total_download_size')),rules)
         .first()
     )
-    n = checkpoint(start,n,'Ready to respond to POST')
+    (start,last,n) = checkpoint(start,last,n,'Ready to respond to POST (w/ download size)')
 
     # 3 categories of background tasks: above fold, on screen, off screen - we are going to kick off
     # separate queries for each category, summarize them (ideally mostly inside SQL, not by retrieving full datasets),
     # then return each item over the socket
 
     # Above the fold summary calculations -
-    n = checkpoint(start,n,'Starting above the fold')
     env_pkg_summary = groupByCategoryAndCount(rootQueryObject,'env_package',sampleRate=sampleRate,numCats=10)
     investigation_summary = groupByCategoryAndCount(rootQueryObject,'investigation_type',sampleRate=sampleRate,numCats=10)
     down_size_summary = groupWithCustomCasesAndCount(db.session.query,rules,'download_size_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
-    n = checkpoint(start,n,'Done with above the fold')
+    (start,last,n) = checkpoint(start,last,n,'Finished with above the fold, ready for 1st socket push')
 
     # On screen summary calculations -
-    n = checkpoint(start,n,'Starting on screen')
     lib_construction_method_summary = groupByCategoryAndCount(rootQueryObject,'library_construction_method',sampleRate=sampleRate)
     lib_strategy_summary = groupByCategoryAndCount(rootQueryObject,'library_strategy',sampleRate=sampleRate,numCats=20)
     env_biome_summary = groupByCategoryAndCount(rootQueryObject,'env_biome',sampleRate=sampleRate,numCats=20)
     avg_read_length_summary = groupWithCustomCasesAndCount(db.session.query,rules,'avg_read_length_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
-    n = checkpoint(start,n,'On screen, non-map done')
+    (start,last,n) = checkpoint(start,last,n,'Finished with on screen, ready for 2nd socket push')
 
-    n = checkpoint(start,n,'Pulling full columns for map analysis')
     mapDataFrame = getSampledColumns(rootQueryObject,['meta_latitude','meta_longitude'],sampleRate=sampleRate)
     (map_data, map_legend_info) = summarizeMap(mapDataFrame)
-    n = checkpoint(start,n,'Map done')
+    (start,last,n) = checkpoint(start,last,n,'Pulled full columns and analyzed map')
 
     # Off screen summary calculations -
-    n = checkpoint(start,n,'Starting on screen')
     lib_source_summary = groupByCategoryAndCount(rootQueryObject,'library_source',sampleRate=sampleRate)
     lib_screening_strategy_summary = groupByCategoryAndCount(rootQueryObject,'library_screening_strategy',sampleRate=sampleRate,numCats=20)
     study_type_summary = groupByCategoryAndCount(rootQueryObject,'study_type',sampleRate=sampleRate)
@@ -346,7 +262,7 @@ def summarizeDatasets(queryObject,rules,sampleRate=0.2):
     gc_percent_summary = groupWithCustomCasesAndCount(db.session.query,rules,'gc_percent_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
     library_reads_sequenced_summary = groupWithCustomCasesAndCount(db.session.query,rules,'library_reads_sequenced_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
     total_bases_summary = groupWithCustomCasesAndCount(db.session.query,rules,'total_num_bases_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
-    n = checkpoint(start,n,'Off screen done')
+    (start,last,n) = checkpoint(start,last,n,'Finished with off screen, ready for last socket push')
 
     return {
         "summary": {

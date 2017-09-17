@@ -243,7 +243,7 @@ class SearchDatasetsSummary(Resource):
             from_cache = client.get(cache_key)
 
             if from_cache is None:
-                summary = summarizeDatasets(Dataset.query,rules)
+                summary = summarizeDatasets(Dataset.query,rules,0.05)
                 client.set(cache_key, summary)
                 return summary
             else:
