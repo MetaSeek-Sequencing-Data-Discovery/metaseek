@@ -6,7 +6,7 @@ from models import *
 from datetime import datetime
 from decimal import Decimal
 from collections import Counter
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 import scipy.stats as sp
 import time
 
@@ -75,11 +75,13 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
 
     return queryObject
 
-def summarizeColumn(queryObject,columnName,linearBins=False,logBins=False, num_cats=None):
-    columnQueryObject = queryObject.with_entities(
-        getattr(Dataset,columnName)
-    )
-    dataFrame = pd.read_sql(columnQueryObject.statement,db.session.bind)
+def getSampledColumns(queryObject,columnNames,sampleRate=0.0001):
+    columnQueryObject = queryObject.with_entities(*[getattr(Dataset,c) for c in columnNames])
+    sampledColumns = columnQueryObject.filter(func.rand() < sampleRate)
+    dataFrame = pd.read_sql(sampledColumns.statement,db.session.bind)
+    return dataFrame
+
+def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cats=None):
     dataColumn = dataFrame[columnName].dropna()
     uniqueCount = len(dataColumn.unique())
     if uniqueCount == 0:
@@ -169,184 +171,115 @@ def sumColumn(queryObject,columnName):
     total = sum(dataFrame[columnName].dropna())
     return total
 
-def checkpoint(start, n):
+def checkpoint(start, n, message=''):
     checkpoint = time.time()
-    print 'checkpoint ' + str(n) + ':'
+    print 'checkpoint ' + str(n) + ' - ' + message + ':'
     print str(checkpoint - start) + ' since start'
     return n + 1
 
 def summarizeDatasets(queryObject):
+    # queryObject is a filtered (including all "where's") Dataset.query object
     start = time.time()
-    n = checkpoint(start,0)
-    print 'started summarizing at ' + str(start)
     print queryObject
+
+    # this is the count of records that match all of the current where's
+    # this is the first thing that will be returned to the front-end in the
+    # POST to /datasets/search/summary
     total = queryObject.count()
-    n = checkpoint(start,n)
-    if total > 0:
-        # Simple numeric sum responses
-        total_download_size = sumColumn(queryObject,'download_size_maxrun')
-        n = checkpoint(start,n)
+    n = checkpoint(start,1,'have the total')
 
-        # Simple count histogram responses
-        investigation_summary = summarizeColumn(queryObject,'investigation_type', num_cats=15)
-        n = checkpoint(start,n)
-        lib_source_summary = summarizeColumn(queryObject,'library_source')
-        n = checkpoint(start,n)
-        env_pkg_summary = summarizeColumn(queryObject,'env_package', num_cats=15)
-        n = checkpoint(start,n)
-        lib_strategy_summary = summarizeColumn(queryObject,'library_strategy', num_cats=20)
-        n = checkpoint(start,n)
-        lib_screening_strategy_summary = summarizeColumn(queryObject,'library_screening_strategy', num_cats=20)
-        n = checkpoint(start,n)
-        lib_construction_method_summary = summarizeColumn(queryObject,'library_construction_method')
-        n = checkpoint(start,n)
-        study_type_summary = summarizeColumn(queryObject,'study_type')
-        n = checkpoint(start,n)
-        sequencing_method_summary = summarizeColumn(queryObject,'sequencing_method', num_cats=10)
-        n = checkpoint(start,n)
+    # 3 categories of tasks: above fold, on screen, off screen - we are going to kick off
+    # separate queries for each category, summarize them (ideally mostly inside SQL), then return
+    # each item over the socket
 
-        #maybe top-10 or top-15 categorical responses
-        instrument_model_summary = summarizeColumn(queryObject,'instrument_model',num_cats=15)
-        n = checkpoint(start,n)
-        geo_loc_name_summary = summarizeColumn(queryObject,'geo_loc_name',num_cats=20)
-        n = checkpoint(start,n)
-        env_biome_summary = summarizeColumn(queryObject,'env_biome',num_cats=20)
-        n = checkpoint(start,n)
-        env_feature_summary = summarizeColumn(queryObject,'env_feature',num_cats=20)
-        n = checkpoint(start,n)
-        env_material_summary = summarizeColumn(queryObject,'env_material',num_cats=20)
-        n = checkpoint(start,n)
-        # add more here . . .
+    # Above the fold summary calculations -
+    aboveFoldDataFrame = getSampledColumns(queryObject,['download_size_maxrun','env_package','investigation_type','download_size_maxrun'],sampleRate=0.001)
+    total_download_size = sum(aboveFoldDataFrame['download_size_maxrun'].dropna())
+    env_pkg_summary = summarizeColumn(aboveFoldDataFrame,'env_package', num_cats=15)
+    investigation_summary = summarizeColumn(aboveFoldDataFrame,'investigation_type', num_cats=15)
+    down_size_summary = summarizeColumn(aboveFoldDataFrame,'download_size_maxrun',logBins=True)
+    n = checkpoint(start,n,'above the fold done')
 
-        # Linear binned histogram responses
-        avg_read_length_summary = summarizeColumn(queryObject,'avg_read_length_maxrun',linearBins=True)
-        n = checkpoint(start,n)
-        gc_percent_summary = summarizeColumn(queryObject,'gc_percent_maxrun',linearBins=True)
-        n = checkpoint(start,n)
-        lat_summary = summarizeColumn(queryObject,'meta_latitude',linearBins=True)
-        n = checkpoint(start,n)
-        lon_summary = summarizeColumn(queryObject,'meta_longitude',linearBins=True)
-        n = checkpoint(start,n)
-        # add more here . . .
-
-        # Log binned histogram responses
-        library_reads_sequenced_summary = summarizeColumn(queryObject,'library_reads_sequenced_maxrun',logBins=True)
-        n = checkpoint(start,n)
-        total_bases_summary = summarizeColumn(queryObject,'total_num_bases_maxrun',logBins=True)
-        n = checkpoint(start,n)
-        down_size_summary = summarizeColumn(queryObject,'download_size_maxrun',logBins=True)
-        n = checkpoint(start,n)
-        # add more here . . .
-
-        # Complex / one-off responses
-
-        # Collection date summarizing is broken because column is no longer a datettime
-
-        # collection_date - keep just year for summary for now (might want month for e.g. season searches later on, but default date is 03-13 00:00:00 and need to deal with that)
-        # Would really like to fill in empty values here, histogram of years without empty years is a bit odd
-        # yearFrame = queryResultDataframe['collection_date'].dt.to_period("A")
-        # year_summary = queryResultDataframe.groupby(yearFrame).size()
-        # year_summary.index = year_summary.index.to_series().astype(str)
-        # year_summary = dict(year_summary)
-
-        # Map summary is broken because lat / lon are both strings
-
-        mapQueryObject = queryObject.with_entities(
-            Dataset.meta_latitude,
-            Dataset.meta_longitude
-        )
-        mapDataframe = pd.read_sql(mapQueryObject.statement,db.session.bind)
-        n = checkpoint(start,n)
-        latlon  = mapDataframe[['meta_latitude','meta_longitude']]
-        latlon = latlon[pd.notnull(latlon['meta_latitude'])]
-        latlon = latlon[pd.notnull(latlon['meta_longitude'])]
-        minLat = np.amin(latlon['meta_latitude'])
-        maxLat = np.amax(latlon['meta_latitude'])
-        minLon = np.amin(latlon['meta_longitude'])
-        maxLon = np.amax(latlon['meta_longitude'])
-        if len(latlon) > 1:
-            latlon_map = np.histogram2d(x=latlon['meta_longitude'],y=latlon['meta_latitude'],bins=[36,18], range=[[minLon, maxLon], [minLat, maxLat]])
-        else:
-            latlon_map = np.histogram2d(x=[],y=[],bins=[36,18], range=[[-180, 180], [-90, 90]])
-        #define latlon map color bin info
-        percentiles, countRanges, fillColors = getMapBins(latlon_map[0], num_bins=10)
-        # range should be flexible to rules in DatasetSearchSummary
-        # latlon_map[0] is the lonxlat (XxY) array of counts; latlon_map[1] is the nx/lon bin starts; map[2] ny/lat bin starts
-        lonstepsize = (latlon_map[1][1]-latlon_map[1][0])/2
-        latstepsize = (latlon_map[2][1]-latlon_map[2][0])/2
-        maxMapCount = np.amax(latlon_map[0])
-        map_data = []
-        for lon_ix,lonbin in enumerate(latlon_map[0]):
-            for lat_ix,latbin in enumerate(lonbin):
-                #[latlon_map[2][ix]+latstepsize for ix,latbin in enumerate(latlon_map[0][0])]
-                lat = latlon_map[2][lat_ix]+latstepsize
-                lon = latlon_map[1][lon_ix]+lonstepsize
-                value = latbin
-                buffer=0.0001
-                #left-bottom, left-top, right-top, right-bottom, left-bottom
-                polygon = [[lon-lonstepsize+buffer,lat-latstepsize+buffer], [lon-lonstepsize+buffer,lat+latstepsize-buffer], [lon+lonstepsize-buffer,lat+latstepsize-buffer], [lon+lonstepsize-buffer,lat-latstepsize+buffer], [lon-lonstepsize,lat-latstepsize]]
-                bin_ix = np.amax(np.argwhere(np.array(percentiles)<=sp.percentileofscore(latlon_map[0].flatten(), value)))
-                fillColor = fillColors[bin_ix]
-
-                map_data.append({"lat":lat,"lon":lon,"count":value,"polygon":polygon, "fillColor":fillColor})
-        map_legend_info = {"ranges":countRanges, "fills":fillColors}
-        n = checkpoint(start,n)
-        return {
-            "summary": {
-                "avg_read_length_summary":avg_read_length_summary,
-                "download_size_summary":down_size_summary,
-                "env_biome_summary":env_biome_summary,
-                "env_feature_summary":env_feature_summary,
-                "env_material_summary":env_material_summary,
-                "env_package_summary":env_pkg_summary,
-                "gc_percent_summary":gc_percent_summary,
-                "geo_loc_name_summary":geo_loc_name_summary,
-                "investigation_type_summary":investigation_summary,
-                "instrument_model_summary":instrument_model_summary,
-                "latitude_summary":lat_summary,
-                "latlon_map":map_data,
-                "map_legend_info":map_legend_info,
-                "library_construction_method_summary":lib_construction_method_summary,
-                "library_reads_sequenced_summary":library_reads_sequenced_summary,
-                "library_screening_strategy_summary":lib_screening_strategy_summary,
-                "library_source_summary":lib_source_summary,
-                "library_strategy_summary":lib_strategy_summary,
-                "longitude_summary":lon_summary,
-                "sequencing_method_summary":sequencing_method_summary,
-                "study_type_summary":study_type_summary,
-                "total_bases_summary":total_bases_summary,
-                "total_datasets":int(total),
-                "total_download_size":int(total_download_size)
-                #"year_collected_summary":{}, #from metadata_publication_date
-                }
-            }
+    # On screen summary calculations -
+    onScreenDataFrame = getSampledColumns(queryObject,['meta_latitude','meta_longitude','library_construction_method','library_strategy','env_biome','avg_read_length_maxrun'],sampleRate=0.001)
+    lib_construction_method_summary = summarizeColumn(onScreenDataFrame,'library_construction_method')
+    lib_strategy_summary = summarizeColumn(onScreenDataFrame,'library_strategy', num_cats=20)
+    env_biome_summary = summarizeColumn(onScreenDataFrame,'env_biome',num_cats=20)
+    avg_read_length_summary = summarizeColumn(onScreenDataFrame,'avg_read_length_maxrun',linearBins=True)
+    n = checkpoint(start,n,'on screen, non-map done')
+    latlon  = onScreenDataFrame[['meta_latitude','meta_longitude']]
+    latlon = latlon[pd.notnull(latlon['meta_latitude'])]
+    latlon = latlon[pd.notnull(latlon['meta_longitude'])]
+    minLat = np.amin(latlon['meta_latitude'])
+    maxLat = np.amax(latlon['meta_latitude'])
+    minLon = np.amin(latlon['meta_longitude'])
+    maxLon = np.amax(latlon['meta_longitude'])
+    if len(latlon) > 1:
+        latlon_map = np.histogram2d(x=latlon['meta_longitude'],y=latlon['meta_latitude'],bins=[36,18], range=[[minLon, maxLon], [minLat, maxLat]])
     else:
-        return {
-            "summary":{
-                "avg_read_length_summary":{},
-                "download_size_summary":{},
-                "env_biome_summary":{},
-                "env_feature_summary":{},
-                "env_material_summary":{},
-                "env_package_summary":{},
-                "gc_percent_summary":{},
-                "geo_loc_name_summary":{},
-                "investigation_type_summary":{},
-                "instrument_model_summary":{},
-                "latitude_summary":{},
-                "latlon_map":{},
-                "map_legend_info":{},
-                "library_construction_method_summary":{},
-                "library_reads_sequenced_summary":{},
-                "library_screening_strategy_summary":{},
-                "library_source_summary":{},
-                "library_strategy_summary":{},
-                "longitude_summary":{},
-                "sequencing_method_summary":{},
-                "study_type_summary":{},
-                "total_bases_summary":{},
-                "total_datasets":0,
-                "total_download_size":0,
-                "empty":1
-                }
+        latlon_map = np.histogram2d(x=[],y=[],bins=[36,18], range=[[-180, 180], [-90, 90]])
+    #define latlon map color bin info
+    percentiles, countRanges, fillColors = getMapBins(latlon_map[0], num_bins=10)
+    # range should be flexible to rules in DatasetSearchSummary
+    # latlon_map[0] is the lonxlat (XxY) array of counts; latlon_map[1] is the nx/lon bin starts; map[2] ny/lat bin starts
+    lonstepsize = (latlon_map[1][1]-latlon_map[1][0])/2
+    latstepsize = (latlon_map[2][1]-latlon_map[2][0])/2
+    maxMapCount = np.amax(latlon_map[0])
+    map_data = []
+    for lon_ix,lonbin in enumerate(latlon_map[0]):
+        for lat_ix,latbin in enumerate(lonbin):
+            #[latlon_map[2][ix]+latstepsize for ix,latbin in enumerate(latlon_map[0][0])]
+            lat = latlon_map[2][lat_ix]+latstepsize
+            lon = latlon_map[1][lon_ix]+lonstepsize
+            value = latbin
+            buffer=0.0001
+            #left-bottom, left-top, right-top, right-bottom, left-bottom
+            polygon = [[lon-lonstepsize+buffer,lat-latstepsize+buffer], [lon-lonstepsize+buffer,lat+latstepsize-buffer], [lon+lonstepsize-buffer,lat+latstepsize-buffer], [lon+lonstepsize-buffer,lat-latstepsize+buffer], [lon-lonstepsize,lat-latstepsize]]
+            bin_ix = np.amax(np.argwhere(np.array(percentiles)<=sp.percentileofscore(latlon_map[0].flatten(), value)))
+            fillColor = fillColors[bin_ix]
+
+            map_data.append({"lat":lat,"lon":lon,"count":value,"polygon":polygon, "fillColor":fillColor})
+    map_legend_info = {"ranges":countRanges, "fills":fillColors}
+    n = checkpoint(start,n,'map done')
+
+    # Off screen summary calculations -
+    offScreenDataFrame = getSampledColumns(queryObject,['library_source','library_screening_strategy','study_type','sequencing_method','instrument_model','geo_loc_name','env_feature','env_material','gc_percent_maxrun','library_reads_sequenced_maxrun','total_num_bases_maxrun'],sampleRate=0.001)
+    lib_source_summary = summarizeColumn(offScreenDataFrame,'library_source')
+    lib_screening_strategy_summary = summarizeColumn(offScreenDataFrame,'library_screening_strategy', num_cats=20)
+    study_type_summary = summarizeColumn(offScreenDataFrame,'study_type')
+    sequencing_method_summary = summarizeColumn(offScreenDataFrame,'sequencing_method', num_cats=10)
+    instrument_model_summary = summarizeColumn(offScreenDataFrame,'instrument_model',num_cats=15)
+    geo_loc_name_summary = summarizeColumn(offScreenDataFrame,'geo_loc_name',num_cats=20)
+    env_feature_summary = summarizeColumn(offScreenDataFrame,'env_feature',num_cats=20)
+    env_material_summary = summarizeColumn(offScreenDataFrame,'env_material',num_cats=20)
+    gc_percent_summary = summarizeColumn(offScreenDataFrame,'gc_percent_maxrun',linearBins=True)
+    library_reads_sequenced_summary = summarizeColumn(offScreenDataFrame,'library_reads_sequenced_maxrun',logBins=True)
+    total_bases_summary = summarizeColumn(offScreenDataFrame,'total_num_bases_maxrun',logBins=True)
+    n = checkpoint(start,n,'off screen done')
+
+    return {
+        "summary": {
+            "avg_read_length_summary":avg_read_length_summary,
+            "download_size_summary":down_size_summary,
+            "env_biome_summary":env_biome_summary,
+            "env_feature_summary":env_feature_summary,
+            "env_material_summary":env_material_summary,
+            "env_package_summary":env_pkg_summary,
+            "gc_percent_summary":gc_percent_summary,
+            "geo_loc_name_summary":geo_loc_name_summary,
+            "investigation_type_summary":investigation_summary,
+            "instrument_model_summary":instrument_model_summary,
+            "latlon_map":map_data,
+            "map_legend_info":map_legend_info,
+            "library_construction_method_summary":lib_construction_method_summary,
+            "library_reads_sequenced_summary":library_reads_sequenced_summary,
+            "library_screening_strategy_summary":lib_screening_strategy_summary,
+            "library_source_summary":lib_source_summary,
+            "library_strategy_summary":lib_strategy_summary,
+            "sequencing_method_summary":sequencing_method_summary,
+            "study_type_summary":study_type_summary,
+            "total_bases_summary":total_bases_summary,
+            "total_datasets":int(total),
+            "total_download_size":int(total_download_size)
             }
+        }

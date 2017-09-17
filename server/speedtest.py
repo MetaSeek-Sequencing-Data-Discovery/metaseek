@@ -1,11 +1,12 @@
 import time
 import mysql.connector
+from sqlalchemy import case
 
 # prod
 # cnx = mysql.connector.connect(user='nick', password='REDACTED',host='ec2-52-33-134-115.us-west-2.compute.amazonaws.com',database='metaseek')
 
 # local
-cnx = mysql.connector.connect(user='root',host='127.0.0.1',database='metaseek')
+#cnx = mysql.connector.connect(user='root',host='127.0.0.1',database='metaseek')
 
 cursor = cnx.cursor()
 
@@ -21,8 +22,7 @@ def testQuery(query):
     print 'time to run ' + str(finish-start)
 
 subqueries = [
-	"WHERE download_size_maxrun IS NOT NULL",
-    "WHERE library_source = 'genomic'",
+    "WHERE download_size_maxrun IS NOT NULL and library_source = 'genomic'",
     "WHERE library_source = 'transcriptomic'",
     "WHERE library_source = 'metagenomic'",
     "WHERE investigation_type = 'metagenome'",
@@ -46,10 +46,10 @@ for subquery in subqueries:
 			WHEN download_size_maxrun between 333333333 and 3333333333 then '333333333-3333333333'
 			else '>3333333333'
 		END as maxrun_range
-	FROM dataset """ + subquery + """ AND RAND() < 0.01) t
+	FROM dataset """ + subquery + """ AND RAND() < 0.001) t
 	GROUP BY t.maxrun_range""")
-
 	testQuery(query)
+	print query
 	print "============ END =============="
 
 cursor.close()
