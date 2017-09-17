@@ -10,7 +10,17 @@ from sqlalchemy import or_, func, case, literal_column, desc
 import scipy.stats as sp
 import time
 
-#function to get color gradient from max to white
+# Utilities
+# Simple timing function so you can drop these one-liners through the code
+# n = checkpoint(start,n,'Ready to respond to POST')
+def checkpoint(start, n, message=''):
+    checkpoint = time.time()
+    print 'checkpoint ' + str(n) + ' - ' + message + ':'
+    print str(checkpoint - start) + ' since start'
+    return n + 1
+
+### Map Helpers
+# Get color gradient from max to white
 def getFillColor(count, maxCount, r,g,b):
     #e.g. [99, 105, 224] is #6369e0; compared to #FFFFFF is [255,255,255]
     #use rgb provided, make varying opacity from 25-225
@@ -25,7 +35,8 @@ def getFillColor(count, maxCount, r,g,b):
     #else:
     #    rgb.append(175)
     return rgb
-#function to get color from full opacity to transparent with a set number of bins spanning even percentiles of a range of values
+
+# Get color from full opacity to transparent with a set number of bins spanning even percentiles of a range of values
 def getMapBins(map_counts, num_bins): #e.g. latlon_map[0]
     #find upper limit of percentile for 0 count (for all data is something like 30th)
     bottom = sp.percentileofscore(map_counts.flatten(), 0.0, kind='weak')
@@ -46,7 +57,46 @@ def getMapBins(map_counts, num_bins): #e.g. latlon_map[0]
         fillColors.append([242, 111, 99, (255*0.8)*(ix/float(num_bins-1))])
     return percentiles, countRanges, fillColors
 
+# Create the actual data to power our map overlay
+def summarizeMap(mapDataFrame):
+    latlon  = mapDataFrame[['meta_latitude','meta_longitude']]
+    latlon = latlon[pd.notnull(latlon['meta_latitude'])]
+    latlon = latlon[pd.notnull(latlon['meta_longitude'])]
+    minLat = np.amin(latlon['meta_latitude'])
+    maxLat = np.amax(latlon['meta_latitude'])
+    minLon = np.amin(latlon['meta_longitude'])
+    maxLon = np.amax(latlon['meta_longitude'])
+    if len(latlon) > 1:
+        latlon_map = np.histogram2d(x=latlon['meta_longitude'],y=latlon['meta_latitude'],bins=[36,18], range=[[minLon, maxLon], [minLat, maxLat]])
+    else:
+        latlon_map = np.histogram2d(x=[],y=[],bins=[36,18], range=[[-180, 180], [-90, 90]])
+    #define latlon map color bin info
+    percentiles, countRanges, fillColors = getMapBins(latlon_map[0], num_bins=10)
+    # range should be flexible to rules in DatasetSearchSummary
+    # latlon_map[0] is the lonxlat (XxY) array of counts; latlon_map[1] is the nx/lon bin starts; map[2] ny/lat bin starts
+    lonstepsize = (latlon_map[1][1]-latlon_map[1][0])/2
+    latstepsize = (latlon_map[2][1]-latlon_map[2][0])/2
+    maxMapCount = np.amax(latlon_map[0])
+    map_data = []
+    for lon_ix,lonbin in enumerate(latlon_map[0]):
+        for lat_ix,latbin in enumerate(lonbin):
+            #[latlon_map[2][ix]+latstepsize for ix,latbin in enumerate(latlon_map[0][0])]
+            lat = latlon_map[2][lat_ix]+latstepsize
+            lon = latlon_map[1][lon_ix]+lonstepsize
+            value = latbin
+            buffer=0.0001
+            #left-bottom, left-top, right-top, right-bottom, left-bottom
+            polygon = [[lon-lonstepsize+buffer,lat-latstepsize+buffer], [lon-lonstepsize+buffer,lat+latstepsize-buffer], [lon+lonstepsize-buffer,lat+latstepsize-buffer], [lon+lonstepsize-buffer,lat-latstepsize+buffer], [lon-lonstepsize,lat-latstepsize]]
+            bin_ix = np.amax(np.argwhere(np.array(percentiles)<=sp.percentileofscore(latlon_map[0].flatten(), value)))
+            fillColor = fillColors[bin_ix]
 
+            map_data.append({"lat":lat,"lon":lon,"count":value,"polygon":polygon, "fillColor":fillColor})
+    map_legend_info = {"ranges":countRanges, "fills":fillColors}
+    return (map_data,map_legend_info)
+
+# Query Construction Helpers / Data Retrieval
+# Based on a rule (field name, comparator and value), add a filter to a query object
+# TODO add some better documentation here on what each type is
 def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
     fieldattr = getattr(targetClass,field)
     if ruletype == 0:
@@ -75,12 +125,77 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
 
     return queryObject
 
-def getSampledColumns(queryObject,columnNames,sampleRate=0.33):
+# Apply all rules to a query object, applying filterQueryByRule repeatedly
+def filterDatasetQueryObjectWithRules(queryObject,rules):
+    for rule in rules:
+        field = rule['field']
+        ruletype = rule['type']
+        value = rule['value']
+        queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+    return queryObject
+
+
+# Create and run the query for
+# Group by a column and return the sum for each group
+def groupByCategoryAndCount(queryObject,columnName,sampleRate=0.2,numCats=False):
+    columnObject = getattr(Dataset,columnName)
+    query = (
+        queryObject.with_entities(columnObject) # choose only the column we care about
+        .filter(columnObject.isnot(None)) # filter out NULLs, TODO maybe make this optional
+        .filter(func.rand() < sampleRate) # grab random sample of rows
+        .add_columns(func.count(1).label('count')) # add count to response
+        .group_by(columnName) # group by
+        .order_by(desc('count')) # order by the largest first
+    )
+    # If no numCats is passed in, show all the groups
+    if numCats:
+        query = query.limit(numCats) # show the top N results
+    return (
+        dict((key,val * (1/sampleRate)) for key, val in # rescale sampled columns to approx. results on full dataset
+            query.all() # actually run the query
+        )
+    )
+
+# Create a query object for a complex "histogram in SQL" query with custom numerical bin sizes
+def createNumericBinCaseStatement(dbSession,columnObject,bins,sumLabel):
+    cases = []
+    for i, threshold in enumerate(bins):
+        if i == 0:
+            low = 0
+        else:
+            low = bins[i-1]
+        high = bins[i]
+        caseLabel = str(low) + '-' + str(high)
+        addCase = columnObject < threshold,literal_column("'" + caseLabel + "'")
+        cases.append(addCase)
+    return dbSession(
+        case(cases, else_=literal_column("'> " + str(bins[-1]) + "'"))
+        .label(sumLabel),func.count(1)
+    )
+
+# Run a custom-binned histogram query and return the counted results
+def groupWithCustomCasesAndCount(dbSession,rules,columnName,bins,sampleRate=0.2):
+    columnObject = getattr(Dataset,columnName)
+    queryObject = createNumericBinCaseStatement(dbSession,columnObject,bins,columnName + '_hist')
+    queryObject = filterDatasetQueryObjectWithRules(queryObject,rules)
+    return (
+        dict((key,val  * (1/sampleRate)) for key, val in
+            queryObject
+            .filter(columnObject.isnot(None))
+            .filter(func.rand() < sampleRate)
+            .group_by(columnName + '_hist')
+            .all()
+        )
+    )
+
+# Retrieve raw sampled data from the database for a list of columns
+def getSampledColumns(queryObject,columnNames,sampleRate=0.2):
     columnQueryObject = queryObject.with_entities(*[getattr(Dataset,c) for c in columnNames])
     sampledColumns = columnQueryObject.filter(func.rand() < sampleRate)
     dataFrame = pd.read_sql(sampledColumns.statement,db.session.bind)
     return dataFrame
 
+# Old summarization code - to summarize a column fully loaded into memory, goal is to remove this
 def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cats=None):
     dataColumn = dataFrame[columnName].dropna()
     uniqueCount = len(dataColumn.unique())
@@ -163,63 +278,8 @@ def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cat
                     logBinnedCounts[histogramBinString] = count
                 return logBinnedCounts
 
-def sumColumn(queryObject,columnName):
-    columnQueryObject = queryObject.with_entities(
-        getattr(Dataset,columnName)
-    )
-    dataFrame = pd.read_sql(columnQueryObject.statement,db.session.bind)
-    total = sum(dataFrame[columnName].dropna())
-    return total
-
-# utility function so you can drop these one-liners through the code
-# n = checkpoint(start,n,'Ready to respond to POST')
-def checkpoint(start, n, message=''):
-    checkpoint = time.time()
-    print 'checkpoint ' + str(n) + ' - ' + message + ':'
-    print str(checkpoint - start) + ' since start'
-    return n + 1
-
-def filterDatasetQueryObjectWithRules(queryObject,rules):
-    for rule in rules:
-        field = rule['field']
-        ruletype = rule['type']
-        value = rule['value']
-        queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
-    return queryObject
-
-def groupByCategoryAndCount(queryObject,columnName,sampleRate=0.1,numCats=10):
-    columnObject = getattr(Dataset,columnName)
-    return (
-        dict((key,val * (1/sampleRate)) for key, val in # rescale sampled columns to approx. results on full dataset
-            queryObject.with_entities(columnObject) # choose only the column we care about
-            .filter(columnObject.isnot(None)) # filter out NULLs
-            .filter(func.rand() < sampleRate) # grab random sample of rows
-            .add_columns(func.count(1).label('count')) # add count to response
-            .group_by(columnName) # group by
-            .order_by(desc('count')) # order by the largest first
-            .limit(numCats) # show the top N results
-            .all() # actually run the query
-        )
-    )
-
-def createNumericBinCaseStatement(dbSession,columnObject,bins,sumLabel):
-    cases = []
-    for i, threshold in enumerate(bins):
-        if i == 0:
-            low = 0
-        else:
-            low = bins[i-1]
-        high = bins[i]
-        caseLabel = str(low) + '-' + str(high)
-        addCase = columnObject < threshold,literal_column("'" + caseLabel + "'")
-        cases.append(addCase)
-    return dbSession(
-        case(cases, else_=literal_column("'> " + str(bins[-1]) + "'"))
-        .label(sumLabel),func.count(1)
-    )
-
-# TODO this is getting huge, maybe break it up
-def summarizeDatasets(queryObject,rules,sampleRate=1):
+# TODO this is getting huge, maybe time to break it up, move to its own file?
+def summarizeDatasets(queryObject,rules,sampleRate=0.2):
     # filter queryObject by adding all "where's" to the Dataset.query object
     # this can be used for categorical group by's, basic counts, etc.
     # we have to construct a custom query object off of db.session.query and filterDatasetQueryObjectWithRules
@@ -257,79 +317,36 @@ def summarizeDatasets(queryObject,rules,sampleRate=1):
     n = checkpoint(start,n,'Starting above the fold')
     env_pkg_summary = groupByCategoryAndCount(rootQueryObject,'env_package',sampleRate=sampleRate,numCats=10)
     investigation_summary = groupByCategoryAndCount(rootQueryObject,'investigation_type',sampleRate=sampleRate,numCats=10)
-    histQuery = createNumericBinCaseStatement(db.session.query,Dataset.download_size_maxrun,[10,100,1000,10000,100000],"download_size_hist")
-    print histQuery
-    histQuery = filterDatasetQueryObjectWithRules(histQuery,rules)
-    print histQuery
-
-    down_size_summary = (
-        dict((x,y * 10) for x, y in
-            histQuery
-            .filter(Dataset.download_size_maxrun.isnot(None))
-            .filter(func.rand() < 0.1)
-            .group_by("download_size_hist")
-            .all()
-        )
-    )
-    # down_size_summary = summarizeColumn(aboveFoldDataFrame,'download_size_maxrun',logBins=True)
-    n = checkpoint(start,n,'done grouping in query $$$$$')
+    down_size_summary = groupWithCustomCasesAndCount(db.session.query,rules,'download_size_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
+    n = checkpoint(start,n,'Done with above the fold')
 
     # On screen summary calculations -
-    onScreenDataFrame = getSampledColumns(rootQueryObject,['meta_latitude','meta_longitude','library_construction_method','library_strategy','env_biome','avg_read_length_maxrun'],sampleRate=0.001)
-    lib_construction_method_summary = summarizeColumn(onScreenDataFrame,'library_construction_method')
-    lib_strategy_summary = summarizeColumn(onScreenDataFrame,'library_strategy', num_cats=20)
-    env_biome_summary = summarizeColumn(onScreenDataFrame,'env_biome',num_cats=20)
-    avg_read_length_summary = summarizeColumn(onScreenDataFrame,'avg_read_length_maxrun',linearBins=True)
-    n = checkpoint(start,n,'on screen, non-map done')
-    latlon  = onScreenDataFrame[['meta_latitude','meta_longitude']]
-    latlon = latlon[pd.notnull(latlon['meta_latitude'])]
-    latlon = latlon[pd.notnull(latlon['meta_longitude'])]
-    minLat = np.amin(latlon['meta_latitude'])
-    maxLat = np.amax(latlon['meta_latitude'])
-    minLon = np.amin(latlon['meta_longitude'])
-    maxLon = np.amax(latlon['meta_longitude'])
-    if len(latlon) > 1:
-        latlon_map = np.histogram2d(x=latlon['meta_longitude'],y=latlon['meta_latitude'],bins=[36,18], range=[[minLon, maxLon], [minLat, maxLat]])
-    else:
-        latlon_map = np.histogram2d(x=[],y=[],bins=[36,18], range=[[-180, 180], [-90, 90]])
-    #define latlon map color bin info
-    percentiles, countRanges, fillColors = getMapBins(latlon_map[0], num_bins=10)
-    # range should be flexible to rules in DatasetSearchSummary
-    # latlon_map[0] is the lonxlat (XxY) array of counts; latlon_map[1] is the nx/lon bin starts; map[2] ny/lat bin starts
-    lonstepsize = (latlon_map[1][1]-latlon_map[1][0])/2
-    latstepsize = (latlon_map[2][1]-latlon_map[2][0])/2
-    maxMapCount = np.amax(latlon_map[0])
-    map_data = []
-    for lon_ix,lonbin in enumerate(latlon_map[0]):
-        for lat_ix,latbin in enumerate(lonbin):
-            #[latlon_map[2][ix]+latstepsize for ix,latbin in enumerate(latlon_map[0][0])]
-            lat = latlon_map[2][lat_ix]+latstepsize
-            lon = latlon_map[1][lon_ix]+lonstepsize
-            value = latbin
-            buffer=0.0001
-            #left-bottom, left-top, right-top, right-bottom, left-bottom
-            polygon = [[lon-lonstepsize+buffer,lat-latstepsize+buffer], [lon-lonstepsize+buffer,lat+latstepsize-buffer], [lon+lonstepsize-buffer,lat+latstepsize-buffer], [lon+lonstepsize-buffer,lat-latstepsize+buffer], [lon-lonstepsize,lat-latstepsize]]
-            bin_ix = np.amax(np.argwhere(np.array(percentiles)<=sp.percentileofscore(latlon_map[0].flatten(), value)))
-            fillColor = fillColors[bin_ix]
+    n = checkpoint(start,n,'Starting on screen')
+    lib_construction_method_summary = groupByCategoryAndCount(rootQueryObject,'library_construction_method',sampleRate=sampleRate)
+    lib_strategy_summary = groupByCategoryAndCount(rootQueryObject,'library_strategy',sampleRate=sampleRate,numCats=20)
+    env_biome_summary = groupByCategoryAndCount(rootQueryObject,'env_biome',sampleRate=sampleRate,numCats=20)
+    avg_read_length_summary = groupWithCustomCasesAndCount(db.session.query,rules,'avg_read_length_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
+    n = checkpoint(start,n,'On screen, non-map done')
 
-            map_data.append({"lat":lat,"lon":lon,"count":value,"polygon":polygon, "fillColor":fillColor})
-    map_legend_info = {"ranges":countRanges, "fills":fillColors}
-    n = checkpoint(start,n,'map done')
+    n = checkpoint(start,n,'Pulling full columns for map analysis')
+    mapDataFrame = getSampledColumns(rootQueryObject,['meta_latitude','meta_longitude'],sampleRate=sampleRate)
+    (map_data, map_legend_info) = summarizeMap(mapDataFrame)
+    n = checkpoint(start,n,'Map done')
 
     # Off screen summary calculations -
-    offScreenDataFrame = getSampledColumns(rootQueryObject,['library_source','library_screening_strategy','study_type','sequencing_method','instrument_model','geo_loc_name','env_feature','env_material','gc_percent_maxrun','library_reads_sequenced_maxrun','total_num_bases_maxrun'],sampleRate=0.001)
-    lib_source_summary = summarizeColumn(offScreenDataFrame,'library_source')
-    lib_screening_strategy_summary = summarizeColumn(offScreenDataFrame,'library_screening_strategy', num_cats=20)
-    study_type_summary = summarizeColumn(offScreenDataFrame,'study_type')
-    sequencing_method_summary = summarizeColumn(offScreenDataFrame,'sequencing_method', num_cats=10)
-    instrument_model_summary = summarizeColumn(offScreenDataFrame,'instrument_model',num_cats=15)
-    geo_loc_name_summary = summarizeColumn(offScreenDataFrame,'geo_loc_name',num_cats=20)
-    env_feature_summary = summarizeColumn(offScreenDataFrame,'env_feature',num_cats=20)
-    env_material_summary = summarizeColumn(offScreenDataFrame,'env_material',num_cats=20)
-    gc_percent_summary = summarizeColumn(offScreenDataFrame,'gc_percent_maxrun',linearBins=True)
-    library_reads_sequenced_summary = summarizeColumn(offScreenDataFrame,'library_reads_sequenced_maxrun',logBins=True)
-    total_bases_summary = summarizeColumn(offScreenDataFrame,'total_num_bases_maxrun',logBins=True)
-    n = checkpoint(start,n,'off screen done')
+    n = checkpoint(start,n,'Starting on screen')
+    lib_source_summary = groupByCategoryAndCount(rootQueryObject,'library_source',sampleRate=sampleRate)
+    lib_screening_strategy_summary = groupByCategoryAndCount(rootQueryObject,'library_screening_strategy',sampleRate=sampleRate,numCats=20)
+    study_type_summary = groupByCategoryAndCount(rootQueryObject,'study_type',sampleRate=sampleRate)
+    sequencing_method_summary = groupByCategoryAndCount(rootQueryObject,'sequencing_method',sampleRate=sampleRate,numCats=10)
+    instrument_model_summary = groupByCategoryAndCount(rootQueryObject,'instrument_model',sampleRate=sampleRate,numCats=15)
+    geo_loc_name_summary = groupByCategoryAndCount(rootQueryObject,'geo_loc_name',sampleRate=sampleRate,numCats=20)
+    env_feature_summary = groupByCategoryAndCount(rootQueryObject,'env_feature',sampleRate=sampleRate,numCats=20)
+    env_material_summary = groupByCategoryAndCount(rootQueryObject,'env_material',sampleRate=sampleRate,numCats=20)
+    gc_percent_summary = groupWithCustomCasesAndCount(db.session.query,rules,'gc_percent_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
+    library_reads_sequenced_summary = groupWithCustomCasesAndCount(db.session.query,rules,'library_reads_sequenced_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
+    total_bases_summary = groupWithCustomCasesAndCount(db.session.query,rules,'total_num_bases_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
+    n = checkpoint(start,n,'Off screen done')
 
     return {
         "summary": {
