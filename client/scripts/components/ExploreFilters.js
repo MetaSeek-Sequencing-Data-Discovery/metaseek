@@ -10,6 +10,7 @@ import Select from 'react-select';
 import Collapsible from 'react-collapsible';
 import AutoComplete from 'material-ui/AutoComplete';
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import Drawer from 'material-ui/Drawer';
 
 import RangeSlider from './RangeSlider';
@@ -205,10 +206,9 @@ var ExploreFilters = React.createClass({
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
           <div>
             <Drawer
-              docked={false}
+              docked={true}
               width={340}
               open={this.props.open}
-              onRequestChange={this.clickawayFilters}
             >
               {/* Ok, so...let's explain this change handler:
                 onChange={this.handleFilterChange.bind(this,"library_source","library_source",5)}
@@ -220,6 +220,7 @@ var ExploreFilters = React.createClass({
                 "library_source","library_source",5
                 These arguments are passed in first, prior to the standard function params.
                  */}
+              <RaisedButton label="hide filters" onClick={this.clickawayFilters} buttonStyle={{width:"350px", backgroundColor:"rgb(215,215,215)"}} style={{margin:"0 0 10px 0", boxShadow: "0px 1px 2px rgba(12, 12, 18, 0.12)"}} labelStyle={{textAlign:"right"}}/>
               <FlatButton label="Reset Filters" primary={true} onClick={this.resetFilters}/>
               <Collapsible trigger="General Sample Info" open={true}>
                 <div>

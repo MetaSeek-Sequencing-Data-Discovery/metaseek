@@ -638,9 +638,24 @@ button.github:after, input[type=submit].github:after {
 
 /* Explore layout */
 
+.header-explore-filteropen {
+  width: 100%;
+  margin: 0 0 0 340px;
+}
+
+.header-explore {
+  width: 100%;
+  margin: 0 0 0 0;
+}
+
 .explore-container {
   width: 1200px;
   margin: 10px auto;
+}
+
+.explore-container-filteropen {
+  width: 1200px;
+  margin: 10px 10% 0 26%;
 }
 
 .right {
