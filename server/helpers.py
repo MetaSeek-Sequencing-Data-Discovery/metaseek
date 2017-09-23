@@ -8,6 +8,14 @@ from decimal import Decimal
 from collections import Counter
 from sqlalchemy import or_
 import scipy.stats as sp
+import time
+
+def checkpoint(start, last, n, message):
+    current = time.time()
+    elapsed = float(int((current-last) * 10))/10
+    totalElapsed = float(int((current-start) * 10))/10
+    print '| ' + str(n).ljust(4) + ' | ' + (str(elapsed) + 's').rjust(9) + ' | ' + (str(totalElapsed) + 's').rjust(8) + ' | ' + message.ljust(60) + ' |'
+    return (start,current,n+1)
 
 #function to get color gradient from max to white
 def getFillColor(count, maxCount, r,g,b):
@@ -156,7 +164,16 @@ def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cat
                     logBinnedCounts[histogramBinString] = count
                 return logBinnedCounts
 
-def summarizeDatasets(queryObject):
+def summarizeDatasets(queryObject, rules):
+
+    print 'Summarizing for rules: ' + str(rules)
+    print 'No sampling'
+    print '------------------------------------------------------------------------------------------'
+    print '| ' + "Step".ljust(4) + ' | ' + "Time (s)".rjust(8) + ' | ' + "Total (s)".rjust(9) + ' | ' + "Message".ljust(60) + ' |'
+
+    start = time.time()
+    (start,last,n) = checkpoint(start,start,1,'Started')
+
     filteredQueryObject = queryObject.with_entities(
         Dataset.download_size_maxrun,
         Dataset.investigation_type,
@@ -182,6 +199,8 @@ def summarizeDatasets(queryObject):
 
     queryResultDataframe = pd.read_sql(filteredQueryObject.statement,db.session.bind)
 
+    (start,last,n) = checkpoint(start,last,n,'Got the full query result frame back')
+
     total = len(queryResultDataframe.index)
     if total > 0:
         # Simple aggregate responses
@@ -197,6 +216,7 @@ def summarizeDatasets(queryObject):
         lib_construction_method_summary = summarizeColumn(queryResultDataframe,'library_construction_method')
         study_type_summary = summarizeColumn(queryResultDataframe,'study_type')
         sequencing_method_summary = summarizeColumn(queryResultDataframe,'sequencing_method', num_cats=10)
+        (start,last,n) = checkpoint(start,last,n,'Done with simple counts')
 
         #maybe top-10 or top-15 categorical responses
         instrument_model_summary = summarizeColumn(queryResultDataframe,'instrument_model',num_cats=15)
@@ -217,6 +237,7 @@ def summarizeDatasets(queryObject):
         library_reads_sequenced_summary = summarizeColumn(queryResultDataframe,'library_reads_sequenced_maxrun',logBins=True)
         total_bases_summary = summarizeColumn(queryResultDataframe,'total_num_bases_maxrun',logBins=True)
         down_size_summary = summarizeColumn(queryResultDataframe,'download_size_maxrun',logBins=True)
+        (start,last,n) = checkpoint(start,last,n,'Done with all bins and categories')
         # add more here . . .
 
         # Complex / one-off responses
@@ -265,6 +286,7 @@ def summarizeDatasets(queryObject):
 
                 map_data.append({"lat":lat,"lon":lon,"count":value,"polygon":polygon, "fillColor":fillColor})
         map_legend_info = {"ranges":countRanges, "fills":fillColors}
+        (start,last,n) = checkpoint(start,last,n,'Done with the map, sending back response')
         return {
             "summary": {
                 "avg_read_length_summary":avg_read_length_summary,
