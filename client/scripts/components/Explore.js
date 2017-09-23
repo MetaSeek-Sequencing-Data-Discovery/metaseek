@@ -232,10 +232,9 @@ var Explore = React.createClass({
               <text style={{position:"fixed",top:"170px", left:"5px", color:"rgb(175,175,175)", fontFamily:"Roboto"}}>Edit Filters</text>
               <div className={this.state.filtersOpen ? "header-explore-filteropen" : "header-explore"}>
                 <Header history={this.props.history}/>
-                <h2>Explore</h2>
               </div>
               <div className={this.state.filtersOpen ? "explore-container-filteropen" : "explore-container"}>
-
+                <h2>Explore</h2>
                 <div className="save-discovery-button-container">
                   <RaisedButton
                     className="save-discovery-button"
