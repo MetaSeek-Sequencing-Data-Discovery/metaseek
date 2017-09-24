@@ -1,6 +1,5 @@
 import React from 'react';
-import { VictoryBar, VictoryChart, VictoryAxis, VictoryLabel, VictoryTooltip} from 'victory';
-import CustomTheme from './CustomTheme';
+import { VictoryBar, VictoryChart, VictoryVoronoiContainer, VictoryAxis, VictoryLabel, VictoryTooltip} from 'victory';
 
 
 var HistogramVictory = React.createClass({
@@ -14,7 +13,7 @@ var HistogramVictory = React.createClass({
     // remove nulls / boring values
     var activeFieldDataValidKeys = Object.keys(activeFieldData).filter(
       function(value, index) {
-        if (value == "no data" || value == "other categories" || value == "Other") {
+        if (value == "no data" || value == "other categories") {
           return false; // skip
         } else {
           return true;
@@ -24,7 +23,8 @@ var HistogramVictory = React.createClass({
 
     // Sort the fields by value and grab the top 6 to display if there are more than 6
     var activeFieldSorted = activeFieldDataValidKeys.sort(function(a, b) {return -(activeFieldData[a] - activeFieldData[b])});
-    var finalDataPoints = (activeFieldSorted.length > 6) ? activeFieldSorted.slice(0, 6) : activeFieldSorted;
+    var finalDataPoints = Object.keys(activeFieldData).includes("other categories") ? activeFieldSorted.concat(["other categories"]) : activeFieldSorted;
+    var finalDataPoints = Object.keys(activeFieldData).includes("no data") ? finalDataPoints.concat(["no data"]) : finalDataPoints;
 
     // Format data the way VictoryChart / VictoryBar wants it
     var histData = finalDataPoints.map(
@@ -37,10 +37,21 @@ var HistogramVictory = React.createClass({
     return(
       <div className="histogram-container">
         <VictoryChart
-          theme={CustomTheme.metaseek}
+          theme={this.props.colortheme}
+          width={778}
+          padding={{top: 0, right: 25, bottom: 5, left: 65 }}
           // domainPadding will add space to each side of VictoryBar to
           // prevent it from overlapping the axis
-          domainPadding={10}
+          domainPadding={50}
+          containerComponent={
+            <VictoryVoronoiContainer
+              dimension="x"
+              labels={(histData) => histData.x + " : " + histData.count }
+              labelComponent={
+                <VictoryTooltip
+                  flyoutStyle={{fill: "white"}}
+                />}
+          />}
         >
 
           <VictoryAxis
@@ -61,8 +72,8 @@ var HistogramVictory = React.createClass({
             x="x"
             y="count"
             labels={(d) => d.y}
-            style={{ labels: { fill: "#333",fontSize: 12} }}
-            labelComponent={<VictoryLabel dx={22}/>}
+            style={{ labels: { fill: "#333",fontSize: 12 } }}
+            labelComponent={<VictoryLabel angle={-45} textAnchor="start" verticalAnchor="end"/>}
           />
         </VictoryChart>
       </div>

@@ -183,15 +183,8 @@ class SearchDatasets(Resource):
             parser.add_argument('filter_params', type=str)
             args = parser.parse_args()
             filter_params = json.loads(args['filter_params'])
-            rules = filter_params['rules']
 
-            queryObject = Dataset.query
-
-            for rule in rules:
-                field = rule['field']
-                ruletype = rule['type']
-                value = rule['value']
-                queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+            queryObject = filterDatasetQueryObjectWithRules(Dataset.query,filter_params['rules'])
 
             pageObject = queryObject.paginate(page,datasetsPerPage,False)
             totalPageCount = int(math.ceil(pageObject.total / datasetsPerPage))
@@ -222,12 +215,13 @@ class GetDatasetSummary(Resource):
         # str(hashxx(json.dumps(json.loads('{"rules":[]}')['rules'])))
         # Allows this cached value to be reused by SearchDatasetsSummary when no rules are set
         cache_key = '2027185612'
+        rules = []
 
         from_cache = client.get(cache_key)
 
         if from_cache is None:
             queryObject = Dataset.query
-            summary = summarizeDatasets(queryObject)
+            summary = summarizeDatasets(queryObject,rules)
             client.set(cache_key, summary)
             return summary
         else:
@@ -246,15 +240,7 @@ class SearchDatasetsSummary(Resource):
             from_cache = client.get(cache_key)
 
             if from_cache is None:
-                queryObject = Dataset.query
-
-                for rule in rules:
-                    field = rule['field']
-                    ruletype = rule['type']
-                    value = rule['value']
-                    queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
-
-                summary = summarizeDatasets(queryObject)
+                summary = summarizeDatasets(Dataset.query,rules,0.05)
                 client.set(cache_key, summary)
                 return summary
             else:
@@ -268,8 +254,8 @@ class GetDiscovery(Resource):
     @marshal_with({
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
+        'discovery_title':fields.String,
         'uri': fields.Url('getdiscovery', absolute=True),
-        'datasets':fields.Nested(summarizedDatasetFields),
         'owner':fields.Nested({
             'firebase_id':fields.String,
             'uri':fields.Url('getuser', absolute=True)
@@ -282,8 +268,8 @@ class GetAllDiscoveries(Resource):
     @marshal_with({
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
+        'discovery_title':fields.String,
         'uri': fields.Url('getdiscovery', absolute=True),
-        'datasets':fields.Nested(summarizedDatasetFields),
         'owner':fields.Nested({
             'firebase_id':fields.String,
             'uri':fields.Url('getuser', absolute=True)
@@ -298,24 +284,12 @@ class CreateDiscovery(Resource):
             parser = reqparse.RequestParser()
             parser.add_argument('owner_id', type=str)
             parser.add_argument('filter_params', type=str)
+            parser.add_argument('discovery_title', type=str)
             args = parser.parse_args()
-
-            filter_params = json.loads(args['filter_params'])
-            rules = filter_params['rules']
-
-            queryObject = Dataset.query
-
-            for rule in rules:
-                field = rule['field']
-                ruletype = rule['type']
-                value = rule['value']
-                queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
-
-            matchingDatasets = queryObject.all()
 
             owner = User.query.filter_by(firebase_id=args['owner_id']).first()
 
-            newDiscovery = Discovery(owner.id,args['filter_params'],matchingDatasets)
+            newDiscovery = Discovery(owner.id,args['filter_params'],args['discovery_title'])
             db.session.add(newDiscovery)
             db.session.commit()
             return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id)}}
@@ -335,6 +309,7 @@ class CacheStats(Resource):
 class BuildCaches(Resource):
     def get(self):
         # TODO actually define which ones we want here or create this list dynamically
+        print 'Build cache called'
         priorityFilterSets = [
             '{"rules":[]}',
             '{"rules":[{"field":"library_source","type":5,"value":"genomic"}]}',
@@ -356,6 +331,8 @@ class BuildCaches(Resource):
         results = {}
 
         for filterSet in priorityFilterSets:
+            print' spinning up cache job for '
+            print filterSet
             filter_params = json.loads(filterSet)
             rules = filter_params['rules']
 
@@ -366,9 +343,11 @@ class BuildCaches(Resource):
             results[cache_key]['rules'] = rules
 
             if from_cache is None:
+                print 'not in cache, assigning job'
                 tasks.buildCache.delay(cache_key,rules)
                 results[cache_key]['existing-cache'] = False
             else:
+                print 'already in cache'
                 results[cache_key]['existing-cache'] = True
 
         return results

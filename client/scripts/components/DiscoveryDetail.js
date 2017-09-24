@@ -9,6 +9,8 @@ import Paper from 'material-ui/Paper';
 
 // My component imports
 import Header from './Header';
+import VizDashboard from './VizDashboard';
+import Loading from './Loading';
 
 var apiRequest = axios.create({
   baseURL: apiConfig.baseURL
@@ -17,27 +19,41 @@ var apiRequest = axios.create({
 var DiscoveryDetail = React.createClass({
   getInitialState: function() {
     return {
-      'discovery':{}
+      'discovery':{},
+      'summaryData': [],
+      'loaded': false
     }
   },
   componentWillMount: function() {
     var self = this;
     apiRequest.get('/discovery/' + this.props.params.id)
     .then(function (response) {
-      self.setState({"discovery": response.data.discovery})
-    })
+      self.setState({"discovery": response.data.discovery});
+      apiRequest.post("/datasets/search/summary", {
+        "filter_params":response.data.discovery.filter_params
+      }).then(function (response) {
+        self.setState({"summaryData": response.data.summary, "loaded":true})
+      });
+    });
   },
   render: function() {
+    if (!this.state.loaded) return <Loading/>;
+
     return (
-      <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
-        <div>
-          <Header history={this.props.history}/>
-          <Paper className="single-sheet" zDepth={2}>
-            <h2>Discovery Details</h2>
-            {JSON.stringify(this.state.discovery)}
-          </Paper>
-        </div>
-      </MuiThemeProvider>
+      <div>
+        <Header history={this.props.history}/>
+          <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
+            <div className="explore-container">
+              <Paper className="single-sheet card three" >
+                <h2>{this.state.discovery.discovery_title}</h2>
+                <h3>Discovery Details</h3>
+                {JSON.stringify(this.state.discovery)}
+              </Paper>
+              <VizDashboard activeSummaryData={this.state.summaryData}/>
+            </div>
+          </MuiThemeProvider>
+      </div>
+
     )
   }
 });
