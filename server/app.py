@@ -312,6 +312,7 @@ class CacheStats(Resource):
 class BuildCaches(Resource):
     def get(self):
         # TODO actually define which ones we want here or create this list dynamically
+        print 'Build cache called'
         priorityFilterSets = [
             '{"rules":[]}',
             '{"rules":[{"field":"library_source","type":5,"value":"genomic"}]}',
@@ -333,6 +334,8 @@ class BuildCaches(Resource):
         results = {}
 
         for filterSet in priorityFilterSets:
+            print' spinning up cache job for '
+            print filterSet
             filter_params = json.loads(filterSet)
             rules = filter_params['rules']
 
@@ -343,9 +346,11 @@ class BuildCaches(Resource):
             results[cache_key]['rules'] = rules
 
             if from_cache is None:
+                print 'not in cache, assigning job'
                 tasks.buildCache.delay(cache_key,rules)
                 results[cache_key]['existing-cache'] = False
             else:
+                print 'already in cache'
                 results[cache_key]['existing-cache'] = True
 
         return results

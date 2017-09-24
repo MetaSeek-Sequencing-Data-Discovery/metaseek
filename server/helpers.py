@@ -226,7 +226,7 @@ def summarizeDatasets(queryObject,rules,sampleRate=0.2):
             db.session.query(func.sum(Dataset.download_size_maxrun)
             .label('total_download_size')),rules)
         .first()
-    )
+    )[0]
     (start,last,n) = checkpoint(start,last,n,'Ready to respond to POST (w/ download size)')
 
     # 3 categories of background tasks: above fold, on screen, off screen - we are going to kick off
