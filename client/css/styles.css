@@ -639,7 +639,7 @@ button.github:after, input[type=submit].github:after {
 /* Explore layout */
 
 .header-explore-filteropen {
-  width: 100%;
+  width: 1100px;
   margin: 0 0 0 340px;
 }
 
