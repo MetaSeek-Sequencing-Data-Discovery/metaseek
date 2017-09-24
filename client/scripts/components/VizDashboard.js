@@ -77,41 +77,8 @@ var VizDashboard = React.createClass({
     const seqinfo_histfields = ['library_strategy_summary', 'library_screening_strategy_summary', 'sequencing_method_summary', 'instrument_model_summary'];
     const seqinfo_areafields = ['avg_read_length_summary', 'library_reads_sequenced_summary', 'gc_percent_summary', 'total_bases_summary'];
 
-    var mapRender = function(activeSummaryData,isProcessing) {
-      if (!isProcessing) {
-        if (activeSummaryData.empty) {
-          return <h3>Sorry, no matches!</h3>
-        } else {
-          return <div>
-            <div className="figure-hint-container-map">
-              <span className="figure-hint-label">Environmental Info</span>
-              <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets within latitude and longitude bins. There are 36 longitude bins and 18 latitude bins within the range specified by your filters. Scroll or double click to zoom in on the map. To see higher resolution bins, edit lon/lat filters in the filter bar to the side.</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
-                <ActionHelpOutline />
-              </IconButton>
-              <br/>
-            </div>
-            <MapDeckGL className="explore-map-render" mapdata={activeSummaryData.latlon_map}/>
-            <MapLegend fills={activeSummaryData.map_legend_info.fills} ranges={activeSummaryData.map_legend_info.ranges}/>
-          </div>
-        }
-      } else {
-        return <div>
-          <div>
-            <div className='uil-rolling-css component-loader'>
-              <div>
-                <div></div>
-                <div></div>
-              </div>
-            </div>
-          </div>
-          <h3>Processing...</h3>
-        </div>
-      }
-    };
-
-    return (
-      <div>
-        <Paper className="explore-histogram card left two">
+    const geninfo_histcomponent =
+        <div>
           <div className="figure-hint-container">
             <span className="figure-hint-label">General Sample Info</span>
             <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for each controlled vocabulary value for some General Sample Info fields. Use the select field to change the input value</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
@@ -135,124 +102,187 @@ var VizDashboard = React.createClass({
             </SelectField>
           </div>
           <HistogramVictory activeSummaryData={this.props.activeSummaryData} histinput={this.state.generalinfo_histinput} colortheme={TurquoiseTheme.metaseek}/>
+        </div>;
+
+    const geninfo_radarcomponent =
+      <div>
+        <div className="figure-hint-container">
+          <span className="figure-hint-label">General Sample Info</span>
+          <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for each controlled vocabulary value for some General Sample Info fields. Use the select field to change the input value</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
+            <ActionHelpOutline />
+          </IconButton>
+          <br/>
+        </div>
+        <div className="explore-select">
+          <SelectField value={this.state.generalinfo_radarinput} onChange={this.handleGeneralRadarSelect}>
+            {Object.keys(this.props.activeSummaryData).filter(function(value) {
+              if (value.indexOf('summary') !== -1 && generalinfo_radarfields.includes(value)) {
+                return true;
+              } else {
+                return false;
+              }
+            }).map(function(value, index) {
+              return (
+                <MenuItem key={index} value={value} primaryText={value} />
+              )
+            })}
+          </SelectField>
+        </div>
+        <RadarChart activeSummaryData={this.props.activeSummaryData} radarinput={this.state.generalinfo_radarinput} colortheme={TurquoiseTheme.metaseek}/>
+      </div>;
+
+    const libconst_component =
+      <div>
+        <div className="figure-hint-container">
+          <span className="figure-hint-label">Library Construction Method Summary</span>
+          <IconButton tooltip=<div className="figure-hint-tooltip">Library construction method used for clone libraries.</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
+            <ActionHelpOutline />
+          </IconButton>
+          <br/>
+        </div>
+        <PieVictory activeSummaryData={this.props.activeSummaryData} pieinput="library_construction_method_summary" colortheme={YellowTheme.metaseek}/>
+      </div>;
+
+    const seqinfo_histcomponent =
+      <div>
+        <div className="figure-hint-container">
+          <span className="figure-hint-label">Sequencing Info</span>
+          <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for each controlled vocabulary value for some Sequencing Info fields. Use the select field to change the input value.</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
+            <ActionHelpOutline />
+          </IconButton>
+          <br/>
+        </div>
+        <div className="explore-select">
+          <SelectField value={this.state.seqinfo_histinput} onChange={this.handleSeqHistSelect}>
+            {Object.keys(this.props.activeSummaryData).filter(function(value) {
+              if (value.indexOf('summary') !== -1 && seqinfo_histfields.includes(value)) {
+                return true;
+              } else {
+                return false;
+              }
+            }).map(function(value, index) {
+                return (
+                  <MenuItem key={index} value={value} primaryText={value} />
+                )
+            })}
+          </SelectField>
+        </div>
+        <HistogramVictory activeSummaryData={this.props.activeSummaryData} histinput={this.state.seqinfo_histinput} colortheme={YellowTheme.metaseek}/>
+      </div>;
+
+    const map_component =
+      <div>
+        <div>
+          <div className="figure-hint-container-map">
+            <span className="figure-hint-label">Environmental Info</span>
+            <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets within latitude and longitude bins. There are 36 longitude bins and 18 latitude bins within the range specified by your filters. Scroll or double click to zoom in on the map. To see higher resolution bins, edit lon/lat filters in the filter bar to the side.</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
+              <ActionHelpOutline />
+            </IconButton>
+            <br/>
+          </div>
+          <MapDeckGL className="explore-map-render" mapdata={this.props.activeSummaryData.latlon_map}/>
+          <MapLegend fills={this.props.activeSummaryData.map_legend_info.fills} ranges={this.props.activeSummaryData.map_legend_info.ranges}/>
+        </div>
+      </div>;
+
+    const seqinfo_areacomponent =
+      <div>
+        <div className="figure-hint-container">
+          <span className="figure-hint-label">Sequencing Info</span>
+          <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for each controlled vocabulary value for some Sequencing Info fields. Use the select field to change the input value.</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
+            <ActionHelpOutline />
+          </IconButton>
+          <br/>
+        </div>
+        <div className="explore-select">
+          <SelectField value={this.state.seqinfo_areainput} onChange={this.handleSeqAreaSelect}>
+            {Object.keys(this.props.activeSummaryData).filter(function(value) {
+              if (value.indexOf('summary') !== -1 && seqinfo_areafields.includes(value)) {
+                return true;
+              } else {
+                return false;
+              }
+            }).map(function(value, index) {
+                return (
+                  <MenuItem key={index} value={value} primaryText={value} />
+                )
+            })}
+          </SelectField>
+        </div>
+        <AreaChart activeSummaryData={this.props.activeSummaryData} areainput={this.state.seqinfo_areainput} colortheme={YellowTheme.metaseek}/>
+      </div>;
+
+    const envinfo_wordcloudcomponent =
+      <div>
+        <div className="figure-hint-container">
+          <span className="figure-hint-label">Environmental Info</span>
+          <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for environmental metadata from the ENVO ontology. Use the select field to change the input value. Scroll to see more fields.</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
+            <ActionHelpOutline />
+          </IconButton>
+          <br/>
+        </div>
+        <div className="explore-select">
+          <SelectField value={this.state.wordinput} onChange={this.handleWordSelect}>
+            {Object.keys(this.props.activeSummaryData).filter(function(value) {
+              if (value.indexOf('summary') !== -1 && wordfields.includes(value)) {
+                return true;
+              } else {
+                return false;
+              }
+            }).map(function(value, index) {
+              return (
+                <MenuItem key={index} value={value} primaryText={value} />
+              )
+            })}
+          </SelectField>
+        </div>
+        <WordCloud activeSummaryData={this.props.activeSummaryData} wordinput={this.state.wordinput}/>
+      </div>;
+
+    var renderFigure = function(activeSummaryData,isProcessing,component) {
+      if (!isProcessing) {
+        if (activeSummaryData.empty) {
+          return <h3>Sorry, no matches!</h3>
+        } else {
+          return component
+        }
+      } else {
+        return <div>
+          <div>
+            <div className='uil-rolling-css component-loader'>
+              <div>
+                <div></div>
+                <div></div>
+              </div>
+            </div>
+          </div>
+          <h3>Processing...</h3>
+        </div>
+      }
+    };
+
+    return (
+      <div>
+        <Paper className="explore-histogram card left two">
+          {renderFigure(this.props.activeSummaryData,this.props.processing, geninfo_histcomponent)}
         </Paper>
         <Paper className="explore-radarchart card left one">
-          <div className="figure-hint-container">
-            <span className="figure-hint-label">General Sample Info</span>
-            <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for each controlled vocabulary value for some General Sample Info fields. Use the select field to change the input value</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
-              <ActionHelpOutline />
-            </IconButton>
-            <br/>
-          </div>
-          <div className="explore-select">
-            <SelectField value={this.state.generalinfo_radarinput} onChange={this.handleGeneralRadarSelect}>
-              {Object.keys(this.props.activeSummaryData).filter(function(value) {
-                if (value.indexOf('summary') !== -1 && generalinfo_radarfields.includes(value)) {
-                  return true;
-                } else {
-                  return false;
-                }
-              }).map(function(value, index) {
-                return (
-                  <MenuItem key={index} value={value} primaryText={value} />
-                )
-              })}
-            </SelectField>
-          </div>
-          <RadarChart activeSummaryData={this.props.activeSummaryData} radarinput={this.state.generalinfo_radarinput} colortheme={TurquoiseTheme.metaseek}/>
+          {renderFigure(this.props.activeSummaryData,this.props.processing, geninfo_radarcomponent)}
         </Paper>
-
         <Paper className="explore-histogram card left one">
-          <div className="figure-hint-container">
-            <span className="figure-hint-label">Library Construction Method Summary</span>
-            <IconButton tooltip=<div className="figure-hint-tooltip">Library construction method used for clone libraries.</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
-              <ActionHelpOutline />
-            </IconButton>
-            <br/>
-          </div>
-          <PieVictory activeSummaryData={this.props.activeSummaryData} pieinput="library_construction_method_summary" colortheme={YellowTheme.metaseek}/>
+          {renderFigure(this.props.activeSummaryData,this.props.processing, libconst_component)}
         </Paper>
-
         <Paper className="explore-histogram card left two">
-          <div className="figure-hint-container">
-            <span className="figure-hint-label">Sequencing Info</span>
-            <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for each controlled vocabulary value for some Sequencing Info fields. Use the select field to change the input value.</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
-              <ActionHelpOutline />
-            </IconButton>
-            <br/>
-          </div>
-          <div className="explore-select">
-            <SelectField value={this.state.seqinfo_histinput} onChange={this.handleSeqHistSelect}>
-              {Object.keys(this.props.activeSummaryData).filter(function(value) {
-                if (value.indexOf('summary') !== -1 && seqinfo_histfields.includes(value)) {
-                  return true;
-                } else {
-                  return false;
-                }
-              }).map(function(value, index) {
-                  return (
-                    <MenuItem key={index} value={value} primaryText={value} />
-                  )
-              })}
-            </SelectField>
-          </div>
-          <HistogramVictory activeSummaryData={this.props.activeSummaryData} histinput={this.state.seqinfo_histinput} colortheme={YellowTheme.metaseek}/>
+          {renderFigure(this.props.activeSummaryData,this.props.processing, seqinfo_histcomponent)}
         </Paper>
-
         <Paper className="explore-map card left two ">
-          <div>
-            {mapRender(this.props.activeSummaryData,this.props.processing)}
-          </div>
+          {renderFigure(this.props.activeSummaryData,this.props.processing, map_component)}
         </Paper>
         <Paper className="explore-areachart card left six">
-          <div className="figure-hint-container">
-            <span className="figure-hint-label">Sequencing Info</span>
-            <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for each controlled vocabulary value for some Sequencing Info fields. Use the select field to change the input value.</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
-              <ActionHelpOutline />
-            </IconButton>
-            <br/>
-          </div>
-          <div className="explore-select">
-            <SelectField value={this.state.seqinfo_areainput} onChange={this.handleSeqAreaSelect}>
-              {Object.keys(this.props.activeSummaryData).filter(function(value) {
-                if (value.indexOf('summary') !== -1 && seqinfo_areafields.includes(value)) {
-                  return true;
-                } else {
-                  return false;
-                }
-              }).map(function(value, index) {
-                  return (
-                    <MenuItem key={index} value={value} primaryText={value} />
-                  )
-              })}
-            </SelectField>
-          </div>
-          <AreaChart activeSummaryData={this.props.activeSummaryData} areainput={this.state.seqinfo_areainput} colortheme={YellowTheme.metaseek}/>
+          {renderFigure(this.props.activeSummaryData,this.props.processing, seqinfo_areacomponent)}
         </Paper>
         <Paper className="explore-wordcloud card left six">
-          <div className="figure-hint-container">
-            <span className="figure-hint-label">Environmental Info</span>
-            <IconButton tooltip=<div className="figure-hint-tooltip">Count of datasets for environmental metadata from the ENVO ontology. Use the select field to change the input value. Scroll to see more fields.</div> iconStyle={{color:"rgb(180,180,180)", height:"15px"}} style={{height:"18px", padding:"0", marginTop:"2px"}} >
-              <ActionHelpOutline />
-            </IconButton>
-            <br/>
-          </div>
-          <div className="explore-select">
-            <SelectField value={this.state.wordinput} onChange={this.handleWordSelect}>
-              {Object.keys(this.props.activeSummaryData).filter(function(value) {
-                if (value.indexOf('summary') !== -1 && wordfields.includes(value)) {
-                  return true;
-                } else {
-                  return false;
-                }
-              }).map(function(value, index) {
-                return (
-                  <MenuItem key={index} value={value} primaryText={value} />
-                )
-              })}
-            </SelectField>
-          </div>
-          <WordCloud activeSummaryData={this.props.activeSummaryData} wordinput={this.state.wordinput}/>
+          {renderFigure(this.props.activeSummaryData,this.props.processing, envinfo_wordcloudcomponent)}
         </Paper>
       </div>
     )
