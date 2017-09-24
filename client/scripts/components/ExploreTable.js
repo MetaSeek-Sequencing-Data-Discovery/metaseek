@@ -53,7 +53,7 @@ var ExploreTable = React.createClass({
               <TableBody showRowHover={true} stripedRows={false} displayRowCheckbox={false} preScanRows={false}>
                 {this.props.dataTable.datasets.map( (row, index) => (
                   <TableRow selectable={false} key={index}>
-                    <TableRowColumn><Link to={row.uri}><RaisedButton label={"Details"} buttonStyle={{backgroundColor:"#979CF2"}} labelStyle={{color:"#FFFFFF"}}></RaisedButton></Link></TableRowColumn>
+                    <TableRowColumn><Link to={row.uri}><RaisedButton label={"dataset details"} buttonStyle={{backgroundColor:"#979CF2"}} labelStyle={{color:"#FFFFFF"}}></RaisedButton></Link></TableRowColumn>
                     <TableRowColumn style={{width: '300px',whiteSpace:'normal',display:'inline-block',paddingTop:'9px',paddingBottom:'9px',height:'100%'}}>{row.study_title}</TableRowColumn>
                     <TableRowColumn>{row.expt_link}</TableRowColumn>
                     <TableRowColumn>{row.db_source}</TableRowColumn>
