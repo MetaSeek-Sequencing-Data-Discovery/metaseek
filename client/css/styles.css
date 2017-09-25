@@ -878,6 +878,11 @@ button.github:after, input[type=submit].github:after {
 }
 
 /* Discovery Details */
+.discovery-description {
+  font-style: italic;
+  text-align: center;
+  margin: 10px 18px 25px 18px;
+}
 
 .discovery-filterparam-table-container {
   overflow: visible;

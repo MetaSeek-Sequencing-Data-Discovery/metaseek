@@ -274,6 +274,7 @@ class GetDiscovery(Resource):
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
         'discovery_title':fields.String,
+        'discovery_description':fields.String,
         'uri': fields.Url('getdiscovery', absolute=True),
         'owner':fields.Nested({
             'firebase_id':fields.String,
@@ -304,11 +305,12 @@ class CreateDiscovery(Resource):
             parser.add_argument('owner_id', type=str)
             parser.add_argument('filter_params', type=str)
             parser.add_argument('discovery_title', type=str)
+            parser.add_argument('discovery_description')
             args = parser.parse_args()
 
             owner = User.query.filter_by(firebase_id=args['owner_id']).first()
 
-            newDiscovery = Discovery(owner.id,args['filter_params'],args['discovery_title'])
+            newDiscovery = Discovery(owner.id,args['filter_params'],args['discovery_title'], args['discovery_description'])
             db.session.add(newDiscovery)
             db.session.commit()
             return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id)}}

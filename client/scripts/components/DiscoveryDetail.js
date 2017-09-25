@@ -75,6 +75,7 @@ var DiscoveryDetail = React.createClass({
     var tableHeaderStyles = {color:'#fff',fontFamily:'Roboto',fontSize:'14px',fontWeight:700};
 
     const ruletypes = JSON.parse("{\"0\":\"=\", \"1\":\"<\", \"2\":\">\", \"3\":\"<=\", \"4\":\">=\", \"5\":\"=\", \"6\":\"!=\", \"7\":\"contains\", \"8\":\"contains\", \"9\": \"does not contain\", \"10\":\"is not none\"}");
+
     return (
       <div>
         <Header history={this.props.history}/>
@@ -83,6 +84,9 @@ var DiscoveryDetail = React.createClass({
               <Paper className="discovery-header card three" >
                 <h2>{this.state.discovery.discovery_title}</h2>
                 <h3>Discovery Details</h3>
+                <div className="discovery-description">
+                    <span>{this.state.discovery.discovery_description}</span>
+                </div>
                 <div className="discovery-header-summary">
                   <div className="discovery-header-summary-left">
                     <span className="filterparam-table-title">Filter Parameters</span>
