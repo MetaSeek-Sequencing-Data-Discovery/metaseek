@@ -279,6 +279,7 @@ class GetDiscovery(Resource):
         'uri': fields.Url('getdiscovery', absolute=True),
         'owner':fields.Nested({
             'firebase_id':fields.String,
+            'firebase_name':fields.String,
             'uri':fields.Url('getuser', absolute=True)
         })
     }, envelope='discovery')

@@ -114,7 +114,7 @@ var DiscoveryDetail = React.createClass({
                   <div className="discovery-header-summary-right">
                     <span className="discovery-header-first"><span className="active">{this.state.summaryData.total_datasets} datasets</span></span>
                     <span className="discovery-header-second"> {getReadableFileSizeString(this.state.summaryData.total_download_size)} <span className="overview-title">Estimated Total Download Size</span></span>
-                    <span className="discovery-header-user"><span>{"saved by metaseek user "+this.state.discovery.owner.uri.substr(-1)+" on "+this.state.discovery.timestamp.substr(0,16)}</span></span>
+                    <span className="discovery-header-user"><span>{"saved by metaseek user "+this.state.discovery.owner.firebase_name+" on "+this.state.discovery.timestamp.substr(0,16)}</span></span>
                   </div>
                 </div>
               </Paper>
