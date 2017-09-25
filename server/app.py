@@ -57,6 +57,7 @@ class CreateUser(Resource):
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('firebase_id', type=str, help='Email address to create user')
+            parser.add_argument('firebase_name', type=str, help='Name to create user')
             parser.add_argument('admin', type=int)
             args = parser.parse_args()
 
@@ -65,7 +66,7 @@ class CreateUser(Resource):
             if (existingUser):
                 return {'error':'User already exists!','uri':url_for('getuser',id=existingUser.id)}
             else:
-                newUser = User(args['firebase_id'],args['admin'])
+                newUser = User(args['firebase_id'],args['firebase_name'], args['admin'])
                 db.session.add(newUser)
                 db.session.commit()
                 return {"user":{"uri":url_for('getuser',id=newUser.id)}}

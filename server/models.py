@@ -248,11 +248,13 @@ class Discovery(db.Model):
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     firebase_id = db.Column(db.String(28), unique=True)
+    firebase_name = db.Column(db.String(50))
     admin = db.Column(db.Integer)
     discoveries = db.relationship('Discovery', backref='user', lazy='dynamic')
 
-    def __init__(self, firebase_id, admin=False):
+    def __init__(self, firebase_id, firebase_name=None, admin=False):
         self.firebase_id = firebase_id
+        self.firebase_name = firebase_name
         self.admin = admin
 
     def __repr__(self):

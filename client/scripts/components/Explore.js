@@ -138,6 +138,7 @@ var Explore = React.createClass({
     self.state.firebase.photo = user.photoURL;
     apiRequest.post("/user/create", {
       "firebase_id":self.state.firebase.uid,
+      "firebase_name":self.state.firebase.name,
       "admin":0
     }).then(function(response){
       self.setState({"firebase": self.state.firebase});
