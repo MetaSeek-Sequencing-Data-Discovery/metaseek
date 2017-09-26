@@ -41,6 +41,11 @@ var Header = React.createClass({
             />
           </Link>
         </ToolbarGroup>
+        <ToolbarGroup >
+          <div>
+             <img className="header-image-beta" src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Beta-badge.svg"/>
+          </div>
+        </ToolbarGroup>
       </Toolbar>
      </MuiThemeProvider>
     )
