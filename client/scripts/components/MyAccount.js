@@ -73,13 +73,23 @@ var MyAccount = React.createClass({
 
   successfulLogin : function(user) {
     var self = this;
+    self.state.firebase.name = user.displayName;
+    self.state.firebase.uid = user.uid;
+    self.state.firebase.photo = user.photoURL;
+    apiRequest.post("/user/create", {
+      "firebase_id":self.state.firebase.uid,
+      "firebase_name":self.state.firebase.name,
+      "admin":0
+    }).then(function(response){
+      console.log(response);
+      self.setState({"firebase": self.state.firebase});
+    });
+
     apiRequest.get("/user/"+user.uid+"/discoveries")
     .then(function (response) {
       self.setState({"discoveries": response.data.discoveries});
     });
-    this.state.firebase.name = user.displayName;
-    this.state.firebase.uid = user.uid;
-    this.state.firebase.photo = user.photoURL;
+
     this.setState(this.state.firebase);
 
   },

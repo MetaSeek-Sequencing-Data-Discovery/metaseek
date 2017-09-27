@@ -624,6 +624,12 @@ button.github:after, input[type=submit].github:after {
   margin: 36px 0 36px 18px;
 }
 
+/* Dataset Detail Layout */
+.dataset-sheet {
+  margin: 36px 18px 36px 18px;
+  padding: 18px 5%;
+}
+
 
 /* Add Dataset layout */
 
@@ -635,11 +641,16 @@ button.github:after, input[type=submit].github:after {
   display: block;
 }
 
+/* Header Layout */
+.header-image-beta {
+  width: 50px;
+  height: 50px;
+}
 
 /* Explore layout */
 
 .header-explore-filteropen {
-  width: 100%;
+  width: 1100px;
   margin: 0 0 0 340px;
 }
 
@@ -649,13 +660,18 @@ button.github:after, input[type=submit].github:after {
 }
 
 .explore-container {
-  width: 1200px;
-  margin: 10px auto;
+  width: 1212px;
+  margin: 10px 7.5%;
 }
 
 .explore-container-filteropen {
-  width: 1200px;
-  margin: 10px 10% 0 26%;
+  width: 1100px;
+  margin: 10px 10% 0 23%;
+}
+
+.explore-container-filterclosed {
+  width: 1100px;
+  margin: 10px 11% 0 11%;
 }
 
 .right {
@@ -666,18 +682,18 @@ button.github:after, input[type=submit].github:after {
   float:left;
 }
 
-/* 3 card grid, 380px per card, 18px per gutter between cards */
+/* 3 card grid, 348px per card, 18px per gutter between cards */
 .one {
-  width: 380px;
+  width: 348px;
 }
 
 .overview-size {
-  width: 380px;
+  width: 348px;
   height: 250px;
 }
 
 .two {
-  width: 778px;
+  width: 714px;
 }
 
 .three {
@@ -694,7 +710,7 @@ button.github:after, input[type=submit].github:after {
 }
 
 .six {
-  width: 380px;
+  width: 348px;
   height: 320px;
 }
 
@@ -826,7 +842,7 @@ button.github:after, input[type=submit].github:after {
 }
 
 .histogram-container {
-  width: 778px;
+  width: 714px;
   margin: 0 0 0 0;
   height: 320px;
   overflow:hidden;
@@ -840,7 +856,7 @@ button.github:after, input[type=submit].github:after {
 }
 
 .area-container {
-  width: 380px;
+  width: 348px;
   height: 240px;
 }
 
@@ -872,6 +888,11 @@ button.github:after, input[type=submit].github:after {
 }
 
 /* Discovery Details */
+.discovery-description {
+  font-style: italic;
+  text-align: center;
+  margin: 10px 18px 25px 18px;
+}
 
 .discovery-filterparam-table-container {
   overflow: visible;
@@ -906,10 +927,11 @@ button.github:after, input[type=submit].github:after {
 }
 
 .discovery-header-summary-right {
-  margin: 0 0 0 150px;
+  margin: 0 0 0 18px;
   padding-top: 36px;
   display: inline-block;
   vertical-align: top;
+  width: 550px;
 }
 
 .discovery-header-first {
@@ -942,11 +964,14 @@ button.github:after, input[type=submit].github:after {
 
 .discovery-header-user {
   color: rgb(150,150,150);
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
   font-family: 'Roboto', sans-serif;
   margin: 0 0 18px 0;
   text-align: right;
+  white-space: normal;
+  display: table;
+
   position: relative;
   display: block;
   top: 28%;
@@ -1082,6 +1107,11 @@ button.github:after, input[type=submit].github:after {
 .welcome-email-field {
   display: block;
   margin: 0 auto;
+}
+
+.welcome-text {
+  margin: 36px 0 36px 18px;
+  padding: 36px;
 }
 
 .explore-preview-sheet {
