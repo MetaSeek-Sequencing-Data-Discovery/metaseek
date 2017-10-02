@@ -7,6 +7,9 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import ColorPalette from './ColorPalette';
 import Paper from 'material-ui/Paper';
 import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+import RaisedButton from 'material-ui/RaisedButton';
+
+import {CSVDownload} from 'react-csv';
 
 // My component imports
 import Header from './Header';
@@ -30,7 +33,11 @@ var DiscoveryDetail = React.createClass({
         'hasNext': false,
         'hasPrevious' : false,
         'nextUri' : "/datasets/search/2"
-      }
+      },
+      'datasetIds':{
+        'ids':[]
+      },
+      'downloadIds': false
     }
   },
   componentWillMount: function() {
@@ -70,11 +77,73 @@ var DiscoveryDetail = React.createClass({
     });
   },
 
+  triggerDatasetIds : function() {
+    const datasetIds = {
+    "ids": [
+        [
+            "MetaSeekId",
+            "DatabaseSource",
+            "DatabaseSourceUID",
+            "ExperimentId"
+        ],
+        [
+            31,
+            "SRA",
+            "3784604",
+            "ERX1917644"
+        ],
+        [
+            34,
+            "SRA",
+            "3784600",
+            "ERX1917640"
+        ],
+        [
+            169,
+            "SRA",
+            "4200602",
+            "ERX1842743"
+        ]
+      ]};
+    this.setState({"datasetIds":datasetIds})
+    this.setState({"downloadIds":true})
+  },
+
   render: function() {
     if (!this.state.loaded) return <Loading/>;
     var tableHeaderStyles = {color:'#fff',fontFamily:'Roboto',fontSize:'14px',fontWeight:700};
 
     const ruletypes = JSON.parse("{\"0\":\"=\", \"1\":\"<\", \"2\":\">\", \"3\":\"<=\", \"4\":\">=\", \"5\":\"=\", \"6\":\"!=\", \"7\":\"contains\", \"8\":\"is equal to\", \"9\": \"is not equal to\", \"10\":\"is not none\"}");
+
+    const datasetIds = {
+    "ids": [
+        [
+            "MetaSeekId",
+            "DatabaseSource",
+            "DatabaseSourceUID",
+            "ExperimentId"
+        ],
+        [
+            31,
+            "SRA",
+            "3784604",
+            "ERX1917644"
+        ],
+        [
+            34,
+            "SRA",
+            "3784600",
+            "ERX1917640"
+        ],
+        [
+            169,
+            "SRA",
+            "4200602",
+            "ERX1842743"
+        ]
+      ]};
+    var dataOutput = datasetIds["ids"];
+    console.log(this.state.datasetIds.ids);
 
     return (
       <div>
@@ -116,6 +185,15 @@ var DiscoveryDetail = React.createClass({
                     <span className="discovery-header-second"> {getReadableFileSizeString(this.state.summaryData.total_download_size)} <span className="overview-title">Estimated Total Download Size</span></span>
                     <span className="discovery-header-user"><span>{"saved by metaseek user "+this.state.discovery.owner.firebase_name+" on "+this.state.discovery.timestamp.substr(0,16)}</span></span>
                   </div>
+                </div>
+                <RaisedButton
+                  label="Download Dataset Ids as .csv"
+                  onClick={this.triggerDatasetIds}
+                  primary={true}
+                  disabled={this.state.downloadIds ? true : false}
+                />
+                <div>
+                  {this.state.downloadIds ? <CSVDownload data={this.state.datasetIds.ids} /> : null}
                 </div>
               </Paper>
 

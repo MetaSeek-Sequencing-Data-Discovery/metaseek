@@ -269,6 +269,30 @@ class SearchDatasetsSummary(Resource):
         except Exception as e:
             return {'error': str(e)}
 
+class SearchDatasetIds(Resource):
+    def post(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('filter_params', type=str)
+            args = parser.parse_args()
+            filter_params = json.loads(args['filter_params'])
+            rules = filter_params['rules']
+
+            queryObject = Dataset.query
+
+            for rule in rules:
+                field = rule['field']
+                ruletype = rule['type']
+                value = rule['value']
+                queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+
+            ids = getDatasetIds(queryObject)
+            return ids
+
+        except Exception as e:
+            return {'error': str(e)}
+
+
 # /discovery routes
 class GetDiscovery(Resource):
     @marshal_with({
@@ -385,6 +409,7 @@ api.add_resource(GetAllDatasets,        '/datasets/<int:page>')
 api.add_resource(SearchDatasets,        '/datasets/search/<int:page>')
 api.add_resource(GetDatasetSummary,     '/datasets/summary')
 api.add_resource(SearchDatasetsSummary, '/datasets/search/summary')
+api.add_resource(SearchDatasetIds,      '/datasets/search/ids')
 
 api.add_resource(CreateDiscovery,       '/discovery/create')
 api.add_resource(GetDiscovery,          '/discovery/<int:id>')

@@ -324,3 +324,19 @@ def summarizeDatasets(queryObject):
                 "empty":1
                 }
             }
+
+def getDatasetIds(queryObject):
+    filteredQueryObject = queryObject.with_entities(
+        Dataset.id,
+        Dataset.db_source,
+        Dataset.db_source_uid,
+        Dataset.expt_id
+    )
+
+    queryResultDataframe = pd.read_sql(filteredQueryObject.statement,db.session.bind)
+
+    ids = [['MetaSeekId', 'DatabaseSource', 'DatabaseSourceUID', 'ExperimentId']]
+    values = queryResultDataframe.values.tolist()
+    ids.extend(values) 
+
+    return {"ids":ids}
