@@ -151,9 +151,7 @@ var DiscoveryDetail = React.createClass({
                   primary={true}
                   disabled={this.state.downloadingIds ? true : false}
                 />
-                <div>
-                  {this.state.downloadIds ? <CSVDownload data={this.state.datasetIds} /> : null}
-                </div>
+                
               </Paper>
 
               <Paper className="explore-table card three">
