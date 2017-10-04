@@ -9,8 +9,6 @@ import Paper from 'material-ui/Paper';
 import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import RaisedButton from 'material-ui/RaisedButton';
 
-import {CSVDownload} from 'react-csv';
-
 // My component imports
 import Header from './Header';
 import VizDashboard from './VizDashboard';
@@ -34,10 +32,7 @@ var DiscoveryDetail = React.createClass({
         'hasPrevious' : false,
         'nextUri' : "/datasets/search/2"
       },
-      'datasetIds':{
-        'ids':[]
-      },
-      'downloadIds': false
+      'downloadingIds': false
     }
   },
   componentWillMount: function() {
@@ -77,36 +72,29 @@ var DiscoveryDetail = React.createClass({
     });
   },
 
-  triggerDatasetIds : function() {
-    const datasetIds = {
-    "ids": [
-        [
-            "MetaSeekId",
-            "DatabaseSource",
-            "DatabaseSourceUID",
-            "ExperimentId"
-        ],
-        [
-            31,
-            "SRA",
-            "3784604",
-            "ERX1917644"
-        ],
-        [
-            34,
-            "SRA",
-            "3784600",
-            "ERX1917640"
-        ],
-        [
-            169,
-            "SRA",
-            "4200602",
-            "ERX1842743"
-        ]
-      ]};
-    this.setState({"datasetIds":datasetIds})
-    this.setState({"downloadIds":true})
+  toCSV : function(data, separator) {
+    const csv = data.map((row, index) => row.map((element) => "\"" + element + "\"").join(separator)).join(`\n`);
+    return (csv);
+  },
+
+  downloadIds : function() {
+    var self = this;
+    console.log("download triggered");
+    apiRequest.post("/datasets/search/ids", {
+      "filter_params":self.state.discovery.filter_params
+    }).then(function (response) {
+      self.setState({"downloadingIds":true});
+      console.log("got response", response);
+      const csv = self.toCSV(response.data, ",");
+      const output = encodeURI(`data:text/csv;charset=utf-8,\uFEFF${csv}`);
+      var downloadLink = document.createElement("a");
+      downloadLink.href = output;
+      downloadLink.download = self.state.discovery.discovery_title + "_datasetIds.csv";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    });
+
   },
 
   render: function() {
@@ -114,36 +102,6 @@ var DiscoveryDetail = React.createClass({
     var tableHeaderStyles = {color:'#fff',fontFamily:'Roboto',fontSize:'14px',fontWeight:700};
 
     const ruletypes = JSON.parse("{\"0\":\"=\", \"1\":\"<\", \"2\":\">\", \"3\":\"<=\", \"4\":\">=\", \"5\":\"=\", \"6\":\"!=\", \"7\":\"contains\", \"8\":\"is equal to\", \"9\": \"is not equal to\", \"10\":\"is not none\"}");
-
-    const datasetIds = {
-    "ids": [
-        [
-            "MetaSeekId",
-            "DatabaseSource",
-            "DatabaseSourceUID",
-            "ExperimentId"
-        ],
-        [
-            31,
-            "SRA",
-            "3784604",
-            "ERX1917644"
-        ],
-        [
-            34,
-            "SRA",
-            "3784600",
-            "ERX1917640"
-        ],
-        [
-            169,
-            "SRA",
-            "4200602",
-            "ERX1842743"
-        ]
-      ]};
-    var dataOutput = datasetIds["ids"];
-    console.log(this.state.datasetIds.ids);
 
     return (
       <div>
@@ -187,13 +145,13 @@ var DiscoveryDetail = React.createClass({
                   </div>
                 </div>
                 <RaisedButton
-                  label="Download Dataset Ids as .csv"
-                  onClick={this.triggerDatasetIds}
+                  label={this.state.downloadingIds ? "your IDs are being downloaded" : "Download Dataset Ids as .csv"}
+                  onClick={this.downloadIds}
                   primary={true}
-                  disabled={this.state.downloadIds ? true : false}
+                  disabled={this.state.downloadingIds ? true : false}
                 />
                 <div>
-                  {this.state.downloadIds ? <CSVDownload data={this.state.datasetIds.ids} /> : null}
+                  {this.state.downloadIds ? <CSVDownload data={this.state.datasetIds} /> : null}
                 </div>
               </Paper>
 

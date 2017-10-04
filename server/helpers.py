@@ -333,10 +333,9 @@ def getDatasetIds(queryObject):
         Dataset.expt_id
     )
 
-    queryResultDataframe = pd.read_sql(filteredQueryObject.statement,db.session.bind)
+    queryResults = filteredQueryObject.all()
 
     ids = [['MetaSeekId', 'DatabaseSource', 'DatabaseSourceUID', 'ExperimentId']]
-    values = queryResultDataframe.values.tolist()
-    ids.extend(values) 
+    ids.extend(queryResults)
 
-    return {"ids":ids}
+    return ids

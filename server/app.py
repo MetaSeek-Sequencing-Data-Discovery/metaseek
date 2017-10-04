@@ -79,6 +79,7 @@ class CreateUser(Resource):
 class GetUser(Resource):
     @marshal_with({
         'firebase_id':fields.String,
+        'firebase_name':fields.String,
         'admin':fields.Integer,
         'uri':fields.Url('getuser', absolute=True)
     }, envelope='user')
@@ -88,6 +89,7 @@ class GetUser(Resource):
 class GetAllUsers(Resource):
     @marshal_with({
         'firebase_id':fields.String,
+        'firebase_name':fields.String,
         'admin':fields.Integer,
         'uri':fields.Url('getuser', absolute=True)
     }, envelope='users')
@@ -286,8 +288,17 @@ class SearchDatasetIds(Resource):
                 value = rule['value']
                 queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
 
+            filteredQueryObject = queryObject.with_entities(
+                Dataset.id,
+                Dataset.db_source,
+                Dataset.db_source_uid,
+                Dataset.expt_id
+            )
             ids = getDatasetIds(queryObject)
+
             return ids
+
+
 
         except Exception as e:
             return {'error': str(e)}
