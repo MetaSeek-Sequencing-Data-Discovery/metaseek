@@ -77,24 +77,25 @@ var DiscoveryDetail = React.createClass({
     return (csv);
   },
 
+  downloadCSV : function(output, filename) {
+    var downloadLink = document.createElement("a");
+    downloadLink.href = output;
+    downloadLink.download = filename;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  },
+
   downloadIds : function() {
     var self = this;
-    console.log("download triggered");
     apiRequest.post("/datasets/search/ids", {
       "filter_params":self.state.discovery.filter_params
     }).then(function (response) {
       self.setState({"downloadingIds":true});
-      console.log("got response", response);
       const csv = self.toCSV(response.data, ",");
       const output = encodeURI(`data:text/csv;charset=utf-8,\uFEFF${csv}`);
-      var downloadLink = document.createElement("a");
-      downloadLink.href = output;
-      downloadLink.download = self.state.discovery.discovery_title + "_datasetIds.csv";
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
+      self.downloadCSV(output, self.state.discovery.discovery_title + "_datasetIds.csv");
     });
-
   },
 
   render: function() {
