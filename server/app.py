@@ -288,20 +288,30 @@ class SearchDatasetIds(Resource):
                 value = rule['value']
                 queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
 
-            filteredQueryObject = queryObject.with_entities(
-                Dataset.id,
-                Dataset.db_source,
-                Dataset.db_source_uid,
-                Dataset.expt_id
-            )
             ids = getDatasetIds(queryObject)
 
             return ids
 
-
-
         except Exception as e:
             return {'error': str(e)}
+
+class SearchDatasetMetadata(Resource):
+    @marshal_with(fullDatasetFields, envelope='datasetMetadata')
+
+    def get(self, id):
+        discovery = Discovery.query.filter_by(id=id).first()
+        filter_params = json.loads(discovery.filter_params)
+        rules = filter_params['rules']
+
+        queryObject = Dataset.query
+
+        for rule in rules:
+            field = rule['field']
+            ruletype = rule['type']
+            value = rule['value']
+            queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+
+        return queryObject.all()
 
 
 # /discovery routes
@@ -421,6 +431,7 @@ api.add_resource(SearchDatasets,        '/datasets/search/<int:page>')
 api.add_resource(GetDatasetSummary,     '/datasets/summary')
 api.add_resource(SearchDatasetsSummary, '/datasets/search/summary')
 api.add_resource(SearchDatasetIds,      '/datasets/search/ids')
+api.add_resource(SearchDatasetMetadata, '/datasets/search/metadata/<int:id>')
 
 api.add_resource(CreateDiscovery,       '/discovery/create')
 api.add_resource(GetDiscovery,          '/discovery/<int:id>')

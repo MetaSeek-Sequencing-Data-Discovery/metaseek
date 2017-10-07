@@ -8,6 +8,7 @@ from decimal import Decimal
 from collections import Counter
 from sqlalchemy import or_
 import scipy.stats as sp
+from marshals import *
 
 #function to get color gradient from max to white
 def getFillColor(count, maxCount, r,g,b):
@@ -335,7 +336,27 @@ def getDatasetIds(queryObject):
 
     queryResults = filteredQueryObject.all()
 
-    ids = [['MetaSeekId', 'DatabaseSource', 'DatabaseSourceUID', 'ExperimentId']]
+    ids = [['id', 'db_source', 'db_source_uid', 'expt_id']]
     ids.extend(queryResults)
 
     return ids
+
+def getDatasetsMetadata(queryObject):
+    filteredQueryObject = queryObject.with_entities(*fullDatasetCols)
+    print "reading in df..."
+    #queryResults = filteredQueryObject.all()
+    #queryResultDataframe = pd.read_sql(filteredQueryObject.statement,db.session.bind)
+    queryResults = pd.read_sql(queryObject.statement,db.session.bind)
+    queryResults['date_scraped'] = queryResults['date_scraped'].dt.strftime("%Y-%m-%d %H:%M:%S")
+    queryResults['metadata_publication_date'] = queryResults['metadata_publication_date'].dt.strftime("%Y-%m-%d %H:%M:%S")
+    print queryResults.head()
+    print queryResults['metadata_publication_date'][1]
+    print type(queryResults['metadata_publication_date'][1])
+    metadata = [list(queryResults.columns)]
+    metadata.extend(queryResults.values.tolist())
+    print type(metadata[1][-1])
+
+    #metadata = [fullColnames]
+    #metadata.extend(queryResults)
+
+    return metadata

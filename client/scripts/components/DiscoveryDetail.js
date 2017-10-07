@@ -32,7 +32,8 @@ var DiscoveryDetail = React.createClass({
         'hasPrevious' : false,
         'nextUri' : "/datasets/search/2"
       },
-      'downloadingIds': false
+      'downloadingIds': false,
+      'downloadingMetadata' : false
     }
   },
   componentWillMount: function() {
@@ -86,6 +87,17 @@ var DiscoveryDetail = React.createClass({
     document.body.removeChild(downloadLink);
   },
 
+  toCSVJSON : function(jsons, separator) {
+    const headers = Array.from(
+     jsons.map(json => Object.keys(json))
+     .reduce((a, b) => new Set([...a, ...b]), [])
+    );
+    const data = jsons.map((object) => headers.map((header) => (header in object) ? object[header] : ''));
+    const input = [headers, ...data];
+    const csv = input.map((row, index) => row.map((element) => "\"" + element + "\"").join(separator)).join(`\n`);
+    return (csv);
+  },
+
   downloadIds : function() {
     var self = this;
     apiRequest.post("/datasets/search/ids", {
@@ -94,8 +106,47 @@ var DiscoveryDetail = React.createClass({
       self.setState({"downloadingIds":true});
       const csv = self.toCSV(response.data, ",");
       const output = encodeURI(`data:text/csv;charset=utf-8,\uFEFF${csv}`);
+      console.log(csv);
+      console.log(output);
       self.downloadCSV(output, self.state.discovery.discovery_title + "_datasetIds.csv");
     });
+  },
+/*
+  downloadMetadata : function() {
+    var self = this;
+    apiRequest.post("/datasets/search/metadata", {
+      "filter_params":self.state.discovery.filter_params
+    }).then(function (response) {
+      self.setState({"downloadingMetadata":true});
+      const csv = self.toCSV(response.data, ",");
+      const output = encodeURI(`data:text/csv;charset=utf-8,\uFEFF${csv}`);
+      self.downloadCSV(output, self.state.discovery.discovery_title + "_datasetMetadata.csv");
+    });
+  },
+*/
+  downloadMetadataJSON : function() {
+  var self = this;
+  self.setState({"downloadingMetadata":true});
+  apiRequest.get('/datasets/search/metadata/' + this.props.params.id)
+  .then(function (response) {
+    const csv = self.toCSVJSON(response.data.datasetMetadata, ",");
+    const output = encodeURI(`data:text/csv;charset=utf-8,\uFEFF${csv}`);
+    const finaloutput = output.replace("-", "%2D", output);
+    console.log(finaloutput); 
+    self.downloadCSV(finaloutput, self.state.discovery.discovery_title + "_datasetMetadata.csv");
+  });
+},
+
+  metadataDownloadLabel : function(threshold) {
+    if (this.state.downloadingMetadata) {
+      return "your metadata is being downloaded"
+    } else {
+      if (this.state.summaryData.total_datasets < threshold) {
+        return "Download Full Metadata as .csv (~"+getReadableFileSizeString(this.state.summaryData.total_datasets*90*8)+")"
+      } else {
+        return "Data is too big for full download. Use the API!"
+      }
+    }
   },
 
   render: function() {
@@ -103,6 +154,8 @@ var DiscoveryDetail = React.createClass({
     var tableHeaderStyles = {color:'#fff',fontFamily:'Roboto',fontSize:'14px',fontWeight:700};
 
     const ruletypes = JSON.parse("{\"0\":\"=\", \"1\":\"<\", \"2\":\">\", \"3\":\"<=\", \"4\":\">=\", \"5\":\"=\", \"6\":\"!=\", \"7\":\"contains\", \"8\":\"is equal to\", \"9\": \"is not equal to\", \"10\":\"is not none\"}");
+
+    const n_threshold = 10000;
 
     return (
       <div>
@@ -145,13 +198,20 @@ var DiscoveryDetail = React.createClass({
                     <span className="discovery-header-user"><span>{"saved by metaseek user "+this.state.discovery.owner.firebase_name+" on "+this.state.discovery.timestamp.substr(0,16)}</span></span>
                   </div>
                 </div>
-                <RaisedButton
-                  label={this.state.downloadingIds ? "your IDs are being downloaded" : "Download Dataset Ids as .csv"}
-                  onClick={this.downloadIds}
-                  primary={true}
-                  disabled={this.state.downloadingIds ? true : false}
-                />
-                
+                <div className="download-button-container">
+                  <RaisedButton className="download-button-metadata"
+                    label={this.state.downloadingIds ? "your IDs are being downloaded" : "Download Dataset Ids as .csv (~"+getReadableFileSizeString(this.state.summaryData.total_datasets*4*8)+")"}
+                    onClick={this.downloadIds}
+                    primary={true}
+                    disabled={this.state.downloadingIds ? true : false}
+                  />
+                <RaisedButton className="download-button-metadata"
+                    label={this.metadataDownloadLabel(n_threshold)}
+                    onClick={this.downloadMetadataJSON}
+                    primary={true}
+                    disabled={this.state.downloadingMetadata || this.state.summaryData.total_datasets > n_threshold ? true : false}
+                  />
+                </div>
               </Paper>
 
               <Paper className="explore-table card three">
