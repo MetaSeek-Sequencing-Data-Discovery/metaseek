@@ -229,13 +229,15 @@ class Discovery(db.Model):
     filter_params = db.Column(db.Text)
     timestamp = db.Column(db.DateTime)
     discovery_title = db.Column(db.Text)
+    discovery_description = db.Column(db.Text)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     owner = db.relationship('User',backref=db.backref('myDiscoveries',lazy='dynamic'))
 
-    def __init__(self, owner_id, filter_params, discovery_title, timestamp=None, ):
+    def __init__(self, owner_id, filter_params, discovery_title, discovery_description=None, timestamp=None, ):
         self.owner_id = owner_id
         self.filter_params = filter_params
         self.discovery_title = discovery_title
+        self.discovery_description = discovery_description
         if timestamp is None:
             timestamp = datetime.utcnow()
         self.timestamp = timestamp
@@ -246,11 +248,13 @@ class Discovery(db.Model):
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     firebase_id = db.Column(db.String(28), unique=True)
+    firebase_name = db.Column(db.String(50))
     admin = db.Column(db.Integer)
     discoveries = db.relationship('Discovery', backref='user', lazy='dynamic')
 
-    def __init__(self, firebase_id, admin=False):
+    def __init__(self, firebase_id, firebase_name=None, admin=False):
         self.firebase_id = firebase_id
+        self.firebase_name = firebase_name
         self.admin = admin
 
     def __repr__(self):

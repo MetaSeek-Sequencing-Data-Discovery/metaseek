@@ -46,6 +46,7 @@ var Explore = React.createClass({
       'filtersOpen': true,
       'submitDiscoveryOpen': false,
       'discoveryTitle': '',
+      'discoveryDescription':'',
       'promptLoginOpen': false
     }
   },
@@ -137,6 +138,7 @@ var Explore = React.createClass({
     self.state.firebase.photo = user.photoURL;
     apiRequest.post("/user/create", {
       "firebase_id":self.state.firebase.uid,
+      "firebase_name":self.state.firebase.name,
       "admin":0
     }).then(function(response){
       self.setState({"firebase": self.state.firebase});
@@ -163,12 +165,17 @@ var Explore = React.createClass({
     this.setState({'discoveryTitle':newValue});
   },
 
+  updateDiscoveryDescription : function(event, newValue) {
+    this.setState({'discoveryDescription':newValue});
+  },
+
   submitDiscovery : function() {
     var self = this;
     apiRequest.post("/discovery/create", {
       "owner_id":self.state.firebase.uid,
       "filter_params":self.state.filter_params,
-      "discovery_title":self.state.discoveryTitle
+      "discovery_title":self.state.discoveryTitle,
+      "discovery_description":self.state.discoveryDescription
     }).then(function (response) {
       self.props.history.push("/discovery/" + response.data.discovery.id);
     });
@@ -232,10 +239,9 @@ var Explore = React.createClass({
               <text style={{position:"fixed",top:"170px", left:"5px", color:"rgb(175,175,175)", fontFamily:"Roboto"}}>Edit Filters</text>
               <div className={this.state.filtersOpen ? "header-explore-filteropen" : "header-explore"}>
                 <Header history={this.props.history}/>
-                <h2>Explore</h2>
               </div>
-              <div className={this.state.filtersOpen ? "explore-container-filteropen" : "explore-container"}>
-
+              <div className={this.state.filtersOpen ? "explore-container-filteropen" : "explore-container-filterclosed"}>
+                <h2>Explore</h2>
                 <div className="save-discovery-button-container">
                   <RaisedButton
                     className="save-discovery-button"
@@ -257,6 +263,19 @@ var Explore = React.createClass({
                       onChange={this.updateDiscoveryTitle}
                       value={this.state.discoveryTitle}
                       fullWidth={true}
+                    />
+                  <br className="big-br" />
+                  <TextField
+                    underlineFocusStyle={{color:"#979CF2"}}
+                    floatingLabelFocusStyle={{color:"#979CF2"}}
+                    multiLine={true}
+                    rows={1}
+                    rowsMax={2}
+                    fullWidth={true}
+                    onChange={this.updateDiscoveryDescription}
+                    value={this.state.discoveryDescription}
+                    floatingLabelText="Enter a short description of your discovery"
+                    floatingLabelFixed={true}
                     />
                   </Dialog>
                   <Dialog

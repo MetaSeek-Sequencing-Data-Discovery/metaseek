@@ -57,6 +57,7 @@ class CreateUser(Resource):
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('firebase_id', type=str, help='Email address to create user')
+            parser.add_argument('firebase_name', type=str, help='Name to create user')
             parser.add_argument('admin', type=int)
             args = parser.parse_args()
 
@@ -65,7 +66,7 @@ class CreateUser(Resource):
             if (existingUser):
                 return {'error':'User already exists!','uri':url_for('getuser',id=existingUser.id)}
             else:
-                newUser = User(args['firebase_id'],args['admin'])
+                newUser = User(args['firebase_id'],args['firebase_name'], args['admin'])
                 db.session.add(newUser)
                 db.session.commit()
                 return {"user":{"uri":url_for('getuser',id=newUser.id)}}
@@ -274,9 +275,11 @@ class GetDiscovery(Resource):
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
         'discovery_title':fields.String,
+        'discovery_description':fields.String,
         'uri': fields.Url('getdiscovery', absolute=True),
         'owner':fields.Nested({
             'firebase_id':fields.String,
+            'firebase_name':fields.String,
             'uri':fields.Url('getuser', absolute=True)
         })
     }, envelope='discovery')
@@ -304,11 +307,12 @@ class CreateDiscovery(Resource):
             parser.add_argument('owner_id', type=str)
             parser.add_argument('filter_params', type=str)
             parser.add_argument('discovery_title', type=str)
+            parser.add_argument('discovery_description')
             args = parser.parse_args()
 
             owner = User.query.filter_by(firebase_id=args['owner_id']).first()
 
-            newDiscovery = Discovery(owner.id,args['filter_params'],args['discovery_title'])
+            newDiscovery = Discovery(owner.id,args['filter_params'],args['discovery_title'], args['discovery_description'])
             db.session.add(newDiscovery)
             db.session.commit()
             return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id)}}
