@@ -47,6 +47,9 @@ def getMapBins(map_counts, num_bins): #e.g. latlon_map[0]
     return percentiles, countRanges, fillColors
 
 
+# Query Construction Helpers / Data Retrieval
+# Based on a rule (field name, comparator and value), add a filter to a query object
+# TODO add some better documentation here on what each type is
 def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
     fieldattr = getattr(targetClass,field)
     if ruletype == 0:
@@ -73,6 +76,15 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
     elif ruletype == 10:
         queryObject = queryObject.filter(fieldattr != None)
 
+    return queryObject
+
+# Apply all rules to a query object, applying filterQueryByRule repeatedly
+def filterDatasetQueryObjectWithRules(queryObject,rules):
+    for rule in rules:
+        field = rule['field']
+        ruletype = rule['type']
+        value = rule['value']
+        queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
     return queryObject
 
 def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cats=None):
