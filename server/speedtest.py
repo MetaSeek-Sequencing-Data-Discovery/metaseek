@@ -3,7 +3,7 @@ import mysql.connector
 from sqlalchemy import case
 
 # prod
-# cnx = mysql.connector.connect(user='nick', password='REDACTED',host='ec2-52-33-134-115.us-west-2.compute.amazonaws.com',database='metaseek')
+cnx = mysql.connector.connect(user='metaseek', password='Micr0be$',host='metaseek.ccyurqn8bx2a.us-west-2.rds.amazonaws.com',database='metaseek')
 
 # local
 #cnx = mysql.connector.connect(user='root',host='127.0.0.1',database='metaseek')
