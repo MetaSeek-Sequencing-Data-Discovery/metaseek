@@ -9,6 +9,16 @@ from collections import Counter
 from sqlalchemy import or_
 import scipy.stats as sp
 from marshals import *
+import unicodedata
+import re
+
+# Normalizes string, converts to lowercase, removes non-alpha characters,
+# and converts spaces to hyphens.
+def slugify(value):
+    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
+    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
+    value = unicode(re.sub('[-\s]+', '-', value))
+    return value
 
 #function to get color gradient from max to white
 def getFillColor(count, maxCount, r,g,b):

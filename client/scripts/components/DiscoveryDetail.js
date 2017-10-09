@@ -31,11 +31,10 @@ var DiscoveryDetail = React.createClass({
         'hasNext': false,
         'hasPrevious' : false,
         'nextUri' : "/datasets/search/2"
-      },
-      'downloadingIds': false,
-      'downloadingMetadata' : false
+      }
     }
   },
+
   componentWillMount: function() {
     var self = this;
     apiRequest.get('/discovery/' + this.props.params.id)
@@ -73,79 +72,31 @@ var DiscoveryDetail = React.createClass({
     });
   },
 
-  toCSV : function(data, separator) {
-    const csv = data.map((row, index) => row.map((element) => "\"" + element + "\"").join(separator)).join(`\n`);
-    return (csv);
-  },
-
-  downloadCSV : function(output, filename) {
+  downloadIdCSV : function() {
+    var self = this;
+    var csvResultURL = apiConfig.baseURL + 'discovery/' + this.props.params.id + '/ids';
     var downloadLink = document.createElement("a");
-    downloadLink.href = output;
-    downloadLink.download = filename;
+    downloadLink.href = csvResultURL;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
   },
 
-  toCSVJSON : function(jsons, separator) {
-    const headers = Array.from(
-     jsons.map(json => Object.keys(json))
-     .reduce((a, b) => new Set([...a, ...b]), [])
-    );
-    const data = jsons.map((object) => headers.map((header) => (header in object) ? object[header] : ''));
-    const input = [headers, ...data];
-    const csv = input.map((row, index) => row.map((element) => "\"" + element + "\"").join(separator)).join(`\n`);
-    return (csv);
-  },
-
-  downloadIds : function() {
+  downloadFullCSV : function() {
     var self = this;
-    apiRequest.post("/datasets/search/ids", {
-      "filter_params":self.state.discovery.filter_params
-    }).then(function (response) {
-      self.setState({"downloadingIds":true});
-      const csv = self.toCSV(response.data, ",");
-      const output = encodeURI(`data:text/csv;charset=utf-8,\uFEFF${csv}`);
-      console.log(csv);
-      console.log(output);
-      self.downloadCSV(output, self.state.discovery.discovery_title + "_datasetIds.csv");
-    });
+    var csvResultURL = apiConfig.baseURL + 'discovery/' + this.props.params.id + '/download';
+    var downloadLink = document.createElement("a");
+    downloadLink.href = csvResultURL;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
   },
-/*
-  downloadMetadata : function() {
-    var self = this;
-    apiRequest.post("/datasets/search/metadata", {
-      "filter_params":self.state.discovery.filter_params
-    }).then(function (response) {
-      self.setState({"downloadingMetadata":true});
-      const csv = self.toCSV(response.data, ",");
-      const output = encodeURI(`data:text/csv;charset=utf-8,\uFEFF${csv}`);
-      self.downloadCSV(output, self.state.discovery.discovery_title + "_datasetMetadata.csv");
-    });
-  },
-*/
-  downloadMetadataJSON : function() {
-  var self = this;
-  self.setState({"downloadingMetadata":true});
-  apiRequest.get('/datasets/search/metadata/' + this.props.params.id)
-  .then(function (response) {
-    const csv = self.toCSVJSON(response.data.datasetMetadata, ",");
-    const output = encodeURI(`data:text/csv;charset=utf-8,\uFEFF${csv}`);
-    const finaloutput = output.replace("-", "%2D", output);
-    console.log(finaloutput); 
-    self.downloadCSV(finaloutput, self.state.discovery.discovery_title + "_datasetMetadata.csv");
-  });
-},
 
   metadataDownloadLabel : function(threshold) {
-    if (this.state.downloadingMetadata) {
-      return "your metadata is being downloaded"
+    if (this.state.summaryData.total_datasets < threshold) {
+      return "Download Full Metadata as .csv (~"+getReadableFileSizeString(this.state.summaryData.total_datasets*90*8)+")"
     } else {
-      if (this.state.summaryData.total_datasets < threshold) {
-        return "Download Full Metadata as .csv (~"+getReadableFileSizeString(this.state.summaryData.total_datasets*90*8)+")"
-      } else {
-        return "Data is too big for full download. Use the API!"
-      }
+      return "Data is too big for full download. Use the API!"
     }
   },
 
@@ -200,16 +151,15 @@ var DiscoveryDetail = React.createClass({
                 </div>
                 <div className="download-button-container">
                   <RaisedButton className="download-button-metadata"
-                    label={this.state.downloadingIds ? "your IDs are being downloaded" : "Download Dataset Ids as .csv (~"+getReadableFileSizeString(this.state.summaryData.total_datasets*4*8)+")"}
-                    onClick={this.downloadIds}
+                    label={"Download Dataset Ids as .csv (~"+getReadableFileSizeString(this.state.summaryData.total_datasets*4*8)+")"}
+                    onClick={this.downloadIdCSV}
                     primary={true}
-                    disabled={this.state.downloadingIds ? true : false}
                   />
                 <RaisedButton className="download-button-metadata"
                     label={this.metadataDownloadLabel(n_threshold)}
-                    onClick={this.downloadMetadataJSON}
+                    onClick={this.downloadFullCSV}
                     primary={true}
-                    disabled={this.state.downloadingMetadata || this.state.summaryData.total_datasets > n_threshold ? true : false}
+                    disabled={this.state.summaryData.total_datasets > n_threshold ? true : false}
                   />
                 </div>
               </Paper>
