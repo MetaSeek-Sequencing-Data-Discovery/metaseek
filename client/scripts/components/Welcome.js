@@ -21,6 +21,7 @@ import Formsy from 'formsy-react';
 import {FormsyText} from 'formsy-material-ui/lib';
 
 import Header from './Header';
+import MailChimpSignup from './MailChimpSignup';
 
 var db = firebase.database();
 var signupRef = db.ref("signups");
@@ -99,28 +100,9 @@ var Welcome = React.createClass({
           <div className="welcome-container">
             <h1 className="welcome-announce">Sign up to test the beta version!</h1>
               <Paper className="welcome-signup-submit">
+                <h4>Join our mailing list to receive (very rare) updates on major events here at MetaSeek</h4>
                 {this.state.submitted ? <h2>Thanks for signing up! We'll be in touch soon.</h2> :
-                  <Formsy.Form
-                     onValid={this.enableButton}
-                     onInvalid={this.disableButton}
-                     onValidSubmit={this.submitEmail}
-                     onInvalidSubmit={this.notifyFormError}
-                     >
-                    <p>Enter your email address to be notified when our beta version is released</p>
-                    <FormsyText
-                      className="welcome-email-field"
-                      name="email address"
-                      validations="isEmail"
-                      validationError={errorMessages.emailError}
-                      required
-                      hintText="metaseek.cloud@gmail.com"
-                    />
-                    <RaisedButton
-                      type="submit"
-                      label="Signup"
-                      primary={true}
-                    />
-                  </Formsy.Form>
+                <MailChimpSignup />
                 }
               </Paper>
             <h1>Welcome to MetaSeek</h1>
