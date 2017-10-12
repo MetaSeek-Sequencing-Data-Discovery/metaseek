@@ -1074,9 +1074,90 @@ button.github:after, input[type=submit].github:after {
 
 .welcome-container {
   text-align: center;
-  width: 1024px;
-  margin: 0 auto;
-  padding-top: 15px;
+}
+
+.welcome-first {
+  width: 100%;
+  height: 600px;
+  background-image: url('/images/DNAsequencing_stockphoto_dark.jpg');
+  background-size: cover;
+}
+
+.welcome-text {
+  color: #FFFFFF;
+  padding: 36px;
+  margin: 0;
+}
+
+.welcome-title {
+  color: #FFFFFF;
+  font-size: 4rem;
+  font-weight: 700;
+  padding: 90px 0 36px 0;
+  margin: 0;
+}
+
+.subscribe-form-label {
+  color: #FFFFFF;
+  line-height: 150%;
+  font-family: Helvetica;
+  font-size: 16px;
+  margin-top: 8px;
+  font-weight: bold;
+}
+
+.subscribe-reqd {
+  color: #FEB28D;
+  font-size: 20px;
+}
+
+.subscribe-table {
+  width: 400px;
+  display: inline-block;
+  text-align: left;
+}
+
+.subscribe-input {
+  background: #fff;
+  height: 36px;
+  width: 100%;
+  border: 2px solid #d0d0d0 !important;
+  border-radius: 3px;
+  margin: 3px 0 12px 0;
+  overflow: hidden;
+}
+
+.subscribe-button {
+  background-color: #6369E0 !important;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-family: 'Helvetica', Arial, sans-serif;
+  height: 42px;
+  margin: 12px 5px 12px 0;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 3px;
+}
+
+.welcome-features {
+  background-color: #FFFFFF;
+  display: inline-block;
+  width: 100%;
+}
+
+.feature-block {
+  width: 300px;
+  margin: 75px;
+  display: inline-block;
+}
+
+.feature-block-title {
+  font-size: 42px;
+  font-weight: 600;
+}
+
+.feature-block-body {
+  font-size: 18px;
 }
 
 .welcome-announce {
@@ -1107,11 +1188,6 @@ button.github:after, input[type=submit].github:after {
 .welcome-email-field {
   display: block;
   margin: 0 auto;
-}
-
-.welcome-text {
-  margin: 36px 0 36px 18px;
-  padding: 36px;
 }
 
 .explore-preview-sheet {

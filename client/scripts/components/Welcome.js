@@ -91,22 +91,39 @@ var Welcome = React.createClass({
     var exploreButtonDisplay = 'none';
     if (this.state.firebase.admin) {
       exploreButtonDisplay = 'flex';
-    }
+    };
 
     return(
       <div>
         <Header history={this.props.history}/>
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
           <div className="welcome-container">
-            <h1 className="welcome-announce">Sign up to test the beta version!</h1>
-              <Paper className="welcome-signup-submit">
-                <h4>Join our mailing list to receive (very rare) updates on major events here at MetaSeek</h4>
-                {this.state.submitted ? <h2>Thanks for signing up! We'll be in touch soon.</h2> :
-                <MailChimpSignup />
-                }
-              </Paper>
-            <h1>Welcome to MetaSeek</h1>
-            <p>Discover, curate, and get access to thousands of sequencing samples from all over the web.</p>
+            <div className="welcome-first">
+              <h1 className="welcome-title">Welcome to MetaSeek</h1>
+              <h3 className="welcome-text">Discover, curate, and get access to thousands of sequencing samples from all over the web.</h3>
+              <p className="subscribe-form-label">Join our mailing list to receive (very rare) updates on major events here at MetaSeek</p>
+              {this.state.submitted ? <h2 className="welcome-text">Thanks for signing up! We'll be in touch soon.</h2> :
+              <MailChimpSignup />
+              }
+            </div>
+            <div className="welcome-features">
+              <div className="feature-block">
+                <img src="../images/explore_icon.jpeg"/>
+                <h1 className="feature-block-title">Explore</h1>
+                <p className="feature-block-body">Search and filter metadata from millions of next-generation sequencing datasets to find the set of datasets that meet your needs. Quickly curate integrated sequencing datasets to answer your scientific questions. </p>
+              </div>
+              <div className="feature-block">
+                <img src="../images/discovery_icon.jpeg"/>
+                <h1 className="feature-block-title">Discover</h1>
+                <p className="feature-block-body">Search and filter metadata from millions of next-generation sequencing datasets to find the set of datasets that meet your needs. Quickly curate integrated sequencing datasets to answer your scientific questions. </p>
+              </div>
+              <div className="feature-block">
+                <img src="../images/launch_icon.jpeg"/>
+                <h1 className="feature-block-title">Create</h1>
+                <p className="feature-block-body">Search and filter metadata from millions of next-generation sequencing datasets to find the set of datasets that meet your needs. Quickly curate integrated sequencing datasets to answer your scientific questions. </p>
+              </div>
+            </div>
+
               <div style={{'display':exploreButtonDisplay}}>
                 <Paper zDepth={1}>
                   <Link to='/explore'>

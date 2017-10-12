@@ -15,26 +15,23 @@ var MailChimpSignup = React.createClass({
       <form action="https://cloud.us16.list-manage.com/subscribe/post" method="POST">
         <input type="hidden" name="u" value="cf5bea2cc22645d3e92a973df" />
         <input type="hidden" name="id" value="dc5deb63f1" />
-
-        <div id="mergeTable" >
+        <div id="mergeTable" className="subscribe-table">
             <div id="mergeRow-0">
-                <label htmlFor="MERGE0">Email Address <span >*</span></label>
+                <label htmlFor="MERGE0" className="subscribe-form-label">Email Address <span className="subscribe-reqd">*</span></label>
                 <div >
-                    <input type="email" autoCapitalize="off" autoCorrect="off" name="MERGE0" id="MERGE0" />
+                    <input type="email" autoCapitalize="off" autoCorrect="off" name="MERGE0" id="MERGE0" className="subscribe-input"/>
                 </div>
             </div>
             <div id="mergeRow-1">
-                <label htmlFor="MERGE1">Username</label>
+                <label htmlFor="MERGE1" className="subscribe-form-label">Username</label>
                 <div >
-                    <input type="text" name="MERGE1" id="MERGE1" />
+                    <input type="text" name="MERGE1" id="MERGE1" className="subscribe-input"/>
                 </div>
             </div>
+            <div >
+                <input className="subscribe-button" type="submit" name="submit" value="Subscribe to list" />
+            </div>
         </div>
-        <div >
-            <input type="submit" name="submit" value="Subscribe to list" />
-        </div>
-        <input type="hidden" name="ht" value="4c76c6b5b81b1f6c1a0e5f7676b9460b874c1731:MTUwNzY0NTEwMy4wMTM0" />
-        <input type="hidden" name="mc_signupsource" value="hosted" />
       </form>
     )
   }
