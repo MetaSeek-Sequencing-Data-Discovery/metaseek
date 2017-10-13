@@ -1149,6 +1149,7 @@ button.github:after, input[type=submit].github:after {
   width: 300px;
   margin: 75px;
   display: inline-block;
+  vertical-align: top;
 }
 
 .feature-block-title {
