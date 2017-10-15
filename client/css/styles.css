@@ -1170,6 +1170,7 @@ button.github:after, input[type=submit].github:after {
 .feature-block-title {
   font-size: 42px;
   font-weight: 600;
+  margin: 10px auto;
 }
 
 .feature-block-body {
