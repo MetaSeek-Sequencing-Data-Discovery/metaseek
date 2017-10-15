@@ -41,6 +41,12 @@ var Header = React.createClass({
               primary={true}
             />
           </Link>
+          <Link className="button-link" to='/discoveries'>
+            <FlatButton
+              label="Browse"
+              primary={true}
+            />
+          </Link>
         </ToolbarGroup>
         <ToolbarGroup >
           <RaisedButton

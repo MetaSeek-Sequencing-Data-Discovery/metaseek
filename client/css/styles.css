@@ -595,6 +595,7 @@ ul {
 
 .button-link {
   text-decoration: none;
+  margin: 10px auto;
 }
 
 
@@ -1241,6 +1242,22 @@ button.github:after, input[type=submit].github:after {
 .welcome-email-field {
   display: block;
   margin: 0 auto;
+}
+
+/*browse discoveries styles */
+.browse-discoveries-header {
+  text-align: left;
+  margin: 36px auto 18px auto;
+  width: 1176px;
+  font-weight: 400;
+  font-size: 36px;
+  color: #4A4A50;
+}
+
+.browse-discoveries-table {
+  padding:0px;
+  margin: auto;
+  width: 1176px;
 }
 
 .explore-preview-sheet {
