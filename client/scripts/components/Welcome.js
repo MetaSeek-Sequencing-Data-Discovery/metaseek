@@ -120,48 +120,36 @@ var Welcome = React.createClass({
               <div className="feature-block">
                 <img src="../images/launch_icon.jpeg"/>
                 <h1 className="feature-block-title">Create</h1>
-                <p className="feature-block-body">Get past the data integration step and to your real science, faster. Download dataset metadata, and follow our easy guides to get from dataset lists to fasta files in no time. </p>
+                <p className="feature-block-body">Get past the data integration step and to your real science, faster. Download dataset metadata, and follow our easy guides to get from dataset lists to fasta files in no time.</p>
               </div>
             </div>
-
-              <div style={{'display':exploreButtonDisplay}}>
-                <Paper zDepth={1}>
-                  <Link to='/explore'>
-                    <FlatButton label="DISCOVER"></FlatButton>
-                  </Link>
-                </Paper>
-                <Paper zDepth={1}>
-                  <Link to='/dataset/new'>
-                    <FlatButton label="CONTRIBUTE"></FlatButton>
-                  </Link>
-                </Paper>
-              </div>
-              <h1>What is MetaSeek?</h1>
-              <Paper className="single-sheet">
-                <h3>MetaSeek brings together sequencing metadata from all the major repositories to let you easily search, filter, and curate sequencing datasets for your meta-analysis.</h3>
-              </Paper>
-              <h1>How to use MetaSeek</h1>
+            <div className="welcome-how">
               <div>
-
-              <Paper className="explore-preview-sheet">
-                <div className="explore-preview-sheet-left">
-                  <img src="./images/explore.jpeg"></img>
-                </div>
-                <div className="explore-preview-sheet-right">
-                  <h3>Explore Datasets</h3>
-                    <p>Search and filter on the metadata you care about</p>
-                  <h3>Save and share your discovery</h3>
-                    <p>Get dummy code for data download.</p>
-                    <p>Browse other users’ discoveries, save ones you like or use one as a launching off point.</p>
-                  <h3>Contribute to the metadata pool</h3>
-                    <p>Metadata is only as good as the community it serves.</p>
-                    <p>Flag or correct metadata errors, or annotate a dataset or discovery.</p>
-                </div>
-              </Paper>
+                <h1 className="welcome-how-header">What is MetaSeek?</h1>
+                <h3 className="welcome-how-subheader">MetaSeek brings together sequencing metadata from all the major repositories to let you easily search, filter, and curate sequencing datasets for your meta-analysis.</h3>
+                <h1 className="welcome-how-header">How MetaSeek Works</h1>
+              </div>
+              <div className="welcome-how-graphic">
+                <img src="../images/metaseek_workflow.png"/>
+              </div>
+              <div className="welcome-how-explainer">
+                <h2 className="welcome-how-explain-header">Metadata Integration</h2>
+                <p className="welcome-how-explain-body">Our metadata scrapers gather metadata for every new public sequencing dataset in the Sequence Read Archive (SRA) across the European, U.S., and Japanese databases. New metadata is added automatically as new datasets become public, so MetaSeek is always up to date.</p>
+                <h2 className="welcome-how-explain-header">Constraining Metadata</h2>
+                <p className="welcome-how-explain-body">Sequencing metadata in the SRA is encouraged to follow certain standards, with controlled vocabularies for many fields, but this is not always the reality. Where possible, MetaSeek parses incoming metadata to constrain erroneous or mislabeled fields to their corresponding controlled vocabulary value, or to convert user-provided text to a numeric value for fields like latitude and longitude.</p>
+                <h2 className="welcome-how-explain-header">Inferring Missing Data</h2>
+                <p className="welcome-how-explain-body">Many investigators submit sequencing metadata that is missing essential fields, but these values can be inferred from the context of the other metadata. MetaSeek uses machine learning models to predict controlled vocabularies of some fields, to fill in missing fields.</p>
+                <h2 className="welcome-how-explain-header">Fast Metadata Aggregation</h2>
+                <p className="welcome-how-explain-body">Easily search over metadata from millions of sequencing datasets in seconds. MetaSeek takes care of querying, summarizing, and visualizing the results.</p>
+                <h2 className="welcome-how-explain-header">User-Focused Exploration of Metadata</h2>
+                <p className="welcome-how-explain-body">MetaSeek's interactive visualization dashboard makes it easy to understand, explore and edit your metadata query results. Or if you want to really dive deep, use the API.</p>
+                <h2 className="welcome-how-explain-header">Save and Export</h2>
+                <p className="welcome-how-explain-body">Save metadata discoveries to your account, and browse discoveries from all MetaSeek users. Download metadata for your discovery, and follow our instructions on downloading fasta filesto get started on your investigation.</p>
+              </div>
             </div>
-              <h4>Follow our progress on GitHub, or run your own install of MetaSeek:
-              </h4>
-              <a className="github-button" href="https://github.com/ahoarfrost/metaseek/subscription" data-style="mega" data-count-href="/ahoarfrost/metaseek/watchers" data-count-api="/repos/ahoarfrost/metaseek#subscribers_count" data-count-aria-label="# watchers on GitHub" aria-label="Watch ahoarfrost/metaseek on GitHub">Watch</a>
+            <h4>Follow our progress on GitHub, or run your own install of MetaSeek:
+            </h4>
+            <a className="github-button" href="https://github.com/ahoarfrost/metaseek/subscription" data-style="mega" data-count-href="/ahoarfrost/metaseek/watchers" data-count-api="/repos/ahoarfrost/metaseek#subscribers_count" data-count-aria-label="# watchers on GitHub" aria-label="Watch ahoarfrost/metaseek on GitHub">Watch</a>
           </div>
       </MuiThemeProvider>
     </div>

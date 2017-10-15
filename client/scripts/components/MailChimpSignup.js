@@ -22,12 +22,6 @@ var MailChimpSignup = React.createClass({
                     <input type="email" autoCapitalize="off" autoCorrect="off" name="MERGE0" id="MERGE0" className="subscribe-input"/>
                 </div>
             </div>
-            <div id="mergeRow-1">
-                <label htmlFor="MERGE1" className="subscribe-form-label">Username</label>
-                <div >
-                    <input type="text" name="MERGE1" id="MERGE1" className="subscribe-input"/>
-                </div>
-            </div>
             <div >
                 <input className="subscribe-button" type="submit" name="submit" value="Subscribe to list" />
             </div>

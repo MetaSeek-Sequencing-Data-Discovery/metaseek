@@ -1102,7 +1102,7 @@ button.github:after, input[type=submit].github:after {
   line-height: 150%;
   font-family: Helvetica;
   font-size: 16px;
-  margin-top: 8px;
+  margin-top: 48px;
   font-weight: bold;
 }
 
@@ -1147,7 +1147,7 @@ button.github:after, input[type=submit].github:after {
 
 .feature-block {
   width: 300px;
-  margin: 75px;
+  margin: 25px 50px;
   display: inline-block;
   vertical-align: top;
 }
@@ -1158,6 +1158,49 @@ button.github:after, input[type=submit].github:after {
 }
 
 .feature-block-body {
+  font-size: 18px;
+}
+
+.welcome-how {
+  background-color: #54545A;
+  display: inline-block;
+  width: 100%;
+}
+
+.welcome-how-header {
+  color: #FFFFFF;
+  margin: 36px;
+  font-size: 42px;
+  font-weight: 400;
+}
+
+.welcome-how-subheader {
+  color: #FFFFFF;
+  margin: 10px 10%;
+}
+
+.welcome-how-graphic {
+  margin: 36px;
+  margin-top: 5px;
+  float: left;
+}
+
+.welcome-how-explainer {
+  margin: 36px;
+}
+
+.welcome-how-explain-header {
+  text-align: left;
+  color: #FFFFFF;
+  margin: 36px;
+  font-size: 30px;
+  font-weight: 300;
+}
+
+.welcome-how-explain-body {
+  text-align: left;
+  color: #FFFFFF;
+  margin: 0 10% 0 36px;
   font-size: 18px;
 }
 
