@@ -1,11 +1,13 @@
 from __future__ import division
-from flask import Flask, url_for
+from flask import Flask, url_for, make_response
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, Resource, reqparse, fields, marshal_with, marshal
 from dateutil import parser as dateparser
 from datetime import datetime
 import json
+import unicodecsv
+import StringIO
 from pyhashxx import hashxx
 from pymemcache.client.base import Client
 import os
@@ -79,6 +81,7 @@ class CreateUser(Resource):
 class GetUser(Resource):
     @marshal_with({
         'firebase_id':fields.String,
+        'firebase_name':fields.String,
         'admin':fields.Integer,
         'uri':fields.Url('getuser', absolute=True)
     }, envelope='user')
@@ -88,6 +91,7 @@ class GetUser(Resource):
 class GetAllUsers(Resource):
     @marshal_with({
         'firebase_id':fields.String,
+        'firebase_name':fields.String,
         'admin':fields.Integer,
         'uri':fields.Url('getuser', absolute=True)
     }, envelope='users')
@@ -286,6 +290,70 @@ class GetDiscovery(Resource):
     def get(self, id):
         return Discovery.query.get(id)
 
+class DownloadDiscovery(Resource):
+    def get(self, id):
+        discovery = Discovery.query.filter_by(id=id).first()
+        filter_params = json.loads(discovery.filter_params)
+        rules = filter_params['rules']
+
+        queryObject = filterDatasetQueryObjectWithRules(Dataset.query,filter_params['rules'])
+        results = queryObject.all()
+
+        # StringIO lets you write a csv to a buffer instead of directly to a file with csv writer
+        si = StringIO.StringIO()
+
+        # have to use unicodecsv instead of csv or it fails on our unicode data (like the "degree" sign)
+        cw = unicodecsv.writer(si, encoding='utf-8')
+
+        # write all of the names of the columns as the first row so the CSV has column headers
+        cw.writerow([column.name for column in Dataset.__mapper__.columns])
+
+        # for every result object, get the value for every column, store in an array and write to the csv buffer
+        [cw.writerow([getattr(row, column.name) for column in Dataset.__mapper__.columns]) for row in results]
+
+        # send with the right headers to have the browser treat it like a downloadable file
+        output = make_response(si.getvalue())
+        output.headers["Content-Disposition"] = "attachment; filename=" + slugify(discovery.discovery_title) + "_discovery_data.csv"
+        output.headers["Content-type"] = "text/csv"
+        return output
+
+class DownloadDiscoveryIds(Resource):
+    def get(self, id):
+        print 'downloading all ids'
+        discovery = Discovery.query.filter_by(id=id).first()
+        print 'found the discovery in question'
+        print discovery
+        filter_params = json.loads(discovery.filter_params)
+        print filter_params
+        rules = filter_params['rules']
+        print 'filtering query object'
+        queryObject = filterDatasetQueryObjectWithRules(Dataset.query,filter_params['rules'])
+        print queryObject
+        print 'gathering all results, this could be sloooooow'
+        results = queryObject.all()
+        print results[0:5]
+        print 'assembling string'
+        # StringIO lets you write a csv to a buffer instead of directly to a file with csv writer
+        si = StringIO.StringIO()
+
+        # have to use unicodecsv instead of csv or it fails on our unicode data (like the "degree" sign)
+        cw = unicodecsv.writer(si, encoding='utf-8')
+
+        targetColumns = ['id', 'db_source', 'db_source_uid', 'expt_id']
+
+        # write the names of the target columns as the first row so the CSV has column headers
+        cw.writerow(targetColumns)
+
+        # for every result object, get the value for the target columns, store in an array and write to the csv buffer
+        [cw.writerow([getattr(row, column) for column in targetColumns]) for row in results]
+
+        # send with the right headers to have the browser treat it like a downloadable file
+        output = make_response(si.getvalue())
+        output.headers["Content-Disposition"] = "attachment; filename=" + slugify(discovery.discovery_title) + "_discovery_ids.csv"
+        output.headers["Content-type"] = "text/csv"
+        print 'done with assembly'
+        return output
+
 class GetAllDiscoveries(Resource):
     @marshal_with({
         'filter_params':fields.String,
@@ -386,8 +454,14 @@ api.add_resource(SearchDatasets,        '/datasets/search/<int:page>')
 api.add_resource(GetDatasetSummary,     '/datasets/summary')
 api.add_resource(SearchDatasetsSummary, '/datasets/search/summary')
 
+
 api.add_resource(CreateDiscovery,       '/discovery/create')
 api.add_resource(GetDiscovery,          '/discovery/<int:id>')
+api.add_resource(DownloadDiscovery,     '/discovery/<int:id>/download')
+api.add_resource(DownloadDiscoveryIds,  '/discovery/<int:id>/ids')
+
+# This gets all discoveries for all users - we never use it
+# TODO delete or make this do something more useful
 api.add_resource(GetAllDiscoveries,     '/discoveries')
 
 api.add_resource(PurgeCache,            '/cache/purge')

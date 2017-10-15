@@ -894,6 +894,15 @@ button.github:after, input[type=submit].github:after {
   margin: 10px 18px 25px 18px;
 }
 
+.download-button-container {
+  text-align: center;
+  margin: 28px 10px 15px;
+}
+
+.download-button-metadata {
+  margin: 0 1%;
+}
+
 .discovery-filterparam-table-container {
   overflow: visible;
 }
