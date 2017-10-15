@@ -147,9 +147,11 @@ var Welcome = React.createClass({
                 <p className="welcome-how-explain-body">Save metadata discoveries to your account, and browse discoveries from all MetaSeek users. Download metadata for your discovery, and follow our instructions on downloading fasta filesto get started on your investigation.</p>
               </div>
             </div>
-            <h4>Follow our progress on GitHub, or run your own install of MetaSeek:
-            </h4>
-            <a className="github-button" href="https://github.com/ahoarfrost/metaseek/subscription" data-style="mega" data-count-href="/ahoarfrost/metaseek/watchers" data-count-api="/repos/ahoarfrost/metaseek#subscribers_count" data-count-aria-label="# watchers on GitHub" aria-label="Watch ahoarfrost/metaseek on GitHub">Watch</a>
+            <div className="welcome-footer">
+              <h4>Follow our progress on GitHub, or run your own install of MetaSeek:
+              </h4>
+              <a className="github-button" href="https://github.com/ahoarfrost/metaseek/subscription" data-style="mega" data-count-href="/ahoarfrost/metaseek/watchers" data-count-api="/repos/ahoarfrost/metaseek#subscribers_count" data-count-aria-label="# watchers on GitHub" aria-label="Watch ahoarfrost/metaseek on GitHub">Watch</a>
+            </div>
           </div>
       </MuiThemeProvider>
     </div>

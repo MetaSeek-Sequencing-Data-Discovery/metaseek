@@ -600,8 +600,13 @@ ul {
   margin: 10px auto;
 }
 
-.header-title {
-  color: #6369E0;
+.header-image-beta {
+  width: 50px;
+  height: 50px;
+}
+
+.header-logo {
+  margin: 10px 0;
 }
 
 
@@ -646,16 +651,6 @@ button.github:after, input[type=submit].github:after {
 
 .block-field {
   display: block;
-}
-
-/* Header Layout */
-.header-image-beta {
-  width: 50px;
-  height: 50px;
-}
-
-.header-logo {
-  margin: 10px 0;
 }
 
 /* Explore layout */
@@ -1252,6 +1247,10 @@ button.github:after, input[type=submit].github:after {
 .welcome-email-field {
   display: block;
   margin: 0 auto;
+}
+
+.welcome-footer {
+  padding: 16px;
 }
 
 /*browse discoveries styles */
