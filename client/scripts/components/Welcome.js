@@ -97,32 +97,6 @@ var Welcome = React.createClass({
         <Header history={this.props.history}/>
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
           <div className="welcome-container">
-            <h1 className="welcome-announce">Sign up to test the beta version!</h1>
-              <Paper className="welcome-signup-submit">
-                {this.state.submitted ? <h2>Thanks for signing up! We'll be in touch soon.</h2> :
-                  <Formsy.Form
-                     onValid={this.enableButton}
-                     onInvalid={this.disableButton}
-                     onValidSubmit={this.submitEmail}
-                     onInvalidSubmit={this.notifyFormError}
-                     >
-                    <p>Enter your email address to be notified when our beta version is released</p>
-                    <FormsyText
-                      className="welcome-email-field"
-                      name="email address"
-                      validations="isEmail"
-                      validationError={errorMessages.emailError}
-                      required
-                      hintText="metaseek.cloud@gmail.com"
-                    />
-                    <RaisedButton
-                      type="submit"
-                      label="Signup"
-                      primary={true}
-                    />
-                  </Formsy.Form>
-                }
-              </Paper>
             <h1>Welcome to MetaSeek</h1>
             <p>Discover, curate, and get access to thousands of sequencing samples from all over the web.</p>
               <div style={{'display':exploreButtonDisplay}}>
@@ -138,8 +112,8 @@ var Welcome = React.createClass({
                 </Paper>
               </div>
               <h1>What is MetaSeek?</h1>
-              <Paper className="single-sheet">
-                <h3>MetaSeek brings together sequencing metadata from all the major repositories to let you easily search, filter, and curate sequencing datasets for your meta-analysis.</h3>
+              <Paper className="welcome-text">
+                <h4>MetaSeek brings together sequencing metadata from all the major repositories to let you easily search, filter, and curate sequencing datasets for your meta-analysis.</h4>
               </Paper>
               <h1>How to use MetaSeek</h1>
               <div>

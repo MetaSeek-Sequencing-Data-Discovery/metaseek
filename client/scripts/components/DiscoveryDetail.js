@@ -7,6 +7,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import ColorPalette from './ColorPalette';
 import Paper from 'material-ui/Paper';
 import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+import RaisedButton from 'material-ui/RaisedButton';
 
 // My component imports
 import Header from './Header';
@@ -33,6 +34,7 @@ var DiscoveryDetail = React.createClass({
       }
     }
   },
+
   componentWillMount: function() {
     var self = this;
     apiRequest.get('/discovery/' + this.props.params.id)
@@ -70,11 +72,41 @@ var DiscoveryDetail = React.createClass({
     });
   },
 
+  downloadIdCSV : function() {
+    var self = this;
+    var csvResultURL = apiConfig.baseURL + 'discovery/' + this.props.params.id + '/ids';
+    var downloadLink = document.createElement("a");
+    downloadLink.href = csvResultURL;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  },
+
+  downloadFullCSV : function() {
+    var self = this;
+    var csvResultURL = apiConfig.baseURL + 'discovery/' + this.props.params.id + '/download';
+    var downloadLink = document.createElement("a");
+    downloadLink.href = csvResultURL;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  },
+
+  metadataDownloadLabel : function(threshold) {
+    if (this.state.summaryData.total_datasets < threshold) {
+      return "Download Full Metadata as .csv (~"+getReadableFileSizeString(this.state.summaryData.total_datasets*90*8)+")"
+    } else {
+      return "Data is too big for full download. Use the API!"
+    }
+  },
+
   render: function() {
     if (!this.state.loaded) return <Loading/>;
     var tableHeaderStyles = {color:'#fff',fontFamily:'Roboto',fontSize:'14px',fontWeight:700};
 
-    const ruletypes = JSON.parse("{\"0\":\"=\", \"1\":\"<\", \"2\":\">\", \"3\":\"<=\", \"4\":\">=\", \"5\":\"=\", \"6\":\"!=\", \"7\":\"contains\", \"8\":\"contains\", \"9\": \"does not contain\", \"10\":\"is not none\"}");
+    const ruletypes = JSON.parse("{\"0\":\"=\", \"1\":\"<\", \"2\":\">\", \"3\":\"<=\", \"4\":\">=\", \"5\":\"=\", \"6\":\"!=\", \"7\":\"contains\", \"8\":\"is equal to\", \"9\": \"is not equal to\", \"10\":\"is not none\"}");
+
+    const n_threshold = 10000;
 
     return (
       <div>
@@ -116,6 +148,19 @@ var DiscoveryDetail = React.createClass({
                     <span className="discovery-header-second"> {getReadableFileSizeString(this.state.summaryData.total_download_size)} <span className="overview-title">Estimated Total Download Size</span></span>
                     <span className="discovery-header-user"><span>{"saved by metaseek user "+this.state.discovery.owner.firebase_name+" on "+this.state.discovery.timestamp.substr(0,16)}</span></span>
                   </div>
+                </div>
+                <div className="download-button-container">
+                  <RaisedButton className="download-button-metadata"
+                    label={"Download Dataset Ids as .csv (~"+getReadableFileSizeString(this.state.summaryData.total_datasets*4*8)+")"}
+                    onClick={this.downloadIdCSV}
+                    primary={true}
+                  />
+                <RaisedButton className="download-button-metadata"
+                    label={this.metadataDownloadLabel(n_threshold)}
+                    onClick={this.downloadFullCSV}
+                    primary={true}
+                    disabled={this.state.summaryData.total_datasets > n_threshold ? true : false}
+                  />
                 </div>
               </Paper>
 

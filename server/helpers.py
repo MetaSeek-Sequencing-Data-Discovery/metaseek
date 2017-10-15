@@ -9,6 +9,9 @@ from collections import Counter
 from sqlalchemy import or_
 import scipy.stats as sp
 import time
+from marshals import *
+import unicodedata
+import re
 
 def checkpoint(start, last, n, message):
     current = time.time()
@@ -16,6 +19,14 @@ def checkpoint(start, last, n, message):
     totalElapsed = float(int((current-start) * 10))/10
     print '| ' + str(n).ljust(4) + ' | ' + (str(elapsed) + 's').rjust(9) + ' | ' + (str(totalElapsed) + 's').rjust(8) + ' | ' + message.ljust(60) + ' |'
     return (start,current,n+1)
+
+# Normalizes string, converts to lowercase, removes non-alpha characters,
+# and converts spaces to hyphens.
+def slugify(value):
+    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
+    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
+    value = unicode(re.sub('[-\s]+', '-', value))
+    return value
 
 #function to get color gradient from max to white
 def getFillColor(count, maxCount, r,g,b):
@@ -54,6 +65,9 @@ def getMapBins(map_counts, num_bins): #e.g. latlon_map[0]
     return percentiles, countRanges, fillColors
 
 
+# Query Construction Helpers / Data Retrieval
+# Based on a rule (field name, comparator and value), add a filter to a query object
+# TODO add some better documentation here on what each type is
 def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
     fieldattr = getattr(targetClass,field)
     if ruletype == 0:
@@ -80,6 +94,15 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
     elif ruletype == 10:
         queryObject = queryObject.filter(fieldattr != None)
 
+    return queryObject
+
+# Apply all rules to a query object, applying filterQueryByRule repeatedly
+def filterDatasetQueryObjectWithRules(queryObject,rules):
+    for rule in rules:
+        field = rule['field']
+        ruletype = rule['type']
+        value = rule['value']
+        queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
     return queryObject
 
 def summarizeColumn(dataFrame,columnName,linearBins=False,logBins=False, num_cats=None):
@@ -346,3 +369,38 @@ def summarizeDatasets(queryObject, rules):
                 "empty":1
                 }
             }
+
+def getDatasetIds(queryObject):
+    filteredQueryObject = queryObject.with_entities(
+        Dataset.id,
+        Dataset.db_source,
+        Dataset.db_source_uid,
+        Dataset.expt_id
+    )
+
+    queryResults = filteredQueryObject.all()
+
+    ids = [['id', 'db_source', 'db_source_uid', 'expt_id']]
+    ids.extend(queryResults)
+
+    return ids
+
+def getDatasetsMetadata(queryObject):
+    filteredQueryObject = queryObject.with_entities(*fullDatasetCols)
+    print "reading in df..."
+    #queryResults = filteredQueryObject.all()
+    #queryResultDataframe = pd.read_sql(filteredQueryObject.statement,db.session.bind)
+    queryResults = pd.read_sql(queryObject.statement,db.session.bind)
+    queryResults['date_scraped'] = queryResults['date_scraped'].dt.strftime("%Y-%m-%d %H:%M:%S")
+    queryResults['metadata_publication_date'] = queryResults['metadata_publication_date'].dt.strftime("%Y-%m-%d %H:%M:%S")
+    print queryResults.head()
+    print queryResults['metadata_publication_date'][1]
+    print type(queryResults['metadata_publication_date'][1])
+    metadata = [list(queryResults.columns)]
+    metadata.extend(queryResults.values.tolist())
+    print type(metadata[1][-1])
+
+    #metadata = [fullColnames]
+    #metadata.extend(queryResults)
+
+    return metadata
