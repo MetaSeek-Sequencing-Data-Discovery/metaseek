@@ -27,7 +27,10 @@ var Header = React.createClass({
     return (
     <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
       <Toolbar>
-        <ToolbarTitle text="MetaSeek" />
+        <ToolbarGroup className="header-logo">
+          <img src="../images/metaseek_logo.png" width="36px" height="36px"/>
+          <ToolbarTitle text="etaSeek" className="header-title"/>
+        </ToolbarGroup>
         <ToolbarGroup>
           <Link className="button-link" to='/myaccount'>
             <FlatButton

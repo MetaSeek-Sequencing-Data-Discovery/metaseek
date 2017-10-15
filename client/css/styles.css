@@ -593,9 +593,15 @@ ul {
   margin: -18px 0 0 0;
 }
 
+/*Header styles*/
+
 .button-link {
   text-decoration: none;
   margin: 10px auto;
+}
+
+.header-title {
+  color: #6369E0;
 }
 
 
@@ -646,6 +652,10 @@ button.github:after, input[type=submit].github:after {
 .header-image-beta {
   width: 50px;
   height: 50px;
+}
+
+.header-logo {
+  margin: 10px 0;
 }
 
 /* Explore layout */
@@ -1101,7 +1111,7 @@ button.github:after, input[type=submit].github:after {
 
 .welcome-title {
   color: #FFFFFF;
-  font-size: 4rem;
+  font-size: 4.5rem;
   font-weight: 700;
   padding: 90px 0 36px 0;
   margin: 0;
