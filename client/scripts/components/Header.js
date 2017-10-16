@@ -28,8 +28,10 @@ var Header = React.createClass({
     <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
       <Toolbar>
         <ToolbarGroup className="header-logo">
-          <img src="../images/metaseek_logo.png" width="36px" height="36px"/>
-          <ToolbarTitle text="etaSeek"/>
+          <Link to='/' className="button-logo-link">
+            <img src="../images/metaseek_logo.png" width="36px" height="36px"/>
+            <ToolbarTitle text="etaSeek" style={{color:"rgba(12, 12, 18, 0.4)"}}/>
+          </Link>
         </ToolbarGroup>
         <ToolbarGroup>
           <Link className="button-link" to='/myaccount'>

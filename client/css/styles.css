@@ -600,6 +600,10 @@ ul {
   margin: 10px auto;
 }
 
+.button-logo-link {
+  text-decoration: none;
+}
+
 .header-image-beta {
   width: 50px;
   height: 50px;
