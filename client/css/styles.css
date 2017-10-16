@@ -665,6 +665,21 @@ button.github:after, input[type=submit].github:after {
   margin: 0 0 0 0;
 }
 
+.subscribe-explore-yes {
+  display: inline-block;
+  width: 45%;
+}
+
+.subscribe-explore-no {
+  display: inline-flex;
+  width: 45%;
+  margin-left: 24px;
+}
+
+.subscribe-explore-body {
+  text-align: center;
+}
+
 .explore-container {
   width: 1212px;
   margin: 10px 7.5%;
@@ -815,7 +830,6 @@ button.github:after, input[type=submit].github:after {
 }
 
 .profile-button {
-  width: 180px;
   position: relative;
 }
 

@@ -47,7 +47,8 @@ var Explore = React.createClass({
       'submitDiscoveryOpen': false,
       'discoveryTitle': '',
       'discoveryDescription':'',
-      'promptLoginOpen': false
+      'promptLoginOpen': false,
+      'mailingListOpen': false,
     }
   },
 
@@ -130,7 +131,6 @@ var Explore = React.createClass({
     });
   },
 
-
   successfulLogin : function(user) {
     var self = this;
     self.state.firebase.name = user.displayName;
@@ -141,6 +141,13 @@ var Explore = React.createClass({
       "firebase_name":self.state.firebase.name,
       "admin":0
     }).then(function(response){
+      console.log(response);
+      if (response.data.user) {
+          self.setState({"mailingListOpen": true});
+      }
+      if (response.data.error) {
+        self.setState({"mailingListOpen": true});
+      }
       self.setState({"firebase": self.state.firebase});
     });
   },
@@ -159,6 +166,10 @@ var Explore = React.createClass({
 
   discoveryDialogClose : function () {
     this.setState({'submitDiscoveryOpen': false, 'discoveryTitle': null});
+  },
+
+  mailingListClose : function () {
+    this.setState({"mailingListOpen": false});
   },
 
   updateDiscoveryTitle : function(event, newValue) {
@@ -200,7 +211,6 @@ var Explore = React.createClass({
 
   toggleFilters : function() {
     this.setState({filtersOpen: !this.state.filtersOpen});
-
   },
 
   render : function() {
@@ -222,15 +232,35 @@ var Explore = React.createClass({
 
     const loginPrompt_actions = [
       <RaisedButton
-        label="Log in with Google"
+        label="Sign Up/Log in with Google"
         primary={true}
         onClick={this.triggerGoogleLogin}
       />
     ];
 
+    const mailingList_actions = [
+      <div className="subscribe-explore-yes">
+        <form action="https://cloud.us16.list-manage.com/subscribe/post" method="POST" target="_blank" onSubmit={this.mailingListClose}>
+          <input type="hidden" name="u" value="cf5bea2cc22645d3e92a973df" />
+          <input type="hidden" name="id" value="dc5deb63f1" />
+          <div id="mergeTable">
+            <div>
+                <input className="subscribe-button" type="submit" name="submit" value="Subscribe to list" />
+            </div>
+          </div>
+        </form>
+      </div>,
+      <div className="subscribe-explore-no">
+        <FlatButton
+          label="No thanks"
+          primary={true}
+          onClick={this.mailingListClose}
+        />
+      </div>
+    ];
+
     return (
       <div>
-
           <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
             <div>
               <IconButton  style={{position:"fixed", top: "100px", left:"-35px"}} iconStyle={{color:"rgb(175,175,175)", width: "100px", height:"60px"}} onClick={this.toggleFilters}>
@@ -263,6 +293,7 @@ var Explore = React.createClass({
                       onChange={this.updateDiscoveryTitle}
                       value={this.state.discoveryTitle}
                       fullWidth={true}
+                      hintText="Discovery Title"
                     />
                   <br className="big-br" />
                   <TextField
@@ -286,7 +317,7 @@ var Explore = React.createClass({
                     contentStyle={{width:"380px", textAlign:"center"}}
                     actionsContainerStyle={{textAlign:"center"}}
                   >
-                    Please log in with Google to save your discovery.
+                    Please sign up or log in with Google to save your discovery.
                   </Dialog>
                 </div>
 
@@ -347,8 +378,16 @@ var Explore = React.createClass({
                         className="profile-button"
                         onClick={this.state.firebase.uid ?  this.triggerLogout : this.triggerGoogleLogin }
                         primary={this.state.firebase.uid ? false : true}
-                        label={this.state.firebase.uid ? "Log Out" : "Log In With Google" }
+                        label={this.state.firebase.uid ? "Log Out" : "Sign Up/Log In With Google" }
                       />
+                      <Dialog
+                        title={"Welcome to MetaSeek, "+this.state.firebase.name+"!"}
+                        actions={mailingList_actions}
+                        modal={true}
+                        open={this.state.mailingListOpen}
+                      >
+                      <h4 className="subscribe-explore-body">Join our mailing list to receive (very rare) updates on major events here at MetaSeek</h4>
+                      </Dialog>
                     </div>
                   </div>
                 </Paper>
