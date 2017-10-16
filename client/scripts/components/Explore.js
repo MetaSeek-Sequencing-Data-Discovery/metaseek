@@ -145,9 +145,6 @@ var Explore = React.createClass({
       if (response.data.user) {
           self.setState({"mailingListOpen": true});
       }
-      if (response.data.error) {
-        self.setState({"mailingListOpen": true});
-      }
       self.setState({"firebase": self.state.firebase});
     });
   },
