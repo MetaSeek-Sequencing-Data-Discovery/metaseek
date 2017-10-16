@@ -593,8 +593,20 @@ ul {
   margin: -18px 0 0 0;
 }
 
+/*Header styles*/
+
 .button-link {
   text-decoration: none;
+  margin: 10px auto;
+}
+
+.header-image-beta {
+  width: 50px;
+  height: 50px;
+}
+
+.header-logo {
+  margin: 10px 0;
 }
 
 
@@ -639,12 +651,6 @@ button.github:after, input[type=submit].github:after {
 
 .block-field {
   display: block;
-}
-
-/* Header Layout */
-.header-image-beta {
-  width: 50px;
-  height: 50px;
 }
 
 /* Explore layout */
@@ -1083,9 +1089,135 @@ button.github:after, input[type=submit].github:after {
 
 .welcome-container {
   text-align: center;
-  width: 1024px;
-  margin: 0 auto;
-  padding-top: 15px;
+}
+
+.welcome-first {
+  width: 100%;
+  height: 600px;
+  background-image: url('/images/DNAsequencing_stockphoto_dark.jpg');
+  background-size: cover;
+}
+
+.welcome-text {
+  color: #FFFFFF;
+  padding: 36px;
+  margin: 0;
+}
+
+.welcome-title {
+  color: #FFFFFF;
+  font-size: 4.5rem;
+  font-weight: 700;
+  padding: 90px 0 36px 0;
+  margin: 0;
+}
+
+.subscribe-form-label {
+  color: #FFFFFF;
+  line-height: 150%;
+  font-family: Helvetica;
+  font-size: 16px;
+  margin-top: 48px;
+  font-weight: bold;
+}
+
+.subscribe-reqd {
+  color: #FEB28D;
+  font-size: 20px;
+}
+
+.subscribe-table {
+  width: 400px;
+  display: inline-block;
+  text-align: left;
+}
+
+.subscribe-input {
+  background: #fff;
+  height: 36px;
+  width: 100%;
+  border: 2px solid #d0d0d0 !important;
+  border-radius: 3px;
+  margin: 3px 0 12px 0;
+  overflow: hidden;
+}
+
+.subscribe-button {
+  background-color: #6369E0 !important;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-family: 'Helvetica', Arial, sans-serif;
+  height: 42px;
+  margin: 12px 5px 12px 0;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 3px;
+}
+
+.welcome-features {
+  background-color: #FFFFFF;
+  display: inline-block;
+  width: 100%;
+}
+
+.feature-block {
+  width: 300px;
+  margin: 25px 50px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.feature-block-title {
+  font-size: 42px;
+  font-weight: 600;
+  margin: 10px auto;
+}
+
+.feature-block-body {
+  font-size: 18px;
+}
+
+.welcome-how {
+  background-color: #54545A;
+  display: inline-block;
+  width: 100%;
+}
+
+.welcome-how-header {
+  color: #FFFFFF;
+  margin: 36px;
+  font-size: 42px;
+  font-weight: 400;
+}
+
+.welcome-how-subheader {
+  color: #FFFFFF;
+  margin: 10px 10%;
+}
+
+.welcome-how-graphic {
+  margin: 36px;
+  margin-top: 5px;
+  float: left;
+}
+
+.welcome-how-explainer {
+  margin: 36px;
+}
+
+.welcome-how-explain-header {
+  text-align: left;
+  color: #FFFFFF;
+  margin: 36px;
+  font-size: 30px;
+  font-weight: 300;
+}
+
+.welcome-how-explain-body {
+  text-align: left;
+  color: #FFFFFF;
+  margin: 0 10% 0 36px;
+  font-size: 18px;
 }
 
 .welcome-announce {
@@ -1118,9 +1250,24 @@ button.github:after, input[type=submit].github:after {
   margin: 0 auto;
 }
 
-.welcome-text {
-  margin: 36px 0 36px 18px;
-  padding: 36px;
+.welcome-footer {
+  padding: 16px;
+}
+
+/*browse discoveries styles */
+.browse-discoveries-header {
+  text-align: left;
+  margin: 36px auto 18px auto;
+  width: 1176px;
+  font-weight: 400;
+  font-size: 36px;
+  color: #4A4A50;
+}
+
+.browse-discoveries-table {
+  padding:0px;
+  margin: auto;
+  width: 1176px;
 }
 
 .explore-preview-sheet {
