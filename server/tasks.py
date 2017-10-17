@@ -33,18 +33,8 @@ app = Celery('app', broker='pyamqp://guest@localhost//')
 
 @app.task
 def buildCache(cache_key,rules):
-    print rules
     start = datetime.now()
-
-    queryObject = Dataset.query
-
-    for rule in rules:
-        field = rule['field']
-        ruletype = rule['type']
-        value = rule['value']
-        queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
-
-    summary = summarizeDatasets(queryObject)
+    summary = summarizeDatasets(Dataset.query,rules,sampleRate=.25)
     client.set(cache_key, summary)
     finish = datetime.now()
     print 'took this long to build'
