@@ -33,7 +33,6 @@ app = Celery('app', broker='pyamqp://guest@localhost//')
 
 @app.task
 def buildCache(cache_key,rules):
-    print rules
     start = datetime.now()
     summary = summarizeDatasets(Dataset.query,rules,sampleRate=.25)
     client.set(cache_key, summary)

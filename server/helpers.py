@@ -9,6 +9,9 @@ from collections import Counter
 from sqlalchemy import or_, func, case, literal_column, desc
 import scipy.stats as sp
 import time
+from marshals import *
+import unicodedata
+import re
 
 # Utilities
 # Simple timing function so you can drop these one-liners through the code
@@ -19,6 +22,14 @@ def checkpoint(start, last, n, message):
     totalElapsed = float(int((current-start) * 10))/10
     print '| ' + str(n).ljust(4) + ' | ' + (str(elapsed) + 's').rjust(9) + ' | ' + (str(totalElapsed) + 's').rjust(8) + ' | ' + message.ljust(60) + ' |'
     return (start,current,n+1)
+
+# Normalizes string, converts to lowercase, removes non-alpha characters,
+# and converts spaces to hyphens.
+def slugify(value):
+    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
+    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
+    value = unicode(re.sub('[-\s]+', '-', value))
+    return value
 
 ### Map Helpers
 # Get color gradient from max to white
@@ -90,7 +101,6 @@ def summarizeMap(mapDataFrame):
             polygon = [[lon-lonstepsize+buffer,lat-latstepsize+buffer], [lon-lonstepsize+buffer,lat+latstepsize-buffer], [lon+lonstepsize-buffer,lat+latstepsize-buffer], [lon+lonstepsize-buffer,lat-latstepsize+buffer], [lon-lonstepsize,lat-latstepsize]]
             bin_ix = np.amax(np.argwhere(np.array(percentiles)<=sp.percentileofscore(latlon_map[0].flatten(), value)))
             fillColor = fillColors[bin_ix]
-
             map_data.append({"lat":lat,"lon":lon,"count":value,"polygon":polygon, "fillColor":fillColor})
     map_legend_info = {"ranges":countRanges, "fills":fillColors}
     return (map_data,map_legend_info)

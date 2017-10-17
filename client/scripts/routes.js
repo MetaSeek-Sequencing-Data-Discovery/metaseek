@@ -17,6 +17,7 @@ import AddDataset from './components/AddDataset';
 import DatasetDetail from './components/DatasetDetail';
 import DiscoveryDetail from './components/DiscoveryDetail';
 import Glossary from './components/Glossary';
+import BrowseDiscoveries from './components/BrowseDiscoveries';
 
 /*
   Routes
@@ -37,6 +38,7 @@ var routes = (
     <Route path="/dataset/new" component={AddDataset}/>
     <Route path="/dataset/:id" component={DatasetDetail}/>
     <Route path="/discovery/:id" component={DiscoveryDetail}/>
+    <Route path="/discoveries" component={BrowseDiscoveries}/>
     <Route path="/glossary" component={Glossary}/>
     <Route path="*" component={NotFound}/>
   </Router>

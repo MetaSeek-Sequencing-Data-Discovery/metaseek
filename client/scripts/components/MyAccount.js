@@ -11,6 +11,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import ColorPalette from './ColorPalette';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import Paper from 'material-ui/Paper';
+import Dialog from 'material-ui/Dialog';
 import {Table, TableBody, TableFooter, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 
 import Header from './Header';
@@ -27,7 +28,8 @@ var MyAccount = React.createClass({
           'name':null,
           'photo':null
         },
-        'discoveries': []
+        'discoveries': [],
+        'mailingListOpen': false
       }
   },
 
@@ -82,6 +84,9 @@ var MyAccount = React.createClass({
       "admin":0
     }).then(function(response){
       console.log(response);
+      if (response.data.user) {
+          self.setState({"mailingListOpen": true});
+      }
       self.setState({"firebase": self.state.firebase});
     });
 
@@ -94,6 +99,10 @@ var MyAccount = React.createClass({
 
   },
 
+  mailingListClose : function () {
+    this.setState({"mailingListOpen": false});
+  },
+
   render : function() {
     if (!this.state.firebase.uid) return (
       <div>
@@ -103,7 +112,7 @@ var MyAccount = React.createClass({
             <h3>Log in with Google to view your MetaSeek account.</h3>
             <div className="login-buttons">
               <RaisedButton
-                label="Log In"
+                label="Sign Up/Log In With Google"
                 onClick={this.triggerLogin}
                 primary={true}
                 disabled={this.state.firebase.uid}
@@ -116,11 +125,40 @@ var MyAccount = React.createClass({
 
     var tableHeaderStyles = {color:'#fff',fontFamily:'Roboto',fontSize:'20px',fontWeight:600};
 
+    const mailingList_actions = [
+      <div className="subscribe-explore-yes">
+        <form action="https://cloud.us16.list-manage.com/subscribe/post" method="POST" target="_blank" onSubmit={this.mailingListClose}>
+          <input type="hidden" name="u" value="cf5bea2cc22645d3e92a973df" />
+          <input type="hidden" name="id" value="dc5deb63f1" />
+          <div id="mergeTable">
+            <div>
+                <input className="subscribe-button" type="submit" name="submit" value="Subscribe to list" />
+            </div>
+          </div>
+        </form>
+      </div>,
+      <div className="subscribe-explore-no">
+        <FlatButton
+          label="No thanks"
+          primary={true}
+          onClick={this.mailingListClose}
+        />
+      </div>
+    ];
+
     return (
       <div>
         <Header history={this.props.history}/>
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
           <div>
+            <Dialog
+              title={"Welcome to MetaSeek, "+this.state.firebase.name+"!"}
+              actions={mailingList_actions}
+              modal={true}
+              open={this.state.mailingListOpen}
+            >
+            <h4 className="subscribe-explore-body">Join our mailing list to receive (very rare) updates on major events here at MetaSeek</h4>
+            </Dialog>
             <Paper className="myacct-loggedin" >
               <div>
                  <img className="profile-image-myacct" src={this.state.firebase.photo}/>

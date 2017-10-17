@@ -64,7 +64,7 @@ Restart Apache:
 
 Check the server is live:
 
-`curl https://api.metaseek.cloud/api/users`
+`curl https://api.metaseek.cloud/users`
 
 To debug:
 
