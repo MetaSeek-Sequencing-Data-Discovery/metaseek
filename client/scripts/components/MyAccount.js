@@ -123,8 +123,6 @@ var MyAccount = React.createClass({
       </div>
     );
 
-    var tableHeaderStyles = {color:'#fff',fontFamily:'Roboto',fontSize:'20px',fontWeight:600};
-
     const mailingList_actions = [
       <div className="subscribe-explore-yes">
         <form action="https://cloud.us16.list-manage.com/subscribe/post" method="POST" target="_blank" onSubmit={this.mailingListClose}>
@@ -180,11 +178,11 @@ var MyAccount = React.createClass({
 
             <Paper className="user-discoveries-table">
               <Table bodyStyle={{overflowX: 'scroll', width:'100%' }} fixedHeader={false} fixedFooter={false} selectable={false} style={{'tableLayout':'auto'}}>
-                <TableHeader style={{backgroundColor:'#979CF2'}} adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
+                <TableHeader adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
                   <TableRow selectable={false}>
-                    <TableHeaderColumn style={tableHeaderStyles}>{this.state.discoveries.length + " Discoveries"}</TableHeaderColumn>
-                    <TableHeaderColumn style={tableHeaderStyles}>Date Created</TableHeaderColumn>
-                    <TableHeaderColumn style={tableHeaderStyles}></TableHeaderColumn>
+                    <TableHeaderColumn>{this.state.discoveries.length + " Discoveries"}</TableHeaderColumn>
+                    <TableHeaderColumn>Date Created</TableHeaderColumn>
+                    <TableHeaderColumn></TableHeaderColumn>
                   </TableRow>
                 </TableHeader>
                 <TableBody showRowHover={false} stripedRows={false} displayRowCheckbox={false} preScanRows={false}>

@@ -28,14 +28,6 @@ body {
   box-sizing: inherit;
 }
 
-
-/* Global styles */
-/*background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%236369e0' fill-opacity='0.04' fill-rule='evenodd'/%3E%3C/svg%3E");*/
-body {
-  background-color: #F5F6F7;
-}
-
-
 /* Rolling loader styles */
 
 @-webkit-keyframes uil-rolling-anim {
@@ -251,7 +243,7 @@ body {
   width: 200px;
   height: 100px;
   border-radius: 1000px 1000px 0 0;
-  border-color: #633da1;
+  border-color: $default;
   border-style: solid;
   border-width: 24px;
   border-bottom-width: 0;
@@ -344,23 +336,23 @@ ul {
   right: 16px;
   top: 28%;
   font-size: 20px;
-  color:#666;
+  color:$cloud6;
 }
 
 .callout .active {
   font-weight: 700;
-  color:#333;
+  color:$cloud9;
 }
 
 .download-info {
   font-weight: 700;
   font-size: 32px;
-  color: #333;
+  color: $cloud9;
 }
 
 .download-info-tag {
   font-weight: 300;
-  color:#666;
+  color:$cloud6;
 }
 
 .download-button {
@@ -390,7 +382,7 @@ ul {
   display: block;
   top: 28%;
   font-size: 18px;
-  color:#666;
+  color:$cloud10;
   margin: 26px 0 26px 0;
   text-align: center;
 }
@@ -398,7 +390,7 @@ ul {
 .overview-content .active {
   font-weight: 700;
   font-size: 38px;
-  color: rgb(99, 105, 224);
+  color: $light;
 }
 
 .overview-content-download {
@@ -407,7 +399,7 @@ ul {
   display: block;
   top: 28%;
   font-size: 38px;
-  color: rgb(99, 105, 224);
+  color: $light;
   margin: 62px 0 62px 0;
   text-align: center;
 }
@@ -418,7 +410,7 @@ ul {
   display: block;
   top: 28%;
   font-size: 18px;
-  color:#666;
+  color:$cloud10;
   text-align: center;
   margin: 36px 0 0 0;
   padding: 0 20px 0 20px;
@@ -446,7 +438,7 @@ ul {
 .overview-title {
   font-size:18px;
   font-weight: bold;
-  color: rgb(60,60,60);
+  color: $cloud10;
 }
 
 .figure-hint-tooltip {
@@ -456,7 +448,7 @@ ul {
 }
 
 .figure-hint-label {
-  color: rgb(180,180,180);
+  color: $cloud10;
   font-size: 14px;
   padding-left: 10px;
 }
@@ -497,7 +489,7 @@ button.github, input[type=submit].github {
   display: block;
   margin-bottom: 2rem;
   width: 100%;
-  color: #fff;
+  color: $white;
   padding: 2rem
 }
 
@@ -727,9 +719,9 @@ button.github:after, input[type=submit].github:after {
 
 
 .word-cloud-tag-wrapper {
-  border: 2px solid rgba(177,178,246,.5);
+  border: 2px solid $cloud4;
   border-radius: 2px;
-  background-color: rgba(248,248,254,.1);
+  background-color: $white;
   display: inline-block;
   padding: 6px;
   margin: 3px;
@@ -813,7 +805,7 @@ button.github:after, input[type=submit].github:after {
 .filterparam-table-title {
   font-size: 18px;
   font-weight: 600;
-  color: rgb(150,150,150);
+  color: $cloud6;
   margin-left: 12px;
   font-family: 'Roboto', sans-serif;
 }
@@ -848,14 +840,14 @@ button.github:after, input[type=submit].github:after {
   display: block;
   top: 28%;
   font-size: 18px;
-  color:#666;
+  color:$cloud8;
   text-align: right;
 }
 
 .discovery-header-first .active {
   font-weight: 700;
   font-size: 38px;
-  color: rgb(99, 105, 224);
+  color: $light;
 }
 
 .discovery-header-second {
@@ -864,13 +856,13 @@ button.github:after, input[type=submit].github:after {
   display: block;
   top: 28%;
   font-size: 38px;
-  color: rgb(99, 105, 224);
+  color: $light;
   margin: 0 0 30px 0;
   text-align: right;
 }
 
 .discovery-header-user {
-  color: rgb(150,150,150);
+  color: $cloud4;
   font-size: 16px;
   font-weight: 500;
   font-family: 'Roboto', sans-serif;
@@ -887,14 +879,14 @@ button.github:after, input[type=submit].github:after {
 .discovery-datasets-title-container {
     width: 100%;
     height: 45px;
-    background-color: rgb(225,225,225);
+    background-color: $cloud2;
     padding: 12px;
 }
 
 .discovery-datasets-title {
   font-size: 18px;
   font-weight: 600;
-  color: rgb(150,150,150);
+  color: $cloud4;
   font-family: 'Roboto', sans-serif;
   height: 50px;
 }
@@ -960,6 +952,17 @@ button.github:after, input[type=submit].github:after {
   clear: both;
 }
 
+.user-discoveries-table thead {
+  background-color:$default;
+}
+
+.user-discoveries-table th {
+  color:$white;
+  font-family:'Roboto';
+  font-size:'20px';
+  font-weight:600;
+}
+
 /* Glossary layout */
 .glossary-paper {
   margin: 0 15% 0 15%;
@@ -991,13 +994,13 @@ button.github:after, input[type=submit].github:after {
 }
 
 .welcome-text {
-  color: #FFFFFF;
+  color: $white;
   padding: 36px;
   margin: 0;
 }
 
 .welcome-title {
-  color: #FFFFFF;
+  color: $white;
   font-size: 4.5rem;
   font-weight: 700;
   padding: 90px 0 36px 0;
@@ -1005,7 +1008,7 @@ button.github:after, input[type=submit].github:after {
 }
 
 .subscribe-form-label {
-  color: #FFFFFF;
+  color: $white;
   line-height: 150%;
   font-family: Helvetica;
   font-size: 16px;
@@ -1036,7 +1039,7 @@ button.github:after, input[type=submit].github:after {
 
 .subscribe-button {
   background-color: #6369E0 !important;
-  color: #FFFFFF;
+  color: $white;
   font-size: 16px;
   font-family: 'Helvetica', Arial, sans-serif;
   height: 42px;
@@ -1047,7 +1050,7 @@ button.github:after, input[type=submit].github:after {
 }
 
 .welcome-features {
-  background-color: #FFFFFF;
+  background-color: $white;
   display: inline-block;
   width: 100%;
 }
@@ -1076,14 +1079,14 @@ button.github:after, input[type=submit].github:after {
 }
 
 .welcome-how-header {
-  color: #FFFFFF;
+  color: $white;
   margin: 36px;
   font-size: 42px;
   font-weight: 400;
 }
 
 .welcome-how-subheader {
-  color: #FFFFFF;
+  color: $white;
   margin: 10px 10%;
 }
 
@@ -1099,7 +1102,7 @@ button.github:after, input[type=submit].github:after {
 
 .welcome-how-explain-header {
   text-align: left;
-  color: #FFFFFF;
+  color: $white;
   margin: 36px;
   font-size: 30px;
   font-weight: 300;
@@ -1107,7 +1110,7 @@ button.github:after, input[type=submit].github:after {
 
 .welcome-how-explain-body {
   text-align: left;
-  color: #FFFFFF;
+  color: $white;
   margin: 0 10% 0 36px;
   font-size: 18px;
 }
@@ -1160,6 +1163,17 @@ button.github:after, input[type=submit].github:after {
   padding:0px;
   margin: auto;
   width: 1176px;
+}
+
+.browse-discoveries-table thead {
+  background-color:$default;
+}
+
+.browse-discoveries-table th {
+  color:$white;
+  font-family:'Roboto';
+  font-size:'20px';
+  font-weight:600;
 }
 
 .explore-preview-sheet {
@@ -1293,7 +1307,7 @@ button.github:after, input[type=submit].github:after {
 }
 
 .rc-slider-mark-text-active {
-  color: #666;
+  color: $cloud8;
 }
 
 .rc-slider-step {
@@ -1775,7 +1789,7 @@ button.github:after, input[type=submit].github:after {
 }
 
 .is-open .Select-arrow, .Select-arrow-zone:hover>.Select-arrow {
-  border-top-color: #666;
+  border-top-color: $cloud8;
 }
 
 .Select--multi .Select-multi-value-wrapper {

@@ -1,34 +1,25 @@
+// Make sure these styles are aligned with those in css/colors/scss
+// Sass variable names from that file are listed here alongside the color
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _colors = require('material-ui/styles/colors');
-
-var _colorManipulator = require('material-ui/utils/colorManipulator');
-
-var _spacing = require('material-ui/styles/spacing');
-
-var _spacing2 = _interopRequireDefault(_spacing);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 exports.default = {
-  spacing: _spacing2.default,
   palette: {
-    primary1Color: "#6369E0",
-    primary2Color: "#979CF2",
-    primary3Color: "#9A99A6",
-    accent1Color: "#FEB28D",
-    accent2Color: "#E1E1E4",
-    accent3Color: "#838291",
-    textColor: "#0C0C12",
-    secondaryTextColor: (0, _colorManipulator.fade)("#0C0C12", 0.54),
-    alternateTextColor: _colors.white,
-    canvasColor: _colors.white,
-    borderColor: "#D0D0D7",
-    disabledColor: (0, _colorManipulator.fade)("#0C0C12", 0.3),
-    pickerHeaderColor: "#6369E0",
-    clockCircleColor: (0, _colorManipulator.fade)("#0C0C12", 0.07),
-    shadowColor: "#0C0C12"
+    primary1Color: "#1a9c6e", // $default
+    primary2Color: "#1fb380", // $light
+    primary3Color: "#55d5a9", // $lighter
+    accent1Color: "#425ba1", // $accent
+    accent2Color: "#D2D9ED", // $accentLight
+    accent3Color: "#D2D9ED", // $accentLight
+    textColor: "#3c3c3c", // $cloud10
+    secondaryTextColor: "#949494",  // $cloud6
+    alternateTextColor: "#fff", // $white
+    canvasColor: "#fff", // $white
+    borderColor: "#DADADA", // $cloud4
+    disabledColor: "#DADADA", // $cloud4
+    pickerHeaderColor: "#1a9c6e", // $default
+    clockCircleColor: "#F6F6F6",  // $cloud2
+    shadowColor: "#3c3c3c" // $cloud10
   }
 };
