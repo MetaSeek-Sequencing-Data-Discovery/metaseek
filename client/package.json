@@ -21,6 +21,7 @@
     "gulp-html-replace": "^1.6.2",
     "gulp-imagemin": "^3.1.1",
     "gulp-notify": "2.2.0",
+    "gulp-sass": "^3.1.0",
     "gulp-uglify": "1.4.2",
     "lodash": "^4.17.4",
     "luma.gl": "^4.0.2",
