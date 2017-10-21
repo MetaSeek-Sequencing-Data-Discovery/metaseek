@@ -33,7 +33,7 @@ var uglify = require('gulp-uglify');
 */
 gulp.task('styles',function() {
   // Compiles CSS
-  gulp.src('css/styles.scss')
+  gulp.src('css/*.scss')
     .pipe(sass.sync().on('error', sass.logError))
     .pipe(autoprefixer())
     .pipe(cleanCSS({compatibility: '*'}))
