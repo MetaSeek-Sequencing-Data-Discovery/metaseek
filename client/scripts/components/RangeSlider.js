@@ -1,5 +1,4 @@
 import React from 'react';
-import Tooltip from 'rc-tooltip';
 import Slider from 'rc-slider';
 
 const Range = Slider.createSliderWithTooltip(Slider.Range);
