@@ -33,7 +33,7 @@ var uglify = require('gulp-uglify');
 */
 gulp.task('styles',function() {
   // Compiles CSS
-  gulp.src('css/*.scss')
+  gulp.src('css/styles.scss')
     .pipe(sass.sync().on('error', sass.logError))
     .pipe(autoprefixer())
     .pipe(cleanCSS({compatibility: '*'}))
@@ -109,7 +109,7 @@ function buildScript(file, watch) {
 }
 
 gulp.task('default', ['copy-index-html','images','styles','browser-sync'], function() {
-  gulp.watch('css/styles.scss', ['styles']); // gulp watch for style changes
+  gulp.watch('css/*.scss', ['styles']); // gulp watch for style changes
   return buildScript('main.js', true); // browserify watch for JS changes
 });
 
