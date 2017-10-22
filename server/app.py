@@ -111,40 +111,6 @@ class GetUserDiscoveries(Resource):
         return Discovery.query.filter_by(owner_id=owner.id).all()
 
 ## /dataset routes
-#class CreateDataset(Resource):
-#    def post(self):
-#        try:
-#            parser = reqparse.RequestParser()
-#            # Note that any arguments added here MUST be present in the POST request or the request will fail with
-#            # 400 - Bad Request as the response
-#            parser.add_argument('latitude', type=str)
-#            parser.add_argument('longitude', type=str)
-#            parser.add_argument('investigation_type',type=str)
-#            parser.add_argument('env_package',type=str)
-#            parser.add_argument('library_source',type=str)
-#            parser.add_argument('avg_read_length_maxrun',type=float)
-#            parser.add_argument('total_num_reads',type=int)
-#            parser.add_argument('total_num_bases',type=int)
-#            parser.add_argument('download_size_maxrun',type=int)
-#            parser.add_argument('gc_percent_maxrun',type=float)
-#            parser.add_argument('biosample_link',type=str)
-#            parser.add_argument('sample_title',type=str)
-#            parser.add_argument('collection_date',type=str)
-#
-#            args = parser.parse_args()
-#            try:
-#                datetimeguess = dateparser.parse(args['collection_date'])
-#            except ValueError:
-#                datetimeguess = None
-#
-#            newDataset = Dataset(args['biosample_link'],args['sample_title'],args['investigation_type'],args['library_source'], args['env_package'],datetimeguess, args['latitude'], args['longitude'], args['avg_read_length_maxrun'], args['total_num_reads'], args['total_num_bases_maxrun'], args['download_size_maxrun'],args['gc_percent_maxrun'])
-#            db.session.add(newDataset)
-#            db.session.commit()
-#            return {"dataset":{"id":newDataset.id,"uri":url_for('getdataset',id=newDataset.id)}}
-#
-#        except Exception as e:
-#            return {'error': str(e)}
-
 class GetDataset(Resource):
     @marshal_with(fullDatasetFields, envelope='dataset')
     def get(self, id):
@@ -432,14 +398,11 @@ api.add_resource(GetUser,               '/user/<int:id>')
 api.add_resource(GetAllUsers,           '/users')
 api.add_resource(GetUserDiscoveries,    '/user/<string:id>/discoveries')
 
-# Temporarily removed - the only way to add a dataset is through scrapers/SRA/SRA_scrape.py
-# api.add_resource(CreateDataset,       '/dataset/create')
 api.add_resource(GetDataset,            '/dataset/<int:id>')
 api.add_resource(GetAllDatasets,        '/datasets/<int:page>')
 api.add_resource(SearchDatasets,        '/datasets/search/<int:page>')
 api.add_resource(GetDatasetSummary,     '/datasets/summary')
 api.add_resource(SearchDatasetsSummary, '/datasets/search/summary')
-
 
 api.add_resource(CreateDiscovery,       '/discovery/create')
 api.add_resource(GetDiscovery,          '/discovery/<int:id>')

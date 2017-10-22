@@ -13,7 +13,6 @@ import NotFound from './components/NotFound';
 import Welcome from './components/Welcome';
 import Explore from './components/Explore';
 import MyAccount from './components/MyAccount';
-import AddDataset from './components/AddDataset';
 import DatasetDetail from './components/DatasetDetail';
 import DiscoveryDetail from './components/DiscoveryDetail';
 import Glossary from './components/Glossary';
@@ -35,7 +34,6 @@ var routes = (
     <Route path="/" component={Welcome}/>
     <Route path="/explore" component={Explore}/>
     <Route path="/myaccount" component={MyAccount}/>
-    <Route path="/dataset/new" component={AddDataset}/>
     <Route path="/dataset/:id" component={DatasetDetail}/>
     <Route path="/discovery/:id" component={DiscoveryDetail}/>
     <Route path="/discoveries" component={BrowseDiscoveries}/>
