@@ -71,11 +71,11 @@ var VizDashboard = React.createClass({
     const radarfields = ['study_type_summary','library_source_summary','investigation_type_summary','env_package_summary'];
     const generalinfo_radarfields = ['library_source_summary','investigation_type_summary'];
     const wordfields = ['env_biome_summary','env_feature_summary','env_material_summary','geo_loc_name_summary'];
-    const areafields = ['avg_read_length_summary', 'download_size_summary', 'gc_percent_summary', 'latitude_summary', 'longitude_summary', 'library_reads_sequenced_summary', 'total_bases_summary'];
+    const areafields = ['avg_read_length_summary', 'download_size_summary', 'latitude_summary', 'longitude_summary', 'library_reads_sequenced_summary', 'total_bases_summary'];
     const histfields = ['sequencing_method_summary', 'instrument_model_summary', 'library_strategy_summary', 'library_screening_strategy_summary', 'library_construction_method_summary', 'investigation_type_summary', 'env_package_summary', 'library_source_summary', 'study_type_summary'];
     const generalinfo_histfields = ['env_package_summary', 'study_type_summary'];
     const seqinfo_histfields = ['library_strategy_summary', 'library_screening_strategy_summary', 'sequencing_method_summary', 'instrument_model_summary'];
-    const seqinfo_areafields = ['avg_read_length_summary', 'library_reads_sequenced_summary', 'gc_percent_summary', 'total_bases_summary'];
+    const seqinfo_areafields = ['avg_read_length_summary', 'library_reads_sequenced_summary', 'total_bases_summary'];
 
     const geninfo_histcomponent =
         <div>

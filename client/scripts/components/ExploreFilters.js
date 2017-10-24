@@ -310,19 +310,6 @@ var ExploreFilters = React.createClass({
                   step={this.state.filterStates.avgRdLgthMax.value/100}
                 />
                 <div>
-                  <h4 className="filter-field-with-help">Percent GC</h4>
-                    <IconButton tooltip=<div style={tooltipStyle}>Percent of G or C nucleotides sequenced.</div> tooltipPosition="top-center" href="/glossary#percent_gc" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
-                      <ActionHelpOutline />
-                    </IconButton>
-                </div>
-                <RangeSlider field="gc_percent_maxrun" filterMin="gcPercentMin" filterMax="gcPercentMax"
-                  filterTypeMin={4} filterTypeMax={3} min={0} max={1}
-                  minValue={this.state.filterStates.gcPercentMin.value} maxValue={this.state.filterStates.gcPercentMax.value}
-                  handleFilterChange={this.handleFilterChange}
-                  step={0.01}
-                />
-
-                <div>
                   <h4 className="filter-field-with-help">Number of Reads Sequenced</h4>
                     <IconButton tooltip=<div style={tooltipStyle}>Total number of reads sequenced.</div> tooltipPosition="top-center" href="/glossary#library_reads_sequenced" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
                         <ActionHelpOutline />
