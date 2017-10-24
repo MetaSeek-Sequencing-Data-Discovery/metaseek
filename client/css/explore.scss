@@ -31,7 +31,17 @@
 
 .six {
   width: 348px;
-  height: 320px;
+  height: 563px;
+}
+
+.seven {
+  width: 531px;
+  height: 400px;
+}
+
+.eight {
+  width: 392px;
+  height: 563px;
 }
 
 .card {
@@ -141,7 +151,7 @@
 }
 
 .figure-hint-container-map {
-  margin: -18px 0 0 0;
+  margin: -14px 0 10px -10px;
 }
 
 
@@ -199,7 +209,7 @@
 
 .explore-map {
   margin: 0 0 18px 18px;
-  height: 656px;
+  height: 563px;
 }
 
 .explore-map-contents {
@@ -234,7 +244,6 @@
 
 .explore-radarchart {
   padding:3px;
-  height:400px;
   margin: 0 0 18px 18px;
 }
 
@@ -271,18 +280,6 @@
   position: relative;
 }
 
-.explore-map-container {
-  width: 742px;
-  margin: 0 auto;
-}
-
-.explore-map-heat-container {
-  width: 742px;
-  height: 371px;
-  background-image: url('/images/BWmapBackground.jpg');
-  background-size: cover;
-}
-
 .word-cloud-tag-wrapper {
   border: 2px solid $cloud4;
   border-radius: 2px;
@@ -296,13 +293,6 @@
   display:block;
 }
 
-.histogram-container {
-  width: 714px;
-  margin: 0 0 0 0;
-  height: 320px;
-  overflow:hidden;
-}
-
 .pie-container {
   width: 360px;
   margin: 0 0 0 0;
@@ -310,15 +300,8 @@
   overflow:hidden;
 }
 
-.area-container {
-  width: 348px;
-  height: 240px;
-}
-
 .radar-container {
-  width: 360px;
   margin: 0 auto;
-  height: 320px;
   overflow:hidden;
 }
 
@@ -327,7 +310,7 @@
 }
 
 .explore-select {
-  margin-left: 60px;
+  margin-left: 10px;
   height: 50px;
 }
 

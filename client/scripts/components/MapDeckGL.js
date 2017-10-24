@@ -10,8 +10,8 @@ var MapDeckGL = React.createClass({
   getInitialState : function() {
     return {
       viewport: {
-        'width': 570,
-        'height': 570,
+        'width': 500,
+        'height': 500,
         'latitude': 0,
         'longitude': 0,
         'zoom': 0,

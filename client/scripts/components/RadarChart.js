@@ -26,6 +26,8 @@ var RadarChart = React.createClass({
       <div className="radar-container">
         <VictoryChart
           polar
+          width={this.props.width}
+          height={this.props.height}
           theme={this.props.colortheme}
           domain={{ y: [ 0, 1 ] }}
           containerComponent={<VictoryVoronoiContainer/>}
