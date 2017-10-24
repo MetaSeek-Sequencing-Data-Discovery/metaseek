@@ -247,7 +247,7 @@ def summarizeDatasets(queryObject,rules,sampleRate=0.2):
 
     # Above the fold summary calculations -
     env_pkg_summary = groupByCategoryAndCount(rootQueryObject,'env_package',sampleRate=sampleRate,numCats=15, includeNone=True)
-    investigation_summary = groupByCategoryAndCount(rootQueryObject,'investigation_type',sampleRate=sampleRate,numCats=10)
+    investigation_summary = groupByCategoryAndCount(rootQueryObject,'investigation_type',sampleRate=sampleRate,numCats=10, includeNone=True)
     down_size_summary = groupWithCustomCasesAndCount(db.session.query,rules,'download_size_maxrun',[1e3,1e4,1e5,1e6,1e7,1e9,1e10,1e11],sampleRate=sampleRate)
     (start,last,n) = checkpoint(start,last,n,'Finished with above the fold, ready for 1st socket push')
 
