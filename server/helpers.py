@@ -162,7 +162,7 @@ def groupByCategoryAndCount(queryObject,columnName,sampleRate=0.2,numCats=False,
     # If no numCats is passed in, show all the groups
     if numCats:
         query = query.limit(numCats) # show the top N results
-
+    #TODO maybe: count 'other column' if numCats, where sum counts all but top numCats fields
     return (
         dict((key,val * (1/sampleRate)) for key, val in # rescale sampled columns to approx. results on full dataset
             query.all() # actually run the query

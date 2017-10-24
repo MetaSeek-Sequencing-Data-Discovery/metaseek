@@ -13,7 +13,7 @@ var HistogramVictory = React.createClass({
     // remove nulls / boring values
     var activeFieldDataValidKeys = Object.keys(activeFieldData).filter(
       function(value, index) {
-        if (value == "no data" || value == "other categories") {
+        if (value == "no data" || value == "other categories" || value == "null") {
           return false; // skip
         } else {
           return true;
@@ -25,11 +25,15 @@ var HistogramVictory = React.createClass({
     var activeFieldSorted = activeFieldDataValidKeys.sort(function(a, b) {return -(activeFieldData[a] - activeFieldData[b])});
     var finalDataPoints = Object.keys(activeFieldData).includes("other categories") ? activeFieldSorted.concat(["other categories"]) : activeFieldSorted;
     var finalDataPoints = Object.keys(activeFieldData).includes("no data") ? finalDataPoints.concat(["no data"]) : finalDataPoints;
+    var finalDataPoints = Object.keys(activeFieldData).includes("null") ? finalDataPoints.concat(["null"]) : finalDataPoints;
 
     // Format data the way VictoryChart / VictoryBar wants it
     var histData = finalDataPoints.map(
       function(value,index) {
         var count = activeFieldData[value];
+        if (value=="null") {
+          var value = "no data";
+        }
         return {"x":value,"count":count,"label":value};
       }
     );
