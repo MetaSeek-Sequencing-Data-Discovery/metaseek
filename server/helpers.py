@@ -148,19 +148,21 @@ def filterDatasetQueryObjectWithRules(queryObject,rules):
 
 # Create and run the query for
 # Group by a column and return the sum for each group
-def groupByCategoryAndCount(queryObject,columnName,sampleRate=0.2,numCats=False):
+def groupByCategoryAndCount(queryObject,columnName,sampleRate=0.2,numCats=False, includeNone=False):
     columnObject = getattr(Dataset,columnName)
     query = (
         queryObject.with_entities(columnObject) # choose only the column we care about
-        .filter(columnObject.isnot(None)) # filter out NULLs, TODO maybe make this optional
         .filter(func.rand() < sampleRate) # grab random sample of rows
         .add_columns(func.count(1).label('count')) # add count to response
         .group_by(columnName) # group by
         .order_by(desc('count')) # order by the largest first
     )
+    if not includeNone:
+        query = query.filter(columnObject.isnot(None)) # filter out NULLs
     # If no numCats is passed in, show all the groups
     if numCats:
         query = query.limit(numCats) # show the top N results
+
     return (
         dict((key,val * (1/sampleRate)) for key, val in # rescale sampled columns to approx. results on full dataset
             query.all() # actually run the query
@@ -244,7 +246,7 @@ def summarizeDatasets(queryObject,rules,sampleRate=0.2):
     # then return each item over the socket
 
     # Above the fold summary calculations -
-    env_pkg_summary = groupByCategoryAndCount(rootQueryObject,'env_package',sampleRate=sampleRate,numCats=10)
+    env_pkg_summary = groupByCategoryAndCount(rootQueryObject,'env_package',sampleRate=sampleRate,numCats=15, includeNone=True)
     investigation_summary = groupByCategoryAndCount(rootQueryObject,'investigation_type',sampleRate=sampleRate,numCats=10)
     down_size_summary = groupWithCustomCasesAndCount(db.session.query,rules,'download_size_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
     (start,last,n) = checkpoint(start,last,n,'Finished with above the fold, ready for 1st socket push')
