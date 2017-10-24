@@ -354,12 +354,14 @@ var ExploreFilters = React.createClass({
                       <ActionHelpOutline />
                     </IconButton>
                 </div>
+                /*
                 <RangeSlider field="gc_percent_maxrun" filterMin="gcPercentMin" filterMax="gcPercentMax"
                   filterTypeMin={4} filterTypeMax={3} min={0} max={1}
                   minValue={this.state.filterStates.gcPercentMin.value} maxValue={this.state.filterStates.gcPercentMax.value}
                   handleFilterChange={this.handleFilterChange}
                   step={0.01}
                 />
+                */
 
                 <div>
                   <h4 className="filter-field-with-help">Number of Reads Sequenced</h4>

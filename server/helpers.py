@@ -248,14 +248,14 @@ def summarizeDatasets(queryObject,rules,sampleRate=0.2):
     # Above the fold summary calculations -
     env_pkg_summary = groupByCategoryAndCount(rootQueryObject,'env_package',sampleRate=sampleRate,numCats=15, includeNone=True)
     investigation_summary = groupByCategoryAndCount(rootQueryObject,'investigation_type',sampleRate=sampleRate,numCats=10)
-    down_size_summary = groupWithCustomCasesAndCount(db.session.query,rules,'download_size_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
+    down_size_summary = groupWithCustomCasesAndCount(db.session.query,rules,'download_size_maxrun',[1e3,1e4,1e5,1e6,1e7,1e9,1e10,1e11],sampleRate=sampleRate)
     (start,last,n) = checkpoint(start,last,n,'Finished with above the fold, ready for 1st socket push')
 
     # On screen summary calculations -
     lib_construction_method_summary = groupByCategoryAndCount(rootQueryObject,'library_construction_method',sampleRate=sampleRate)
     lib_strategy_summary = groupByCategoryAndCount(rootQueryObject,'library_strategy',sampleRate=sampleRate,numCats=20)
     env_biome_summary = groupByCategoryAndCount(rootQueryObject,'env_biome',sampleRate=sampleRate,numCats=20)
-    avg_read_length_summary = groupWithCustomCasesAndCount(db.session.query,rules,'avg_read_length_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
+    avg_read_length_summary = groupWithCustomCasesAndCount(db.session.query,rules,'avg_read_length_maxrun',[0,100,200,300,400,500,600,700,800,900,1000],sampleRate=sampleRate)
     (start,last,n) = checkpoint(start,last,n,'Finished with on screen, ready for 2nd socket push')
 
     mapDataFrame = getSampledColumns(rootQueryObject,['meta_latitude','meta_longitude'],sampleRate=sampleRate)
@@ -271,9 +271,9 @@ def summarizeDatasets(queryObject,rules,sampleRate=0.2):
     geo_loc_name_summary = groupByCategoryAndCount(rootQueryObject,'geo_loc_name',sampleRate=sampleRate,numCats=20)
     env_feature_summary = groupByCategoryAndCount(rootQueryObject,'env_feature',sampleRate=sampleRate,numCats=20)
     env_material_summary = groupByCategoryAndCount(rootQueryObject,'env_material',sampleRate=sampleRate,numCats=20)
-    gc_percent_summary = groupWithCustomCasesAndCount(db.session.query,rules,'gc_percent_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
-    library_reads_sequenced_summary = groupWithCustomCasesAndCount(db.session.query,rules,'library_reads_sequenced_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
-    total_bases_summary = groupWithCustomCasesAndCount(db.session.query,rules,'total_num_bases_maxrun',[10,100,1000,10000,100000],sampleRate=sampleRate)
+    gc_percent_summary = groupWithCustomCasesAndCount(db.session.query,rules,'gc_percent_maxrun',[0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9],sampleRate=sampleRate)
+    library_reads_sequenced_summary = groupWithCustomCasesAndCount(db.session.query,rules,'library_reads_sequenced_maxrun',[0,10,100,1000,1e4,1e5,1e6,1e7,1e8,1e9],sampleRate=sampleRate)
+    total_bases_summary = groupWithCustomCasesAndCount(db.session.query,rules,'total_num_bases_maxrun',[0,10,100,1000,1e4,1e5,1e6,1e7,1e8,1e9,1e10,1e11],sampleRate=sampleRate)
     (start,last,n) = checkpoint(start,last,n,'Finished with off screen, ready for last socket push')
 
     return {
