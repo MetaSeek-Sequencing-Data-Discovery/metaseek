@@ -1,0 +1,432 @@
+/* Explore page uses a simple grid system, defined here */
+@import 'colors';
+@import 'loaders';
+
+/* 3 card grid, 348px per card, 18px per gutter between cards */
+.one {
+  width: 348px;
+}
+
+.overview-size {
+  width: 348px;
+  height: 250px;
+}
+
+.two {
+  width: 714px;
+}
+
+.three {
+  width: 1176px;
+  clear: both;
+}
+
+.four {
+  width: 670px;
+}
+
+.five {
+  width: 250px;
+}
+
+.six {
+  width: 348px;
+  height: 320px;
+}
+
+.card {
+  padding: 18px;
+}
+
+.right {
+  float:right;
+}
+
+.left {
+  float:left;
+}
+
+.save-discovery-button-container {
+  margin: 0 auto;
+  position: relative;
+}
+
+.save-discovery-button {
+  width: 200px;
+  margin: 18px 0 18px -100px;
+  left: 50%;
+  position: relative;
+}
+
+.overview-content {
+  font-weight: 300;
+  position: relative;
+  display: block;
+  top: 28%;
+  font-size: 18px;
+  color:$cloud10;
+  margin: 26px 0 26px 0;
+  text-align: center;
+}
+
+.overview-content .active {
+  font-weight: 700;
+  font-size: 38px;
+  color: $light;
+}
+
+.overview-content-download {
+  font-weight: 700;
+  position: relative;
+  display: block;
+  top: 28%;
+  font-size: 38px;
+  color: $light;
+  margin: 62px 0 62px 0;
+  text-align: center;
+}
+
+.overview-content-user {
+  font-weight: 300;
+  position: relative;
+  display: block;
+  top: 28%;
+  font-size: 18px;
+  color:$cloud10;
+  text-align: center;
+  margin: 36px 0 0 0;
+  padding: 0 20px 0 20px;
+}
+
+.overview-content-user-inactive {
+  margin: 18px 0 36px 0;
+  text-align: center;
+}
+
+.overview-content-user-active {
+  text-align: center;
+  margin: -20px 0 0 0;
+}
+
+
+.user-photo {
+  float: left;
+}
+
+.user-active-message {
+  text-align: right;
+  padding: 18px 0 10px 0;
+}
+
+.overview-title {
+  font-size:18px;
+  font-weight: bold;
+  color: $cloud10;
+}
+
+.figure-hint-tooltip {
+  width: 200px;
+  white-space: normal;
+  text-align: left;
+}
+
+.figure-hint-label {
+  color: $cloud10;
+  font-size: 14px;
+  padding-left: 10px;
+}
+
+.figure-hint-container {
+  display: block;
+}
+
+.figure-hint-container-map {
+  margin: -18px 0 0 0;
+}
+
+
+/* Explore layout */
+
+.header-explore-filteropen {
+  width: 1100px;
+  margin: 0 0 0 340px;
+}
+
+.header-explore {
+  width: 100%;
+  margin: 0 0 0 0;
+}
+
+.subscribe-explore-yes {
+  display: inline-block;
+  width: 45%;
+}
+
+.subscribe-explore-no {
+  display: inline-flex;
+  width: 45%;
+  margin-left: 24px;
+}
+
+.subscribe-explore-body {
+  text-align: center;
+}
+
+.explore-container {
+  width: 1212px;
+  margin: 10px 7.5%;
+}
+
+.explore-container-filteropen {
+  width: 1100px;
+  margin: 10px 10% 0 23%;
+}
+
+.explore-container-filterclosed {
+  width: 1100px;
+  margin: 10px 11% 0 11%;
+}
+
+
+.filter-field-with-help {
+  float: left;
+}
+
+.explore-headline {
+  margin: 0 0 18px 18px;
+  position: relative;
+}
+
+.explore-map {
+  margin: 0 0 18px 18px;
+  height: 656px;
+}
+
+.explore-map-contents {
+  position: absolute;
+  margin: 0 0 0 0;
+}
+
+.map-legend{
+  float: right;
+}
+
+.explore-map-render {
+  margin: 0 0 0 0;
+}
+
+.explore-histogram {
+  padding:3px;
+  height:400px;
+  margin: 0 0 18px 18px;
+}
+
+.explore-areachart {
+  padding:3px;
+  margin: 0 0 18px 18px;
+}
+
+.explore-wordcloud {
+  padding:3px;
+  overflow-y:scroll;
+  margin: 0 0 18px 18px;
+}
+
+.explore-radarchart {
+  padding:3px;
+  height:400px;
+  margin: 0 0 18px 18px;
+}
+
+.explore-download {
+  margin: 0 0 18px 0;
+  padding:16px;
+}
+
+.explore-table {
+  padding:0px;
+  margin: 0 0 18px 18px;
+}
+
+.explore-filter {
+  margin: 12px 12px 0 12px;
+}
+
+.explore-filter-slider {
+  height: 6px;
+  margin-top: -6px;
+}
+
+.profile-container {
+  display:block;
+}
+
+.profile-image {
+  width: 150px;
+  height: 150px;
+  display: inline;
+}
+
+.profile-button {
+  position: relative;
+}
+
+.explore-map-container {
+  width: 742px;
+  margin: 0 auto;
+}
+
+.explore-map-heat-container {
+  width: 742px;
+  height: 371px;
+  background-image: url('/images/BWmapBackground.jpg');
+  background-size: cover;
+}
+
+.word-cloud-tag-wrapper {
+  border: 2px solid $cloud4;
+  border-radius: 2px;
+  background-color: $white;
+  display: inline-block;
+  padding: 6px;
+  margin: 3px;
+}
+
+.word-cloud-tag {
+  display:block;
+}
+
+.histogram-container {
+  width: 714px;
+  margin: 0 0 0 0;
+  height: 320px;
+  overflow:hidden;
+}
+
+.pie-container {
+  width: 360px;
+  margin: 0 0 0 0;
+  height: 320px;
+  overflow:hidden;
+}
+
+.area-container {
+  width: 348px;
+  height: 240px;
+}
+
+.radar-container {
+  width: 360px;
+  margin: 0 auto;
+  height: 320px;
+  overflow:hidden;
+}
+
+.area-container > svg > g > text > tspan {
+  fill: none !important;
+}
+
+.explore-select {
+  margin-left: 60px;
+  height: 50px;
+}
+
+.explore-pagination {
+  padding: 12px;
+  text-align: right;
+}
+
+.explore-pagination-count {
+  display: inline-block;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+
+.range-slider {
+  margin-top: 15px;
+  width: 96%;
+  margin-left: 2%;
+}
+
+.range-slider-with-text {
+  width: 100%;
+  height: 30px;
+  position: relative;
+}
+
+.range-slider-with-text-left {
+  float: left;
+  display: flex;
+  width: 10%;
+  margin-right: 4%;
+}
+
+.range-slider-with-text-center {
+  float: left;
+  width: 71%;
+  margin-top: 20px;
+}
+
+.range-slider-with-text-right {
+  float: right;
+  display: flex;
+  width: 10%;
+  margin-left: 5%;
+}
+
+
+.chips {
+  min-height: 36px;
+  border-bottom: 1px solid rgb(224, 224, 224);
+  line-height: 1;
+  font-size: 1em;
+}
+
+.chips-input {
+  display: inline-block;
+  width: 33% !important;
+  min-height: 36px;
+  margin: 0 0 5px 10px !important;
+  border: 0;
+  outline: none;
+  font-size: 0.9rem;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+.chip {
+  display: inline-block;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 5px;
+  margin-right: 25px;
+  position: relative;
+  padding: 0;
+  height: 32px;
+}
+
+.chip .chip-value {
+  display: inline-block;
+  padding-left: 15px;
+  padding-right: 7.5px;
+  background: #555;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 15px 0 0 15px;
+}
+
+.chip .chip-delete-button {
+  background: #555;
+  color: #fff;
+  border: 0;
+  border-radius: 0 15px 15px 0;
+  padding: 5px 10px;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -25px;
+  line-height: 0.5;
+  font-weight: bold;
+}

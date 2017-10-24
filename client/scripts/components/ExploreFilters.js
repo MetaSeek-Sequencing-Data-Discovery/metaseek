@@ -12,16 +12,10 @@ import AutoComplete from 'material-ui/AutoComplete';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Drawer from 'material-ui/Drawer';
-
 import RangeSlider from './RangeSlider';
-import Tooltip from 'rc-tooltip';
-import Slider from 'rc-slider';
 import ChipInput from 'material-ui-chip-input';
 import IconButton from 'material-ui/IconButton';
 import ActionHelpOutline from 'material-ui/svg-icons/action/help-outline';
-
-const Range = Slider.createSliderWithTooltip(Slider.Range);
-
 
 var ExploreFilters = React.createClass({
   getInitialState : function() {
@@ -162,24 +156,11 @@ var ExploreFilters = React.createClass({
     this.setState(this.state);
     this.props.updateFilterParams(this.state.filterStates);
   },
-
-/*
-  handleMinText : function(event, value) {
-    var newRule = {
-      "field":"avg_read_length_maxrun",
-      "type":4,
-      "value":value
-    };
-    this.state.filterStates["avgRdLgthMin"] = newRule;
-    this.setState(this.state);
-  },
-*/
   renderMenuItem : function(value, index) {
     return (
       <MenuItem key={index} value={value} primaryText={value} />
     )
   },
-
   getMultOptions : function(summarydata) {
     var search = [{ value: 'search', label: 'Type to search items...', disabled:{true} }]
     var objects = Object.keys(summarydata).map(function(key,index) {return({value:key, label:key}) });
@@ -187,7 +168,6 @@ var ExploreFilters = React.createClass({
       search.concat(objects)
     )
   },
-
   clickawayFilters : function() {
     this.props.toggleFilters();
   },
@@ -323,31 +303,12 @@ var ExploreFilters = React.createClass({
                       <ActionHelpOutline />
                     </IconButton>
                 </div>
-                {/*
-                <div className='range-slider-with-text-left'>
-                  <TextField
-                     style={{height:'60px'}} inputStyle={{fontSize:'70%'}}
-                     floatingLabelText="min"
-                     defaultValue={this.state.filterStates.avgRdLgthMin.value}
-                     onChange={this.handleMinText}
-                   />
-                </div>
-                <div className='range-slider-with-text-center'>*/}
                 <RangeSlider field="avg_read_length_maxrun" filterMin="avgRdLgthMin" filterMax="avgRdLgthMax"
                   filterTypeMin={4} filterTypeMax={3} min={0} max={30000}
                   minValue={this.state.filterStates.avgRdLgthMin.value} maxValue={this.state.filterStates.avgRdLgthMax.value}
                   handleFilterChange={this.handleFilterChange}
                   step={this.state.filterStates.avgRdLgthMax.value/100}
                 />
-                {/* </div>
-                <div className='range-slider-with-text-right'>
-                  <TextField
-                     defaultValue={this.state.filterStates.avgRdLgthMax.value}
-                     floatingLabelText="max"
-                     style={{height:'60px'}} inputStyle={{fontSize:'70%'}}
-                   />
-                </div> */}
-
                 <div>
                   <h4 className="filter-field-with-help">Number of Reads Sequenced</h4>
                     <IconButton tooltip=<div style={tooltipStyle}>Total number of reads sequenced.</div> tooltipPosition="top-center" href="/glossary#library_reads_sequenced" iconStyle={{color:"#FFB3A0", height:"15px", marginTop:"8px"}} >
@@ -360,17 +321,6 @@ var ExploreFilters = React.createClass({
                   handleFilterChange={this.handleFilterChange}
                   step={this.state.filterStates.libRdsSqdMax.value/1000}
                 />
-                {/*
-                  <h4>Library Reads Sequenced</h4>
-                  <Range marks={{0:'0',1:'100',2:'10^3',3:'10^4',4:'10^5',5:'10^6'}} step={null} allowCross={false} min={0} max={5} defaultValue={[0,5]} onAfterStop={this.handlelog}/>*/}
-
-                {/*}<h4>Total Number of Bases</h4>
-                <RangeSlider field="total_num_bases_maxrun" filterMin="totBasesMin" filterMax="totBasesMax"
-                  filterTypeMin={4} filterTypeMax={3} min={0} max={1000000000000}
-                  minValue={this.state.filterStates.totBasesMin.value} maxValue={this.state.filterStates.totBasesMax.value}
-                  handleFilterChange={this.handleFilterChange}
-                  step={this.state.filterStates.totBasesMax.value/1000000000}
-                />*/}
               </Collapsible>
 
               <Collapsible trigger="Environmental/Contextual Info" open={false}>
@@ -423,14 +373,6 @@ var ExploreFilters = React.createClass({
                 <ChipInput
                   onChange={this.handleChipBlur.bind(this,"geo_loc_name","geo_loc_name",7,this.state.chipStates.geo_loc_name)}
                 />
-                {/* Find a better component for this
-                  <h4>Geographic Location</h4>
-                  <AutoComplete
-                    dataSource={["press Enter to search samples with this text in its geo_loc_name"]}
-                    hintText="Search for geo_loc_name"
-                    floatingLabelText="Geographic Locations containing:"
-                  />
-                  */}
               </Collapsible>
             </Drawer>
 

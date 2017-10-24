@@ -37,8 +37,6 @@ var BrowseDiscoveries = React.createClass({
   },
 
   render : function() {
-    var tableHeaderStyles = {color:'#fff',fontFamily:'Roboto',fontSize:'20px',fontWeight:600};
-
     return (
       <div>
         <Header history={this.props.history}/>
@@ -47,11 +45,11 @@ var BrowseDiscoveries = React.createClass({
             <h1 className="browse-discoveries-header">{"Viewing " + this.state.discoveries.length + " MetaSeek Discoveries"}</h1>
             <Paper className="browse-discoveries-table">
               <Table bodyStyle={{overflowX: 'scroll', width:'100%' }} fixedHeader={false} fixedFooter={false} selectable={false} style={{'tableLayout':'auto'}}>
-                <TableHeader style={{backgroundColor:'#979CF2'}} adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
+                <TableHeader adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
                   <TableRow selectable={false}>
-                    <TableHeaderColumn style={tableHeaderStyles}>Discovery Title</TableHeaderColumn>
-                    <TableHeaderColumn style={tableHeaderStyles}>Date Created</TableHeaderColumn>
-                    <TableHeaderColumn style={tableHeaderStyles}></TableHeaderColumn>
+                    <TableHeaderColumn>Discovery Title</TableHeaderColumn>
+                    <TableHeaderColumn>Date Created</TableHeaderColumn>
+                    <TableHeaderColumn></TableHeaderColumn>
                   </TableRow>
                 </TableHeader>
                 <TableBody showRowHover={false} stripedRows={false} displayRowCheckbox={false} preScanRows={false}>

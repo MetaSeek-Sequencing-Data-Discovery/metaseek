@@ -1,0 +1,188 @@
+@import 'colors';
+
+.welcome-container {
+  text-align: center;
+}
+
+.welcome-first {
+  width: 100%;
+  height: 600px;
+  background-image: url('/images/welcome-hero.jpg');
+  background-size: cover;
+}
+
+.welcome-text {
+  color: $white;
+  padding: 36px;
+  margin: 0;
+}
+
+.welcome-title {
+  color: $white;
+  font-size: 4.5rem;
+  font-weight: 700;
+  padding: 90px 0 36px 0;
+  margin: 0;
+}
+
+.subscribe-form-label {
+  color: $white;
+  line-height: 150%;
+  font-family: 'Roboto';
+  font-size: 16px;
+  margin-top: 48px;
+  font-weight: 500;
+}
+
+.subscribe-reqd {
+  color: $accent;
+  font-size: 20px;
+}
+
+.subscribe-table {
+  width: 400px;
+  display: inline-block;
+  text-align: left;
+}
+
+.subscribe-input {
+  background: #fff;
+  height: 36px;
+  width: 100%;
+  border: 2px solid $cloud2 !important;
+  border-radius: 3px;
+  margin: 3px 0 12px 0;
+  overflow: hidden;
+}
+
+.subscribe-button {
+  background-color: $default !important;
+  color: $white;
+  font-size: 16px;
+  font-family: 'Roboto', Arial, sans-serif;
+  height: 42px;
+  margin: 12px 5px 12px 0;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 3px;
+}
+
+.welcome-features {
+  background-color: $white;
+  display: inline-block;
+  width: 100%;
+}
+
+.feature-block {
+  width: 300px;
+  margin: 25px 50px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.feature-block-title {
+  font-size: 42px;
+  font-weight: 600;
+  margin: 10px auto;
+}
+
+.feature-block-body {
+  font-size: 18px;
+}
+
+.welcome-how {
+  background-color: $cloud10;
+  display: inline-block;
+  width: 100%;
+}
+
+.welcome-how-header {
+  color: $white;
+  margin: 36px;
+  font-size: 42px;
+  font-weight: 400;
+}
+
+.welcome-how-subheader {
+  color: $white;
+  margin: 10px 10%;
+}
+
+.welcome-how-graphic {
+  margin: 36px;
+  margin-top: 5px;
+  float: left;
+}
+
+.welcome-how-explainer {
+  margin: 36px;
+}
+
+.welcome-how-explain-header {
+  text-align: left;
+  color: $white;
+  margin: 36px;
+  font-size: 30px;
+  font-weight: 300;
+}
+
+.welcome-how-explain-body {
+  text-align: left;
+  color: $white;
+  margin: 0 10% 0 36px;
+  font-size: 18px;
+}
+
+.welcome-announce {
+  font-size: 2.6em;
+  margin-top: 50px;
+  font-weight: 500;
+}
+
+.welcome-enter {
+  font-size: 1.1em;
+  text-align: center;
+}
+
+.welcome-cta {
+  width: 150px;
+  height: 60px;
+  margin: 0 auto;
+  padding-top: 10px;
+}
+
+.welcome-signup-submit {
+  text-align: center;
+  margin: 12px auto 25px;
+  width: 400px;
+  padding: 5px;
+}
+
+.welcome-email-field {
+  display: block;
+  margin: 0 auto;
+}
+
+.welcome-footer {
+  padding: 16px;
+}
+
+
+/* Github follow buttons */
+
+button.github, input[type=submit].github {
+  border: 0;
+  display: block;
+  margin-bottom: 2rem;
+  width: 100%;
+  color: $white;
+  padding: 2rem
+}
+
+button.github, input[type=submit].github {
+  background: #82d465
+}
+
+button.github:after, input[type=submit].github:after {
+  background: #5cc437
+}

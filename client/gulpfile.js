@@ -1,27 +1,40 @@
+// The basics
 var gulp = require('gulp');
+
+// CSS stuff
+var autoprefixer = require('gulp-autoprefixer');
+var cleanCSS = require('gulp-clean-css');
+var sass = require('gulp-sass');
+
+// Image stuff
+var imagemin = require('gulp-imagemin');
+
+// HTML stuff
+var htmlreplace = require('gulp-html-replace');
+
+// Live reload
+var browserSync = require('browser-sync');
+var historyApiFallback = require('connect-history-api-fallback');
+var reload = browserSync.reload;
+
+// JS compilation / recompilation
+var buffer = require('vinyl-buffer');
 var source = require('vinyl-source-stream');
 var browserify = require('browserify');
 var reactify = require('reactify');
 var babelify = require('babelify');
 var watchify = require('watchify');
 var notify = require('gulp-notify');
-var autoprefixer = require('gulp-autoprefixer');
-var cleanCSS = require('gulp-clean-css');
 var uglifyify = require('uglifyify');
 var uglify = require('gulp-uglify');
-var htmlreplace = require('gulp-html-replace');
-var buffer = require('vinyl-buffer');
-var imagemin = require('gulp-imagemin');
-var browserSync = require('browser-sync');
-var reload = browserSync.reload;
-var historyApiFallback = require('connect-history-api-fallback');
 
 /*
   Styles optimization / minification
 */
 gulp.task('styles',function() {
   // Compiles CSS
-  gulp.src('css/styles.css')
+  gulp.src('css/styles.scss')
+    .pipe(sass.sync().on('error', sass.logError))
     .pipe(autoprefixer())
     .pipe(cleanCSS({compatibility: '*'}))
     .pipe(gulp.dest('./build/css'))
@@ -95,12 +108,8 @@ function buildScript(file, watch) {
   return rebundle();
 }
 
-gulp.task('scripts', function() {
-  return buildScript('main.js', false); // this will run once because we set watch to false
-});
-
 gulp.task('default', ['copy-index-html','images','styles','browser-sync'], function() {
-  gulp.watch('css/styles.css', ['styles']); // gulp watch for style changes
+  gulp.watch('css/*.scss', ['styles']); // gulp watch for style changes
   return buildScript('main.js', true); // browserify watch for JS changes
 });
 
