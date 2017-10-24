@@ -29,39 +29,31 @@ var Header = React.createClass({
       <Toolbar>
         <ToolbarGroup className="header-logo">
           <Link to='/' className="button-logo-link">
-            <img src="../images/metaseek_logo.png" width="36px" height="36px"/>
-            <ToolbarTitle text="etaSeek" style={{color:"rgba(12, 12, 18, 0.4)"}}/>
+            <img src="../images/logo.png" width="36px" height="36px"/>
+            <span className="header-logo-text">etaSeek</span>
           </Link>
         </ToolbarGroup>
-        <ToolbarGroup>
+        <ToolbarGroup className="header-buttons">
           <Link className="button-link" to='/myaccount'>
-            <FlatButton
+            <RaisedButton
               label="My Account"
-              primary={true}
             />
           </Link>
           <Link className="button-link" to='/explore'>
-            <FlatButton
+            <RaisedButton
               label="Explore"
-              primary={true}
             />
           </Link>
           <Link className="button-link" to='/discoveries'>
-            <FlatButton
+            <RaisedButton
               label="Browse"
-              primary={true}
             />
           </Link>
-        </ToolbarGroup>
-        <ToolbarGroup >
           <RaisedButton
             label="send feedback!"
             primary={true}
             href="https://www.surveymonkey.com/r/HDT27Y8"
           />
-          <div>
-             <img className="header-image-beta" src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Beta-badge.svg"/>
-          </div>
         </ToolbarGroup>
       </Toolbar>
      </MuiThemeProvider>

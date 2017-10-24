@@ -8,10 +8,10 @@ exports.default = {
   palette: {
     primary1Color: "#1a9c6e", // $default
     primary2Color: "#1fb380", // $light
-    primary3Color: "#55d5a9", // $lighter
+    primary3Color: "#949494", // $cloud6
     accent1Color: "#425ba1", // $accent
-    accent2Color: "#D2D9ED", // $accentLight
-    accent3Color: "#D2D9ED", // $accentLight
+    accent2Color: "#425ba1", // $accent
+    accent3Color: "#425ba1", // $accent
     textColor: "#3c3c3c", // $cloud10
     secondaryTextColor: "#949494",  // $cloud6
     alternateTextColor: "#fff", // $white

@@ -53,13 +53,19 @@ body {
   text-decoration: none;
 }
 
-.header-image-beta {
-  width: 50px;
-  height: 50px;
+.header-logo {
+  margin: 4px 0 0 0;
 }
 
-.header-logo {
-  margin: 10px 0;
+.header-logo-text {
+  color: $white;
+  font-size:26px;
+  font-family:'Roboto';
+  font-weight:500;
+}
+
+.header-buttons {
+  width:560px;
 }
 
 /* Typography */

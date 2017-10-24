@@ -108,17 +108,17 @@ var Welcome = React.createClass({
             </div>
             <div className="welcome-features">
               <div className="feature-block">
-                <img src="../images/explore_icon.jpeg"/>
+                <img src="../images/explore_icon.jpg"/>
                 <h1 className="feature-block-title">Explore</h1>
                 <p className="feature-block-body">Search and filter metadata from millions of next-generation sequencing datasets to find the data you care about in seconds. Quickly curate integrated sequencing datasets to answer your scientific questions. </p>
               </div>
               <div className="feature-block">
-                <img src="../images/discovery_icon.jpeg"/>
+                <img src="../images/discovery_icon.jpg"/>
                 <h1 className="feature-block-title">Discover</h1>
                 <p className="feature-block-body">Save discoveries to your account and share with the MetaSeek community. Browse discoveries from other users, save the ones you like or use one as a launching off point for your own exploration. </p>
               </div>
               <div className="feature-block">
-                <img src="../images/launch_icon.jpeg"/>
+                <img src="../images/launch_icon.jpg"/>
                 <h1 className="feature-block-title">Create</h1>
                 <p className="feature-block-body">Get past the data integration step and to your real science, faster. Download dataset metadata, and follow our easy guides to get from dataset lists to fasta files in no time.</p>
               </div>
