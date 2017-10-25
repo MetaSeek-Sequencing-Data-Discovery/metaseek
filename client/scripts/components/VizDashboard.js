@@ -25,7 +25,7 @@ var VizDashboard = React.createClass({
     return {
       'dataTable': {},
       'histinput':'investigation_type_summary',
-      'generalinfo_histinput':'env_package_summary',
+      'generalinfo_histinput':'library_source_summary',
       'seqinfo_histinput': 'library_strategy_summary',
       'areainput':'library_reads_sequenced_summary',
       'seqinfo_areainput':'avg_read_length_summary',
@@ -73,7 +73,7 @@ var VizDashboard = React.createClass({
     const wordfields = ['env_biome_summary','env_feature_summary','env_material_summary','geo_loc_name_summary'];
     const areafields = ['avg_read_length_summary', 'download_size_summary', 'latitude_summary', 'longitude_summary', 'library_reads_sequenced_summary', 'total_bases_summary'];
     const histfields = ['sequencing_method_summary', 'instrument_model_summary', 'library_strategy_summary', 'library_screening_strategy_summary', 'library_construction_method_summary', 'investigation_type_summary', 'env_package_summary', 'library_source_summary', 'study_type_summary'];
-    const generalinfo_histfields = ['env_package_summary', 'study_type_summary'];
+    const generalinfo_histfields = ['library_source_summary','investigation_type_summary', 'env_package_summary', 'study_type_summary'];
     const seqinfo_histfields = ['library_strategy_summary', 'library_screening_strategy_summary', 'sequencing_method_summary', 'instrument_model_summary'];
     const seqinfo_areafields = ['avg_read_length_summary', 'library_reads_sequenced_summary', 'total_bases_summary'];
 
@@ -101,7 +101,7 @@ var VizDashboard = React.createClass({
               })}
             </SelectField>
           </div>
-          <HistogramVictory activeSummaryData={this.props.activeSummaryData} histinput={this.state.generalinfo_histinput} colortheme={TurquoiseTheme.metaseek}/>
+          <HistogramVictory activeSummaryData={this.props.activeSummaryData} histinput={this.state.generalinfo_histinput} colortheme={TurquoiseTheme.metaseek} width={530} height={320}/>
         </div>;
 
     const geninfo_radarcomponent =
@@ -128,7 +128,7 @@ var VizDashboard = React.createClass({
             })}
           </SelectField>
         </div>
-        <RadarChart activeSummaryData={this.props.activeSummaryData} radarinput={this.state.generalinfo_radarinput} colortheme={TurquoiseTheme.metaseek}/>
+        <RadarChart activeSummaryData={this.props.activeSummaryData} radarinput={this.state.generalinfo_radarinput} colortheme={TurquoiseTheme.metaseek} height={160} width={220}/>
       </div>;
 
     const libconst_component =
@@ -167,7 +167,7 @@ var VizDashboard = React.createClass({
             })}
           </SelectField>
         </div>
-        <HistogramVictory activeSummaryData={this.props.activeSummaryData} histinput={this.state.seqinfo_histinput} colortheme={YellowTheme.metaseek}/>
+        <HistogramVictory activeSummaryData={this.props.activeSummaryData} histinput={this.state.seqinfo_histinput} colortheme={YellowTheme.metaseek} width={714} height={320}/>
       </div>;
 
     const map_component =
@@ -263,11 +263,11 @@ var VizDashboard = React.createClass({
 
     return (
       <div>
-        <Paper className="explore-histogram card left two">
+        <Paper className="explore-histogram card left seven">
           {renderFigure(this.props.activeSummaryData,this.props.processing, geninfo_histcomponent)}
         </Paper>
-        <Paper className="explore-radarchart card left one">
-          {renderFigure(this.props.activeSummaryData,this.props.processing, geninfo_radarcomponent)}
+        <Paper className="explore-areachart card left seven">
+          {renderFigure(this.props.activeSummaryData,this.props.processing, seqinfo_areacomponent)}
         </Paper>
         <Paper className="explore-histogram card left one">
           {renderFigure(this.props.activeSummaryData,this.props.processing, libconst_component)}
@@ -275,13 +275,10 @@ var VizDashboard = React.createClass({
         <Paper className="explore-histogram card left two">
           {renderFigure(this.props.activeSummaryData,this.props.processing, seqinfo_histcomponent)}
         </Paper>
-        <Paper className="explore-map card left two ">
+        <Paper className="explore-map card left four">
           {renderFigure(this.props.activeSummaryData,this.props.processing, map_component)}
         </Paper>
-        <Paper className="explore-areachart card left six">
-          {renderFigure(this.props.activeSummaryData,this.props.processing, seqinfo_areacomponent)}
-        </Paper>
-        <Paper className="explore-wordcloud card left six">
+        <Paper className="explore-wordcloud card left eight">
           {renderFigure(this.props.activeSummaryData,this.props.processing, envinfo_wordcloudcomponent)}
         </Paper>
       </div>
