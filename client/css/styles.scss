@@ -1,0 +1,121 @@
+/* General imports */
+@import 'normalize';
+@import 'colors';
+@import 'loaders';
+
+/* Each primary page has specific imports */
+@import 'welcome';
+@import 'explore';
+@import 'discovery';
+@import 'glossary';
+@import 'dataset';
+@import 'my-account';
+@import 'browse';
+
+/* To override styles in rc-slider, rc-select, etc. libraries */
+@import 'rc-overrides';
+
+/* Global styles */
+html, body {
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: 62.5%;
+  box-sizing: border-box;
+  background: $cloud1;
+  color: $cloud10;
+}
+
+body {
+  padding: 0;
+  background: inherit;
+  margin: 0;
+  font-family: 'Roboto';
+  font-size: 1.4rem;
+  //-ms-touch-action: none;
+  //touch-action: none;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+/* Global header */
+
+.button-link {
+  text-decoration: none;
+  margin: 10px auto;
+}
+
+.button-logo-link {
+  text-decoration: none;
+}
+
+.header-logo {
+  margin: 4px 0 0 0;
+}
+
+.header-logo-text {
+  color: $white;
+  font-size:26px;
+  font-family:'Roboto';
+  font-weight:500;
+}
+
+.header-buttons {
+  width:560px;
+}
+
+/* Typography */
+
+html {
+  font-size: 62.5%
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.4rem;
+}
+
+br {
+  line-height: 22px;
+}
+
+.big-br {
+  line-height: 36px;
+}
+
+h1 {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+  font-size: 3rem;
+}
+
+h2, h3, h4, h5, h6 {
+  font-weight: 400;
+  font-family: 'Roboto', sans-serif;
+}
+
+h2 {
+  text-align: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  font-size: 2.6em;
+  font-weight: 300;
+}
+
+h3 {
+  font-size: 2.5rem;
+  text-align: center;
+  font-weight: 300;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

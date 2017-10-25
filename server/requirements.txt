@@ -16,3 +16,4 @@ lxml==3.8.0
 celery==4.1.0
 scipy==0.19.1
 mysql-connector-python-rf
+unicodecsv

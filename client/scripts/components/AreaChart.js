@@ -1,5 +1,5 @@
 import React from 'react';
-import { VictoryChart, VictoryVoronoiContainer, VictoryArea, VictoryAxis, VictoryTooltip} from 'victory';
+import { VictoryChart, VictoryVoronoiContainer, VictoryArea, VictoryAxis, VictoryTooltip, VictoryLabel} from 'victory';
 import {getReadableFileSizeString} from '../helpers';
 
 var AreaChart = React.createClass({
@@ -20,7 +20,7 @@ var AreaChart = React.createClass({
         }
       }
     );
-
+    /*
     var activeFieldSorted = activeFieldDataValidKeys.sort(function(a, b) {
       if (a.includes("^")) {
         var match_a = a.match(/\d+/g); //find all the integers, for 10^2-10^3 will return [10,2,10,3]
@@ -30,8 +30,10 @@ var AreaChart = React.createClass({
       else {
         return (parseInt(a) - parseInt(b))}
       });
-
+      */
+    var activeFieldSorted = activeFieldDataValidKeys.sort()
     // Format data the way VictoryChart / VictoryArea wants it
+    console.log(activeFieldSorted);
     var chartData = activeFieldSorted.map(
       function(value,index) {
         var count = activeFieldData[value];
@@ -44,30 +46,73 @@ var AreaChart = React.createClass({
         else {
           var newfield = value;
         }
-        return {"x":parseInt(index),"count":count,"label":newfield + " : " + count};
+        return {"x":Number(index+0.5),"count":count,"label":newfield + " : " + count};
       }
     );
+    console.log(chartData);
+
+    var chartLabels = chartData.map(function(value, index) {
+        var low = value.label.split(" :")[0].split("-")[0];
+        var high = value.label.split(" :")[0].split("-")[1];
+        console.log(low, high, index);
+        if (low.startsWith(">")) {
+          if (Math.floor(Math.log10(parseFloat(low.split("> ")[1])))>3) {
+            var power = Math.floor(Math.log10(parseFloat(low.split("> ")[1])));
+            var num = low.split("> ")[1];
+            if (String(num).substr(0,2)=="10") {
+              var low = ">10"+String(power).sup();
+            } else {
+              var low = ">"+num[0]+"e"+String(power);
+            }
+          }
+          return low;
+        } else {
+          if (Math.floor(Math.log10(high))>3) {
+            if (high.substr(0,2)=="10") {
+              var high = "10"+String(Math.floor(Math.log10(high))).sup();
+            } else {
+              var high = high[0]+"e"+String(Math.floor(Math.log10(high)));
+            }
+          }
+          return high;
+        }
+      }
+    );
+    //var flatChartLabels = [].concat(...chartLabels);
+    console.log(chartLabels);
+
+    var areawidth = 530;
 
     return(
       <div className="area-container">
         <VictoryChart
           theme={this.props.colortheme}
-          width={380}
-          height={240}
-          padding={{top: 20, right: 10, bottom: 10, left: 10 }}
+          width={areawidth}
+          height={320}
+          padding={{top: 10, right: 25, left: 55, bottom: 35}}
           containerComponent={
             <VictoryVoronoiContainer
               dimension="x"
               labels={(chartData) => chartData.label}
+              style={{overflow:"visible"}}
               labelComponent={
                 <VictoryTooltip
                   flyoutStyle={{fill: "white"}}
                 />}
           />}
         >
-          <VictoryAxis height={100}
+          <VictoryAxis
+            tickValues={chartLabels}
+            fixLabelOverlap={true}
+            style={{ticks: {stroke: "#757575", size: 10}, tickLabels:{fill:"#757575", fontSize:12, fontWeight: 600} }}
+            tickLabelComponent={
+              <VictoryLabel dy={-5} />
+            }
+          />
+          <VictoryAxis
+            dependentAxis
             style={{
-              tickLabels: {display:'none'}
+              tickLabels: { fill: "#757575",fontSize: 12, fontWeight: 600}
             }}
           />
 

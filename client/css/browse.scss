@@ -1,0 +1,21 @@
+@import 'colors';
+
+/*browse discoveries styles */
+.browse-discoveries-header {
+  text-align: left;
+  margin: 36px auto 18px auto;
+  width: 1176px;
+  font-weight: 400;
+  font-size: 36px;
+  color: #4A4A50;
+}
+
+.browse-discoveries-table {
+  padding:0px;
+  margin: auto;
+  width: 1176px;
+}
+
+.browse-discoveries-table thead {
+  background-color:$accent;
+}

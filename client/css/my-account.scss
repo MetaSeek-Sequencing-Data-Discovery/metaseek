@@ -1,0 +1,55 @@
+@import 'colors';
+
+.myacct-loggedout {
+  margin: 48px 20% 0 20%;
+  height: 300px;
+  padding: 50px 20px 50px 20px;
+}
+
+.myacct-loggedin {
+  margin: 48px auto;
+  margin-bottom: 15px;
+  width: 1176px;
+  height: 200px;
+}
+
+.myacct-user {
+  margin: 24px 0 0 220px;
+  position: absolute;
+}
+
+.myacct-name {
+  margin-top: .5rem;
+}
+
+.myacct-logout-button {
+  margin: 16px 0 0 0;
+}
+
+.myacct-discoveryhead {
+  margin: 0 auto;
+  width: 1170px;
+  height: 100px;
+}
+
+.profile-image-myacct {
+  width: 200px;
+  height: 200px;
+  float: left;
+}
+
+.login-buttons {
+  text-align: center;
+  margin: 20px;
+}
+
+.user-discoveries-table {
+  padding:0px;
+  margin: 36px auto;
+  width: 1176px;
+  clear: both;
+}
+
+.user-discoveries-table thead {
+  background-color:$accent;
+}

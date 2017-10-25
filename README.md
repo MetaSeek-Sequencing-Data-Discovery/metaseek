@@ -52,6 +52,10 @@ Open the server folder and activate the virtualenv:
 
 `source ./bin/activate`
 
+Install any missing Python dependencies
+
+`pip install -r requirements.txt`
+
 Reset the DBs - run any pending database migrations and flush the cache:
 
 `python manage.py db upgrade`
@@ -69,6 +73,10 @@ Check the server is live:
 To debug:
 
 `cat /var/log/apache2/error.log`
+
+Make sure Celery is happy for background tasks:
+
+`screen -r celery`
 
 #### Automatically generated script for downloading datasets
 

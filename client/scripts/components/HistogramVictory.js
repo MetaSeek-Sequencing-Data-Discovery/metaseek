@@ -13,7 +13,7 @@ var HistogramVictory = React.createClass({
     // remove nulls / boring values
     var activeFieldDataValidKeys = Object.keys(activeFieldData).filter(
       function(value, index) {
-        if (value == "no data" || value == "other categories") {
+        if (value == "no data" || value == "other categories" || value == "null") {
           return false; // skip
         } else {
           return true;
@@ -25,21 +25,26 @@ var HistogramVictory = React.createClass({
     var activeFieldSorted = activeFieldDataValidKeys.sort(function(a, b) {return -(activeFieldData[a] - activeFieldData[b])});
     var finalDataPoints = Object.keys(activeFieldData).includes("other categories") ? activeFieldSorted.concat(["other categories"]) : activeFieldSorted;
     var finalDataPoints = Object.keys(activeFieldData).includes("no data") ? finalDataPoints.concat(["no data"]) : finalDataPoints;
+    var finalDataPoints = Object.keys(activeFieldData).includes("null") ? finalDataPoints.concat(["null"]) : finalDataPoints;
 
     // Format data the way VictoryChart / VictoryBar wants it
     var histData = finalDataPoints.map(
       function(value,index) {
         var count = activeFieldData[value];
+        if (value=="null") {
+          var value = "no data";
+        }
         return {"x":value,"count":count,"label":value};
       }
     );
 
     return(
-      <div className="histogram-container">
+      <div>
         <VictoryChart
           theme={this.props.colortheme}
-          width={778}
-          padding={{top: 0, right: 25, bottom: 5, left: 65 }}
+          width={this.props.width}
+          height={this.props.height}
+          padding={{top: 10, right: 25, left: 65, bottom: 10}}
           // domainPadding will add space to each side of VictoryBar to
           // prevent it from overlapping the axis
           domainPadding={50}
@@ -55,7 +60,7 @@ var HistogramVictory = React.createClass({
         >
 
           <VictoryAxis
-            // X axis with labels
+            // X axis without labels
             style={{
               tickLabels: {display:'none'}
             }}
@@ -63,9 +68,7 @@ var HistogramVictory = React.createClass({
           <VictoryAxis
             // Y axis with labels
             dependentAxis
-            style={{
-              tickLabels: { fill: "#333",fontSize: 12}
-            }}
+            style={{tickLabels:{fill:"#757575", fontSize:12, fontWeight: 600} }}
           />
           <VictoryBar
             data={histData}
