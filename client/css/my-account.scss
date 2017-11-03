@@ -19,12 +19,11 @@
 }
 
 .myacct-name {
-  float: left;
+  margin-top: .5rem;
 }
 
 .myacct-logout-button {
-  float: left;
-  margin: 36px 0 0 0;
+  margin: 16px 0 0 0;
 }
 
 .myacct-discoveryhead {
@@ -44,11 +43,6 @@
   margin: 20px;
 }
 
-.num-discoveries {
-  float: left;
-  margin: 130px 0 0 20px
-}
-
 .user-discoveries-table {
   padding:0px;
   margin: 36px auto;
@@ -57,12 +51,5 @@
 }
 
 .user-discoveries-table thead {
-  background-color:$default;
-}
-
-.user-discoveries-table th {
-  color:$white;
-  font-family:'Roboto';
-  font-size:'20px';
-  font-weight:600;
+  background-color:$accent;
 }

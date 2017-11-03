@@ -163,16 +163,13 @@ var MyAccount = React.createClass({
               </div>
               <div className="myacct-user">
                 <h2 className="myacct-name">{this.state.firebase.name}</h2>
+                <span className="discovery-header-user">{this.state.discoveries.length + " saved discoveries"}</span>
                 <div className="myacct-logout-button">
-                  <FlatButton
+                  <RaisedButton
                     label="Log Out"
                     onClick={this.triggerLogout}
-                    primary={true}
                   />
                 </div>
-              </div>
-              <div className="num-discoveries">
-                <span className="discovery-header-user">{this.state.discoveries.length + " saved discoveries"}</span>
               </div>
             </Paper>
 
@@ -180,8 +177,8 @@ var MyAccount = React.createClass({
               <Table bodyStyle={{overflowX: 'scroll', width:'100%' }} fixedHeader={false} fixedFooter={false} selectable={false} style={{'tableLayout':'auto'}}>
                 <TableHeader adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
                   <TableRow selectable={false}>
-                    <TableHeaderColumn>{this.state.discoveries.length + " Discoveries"}</TableHeaderColumn>
-                    <TableHeaderColumn>Date Created</TableHeaderColumn>
+                    <TableHeaderColumn style={{color:"#fff",fontFamily:"Roboto",fontSize:"20px",fontWeight:600}} className="user-discoveries-table-header">{this.state.discoveries.length + " Discoveries"}</TableHeaderColumn>
+                    <TableHeaderColumn style={{color:"#fff",fontFamily:"Roboto",fontSize:"20px",fontWeight:600}} className="user-discoveries-table-header">Date Created</TableHeaderColumn>
                     <TableHeaderColumn></TableHeaderColumn>
                   </TableRow>
                 </TableHeader>

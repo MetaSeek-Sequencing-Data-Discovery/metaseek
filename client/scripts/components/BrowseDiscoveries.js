@@ -47,8 +47,8 @@ var BrowseDiscoveries = React.createClass({
               <Table bodyStyle={{overflowX: 'scroll', width:'100%' }} fixedHeader={false} fixedFooter={false} selectable={false} style={{'tableLayout':'auto'}}>
                 <TableHeader adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
                   <TableRow selectable={false}>
-                    <TableHeaderColumn>Discovery Title</TableHeaderColumn>
-                    <TableHeaderColumn>Date Created</TableHeaderColumn>
+                    <TableHeaderColumn style={{color:"#fff",fontFamily:"Roboto",fontSize:"20px",fontWeight:600}}>Discovery Title</TableHeaderColumn>
+                    <TableHeaderColumn style={{color:"#fff",fontFamily:"Roboto",fontSize:"20px",fontWeight:600}}>Date Created</TableHeaderColumn>
                     <TableHeaderColumn></TableHeaderColumn>
                   </TableRow>
                 </TableHeader>
