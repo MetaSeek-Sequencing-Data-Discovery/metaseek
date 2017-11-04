@@ -66,7 +66,7 @@ def getMapBins(map_counts, num_bins): #e.g. latlon_map[0]
     fillColors = []
     for ix in xrange(0,num_bins):
         #the 255*0.8 is the max opacity
-        fillColors.append([31, 179, 128, (255*0.8)*(ix/float(num_bins-1))])
+        fillColors.append([66, 91, 161, (255*0.8)*(ix/float(num_bins-1))])
     return percentiles, countRanges, fillColors
 
 # Create the actual data to power our map overlay

@@ -26,7 +26,7 @@ var Header = React.createClass({
   render : function() {
     return (
     <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
-      <Toolbar>
+      <Toolbar className="header-root">
         <ToolbarGroup className="header-logo">
           <Link to='/' className="button-logo-link">
             <img src="../images/logo.png" width="36px" height="36px"/>
