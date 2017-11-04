@@ -357,17 +357,50 @@ class BuildCaches(Resource):
             '{"rules":[{"field":"library_source","type":5,"value":"genomic"}]}',
             '{"rules":[{"field":"library_source","type":5,"value":"transcriptomic"}]}',
             '{"rules":[{"field":"library_source","type":5,"value":"metagenomic"}]}',
+            '{"rules":[{"field":"library_source","type":5,"value":"metatranscriptomic"}]}',
+            '{"rules":[{"field":"library_source","type":5,"value":"synthetic"}]}',
+            '{"rules":[{"field":"library_source","type":5,"value":"viral rna"}]}',
+
             '{"rules":[{"field":"investigation_type","type":5,"value":"metagenome"}]}',
+            '{"rules":[{"field":"investigation_type","type":5,"value":"bacteria_archaea"}]}',
+            '{"rules":[{"field":"investigation_type","type":5,"value":"eukaryote"}]}',
+            '{"rules":[{"field":"investigation_type","type":5,"value":"mimarks-survey"}]}',
+            '{"rules":[{"field":"investigation_type","type":5,"value":"mimarks-culture"}]}',
+            '{"rules":[{"field":"investigation_type","type":5,"value":"virus"}]}',
+
+            '{"rules":[{"field":"env_package","type":5,"value":"sediment"}]}',
+            '{"rules":[{"field":"env_package","type":5,"value":"soil"}]}',
+            '{"rules":[{"field":"env_package","type":5,"value":"water"}]}',
+            '{"rules":[{"field":"env_package","type":5,"value":"plant-associated"}]}',
+            '{"rules":[{"field":"env_package","type":5,"value":"host-associated"}]}',
+            '{"rules":[{"field":"env_package","type":5,"value":"built environment"}]}',
+            '{"rules":[{"field":"env_package","type":5,"value":"human-associated"}]}',
+            '{"rules":[{"field":"env_package","type":5,"value":"human-gut"}]}',
+            '{"rules":[{"field":"env_package","type":5,"value":"human-skin"}]}',
+
             '{"rules":[{"field":"study_type","type":5,"value":"Other"}]}',
             '{"rules":[{"field":"study_type","type":5,"value":"Whole Genome Sequencing"}]}',
             '{"rules":[{"field":"study_type","type":5,"value":"Transcriptome Analysis"}]}',
             '{"rules":[{"field":"study_type","type":5,"value":"Metagenomics"}]}',
             '{"rules":[{"field":"study_type","type":5,"value":"Population Genomics"}]}',
-            '{"rules":[{"field":"study_type","type":5,"value":"Other"},{"field":"library_source","type":5,"value":"genomic"}]}',
+
+            '{"rules":[{"field":"investigation_type","type":5,"value":"bacteria_archaea"},{"field":"library_source","type":5,"value":"genomic"}]}',
             '{"rules":[{"field":"study_type","type":5,"value":"Whole Genome Sequencing"},{"field":"library_source","type":5,"value":"genomic"}]}',
             '{"rules":[{"field":"study_type","type":5,"value":"Transcriptome Analysis"},{"field":"library_source","type":5,"value":"transcriptomic"}]}',
-            '{"rules":[{"field":"study_type","type":5,"value":"Other"},{"field":"library_source","type":5,"value":"metagenomic"}]}',
-            '{"rules":[{"field":"study_type","type":5,"value":"Metagenomics"},{"field":"library_source","type":5,"value":"metagenomic"}]}'
+            '{"rules":[{"field":"study_type","type":5,"value":"Metagenomics"},{"field":"library_source","type":5,"value":"metagenomic"}]}',
+            '{"rules":[{"field":"investigation_type","type":5,"value":"metagenome"},{"field":"library_source","type":5,"value":"metagenomic"}]}',
+
+            '{"rules":[{"field":"library_strategy","type":5,"value":"WGS"}]}',
+            '{"rules":[{"field":"library_strategy","type":5,"value":"AMPLICON"}]}',
+            '{"rules":[{"field":"library_strategy","type":5,"value":"RNA-Seq"}]}',
+
+            '{"rules":[{"field":"library_screening_strategy","type":5,"value":"RANDOM"}]}',
+            '{"rules":[{"field":"library_screening_strategy","type":5,"value":"PCR"}]}',
+            '{"rules":[{"field":"library_screening_strategy","type":5,"value":"cDNA"}]}',
+
+            '{"rules":[{"field":"sequencing_method","type":5,"value":"illumina"}]}',
+            '{"rules":[{"field":"sequencing_method","type":5,"value":"ls454"}]}'
+
         ]
 
         results = {}
