@@ -28,10 +28,9 @@
 .subscribe-form-label {
   color: $white;
   line-height: 150%;
-  font-family: 'Roboto';
+  font-family: 'Roboto', Helvetica, sans-serif;
   font-size: 16px;
   margin-top: 48px;
-  font-weight: 500;
 }
 
 .subscribe-reqd {
@@ -61,10 +60,11 @@
   font-size: 16px;
   font-family: 'Roboto', Arial, sans-serif;
   height: 42px;
-  margin: 12px 5px 12px 0;
+  margin: 12px auto;
   padding: 0 22px;
   border: 0;
   border-radius: 3px;
+  display: block;
 }
 
 .welcome-features {
@@ -78,6 +78,10 @@
   margin: 25px 50px;
   display: inline-block;
   vertical-align: top;
+}
+
+.feature-block img {
+  width: 256px;
 }
 
 .feature-block-title {
@@ -106,6 +110,7 @@
 .welcome-how-subheader {
   color: $white;
   margin: 10px 10%;
+  line-height: 1.4em;
 }
 
 .welcome-how-graphic {
@@ -131,6 +136,7 @@
   color: $white;
   margin: 0 10% 0 36px;
   font-size: 18px;
+  line-height: 1.4em;
 }
 
 .welcome-announce {
@@ -185,4 +191,108 @@ button.github, input[type=submit].github {
 
 button.github:after, input[type=submit].github:after {
   background: #5cc437
+}
+
+@media (max-width: 1210px) {
+  .feature-block {
+    width: 256px;
+    margin: 25px 25px;
+  }
+
+  .feature-block img {
+    width: 200px;
+  }
+
+  .feature-block-title {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 920px) {
+  .feature-block {
+    width: 60%;
+    margin: 0px 0px;
+  }
+
+  .feature-block img {
+    width: 300px;
+  }
+
+  .feature-block-title, .welcome-how-header, .welcome-how-explain-header {
+    font-size: 46px;
+  }
+
+  .feature-block-body, .welcome-how-subheader, .welcome-how-explain-subheader {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 769px) {
+  .feature-block {
+    width: 75%;
+  }
+
+  .feature-block img {
+    width: 256px;
+  }
+
+  .feature-block-title, .welcome-how-header, .welcome-how-explain-header {
+    font-size: 36px;
+  }
+
+  .feature-block-body, .welcome-how-subheader, .welcome-how-explain-subheader {
+    font-size: 18px;
+  }
+
+  .welcome-first {
+    height:100%;
+  }
+
+  .welcome-text {
+    padding: 36px 0 0 0;
+    font-size: 18px;
+    width:80%;
+    margin: 0 auto;
+  }
+
+  .welcome-title {
+    font-size: 36px;
+    font-weight: 500;
+    padding: 36px 0 0px 0;
+  }
+
+  .subscribe-form-label {
+    font-size: 18px;
+    margin-top: 36px;
+    width:75%;
+    margin: 36px auto 18px;
+    font-weight: 300;
+  }
+
+  .subscribe-reqd {
+    color: $accent;
+    font-size: 20px;
+  }
+
+  .subscribe-table {
+    width: 400px;
+    display: inline-block;
+    text-align: left;
+  }
+  .subscribe-button {
+    margin-bottom:36px;
+  }
+  .welcome-how-graphic {
+    width: 100%;
+    margin: 0 auto 36px;
+  }
+}
+
+@media (max-width: 500px) {
+  .feature-block {
+    width: 88%;
+  }
+  .subscribe-table {
+    width:88%;
+  }
 }
