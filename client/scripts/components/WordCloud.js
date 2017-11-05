@@ -18,11 +18,12 @@ var WordCloud = React.createClass({
     // var colors = ['#a6bddb','#67a9cf','#3690c0','#02818a','#016450'];
 
     var colors = [
-      "#6369E0",
-      "#F79C6F",
-      "#F2C160",
-      "#23BEC6",
-      "#f26f63"
+      "#516DBB",
+      "#7188C7",
+      "#24C991",
+      "#1fb380",
+      "#1A9C6E",
+      "#16825C"
     ];
 
     // Min / max font sizes in pixels for words in word cloud

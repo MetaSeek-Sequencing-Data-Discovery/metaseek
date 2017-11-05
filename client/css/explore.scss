@@ -202,6 +202,10 @@
   float: left;
 }
 
+.collapsible-container {
+  background: $accentLight;
+}
+
 .explore-headline {
   margin: 0 0 18px 18px;
   position: relative;
@@ -325,6 +329,9 @@
   padding-right: 12px;
 }
 
+.table-header {
+  background-color: $accent;
+}
 
 .range-slider {
   margin-top: 15px;

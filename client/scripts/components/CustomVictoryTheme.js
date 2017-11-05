@@ -4,16 +4,14 @@ import { assign } from "lodash";
 // * Colors
 // *
 const colors = [
-  "#6369E0",
-  "#8387E6",
-  "#A3A5EC",
-  "#C3C3F2",
-  "#D3D2F5",
-  "#E3E1F8",
-  "#F3F0FB"
+  "#1fb380",
+  "#7188C7",
+  "#B7D155",
+  "#AB7EC9",
+  "#E53872"
 ];
 
-const charcoal = "#6369E0";
+const charcoal = "#1fb380";
 
 // Typography
 const sansSerif = "'Roboto','sans-serif'";
@@ -24,8 +22,7 @@ const fontSize = 14;
 // *
 const baseProps = {
   width: 360,
-  height: 360,
-  padding: 18,
+  height: 320,
   colorScale: colors
 };
 // *
@@ -47,7 +44,7 @@ const centeredLabelStyles = assign({ textAnchor: "middle" }, baseLabelStyles);
 const strokeLinecap = "round";
 const strokeLinejoin = "round";
 
-export default {
+export default {metaseek : {
   area: assign({
     style: {
       data: {
@@ -138,9 +135,8 @@ export default {
       labels: assign({}, baseLabelStyles, { padding: 20 })
     },
     colorScale: colors,
-    width: 400,
-    height: 400,
-    padding: 50
+    width: 360,
+    height: 320
   },
   scatter: assign({
     style: {
@@ -191,4 +187,4 @@ export default {
       labels: baseLabelStyles
     }
   }
-};
+}};

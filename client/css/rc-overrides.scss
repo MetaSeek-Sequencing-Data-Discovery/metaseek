@@ -10,18 +10,18 @@
   -ms-touch-action: none;
   touch-action: none;
   box-sizing: border-box;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: $cloud7;
 }
 
 .rc-slider * {
   box-sizing: border-box;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: $cloud7;
 }
 
 .rc-slider-rail {
   position: absolute;
   width: 100%;
-  background-color: #D1D2FA;
+  background-color: $accentMedium;
   height: 4px;
   border-radius: 6px;
 }
@@ -31,7 +31,7 @@
   left: 0;
   height: 4px;
   border-radius: 6px;
-  background-color: #6369E0;
+  background-color: $accent;
 }
 
 .rc-slider-handle {
@@ -44,19 +44,19 @@
   cursor: -webkit-grab;
   cursor: grab;
   border-radius: 50%;
-  border: solid 2px #6369E0;
+  border: solid 2px $accent;
   background-color: #fff;
   -ms-touch-action: pan-x;
   touch-action: pan-x;
 }
 
 .rc-slider-handle:hover {
-  border-color: #B1B2F6;
+  border-color: $accentMedium;
 }
 
 .rc-slider-handle:active {
-  border-color: #B1B2F6;
-  box-shadow: 0 0 5px #B1B2F6;
+  border-color: $accentMedium;
+  box-shadow: 0 0 5px $accentMedium;
   cursor: -webkit-grabbing;
   cursor: grabbing;
 }
@@ -75,7 +75,7 @@
   vertical-align: middle;
   text-align: center;
   cursor: pointer;
-  color: #999;
+  color: $cloud6;
 }
 
 .rc-slider-mark-text-active {
@@ -95,7 +95,7 @@
   margin-left: -4px;
   width: 8px;
   height: 8px;
-  border: 2px solid #e9e9e9;
+  border: 2px solid $cloud4;
   background-color: #fff;
   cursor: pointer;
   border-radius: 50%;
@@ -111,19 +111,19 @@
 }
 
 .rc-slider-dot-active {
-  border-color: #B1B2F6;
+  border-color: $accent;
 }
 
 .rc-slider-disabled {
-  background-color: #e9e9e9;
+  background-color: $cloud3;
 }
 
 .rc-slider-disabled .rc-slider-track {
-  background-color: #ccc;
+  background-color: $cloud4;
 }
 
 .rc-slider-disabled .rc-slider-handle, .rc-slider-disabled .rc-slider-dot {
-  border-color: #ccc;
+  border-color: $cloud4;
   box-shadow: none;
   background-color: #fff;
   cursor: not-allowed;
@@ -297,12 +297,12 @@
   top: -9999px;
   visibility: visible;
   box-sizing: border-box;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: $cloud7;
 }
 
 .rc-slider-tooltip * {
   box-sizing: border-box;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: $cloud7;
 }
 
 .rc-slider-tooltip-hidden {
@@ -322,9 +322,9 @@
   color: #fff;
   text-align: center;
   text-decoration: none;
-  background-color: #D0D0D7;
+  background-color: $cloud4;
   border-radius: 6px;
-  box-shadow: 0 0 4px #9A99A6;
+  box-shadow: 0 0 4px $cloud6;
 }
 
 .rc-slider-tooltip-arrow {
@@ -340,7 +340,7 @@
   left: 50%;
   margin-left: -4px;
   border-width: 4px 4px 0;
-  border-top-color: #6c6c6c;
+  border-top-color: $cloud7;
 }
 
 
@@ -357,7 +357,7 @@
 }
 
 .Select.is-disabled>.Select-control {
-  background-color: #f9f9f9;
+  background-color: $cloud2;
 }
 
 .Select.is-disabled>.Select-control:hover {
@@ -372,10 +372,10 @@
 
 .Select-control {
   background-color: #fff;
-  border-color: #d9d9d9 #ccc #b3b3b3;
+  border-color: $cloud5 $cloud4 $cloud7;
   border-radius: 4px;
-  border: 1px solid #ccc;
-  color: #333;
+  border: 1px solid $cloud4;
+  color: $cloud10;
   cursor: default;
   display: table;
   border-spacing: 0;
@@ -388,7 +388,7 @@
 }
 
 .Select-control:hover {
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 0 $cloud7;
 }
 
 .Select-control .Select-input:focus {
@@ -403,12 +403,12 @@
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
   background: #fff;
-  border-color: #b3b3b3 #ccc #d9d9d9;
+  border-color: $cloud7 $cloud4 $cloud5;
 }
 
 .is-open>.Select-control .Select-arrow {
   top: -2px;
-  border-color: transparent transparent #999;
+  border-color: transparent transparent $cloud7;
   border-width: 0 5px 5px;
 }
 
@@ -417,13 +417,13 @@
 }
 
 .is-focused:not(.is-open)>.Select-control {
-  border-color: #8387E6;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 0 3px rgba(49, 56, 214, 0.8);
+  border-color: $accentLight;
+  box-shadow: inset 0 1px 1px $cloud8, 0 0 0 3px $accent;
 }
 
 .Select-placeholder, .Select--single>.Select-control .Select-value {
   bottom: 0;
-  color: #aaa;
+  color: $cloud4;
   left: 0;
   line-height: 34px;
   padding-left: 10px;
@@ -438,7 +438,7 @@
 }
 
 .has-value.Select--single>.Select-control .Select-value .Select-value-label, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value .Select-value-label {
-  color: #333;
+  color: $cloud10;
 }
 
 .has-value.Select--single>.Select-control .Select-value a.Select-value-label, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value a.Select-value-label {
@@ -447,7 +447,7 @@
 }
 
 .has-value.Select--single>.Select-control .Select-value a.Select-value-label:hover, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value a.Select-value-label:hover, .has-value.Select--single>.Select-control .Select-value a.Select-value-label:focus, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value a.Select-value-label:focus {
-  color: #6369E0;
+  color: $accent;
   outline: none;
   text-decoration: underline;
 }
@@ -506,7 +506,7 @@
   height: 16px;
   box-sizing: border-box;
   border-radius: 50%;
-  border: 2px solid #ccc;
+  border: 2px solid $cloud3;
   border-right-color: #333;
   display: inline-block;
   position: relative;
@@ -517,7 +517,7 @@
   -webkit-animation: Select-animation-fadeIn 200ms;
   -o-animation: Select-animation-fadeIn 200ms;
   animation: Select-animation-fadeIn 200ms;
-  color: #999;
+  color: $cloud5;
   cursor: pointer;
   display: table-cell;
   position: relative;
@@ -527,7 +527,7 @@
 }
 
 .Select-clear-zone:hover {
-  color: #FD9981;
+  color: $light;
 }
 
 .Select-clear {
@@ -551,7 +551,7 @@
 }
 
 .Select-arrow {
-  border-color: #999 transparent transparent;
+  border-color: $cloud5 transparent transparent;
   border-style: solid;
   border-width: 5px 5px 2.5px;
   display: inline-block;
@@ -600,9 +600,9 @@
   border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
   background-color: #fff;
-  border: 1px solid #ccc;
-  border-top-color: #e6e6e6;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid $cloud5;
+  border-top-color: $cloud4;
+  box-shadow: 0 1px 0 $cloud8;
   box-sizing: border-box;
   margin-top: -1px;
   max-height: 200px;
@@ -621,7 +621,7 @@
 .Select-option {
   box-sizing: border-box;
   background-color: #fff;
-  color: #666666;
+  color: $cloud7;
   cursor: pointer;
   display: block;
   padding: 8px 10px;
@@ -633,27 +633,27 @@
 }
 
 .Select-option.is-selected {
-  background-color: #E9EAFD;
+  background-color: $accentLight;
   /* Fallback color for IE 8 */
-  background-color: rgba(233, 234, 253, 0.04);
-  color: #333;
+  background-color: $cloud7;
+  color: $cloud10;
 }
 
 .Select-option.is-focused {
-  background-color: #E9EAFD;
+  background-color: $accentLight;
   /* Fallback color for IE 8 */
-  background-color: rgba(233, 234, 253, 0.5);
+  background-color: $cloud6;
   color: #333;
 }
 
 .Select-option.is-disabled {
-  color: #cccccc;
+  color: $cloud5;
   cursor: default;
 }
 
 .Select-noresults {
   box-sizing: border-box;
-  color: #999999;
+  color: $cloud6;
   cursor: default;
   display: block;
   padding: 8px 10px;
@@ -670,14 +670,14 @@
 }
 
 .Select--multi .Select-value {
-  background-color: #E1E2FC;
+  background-color: $accentLight;
   /* Fallback color for IE 8 */
-  background-color: rgba(233, 234, 253, 0.5);
+  background-color: $cloud4;
   border-radius: 2px;
-  border: 1px solid #B1B2F6;
+  border: 1px solid $accent;
   /* Fallback color for IE 8 */
-  border: 1px solid rgba(177, 178, 246, 0.8);
-  color: #6369E0;
+  border: 1px solid $accent;
+  color: $accentDark;
   display: inline-block;
   font-size: 0.9em;
   line-height: 1.4;
@@ -699,7 +699,7 @@
 }
 
 .Select--multi a.Select-value-label {
-  color: #8387E6;
+  color: $accent;
   cursor: pointer;
   text-decoration: none;
 }
@@ -712,38 +712,38 @@
   cursor: pointer;
   border-bottom-left-radius: 2px;
   border-top-left-radius: 2px;
-  border-right: 1px solid #B1B2F6;
+  border-right: 1px solid $accent;
   /* Fallback color for IE 8 */
-  border-right: 1px solid rgba(177, 178, 246, 0.8);
+  border-right: 1px solid $accent;
   padding: 1px 5px 3px;
 }
 
 .Select--multi .Select-value-icon:hover, .Select--multi .Select-value-icon:focus {
-  background-color: #E9EAFD;
+  background-color: $accentLight;
   /* Fallback color for IE 8 */
-  background-color: rgba(255, 255, 255, 0);
-  color: #B1B2F6;
+  background-color: $cloud10;
+  color: $accent;
 }
 
 .Select--multi .Select-value-icon:active {
-  background-color: #E9EAFD;
+  background-color: $accentLight;
   /* Fallback color for IE 8 */
-  background-color: rgba(255, 255, 255, 0);
+  background-color: $cloud10;
 }
 
 .Select--multi.is-disabled .Select-value {
-  background-color: #fcfcfc;
-  border: 1px solid #e3e3e3;
-  color: #333;
+  background-color: $accentLight;
+  border: 1px solid $cloud3;
+  color: $cloud10;
 }
 
 .Select--multi.is-disabled .Select-value-icon {
   cursor: not-allowed;
-  border-right: 1px solid #e3e3e3;
+  border-right: 1px solid $cloud3;
 }
 
 .Select--multi.is-disabled .Select-value-icon:hover, .Select--multi.is-disabled .Select-value-icon:focus, .Select--multi.is-disabled .Select-value-icon:active {
-  background-color: #fcfcfc;
+  background-color: $cloud2;
 }
 
 @keyframes Select-animation-spin {
@@ -765,7 +765,7 @@
 
 .Collapsible__contentInner {
   padding: 10px;
-  border: 1px solid #ebebeb;
+  border: 1px solid $cloud3;
   border-top: 0;
 }
 
@@ -786,8 +786,8 @@
   position: relative;
   border: 1px solid white;
   padding: 10px;
-  background: #E9EAFD;
-  color: #666666;
+  background: $accentLight;
+  color: $cloud9;
 }
 
 .Collapsible__trigger:after {
@@ -799,7 +799,7 @@
   height: 0;
   border-style: solid;
   border-width: 8px 8px 0 8px;
-  border-color: #838291 transparent transparent transparent;
+  border-color: $cloud6 transparent transparent transparent;
   display: block;
   transition: transform 300ms;
 }
@@ -810,15 +810,15 @@
 
 .Collapsible__trigger.is-disabled {
   opacity: 0.5;
-  background-color: grey;
+  background-color: $cloud6;
 }
 
 
 .CustomTriggerCSS {
-  background-color: lightcoral;
+  background-color: $lightest;
   transition: background-color 200ms ease;
 }
 
 .CustomTriggerCSS--open {
-  background-color: #B3B4EF;
+  background-color: $accent;
 }

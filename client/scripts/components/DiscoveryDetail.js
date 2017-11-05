@@ -124,7 +124,7 @@ var DiscoveryDetail = React.createClass({
                     <span className="filterparam-table-title">Filter Parameters</span>
                     <div className="discovery-filterparam-table-container">
                       <Table className="filterparam-table" bodyStyle={{overflowX: 'scroll'}} fixedHeader={false} fixedFooter={false} selectable={false} style={{'tableLayout':'auto', 'overflow':'visible'}}>
-                        <TableHeader style={{backgroundColor:'#7075E0'}} adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
+                        <TableHeader className="discovery-filterparam-table-header" adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
                           <TableRow selectable={false}>
                             <TableHeaderColumn style={tableHeaderStyles}>Field</TableHeaderColumn>
                             <TableHeaderColumn style={tableHeaderStyles}>Filter Type</TableHeaderColumn>

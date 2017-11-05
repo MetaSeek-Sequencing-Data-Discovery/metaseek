@@ -26,7 +26,7 @@ var Header = React.createClass({
   render : function() {
     return (
     <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
-      <Toolbar>
+      <Toolbar className="header-root" style={{backgroundColor:ColorPalette.palette.accent1Color,padding:'0 0 0 24px'}}>
         <ToolbarGroup className="header-logo">
           <Link to='/' className="button-logo-link">
             <img src="../images/logo.png" width="36px" height="36px"/>
@@ -49,7 +49,7 @@ var Header = React.createClass({
               label="Browse"
             />
           </Link>
-          <RaisedButton
+          <RaisedButton className="feedback-button"
             label="send feedback!"
             primary={true}
             href="https://www.surveymonkey.com/r/HDT27Y8"

@@ -17,6 +17,7 @@ import MapLegend from './MapLegend';
 import BPTheme from './CustomVictoryTheme_BP';
 import TurquoiseTheme from './CustomVictoryTheme_turquoise';
 import YellowTheme from './CustomVictoryTheme_Y';
+import VictoryTheme from './CustomVictoryTheme';
 
 
 
@@ -101,7 +102,7 @@ var VizDashboard = React.createClass({
               })}
             </SelectField>
           </div>
-          <HistogramVictory activeSummaryData={this.props.activeSummaryData} histinput={this.state.generalinfo_histinput} colortheme={TurquoiseTheme.metaseek} width={530} height={320}/>
+          <HistogramVictory activeSummaryData={this.props.activeSummaryData} histinput={this.state.generalinfo_histinput} colortheme={VictoryTheme.metaseek} width={530} height={320}/>
         </div>;
 
     const geninfo_radarcomponent =
@@ -128,7 +129,7 @@ var VizDashboard = React.createClass({
             })}
           </SelectField>
         </div>
-        <RadarChart activeSummaryData={this.props.activeSummaryData} radarinput={this.state.generalinfo_radarinput} colortheme={TurquoiseTheme.metaseek} height={160} width={220}/>
+        <RadarChart activeSummaryData={this.props.activeSummaryData} radarinput={this.state.generalinfo_radarinput} colortheme={VictoryTheme.metaseek} height={160} width={220}/>
       </div>;
 
     const libconst_component =
@@ -140,7 +141,7 @@ var VizDashboard = React.createClass({
           </IconButton>
           <br/>
         </div>
-        <PieVictory activeSummaryData={this.props.activeSummaryData} pieinput="library_construction_method_summary" colortheme={YellowTheme.metaseek}/>
+        <PieVictory activeSummaryData={this.props.activeSummaryData} pieinput="library_construction_method_summary" colortheme={VictoryTheme.metaseek}/>
       </div>;
 
     const seqinfo_histcomponent =
@@ -167,7 +168,7 @@ var VizDashboard = React.createClass({
             })}
           </SelectField>
         </div>
-        <HistogramVictory activeSummaryData={this.props.activeSummaryData} histinput={this.state.seqinfo_histinput} colortheme={YellowTheme.metaseek} width={714} height={320}/>
+        <HistogramVictory activeSummaryData={this.props.activeSummaryData} histinput={this.state.seqinfo_histinput} colortheme={VictoryTheme.metaseek} width={714} height={320}/>
       </div>;
 
     const map_component =
@@ -209,7 +210,7 @@ var VizDashboard = React.createClass({
             })}
           </SelectField>
         </div>
-        <AreaChart activeSummaryData={this.props.activeSummaryData} areainput={this.state.seqinfo_areainput} colortheme={YellowTheme.metaseek}/>
+        <AreaChart activeSummaryData={this.props.activeSummaryData} areainput={this.state.seqinfo_areainput} colortheme={VictoryTheme.metaseek}/>
       </div>;
 
     const envinfo_wordcloudcomponent =
