@@ -148,7 +148,7 @@ var Welcome = React.createClass({
               </div>
             </div>
             <div className="welcome-footer">
-              <h4>Follow our progress on GitHub, or run your own install of MetaSeek:
+              <h4>Follow our progress on GitHub, or better yet, contribute!
               </h4>
               <a className="github-button" href="https://github.com/ahoarfrost/metaseek/subscription" data-style="mega" data-count-href="/ahoarfrost/metaseek/watchers" data-count-api="/repos/ahoarfrost/metaseek#subscribers_count" data-count-aria-label="# watchers on GitHub" aria-label="Watch ahoarfrost/metaseek on GitHub">Watch</a>
             </div>
