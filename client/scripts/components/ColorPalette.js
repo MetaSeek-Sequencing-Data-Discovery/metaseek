@@ -21,5 +21,8 @@ exports.default = {
     pickerHeaderColor: "#1A9C6E", // $default
     clockCircleColor: "#F6F6F6",  // $cloud2
     shadowColor: "#3c3c3c" // $cloud10
+  },
+  tooltip: {
+    rippleBackgroundColor: "#FFF"
   }
 };

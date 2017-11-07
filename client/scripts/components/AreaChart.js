@@ -33,7 +33,6 @@ var AreaChart = React.createClass({
       */
     var activeFieldSorted = activeFieldDataValidKeys.sort()
     // Format data the way VictoryChart / VictoryArea wants it
-    console.log(activeFieldSorted);
     var chartData = activeFieldSorted.map(
       function(value,index) {
         var count = activeFieldData[value];
@@ -49,12 +48,10 @@ var AreaChart = React.createClass({
         return {"x":Number(index+0.5),"count":count,"label":newfield + " : " + count};
       }
     );
-    console.log(chartData);
 
     var chartLabels = chartData.map(function(value, index) {
         var low = value.label.split(" :")[0].split("-")[0];
         var high = value.label.split(" :")[0].split("-")[1];
-        console.log(low, high, index);
         if (low.startsWith(">")) {
           if (Math.floor(Math.log10(parseFloat(low.split("> ")[1])))>3) {
             var power = Math.floor(Math.log10(parseFloat(low.split("> ")[1])));
@@ -79,7 +76,6 @@ var AreaChart = React.createClass({
       }
     );
     //var flatChartLabels = [].concat(...chartLabels);
-    console.log(chartLabels);
 
     var areawidth = 530;
 
