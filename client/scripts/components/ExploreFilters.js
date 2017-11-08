@@ -394,7 +394,8 @@ var ExploreFilters = React.createClass({
                   </IconButton>
                 </div>
                 <ChipInput
-                  hintText={"Press enter to generate tags. Click outside the box to search MetaSeek"}
+                  hintText={"Press enter to create tags, and find datasets that contain any tag's text."}
+                  hintStyle={{"color":"#B3B3B3"}}
                   onChange={this.handleChipBlur.bind(this,"env_biome","env_biome",7,this.state.chipStates.env_biome)}
                 />
                 <div>
