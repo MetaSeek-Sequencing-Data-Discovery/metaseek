@@ -5,23 +5,17 @@ const Range = Slider.createSliderWithTooltip(Slider.Range);
 
 var RangeSlider = React.createClass({
   getInitialState : function() {
-    return {
-      "minSlider":this.props.minValue,
-      "maxSlider":this.props.maxValue
-    }
+    return {}
   },
 
   handleValues : function(value) {
-    this.setState({"minSlider": value[0]});
-    this.setState({"maxSlider": value[1]});
+    this.props.updateRangeValues(this.props.filterMin, this.props.filterMax, value[0], value[1]);
   },
 
-  handleStop : function(filterMin,filterMax,field,filterTypeMin,filterTypeMax,value) {
-    this.props.handleFilterChange(filterMin, field, filterTypeMin, event, null, value.minSlider);
-    this.props.handleFilterChange(filterMax, field, filterTypeMax, event, null, value.maxSlider);
+  handleStop : function(filterMin,filterMax,field,filterTypeMin,filterTypeMax, min, max, minValue, maxValue) {
+    this.props.handleNumericFilterChange(filterMin, field, filterTypeMin, min, event, null, minValue);
+    this.props.handleNumericFilterChange(filterMax, field, filterTypeMax, max, event, null, maxValue);
   },
-
-
 
   render : function() {
     var {field, filterMin, filterMax, filterTypeMin, filterTypeMax, min, max, minValue, maxValue, handleFilterChange, ...other} = this.props;
@@ -31,10 +25,10 @@ var RangeSlider = React.createClass({
           min={this.props.min}
           max={this.props.max}
           defaultValue={[this.props.minValue,this.props.maxValue]}
-          value={[this.state.minSlider,this.state.maxSlider]}
+          value={[this.props.minValue,this.props.maxValue]}
           allowCross={false}
           onChange={this.handleValues}
-          onAfterChange={this.handleStop.bind(this,this.props.filterMin,this.props.filterMax,this.props.field,this.props.filterTypeMin,this.props.filterTypeMax,this.state)}
+          onAfterChange={this.handleStop.bind(this,this.props.filterMin,this.props.filterMax,this.props.field,this.props.filterTypeMin,this.props.filterTypeMax, this.props.min, this.props.max, this.props.minValue, this.props.maxValue)}
           {...other}
         />
       </div>

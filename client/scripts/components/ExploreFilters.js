@@ -54,10 +54,10 @@ var ExploreFilters = React.createClass({
         "sequencing_method":[],
         "instrument_model":[],
         "libRdsSqdMin":{
-          "value":0
+          "value":"0"
         },
         "libRdsSqdMax":{
-          "value":10000000000
+          "value":">1e9"
         },
         "totBasesMin":{
           "value":0
@@ -66,10 +66,10 @@ var ExploreFilters = React.createClass({
           "value":1000000000000
         },
         "avgRdLgthMin":{
-          "value":0
+          "value":"0"
         },
         "avgRdLgthMax":{
-          "value":30000
+          "value":">1000"
         },
         "gcPercentMin":{
           "value":0
@@ -102,6 +102,32 @@ var ExploreFilters = React.createClass({
       "env_material":[],
       "geo_loc_name":[]
     },
+    "rangeStates" : {
+      "libRdsSqdMin":{
+        "value":0
+      },
+      "libRdsSqdMax":{
+        "value":10
+      },
+      "avgRdLgthMin":{
+        "value":0
+      },
+      "avgRdLgthMax":{
+        "value":11
+      },
+      "latitudeMin":{
+        "value":-90
+      },
+      "latitudeMax":{
+        "value":90
+      },
+      "longitudeMin":{
+        "value":-180
+      },
+      "longitudeMax":{
+        "value":180
+      },
+    },
     "open": true
   }
 },
@@ -123,19 +149,19 @@ var ExploreFilters = React.createClass({
     this.props.updateFilterParams(this.state.filterStates);
   },
 
-  handleNumericFilterChange : function(filterName, field, filterType, event, index, value) {
+  handleNumericFilterChange : function(filterName, field, filterType, extreme, event, index, value) {
     //this will only add filter to filterStates if is not the min or max value (for e.g. )
-    if (!isNaN(value)) {
+    if (value==extreme) {
+      this.state.filterStates[filterName] = {value: extreme};
+      this.setState(this.state);
+      this.props.updateFilterParams(this.state.filterStates);
+    } else {
       var newRule = {
         "field":field,
         "type":filterType,
         "value":value
       };
       this.state.filterStates[filterName] = newRule;
-      this.setState(this.state);
-      this.props.updateFilterParams(this.state.filterStates);
-    } else {
-      this.state.filterStates[filterName] = {"value":[]};
       this.setState(this.state);
       this.props.updateFilterParams(this.state.filterStates);
     }
@@ -189,6 +215,11 @@ var ExploreFilters = React.createClass({
   },
   clickawayFilters : function() {
     this.props.toggleFilters();
+  },
+  updateRangeValues : function(filterMin, filterMax, minValue, maxValue) {
+    this.state.rangeStates[filterMin] = {value: minValue};
+    this.state.rangeStates[filterMax] = {value: maxValue};
+    this.setState(this.state);
   },
 
   render : function() {
@@ -325,8 +356,8 @@ var ExploreFilters = React.createClass({
                 </div>
                 <ManualRangeSlider field="avg_read_length_maxrun" filterMin="avgRdLgthMin" filterMax="avgRdLgthMax"
                   filterTypeMin={4} filterTypeMax={3} min={0} max={11}
-                  minValue={this.state.filterStates.avgRdLgthMin.value} maxValue={this.state.filterStates.avgRdLgthMax.value}
-                  handleNumericFilterChange={this.handleNumericFilterChange}
+                  minValue={this.state.rangeStates.avgRdLgthMin.value} maxValue={this.state.rangeStates.avgRdLgthMax.value}
+                  handleNumericFilterChange={this.handleNumericFilterChange} updateRangeValues={this.updateRangeValues}
                   marks={{0:"0", 1:"100", 2:"200", 3:"300", 4:"400", 5:"500", 6:"600", 7:"700", 8:"800", 9:"900", 10:"1000", 11:">1000"}}
                 />
                 <div>
@@ -337,8 +368,8 @@ var ExploreFilters = React.createClass({
                 </div>
                 <ManualRangeSlider field="library_reads_sequenced_maxrun" filterMin="libRdsSqdMin" filterMax="libRdsSqdMax"
                   filterTypeMin={4} filterTypeMax={3} min={0} max={10}
-                  minValue={this.state.filterStates.libRdsSqdMin.value} maxValue={this.state.filterStates.libRdsSqdMax.value}
-                  handleNumericFilterChange={this.handleNumericFilterChange}
+                  minValue={this.state.rangeStates.libRdsSqdMin.value} maxValue={this.state.rangeStates.libRdsSqdMax.value}
+                  handleNumericFilterChange={this.handleNumericFilterChange} updateRangeValues={this.updateRangeValues}
                   marks={{0:"0", 1:"10", 2:"1e2", 3:"1e3", 4:"1e4", 5:"1e5", 6:"1e6", 7:"1e7", 8:"1e8", 9:"1e9", 10:">1e9"}}
                 />
               </Collapsible>
@@ -347,14 +378,14 @@ var ExploreFilters = React.createClass({
                 <h4>Latitude</h4>
                 <RangeSlider field="meta_latitude" filterMin="latitudeMin" filterMax="latitudeMax"
                   filterTypeMin={4} filterTypeMax={3} min={-90} max={90}
-                  minValue={this.state.filterStates.latitudeMin.value} maxValue={this.state.filterStates.latitudeMax.value}
-                  handleFilterChange={this.handleFilterChange}
+                  minValue={this.state.rangeStates.latitudeMin.value} maxValue={this.state.rangeStates.latitudeMax.value}
+                  handleNumericFilterChange={this.handleNumericFilterChange} updateRangeValues={this.updateRangeValues}
                 />
                 <h4>Longitude</h4>
                 <RangeSlider field="meta_longitude" filterMin="longitudeMin" filterMax="longitudeMax"
                   filterTypeMin={4} filterTypeMax={3} min={-180} max={180}
-                  minValue={this.state.filterStates.longitudeMin.value} maxValue={this.state.filterStates.longitudeMax.value}
-                  handleFilterChange={this.handleFilterChange}
+                  minValue={this.state.rangeStates.longitudeMin.value} maxValue={this.state.rangeStates.longitudeMax.value}
+                  handleNumericFilterChange={this.handleNumericFilterChange} updateRangeValues={this.updateRangeValues}
                 />
                 <div>
                   <h4 className="filter-field-with-help">Environmental Biome</h4>

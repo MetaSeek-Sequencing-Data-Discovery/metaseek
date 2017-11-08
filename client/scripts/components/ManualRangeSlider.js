@@ -6,24 +6,16 @@ const Range = Slider.createSliderWithTooltip(Slider.Range);
 var ManualRangeSlider = React.createClass({
   getInitialState : function() {
     return {
-      "minSlider":this.props.minValue,
-      "maxSlider":this.props.maxValue
     }
   },
 
   handleValues : function(value) {
-    this.setState({"minSlider": Number(value[0])});
-    this.setState({"maxSlider": Number(value[1])});
+    this.props.updateRangeValues(this.props.filterMin, this.props.filterMax, value[0], value[1]);
   },
 
-  handleStop : function(filterMin,filterMax,field,filterTypeMin,filterTypeMax,value) {
-    if (value.minSlider==Object.keys(this.props.marks)[0]) {
-      var mininput = "min";
-    } else {
-      var mininput = Number(Object.values(this.props.marks)[value.minSlider]);
-    }
-    this.props.handleNumericFilterChange(filterMin, field, filterTypeMin, event, null, Number(mininput));
-    this.props.handleNumericFilterChange(filterMax, field, filterTypeMax, event, null, Number(Object.values(this.props.marks)[value.maxSlider]));
+  handleStop : function(filterMin,filterMax,field,filterTypeMin,filterTypeMax, min, max, minValue, maxValue) {
+    this.props.handleNumericFilterChange(filterMin, field, filterTypeMin, this.props.marks[min], event, null, this.props.marks[minValue]);
+    this.props.handleNumericFilterChange(filterMax, field, filterTypeMax, this.props.marks[max], event, null, this.props.marks[maxValue]);
   },
 
   render : function() {
@@ -34,10 +26,10 @@ var ManualRangeSlider = React.createClass({
           min={this.props.min}
           max={this.props.max}
           defaultValue={[this.props.minValue,this.props.maxValue]}
-          value={[this.state.minSlider,this.state.maxSlider]}
+          value={[this.props.minValue,this.props.maxValue]}
           allowCross={false}
           onChange={this.handleValues}
-          onAfterChange={this.handleStop.bind(this,this.props.filterMin,this.props.filterMax,this.props.field,this.props.filterTypeMin,this.props.filterTypeMax,this.state)}
+          onAfterChange={this.handleStop.bind(this,this.props.filterMin,this.props.filterMax,this.props.field,this.props.filterTypeMin,this.props.filterTypeMax, this.props.min, this.props.max, this.props.minValue, this.props.maxValue)}
           {...other}
           tipFormatter={value => Object.values(this.props.marks)[value]}
         />
