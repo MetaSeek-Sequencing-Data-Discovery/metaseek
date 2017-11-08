@@ -46,11 +46,15 @@ body {
 
 .button-link {
   text-decoration: none;
-  margin: 10px auto;
 }
 
 .button-logo-link {
   text-decoration: none;
+  height:56px;
+}
+
+.button-logo-link img {
+  margin-top:8px;
 }
 
 .header-logo {
@@ -66,10 +70,6 @@ body {
 
 .header-buttons {
   width:560px;
-}
-
-.header-root {
-  background-color: $accent;
 }
 
 /* Typography */
@@ -122,4 +122,34 @@ ul {
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+@media (max-width: 769px) {
+  .header-buttons {
+    width:360px;
+    margin-right:24px;
+  }
+
+  .feedback-button {
+    display:none !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .header-logo-text {
+    display:none;
+  }
+}
+
+@media (max-width: 468px) {
+
+  .header-buttons {
+    width:288px;
+    margin-right:24px;
+  }
+
+  .button-link {
+    width:88px;
+    overflow-x:scroll;
+  }
 }
