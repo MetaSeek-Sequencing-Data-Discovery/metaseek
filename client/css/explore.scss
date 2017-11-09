@@ -303,6 +303,20 @@
   display:block;
 }
 
+.word-cloud-tooltip {
+  white-space: normal;
+  background-color: $white !important;
+  border-color: $default !important;
+  border-style: solid !important;
+  border-width: 1px !important;
+  border-radius: 5px !important;
+  padding: 4px 8px !important;
+}
+
+.word-cloud-tooltip::before {
+  border-top: 8px solid $default !important;
+}
+
 .pie-container {
   width: 360px;
   margin: 0 0 0 0;

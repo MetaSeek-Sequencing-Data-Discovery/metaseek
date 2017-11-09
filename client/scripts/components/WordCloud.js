@@ -77,6 +77,7 @@ var WordCloud = React.createClass({
               <ReactTooltip
                 id={activeField + '-tip-' + tag.value}
                 key={activeField + '-tip-' + tag.value}
+                className="word-cloud-tooltip"
                 place="top"
                 type="light"
                 effect="solid"
