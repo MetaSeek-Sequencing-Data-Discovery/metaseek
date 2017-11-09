@@ -103,7 +103,8 @@ class GetUserDiscoveries(Resource):
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
         'uri': fields.Url('getdiscovery', absolute=True),
-        'discovery_title': fields.String
+        'discovery_title': fields.String,
+        'num_datasets': fields.Integer
     }, envelope='discoveries')
 
     def get(self, id):
@@ -312,6 +313,7 @@ class GetAllDiscoveries(Resource):
         'timestamp':fields.DateTime(dt_format='rfc822'),
         'discovery_title':fields.String,
         'uri': fields.Url('getdiscovery', absolute=True),
+        'num_datasets': fields.Integer,
         'owner':fields.Nested({
             'firebase_id':fields.String,
             'uri':fields.Url('getuser', absolute=True)
