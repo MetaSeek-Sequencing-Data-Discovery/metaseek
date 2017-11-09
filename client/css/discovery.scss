@@ -47,7 +47,7 @@
 }
 .discovery-header-summary-left {
   margin: 0 18px 0 0;
-  width: 550px;
+  width: 480px;
   display: inline-block;
   vertical-align: top;
 }
@@ -57,7 +57,8 @@
   padding-top: 36px;
   display: inline-block;
   vertical-align: top;
-  width: 550px;
+  width: 480px;
+  float: right;
 }
 
 .discovery-header-first {
@@ -90,10 +91,11 @@
 
 .discovery-header-user {
   color: $cloud10;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 300;
   font-family: 'Roboto', sans-serif;
   display: block;
+  text-align: right;
 }
 
 .discovery-datasets-title-container {
