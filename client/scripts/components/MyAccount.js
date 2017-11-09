@@ -183,7 +183,7 @@ var MyAccount = React.createClass({
                   </TableRow>
                 </TableHeader>
                 <TableBody showRowHover={false} stripedRows={false} displayRowCheckbox={false} preScanRows={false}>
-                  {this.state.discoveries.map( (discovery, index) => (
+                  {this.state.discoveries.reverse().map( (discovery, index) => (
                     <TableRow selectable={false} key={index}>
                       <TableRowColumn style={{fontSize: "18px", width: "85%"}} >{discovery.discovery_title}</TableRowColumn>
                       <TableRowColumn>{discovery.timestamp.substr(5, 20)}</TableRowColumn>
