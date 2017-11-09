@@ -229,14 +229,16 @@ class Discovery(db.Model):
     filter_params = db.Column(db.Text)
     timestamp = db.Column(db.DateTime)
     discovery_title = db.Column(db.Text)
+    num_datasets = db.Column(db.Integer)
     discovery_description = db.Column(db.Text)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     owner = db.relationship('User',backref=db.backref('myDiscoveries',lazy='dynamic'))
 
-    def __init__(self, owner_id, filter_params, discovery_title, discovery_description=None, timestamp=None, ):
+    def __init__(self, owner_id, filter_params, discovery_title, num_datasets, discovery_description=None, timestamp=None, ):
         self.owner_id = owner_id
         self.filter_params = filter_params
         self.discovery_title = discovery_title
+        self.num_datasets = num_datasets
         self.discovery_description = discovery_description
         if timestamp is None:
             timestamp = datetime.utcnow()

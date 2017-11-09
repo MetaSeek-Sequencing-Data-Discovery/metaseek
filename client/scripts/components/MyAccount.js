@@ -83,7 +83,6 @@ var MyAccount = React.createClass({
       "firebase_name":self.state.firebase.name,
       "admin":0
     }).then(function(response){
-      console.log(response);
       if (response.data.user) {
           self.setState({"mailingListOpen": true});
       }

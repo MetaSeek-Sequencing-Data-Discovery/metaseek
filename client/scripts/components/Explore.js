@@ -182,7 +182,8 @@ var Explore = React.createClass({
       "owner_id":self.state.firebase.uid,
       "filter_params":self.state.filter_params,
       "discovery_title":self.state.discoveryTitle,
-      "discovery_description":self.state.discoveryDescription
+      "discovery_description":self.state.discoveryDescription,
+      "num_datasets":self.state.activeSummaryData.total_datasets
     }).then(function (response) {
       self.props.history.push("/discovery/" + response.data.discovery.id);
     });
@@ -284,8 +285,8 @@ var Explore = React.createClass({
                   >
                     <TextField
                       errorText="This field is required."
-                      errorStyle={{color:"#FEB28D"}}
-                      underlineFocusStyle={{color:"#979CF2"}}
+                      errorStyle={{color:"#cc313d"}}
+                      underlineFocusStyle={{color:"#1A9C6E"}}
                       onChange={this.updateDiscoveryTitle}
                       value={this.state.discoveryTitle}
                       fullWidth={true}
@@ -293,8 +294,8 @@ var Explore = React.createClass({
                     />
                   <br className="big-br" />
                   <TextField
-                    underlineFocusStyle={{color:"#979CF2"}}
-                    floatingLabelFocusStyle={{color:"#979CF2"}}
+                    underlineFocusStyle={{color:"#1A9C6E"}}
+                    floatingLabelFocusStyle={{color:"#1A9C6E"}}
                     multiLine={true}
                     rows={1}
                     rowsMax={2}
