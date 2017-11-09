@@ -163,7 +163,7 @@ var MyAccount = React.createClass({
               </div>
               <div className="myacct-user">
                 <h2 className="myacct-name">{this.state.firebase.name}</h2>
-                <span className="discovery-header-user">{this.state.discoveries.length + " saved discoveries"}</span>
+                <span className="discovery-header-user myacct-user-discoveries">{this.state.discoveries.length + " saved discoveries"}</span>
                 <div className="myacct-logout-button">
                   <RaisedButton
                     label="Log Out"
