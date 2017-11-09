@@ -45,7 +45,41 @@ var AreaChart = React.createClass({
         else {
           var newfield = value;
         }
-        return {"x":Number(index+0.5),"count":count,"label":newfield + " : " + count};
+        //define tooltip label
+        var low = value.split("-")[0];
+        var high = value.split("-")[1];
+        if (low.startsWith(">")) {
+          var num = low.split("> ")[1];
+          var power = Math.floor(Math.log10(num));
+          if(power>3) {
+            if (String(num).substr(0,2)=="10") {
+              var low = ">1e"+String(power);
+            } else {
+              var low = ">"+num[0]+"e"+String(power);
+            }
+          }
+          var tooltip = low;
+        } else {
+          var highPower = Math.floor(Math.log10(high));
+          var lowPower = Math.floor(Math.log10(low));
+          if (highPower>=4) {
+            if (high.substr(0,2)=="10") {
+              var high = "1e"+String(highPower);
+            } else {
+              var high = high[0]+"e"+String(highPower);
+            }
+            if (lowPower>3) {
+              if (low.substr(0,2)=="10") {
+                var low = "1e"+String(lowPower);
+              } else {
+                var low = low[0]+"e"+String(lowPower);
+              }
+            }
+          }
+          var tooltip = low + " - " + high;
+        }
+
+        return {"x":Number(index+0.5),"count":count,"label":newfield + " : " + count, "tooltip":tooltip};
       }
     );
 
@@ -57,7 +91,7 @@ var AreaChart = React.createClass({
             var power = Math.floor(Math.log10(parseFloat(low.split("> ")[1])));
             var num = low.split("> ")[1];
             if (String(num).substr(0,2)=="10") {
-              var low = ">10"+String(power).sup();
+              var low = ">1e"+String(power);
             } else {
               var low = ">"+num[0]+"e"+String(power);
             }
@@ -66,7 +100,7 @@ var AreaChart = React.createClass({
         } else {
           if (Math.floor(Math.log10(high))>3) {
             if (high.substr(0,2)=="10") {
-              var high = "10"+String(Math.floor(Math.log10(high))).sup();
+              var high = "1e"+String(Math.floor(Math.log10(high)));
             } else {
               var high = high[0]+"e"+String(Math.floor(Math.log10(high)));
             }
@@ -89,8 +123,8 @@ var AreaChart = React.createClass({
           containerComponent={
             <VictoryVoronoiContainer
               dimension="x"
-              labels={(chartData) => chartData.label}
-              style={{overflow:"visible"}}
+              labels={(chartData) => chartData.tooltip}
+              style={{overflow:"visible", padding: "0 10px"}}
               labelComponent={
                 <VictoryTooltip
                   flyoutStyle={{fill: "white"}}
