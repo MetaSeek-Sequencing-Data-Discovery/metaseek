@@ -3,9 +3,10 @@ import Slider from 'rc-slider';
 
 const Range = Slider.createSliderWithTooltip(Slider.Range);
 
-var RangeSlider = React.createClass({
+var ManualRangeSlider = React.createClass({
   getInitialState : function() {
-    return {}
+    return {
+    }
   },
 
   handleValues : function(value) {
@@ -13,12 +14,12 @@ var RangeSlider = React.createClass({
   },
 
   handleStop : function(filterMin,filterMax,field,filterTypeMin,filterTypeMax, min, max, minValue, maxValue) {
-    this.props.handleNumericFilterChange(filterMin, field, filterTypeMin, min, event, null, minValue);
-    this.props.handleNumericFilterChange(filterMax, field, filterTypeMax, max, event, null, maxValue);
+    this.props.handleNumericFilterChange(filterMin, field, filterTypeMin, this.props.marks[min], event, null, this.props.marks[minValue]);
+    this.props.handleNumericFilterChange(filterMax, field, filterTypeMax, this.props.marks[max], event, null, this.props.marks[maxValue]);
   },
 
   render : function() {
-    var {field, filterMin, filterMax, filterTypeMin, filterTypeMax, min, max, minValue, maxValue, handleFilterChange, ...other} = this.props;
+    var {field, filterMin, filterMax, filterTypeMin, filterTypeMax, min, max, minValue, maxValue, handleNumericFilterChange, marks, ...other} = this.props;
     return(
       <div className='range-slider'>
         <Range
@@ -30,6 +31,7 @@ var RangeSlider = React.createClass({
           onChange={this.handleValues}
           onAfterChange={this.handleStop.bind(this,this.props.filterMin,this.props.filterMax,this.props.field,this.props.filterTypeMin,this.props.filterTypeMax, this.props.min, this.props.max, this.props.minValue, this.props.maxValue)}
           {...other}
+          tipFormatter={value => Object.values(this.props.marks)[value]}
         />
       </div>
     );
@@ -37,4 +39,4 @@ var RangeSlider = React.createClass({
 
 });
 
-export default RangeSlider;
+export default ManualRangeSlider;

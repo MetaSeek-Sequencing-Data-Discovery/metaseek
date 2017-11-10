@@ -39,7 +39,7 @@ var MyAccount = React.createClass({
     if (user) {
       apiRequest.get("/user/"+user.uid+"/discoveries")
       .then(function (response) {
-        self.setState({"discoveries": response.data.discoveries});
+        self.setState({"discoveries": response.data.discoveries.reverse()});
       });
       this.state.firebase.name = user.displayName;
       this.state.firebase.uid = user.uid;
@@ -83,7 +83,6 @@ var MyAccount = React.createClass({
       "firebase_name":self.state.firebase.name,
       "admin":0
     }).then(function(response){
-      console.log(response);
       if (response.data.user) {
           self.setState({"mailingListOpen": true});
       }
@@ -92,7 +91,7 @@ var MyAccount = React.createClass({
 
     apiRequest.get("/user/"+user.uid+"/discoveries")
     .then(function (response) {
-      self.setState({"discoveries": response.data.discoveries});
+      self.setState({"discoveries": response.data.discoveries.reverse()});
     });
 
     this.setState(this.state.firebase);
@@ -163,7 +162,7 @@ var MyAccount = React.createClass({
               </div>
               <div className="myacct-user">
                 <h2 className="myacct-name">{this.state.firebase.name}</h2>
-                <span className="discovery-header-user">{this.state.discoveries.length + " saved discoveries"}</span>
+                <span className="discovery-header-user myacct-user-discoveries">{this.state.discoveries.length + " saved discoveries"}</span>
                 <div className="myacct-logout-button">
                   <RaisedButton
                     label="Log Out"
@@ -178,6 +177,7 @@ var MyAccount = React.createClass({
                 <TableHeader adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
                   <TableRow selectable={false}>
                     <TableHeaderColumn style={{color:"#fff",fontFamily:"Roboto",fontSize:"20px",fontWeight:600}} className="user-discoveries-table-header">{this.state.discoveries.length + " Discoveries"}</TableHeaderColumn>
+                    <TableHeaderColumn style={{color:"#fff",fontFamily:"Roboto",fontSize:"20px",fontWeight:600}} className="user-discoveries-table-header">No. of Datasets</TableHeaderColumn>
                     <TableHeaderColumn style={{color:"#fff",fontFamily:"Roboto",fontSize:"20px",fontWeight:600}} className="user-discoveries-table-header">Date Created</TableHeaderColumn>
                     <TableHeaderColumn></TableHeaderColumn>
                   </TableRow>
@@ -186,6 +186,7 @@ var MyAccount = React.createClass({
                   {this.state.discoveries.map( (discovery, index) => (
                     <TableRow selectable={false} key={index}>
                       <TableRowColumn style={{fontSize: "18px", width: "85%"}} >{discovery.discovery_title}</TableRowColumn>
+                      <TableRowColumn style={{fontSize: "18px", width: "85%"}} >{discovery.num_datasets}</TableRowColumn>
                       <TableRowColumn>{discovery.timestamp.substr(5, 20)}</TableRowColumn>
                       <TableRowColumn style={{textAlign: "center"}}>
                         <Link to={discovery.uri}>

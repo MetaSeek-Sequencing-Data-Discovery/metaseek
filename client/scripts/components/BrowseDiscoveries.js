@@ -30,10 +30,8 @@ var BrowseDiscoveries = React.createClass({
     var self = this;
     apiRequest.get("/discoveries")
     .then(function (response) {
-      console.log(response);
       self.setState({"discoveries": response.data.discoveries});
     });
-    console.log(this.state.discoveries);
   },
 
   render : function() {
@@ -48,14 +46,16 @@ var BrowseDiscoveries = React.createClass({
                 <TableHeader adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
                   <TableRow selectable={false}>
                     <TableHeaderColumn style={{color:"#fff",fontFamily:"Roboto",fontSize:"20px",fontWeight:600}}>Discovery Title</TableHeaderColumn>
+                    <TableHeaderColumn style={{color:"#fff",fontFamily:"Roboto",fontSize:"20px",fontWeight:600}}>No. of Datasets</TableHeaderColumn>
                     <TableHeaderColumn style={{color:"#fff",fontFamily:"Roboto",fontSize:"20px",fontWeight:600}}>Date Created</TableHeaderColumn>
                     <TableHeaderColumn></TableHeaderColumn>
                   </TableRow>
                 </TableHeader>
                 <TableBody showRowHover={false} stripedRows={false} displayRowCheckbox={false} preScanRows={false}>
-                  {this.state.discoveries.map( (discovery, index) => (
+                  {this.state.discoveries.reverse().map( (discovery, index) => (
                     <TableRow selectable={false} key={index}>
                       <TableRowColumn style={{fontSize: "18px", width: "85%"}} >{discovery.discovery_title}</TableRowColumn>
+                      <TableRowColumn style={{fontSize: "18px", width: "85%"}} >{discovery.num_datasets}</TableRowColumn>
                       <TableRowColumn>{discovery.timestamp.substr(5, 20)}</TableRowColumn>
                       <TableRowColumn style={{textAlign: "center"}}>
                         <Link to={discovery.uri}>

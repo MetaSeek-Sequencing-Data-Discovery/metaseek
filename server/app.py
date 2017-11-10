@@ -103,7 +103,8 @@ class GetUserDiscoveries(Resource):
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
         'uri': fields.Url('getdiscovery', absolute=True),
-        'discovery_title': fields.String
+        'discovery_title': fields.String,
+        'num_datasets': fields.Integer
     }, envelope='discoveries')
 
     def get(self, id):
@@ -312,6 +313,7 @@ class GetAllDiscoveries(Resource):
         'timestamp':fields.DateTime(dt_format='rfc822'),
         'discovery_title':fields.String,
         'uri': fields.Url('getdiscovery', absolute=True),
+        'num_datasets': fields.Integer,
         'owner':fields.Nested({
             'firebase_id':fields.String,
             'uri':fields.Url('getuser', absolute=True)
@@ -328,11 +330,14 @@ class CreateDiscovery(Resource):
             parser.add_argument('filter_params', type=str)
             parser.add_argument('discovery_title', type=str)
             parser.add_argument('discovery_description')
+            parser.add_argument('num_datasets', type=int)
             args = parser.parse_args()
+            print args
 
             owner = User.query.filter_by(firebase_id=args['owner_id']).first()
+            print owner.id
 
-            newDiscovery = Discovery(owner.id,args['filter_params'],args['discovery_title'], args['discovery_description'])
+            newDiscovery = Discovery(owner.id,args['filter_params'],args['discovery_title'], args['num_datasets'], args['discovery_description'])
             db.session.add(newDiscovery)
             db.session.commit()
             return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id)}}
