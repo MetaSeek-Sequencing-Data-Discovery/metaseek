@@ -239,6 +239,10 @@ def summarizeDatasets(queryObject,rules,sampleRate=0.2):
             .label('total_download_size')),rules)
         .first()
     )[0]
+
+    if (total_download_size is None):
+        total_download_size = 0
+
     (start,last,n) = checkpoint(start,last,n,'Ready to respond to POST (w/ download size)')
 
     # 3 categories of background tasks: above fold, on screen, off screen - we are going to kick off
