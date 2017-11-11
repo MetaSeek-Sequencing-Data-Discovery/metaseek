@@ -196,6 +196,9 @@ class GetDatasetSummary(Resource):
 
         from_cache = client.get(cache_key)
 
+        db.session.add(Filter('{"rules":[]}'))
+        db.session.commit()
+
         if from_cache is None:
             queryObject = Dataset.query
             summary = summarizeDatasets(queryObject,rules)
@@ -215,6 +218,9 @@ class SearchDatasetsSummary(Resource):
 
             cache_key = str(hashxx(json.dumps(rules)))
             from_cache = client.get(cache_key)
+
+            db.session.add(Filter(args['filter_params']))
+            db.session.commit()
 
             if from_cache is None:
                 summary = summarizeDatasets(Dataset.query,rules,0.05)
