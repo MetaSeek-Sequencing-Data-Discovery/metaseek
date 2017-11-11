@@ -100,7 +100,8 @@ class GetUserDiscoveries(Resource):
         'filter_params':fields.String,
         'timestamp':fields.DateTime(dt_format='rfc822'),
         'uri': fields.Url('getdiscovery', absolute=True),
-        'discovery_title': fields.String
+        'discovery_title': fields.String,
+        'num_datasets': fields.Integer
     }, envelope='discoveries')
 
     def get(self, id):
@@ -192,6 +193,9 @@ class GetDatasetSummary(Resource):
 
         from_cache = client.get(cache_key)
 
+        db.session.add(Filter('{"rules":[]}'))
+        db.session.commit()
+
         if from_cache is None:
             queryObject = Dataset.query
             summary = summarizeDatasets(queryObject,rules)
@@ -211,6 +215,9 @@ class SearchDatasetsSummary(Resource):
 
             cache_key = str(hashxx(json.dumps(rules)))
             from_cache = client.get(cache_key)
+
+            db.session.add(Filter(args['filter_params']))
+            db.session.commit()
 
             if from_cache is None:
                 summary = summarizeDatasets(Dataset.query,rules,0.05)
@@ -309,6 +316,7 @@ class GetAllDiscoveries(Resource):
         'timestamp':fields.DateTime(dt_format='rfc822'),
         'discovery_title':fields.String,
         'uri': fields.Url('getdiscovery', absolute=True),
+        'num_datasets': fields.Integer,
         'owner':fields.Nested({
             'firebase_id':fields.String,
             'uri':fields.Url('getuser', absolute=True)
@@ -325,11 +333,14 @@ class CreateDiscovery(Resource):
             parser.add_argument('filter_params', type=str)
             parser.add_argument('discovery_title', type=str)
             parser.add_argument('discovery_description')
+            parser.add_argument('num_datasets', type=int)
             args = parser.parse_args()
+            print args
 
             owner = User.query.filter_by(firebase_id=args['owner_id']).first()
+            print owner.id
 
-            newDiscovery = Discovery(owner.id,args['filter_params'],args['discovery_title'], args['discovery_description'])
+            newDiscovery = Discovery(owner.id,args['filter_params'],args['discovery_title'], args['num_datasets'], args['discovery_description'])
             db.session.add(newDiscovery)
             db.session.commit()
             return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id)}}
@@ -348,62 +359,15 @@ class CacheStats(Resource):
 
 class BuildCaches(Resource):
     def get(self):
-        # TODO actually define which ones we want here or create this list dynamically
-        priorityFilterSets = [
-            '{"rules":[]}',
-            '{"rules":[{"field":"library_source","type":5,"value":"genomic"}]}',
-            '{"rules":[{"field":"library_source","type":5,"value":"transcriptomic"}]}',
-            '{"rules":[{"field":"library_source","type":5,"value":"metagenomic"}]}',
-            '{"rules":[{"field":"library_source","type":5,"value":"metatranscriptomic"}]}',
-            '{"rules":[{"field":"library_source","type":5,"value":"synthetic"}]}',
-            '{"rules":[{"field":"library_source","type":5,"value":"viral rna"}]}',
-
-            '{"rules":[{"field":"investigation_type","type":5,"value":"metagenome"}]}',
-            '{"rules":[{"field":"investigation_type","type":5,"value":"bacteria_archaea"}]}',
-            '{"rules":[{"field":"investigation_type","type":5,"value":"eukaryote"}]}',
-            '{"rules":[{"field":"investigation_type","type":5,"value":"mimarks-survey"}]}',
-            '{"rules":[{"field":"investigation_type","type":5,"value":"mimarks-culture"}]}',
-            '{"rules":[{"field":"investigation_type","type":5,"value":"virus"}]}',
-
-            '{"rules":[{"field":"env_package","type":5,"value":"sediment"}]}',
-            '{"rules":[{"field":"env_package","type":5,"value":"soil"}]}',
-            '{"rules":[{"field":"env_package","type":5,"value":"water"}]}',
-            '{"rules":[{"field":"env_package","type":5,"value":"plant-associated"}]}',
-            '{"rules":[{"field":"env_package","type":5,"value":"host-associated"}]}',
-            '{"rules":[{"field":"env_package","type":5,"value":"built environment"}]}',
-            '{"rules":[{"field":"env_package","type":5,"value":"human-associated"}]}',
-            '{"rules":[{"field":"env_package","type":5,"value":"human-gut"}]}',
-            '{"rules":[{"field":"env_package","type":5,"value":"human-skin"}]}',
-
-            '{"rules":[{"field":"study_type","type":5,"value":"Other"}]}',
-            '{"rules":[{"field":"study_type","type":5,"value":"Whole Genome Sequencing"}]}',
-            '{"rules":[{"field":"study_type","type":5,"value":"Transcriptome Analysis"}]}',
-            '{"rules":[{"field":"study_type","type":5,"value":"Metagenomics"}]}',
-            '{"rules":[{"field":"study_type","type":5,"value":"Population Genomics"}]}',
-
-            '{"rules":[{"field":"investigation_type","type":5,"value":"bacteria_archaea"},{"field":"library_source","type":5,"value":"genomic"}]}',
-            '{"rules":[{"field":"study_type","type":5,"value":"Whole Genome Sequencing"},{"field":"library_source","type":5,"value":"genomic"}]}',
-            '{"rules":[{"field":"study_type","type":5,"value":"Transcriptome Analysis"},{"field":"library_source","type":5,"value":"transcriptomic"}]}',
-            '{"rules":[{"field":"study_type","type":5,"value":"Metagenomics"},{"field":"library_source","type":5,"value":"metagenomic"}]}',
-            '{"rules":[{"field":"investigation_type","type":5,"value":"metagenome"},{"field":"library_source","type":5,"value":"metagenomic"}]}',
-
-            '{"rules":[{"field":"library_strategy","type":5,"value":"WGS"}]}',
-            '{"rules":[{"field":"library_strategy","type":5,"value":"AMPLICON"}]}',
-            '{"rules":[{"field":"library_strategy","type":5,"value":"RNA-Seq"}]}',
-
-            '{"rules":[{"field":"library_screening_strategy","type":5,"value":"RANDOM"}]}',
-            '{"rules":[{"field":"library_screening_strategy","type":5,"value":"PCR"}]}',
-            '{"rules":[{"field":"library_screening_strategy","type":5,"value":"cDNA"}]}',
-
-            '{"rules":[{"field":"sequencing_method","type":5,"value":"illumina"}]}',
-            '{"rules":[{"field":"sequencing_method","type":5,"value":"ls454"}]}'
-
-        ]
-
+        # Looks up literally every filter anyone has ever looked up in descending order by how often
+        # For now...let's build all of them!
+        allFilterSetsWithCounts = db.session.query(Filter.filter_params,func.count(Filter.filter_params).label('times_filtered')).group_by(Filter.filter_params).order_by('times_filtered DESC').all()
         results = {}
 
-        for filterSet in priorityFilterSets:
-            filter_params = json.loads(filterSet)
+        for (filter_string, times_filtered) in allFilterSetsWithCounts:
+            print 'running ' + filter_string
+            print 'has been run ' + str(times_filtered) + ' times.'
+            filter_params = json.loads(filter_string)
             rules = filter_params['rules']
 
             cache_key = str(hashxx(json.dumps(rules)))

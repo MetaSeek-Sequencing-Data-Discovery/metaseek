@@ -17,7 +17,7 @@
 }
 
 .three {
-  width: 1176px;
+  width: 1080px;
   clear: both;
 }
 
@@ -138,6 +138,12 @@
   width: 200px;
   white-space: normal;
   text-align: left;
+  color: $accent;
+  background-color: $white;
+  border-color: $accent;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 3px;
 }
 
 .figure-hint-label {
@@ -295,6 +301,20 @@
 
 .word-cloud-tag {
   display:block;
+}
+
+.word-cloud-tooltip {
+  white-space: normal;
+  background-color: $white !important;
+  border-color: $default !important;
+  border-style: solid !important;
+  border-width: 1px !important;
+  border-radius: 5px !important;
+  padding: 4px 8px !important;
+}
+
+.word-cloud-tooltip::before {
+  border-top: 8px solid $default !important;
 }
 
 .pie-container {
