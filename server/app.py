@@ -322,6 +322,7 @@ class GetAllDiscoveries(Resource):
         'num_datasets': fields.Integer,
         'owner':fields.Nested({
             'firebase_id':fields.String,
+            'firebase_name':fields.String,
             'uri':fields.Url('getuser', absolute=True)
         })
     }, envelope='discoveries')

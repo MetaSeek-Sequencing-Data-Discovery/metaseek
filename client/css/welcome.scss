@@ -114,9 +114,14 @@
 }
 
 .welcome-how-graphic {
-  margin: 36px;
+  margin: 36px 36px 18px 0;
   margin-top: 5px;
   float: left;
+  width: 480px;
+}
+
+.welcome-how-graphic img {
+  width: 100%;
 }
 
 .welcome-how-explainer {
@@ -216,6 +221,12 @@ button.github:after, input[type=submit].github:after {
 
   .feature-block img {
     width: 300px;
+  }
+
+  .welcome-how-graphic {
+    width:80%;
+    margin: 36px auto;
+    float:none;
   }
 
   .feature-block-title, .welcome-how-header, .welcome-how-explain-header {
