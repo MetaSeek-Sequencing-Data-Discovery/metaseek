@@ -341,3 +341,15 @@ class ScrapeError(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.error_msg
+
+class Filter(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    filter_params = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime)
+
+    def __init__(self, filter_params, timestamp=None):
+        self.filter_params = filter_params
+        self.timestamp = datetime.utcnow()
+
+    def __repr__(self):
+        return '<Filter %r>' % self.filter_params

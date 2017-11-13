@@ -108,10 +108,10 @@ var MyAccount = React.createClass({
         <Header history={this.props.history}/>
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
           <Paper className="myacct-loggedout" >
-            <h3>Log in with Google to view your MetaSeek account.</h3>
+            <h3>Log in with Google to create and save discoveries!</h3>
             <div className="login-buttons">
               <RaisedButton
-                label="Sign Up/Log In With Google"
+                label="Log In with Google"
                 onClick={this.triggerLogin}
                 primary={true}
                 disabled={this.state.firebase.uid}
