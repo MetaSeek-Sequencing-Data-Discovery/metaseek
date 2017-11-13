@@ -36,7 +36,7 @@ var Header = React.createClass({
         <ToolbarGroup className="header-buttons">
           <Link className="button-link" to='/myaccount'>
             <RaisedButton
-              label="My Account"
+              label="Account"
             />
           </Link>
           <Link className="button-link" to='/explore'>

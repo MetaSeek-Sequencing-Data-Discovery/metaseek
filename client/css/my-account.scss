@@ -1,15 +1,18 @@
 @import 'colors';
 
 .myacct-loggedout {
-  margin: 48px 20% 0 20%;
-  height: 300px;
-  padding: 50px 20px 50px 20px;
+  margin: 48px auto;
+  width: 75%;
+  max-width:600px;
+  height: 200px;
+  padding: 24px 20px 50px 20px;
 }
 
 .myacct-loggedin {
   margin: 48px auto;
   margin-bottom: 15px;
-  width: 1176px;
+  width: 80%;
+  max-width:1176px;
   height: 200px;
 }
 
@@ -32,12 +35,6 @@
   margin: 16px 0 0 0;
 }
 
-.myacct-discoveryhead {
-  margin: 0 auto;
-  width: 1170px;
-  height: 100px;
-}
-
 .profile-image-myacct {
   width: 200px;
   height: 200px;
@@ -49,13 +46,59 @@
   margin: 20px;
 }
 
+.myacct-discoveryhead {
+  margin: 0 auto;
+  width: 1170px;
+  height: 100px;
+}
+
 .user-discoveries-table {
   padding:0px;
   margin: 36px auto;
-  width: 1176px;
+  width: 80%;
+  max-width:1176px;
   clear: both;
 }
 
 .user-discoveries-table thead {
   background-color:$accent;
+}
+
+@media (max-width: 500px) {
+  .myacct-loggedin {
+    margin: 24px auto 8px;
+    width: 95%;
+    height: 120px;
+  }
+
+  .myacct-name {
+    margin: 8px 0 8px 8px;
+    font-size: 1.6em;
+  }
+
+  .myacct-user {
+    margin: 0 0 0 120px;
+    position: absolute;
+  }
+
+  .profile-image-myacct {
+    width: 120px;
+    height: 120px;
+  }
+
+  .myacct-user-discoveries {
+    margin-left:8px;
+  }
+
+  .myacct-logout-button {
+    margin: 8px 0 0 8px;
+  }
+
+  .user-discoveries-table {
+    width:95%;
+  }
+
+  .myacct-loggedout {
+    width: 90%
+  }
 }
