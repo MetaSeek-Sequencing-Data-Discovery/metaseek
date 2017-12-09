@@ -389,21 +389,16 @@ class BuildCaches(Resource):
         return results
 
 #user-facing calls
+user_n_threshold = 1000
+
 class SearchDatasetIds(Resource):
     def post(self):
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('filter_params', type=str)
             args = parser.parse_args()
-            print "args", args
-            print args['filter_params']
             filter_params = json.loads(args['filter_params'])
-            print "filter_params", filter_params
             rules = filter_params['rules']
-            print "rules", rules
-            #add filter parameters to log of filters? not for now
-            #db.session.add(Filter(args['filter_params']))
-            #db.session.commit()
 
             queryObject = filterDatasetQueryObjectWithRules(Dataset.query,rules)
             result = queryObject.with_entities(Dataset.id).all()
@@ -414,8 +409,26 @@ class SearchDatasetIds(Resource):
         except Exception as e:
             return {'error': str(e)}
 
+class SearchDatasetMetadata(Resource):
+    def post(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('filter_params', type=str)
+            args = parser.parse_args()
+            filter_params = json.loads(args['filter_params'])
+            rules = filter_params['rules']
+
+            queryObject = filterDatasetQueryObjectWithRules(Dataset.query,rules)
+            result = marshal(queryObject.all(), fullDatasetFields)
+            if queryObject.count()>user_n_threshold:
+                return {'error':'you are trying to get metadata for too many datasets at once. Please query the database for '+str(user_n_threshold)+' or fewer datasets at a time'}
+            else:
+                return {"count_matching_datasets":len(result), "filter_params":filter_params, "datasets":result}
+
+        except Exception as e:
+            return {'error': str(e)}
+
 class MetadataFromIds(Resource):
-    @marshal_with(fullDatasetFields, envelope='datasets')
     def post(self):
         try:
             parser = reqparse.RequestParser()
@@ -424,15 +437,12 @@ class MetadataFromIds(Resource):
             metaseek_ids = json.loads(args['metaseek_ids'])
 
             #check if the number of ids you're looking up is below an acceptable threshold; otherwise return error
-            #let's use threshold of 100,000
-            threshold = 1000
-            if len(metaseek_ids)>threshold:
-                return {'error':'you are trying to get metadata for too many datasets at once. Please query the database for '+str(threshold)+' or fewer datasets at a time'}
+            if len(metaseek_ids)>user_n_threshold:
+                return {'error':'you are trying to get metadata for too many datasets at once. Please query the database for '+str(user_n_threshold)+' or fewer datasets at a time'}
             else:
                 queryObject = filterQueryByRule(Dataset,Dataset.query,'id',8,metaseek_ids)
-                results = queryObject.all()
-                print results[0:5]
-                return queryObject.all()
+                result = marshal(queryObject.all(), fullDatasetFields)
+                return {"count_matching_datasets":len(result), "datasets":result}
 
         except Exception as e:
             return {'error': str(e)}
@@ -466,10 +476,11 @@ api.add_resource(CacheStats,            '/cache/stats')
 api.add_resource(BuildCaches,           '/cache/build')
 
 #user-facing API calls
-#SearchDatasetIds, return matching ids from filter params /datasets/search/ids
+#SearchDatasetIds, return matching ids from filter params
 api.add_resource(SearchDatasetIds,      '/datasets/search/ids')
-#SearchDatasetMetadata, return matching metadata from filter params (max number of datasets) /datasets/search/metadata
-#MetadataFromIds, return metadata from list of metaseek ids /datasets/metadata
+#SearchDatasetMetadata, return matching metadata from filter params
+api.add_resource(SearchDatasetMetadata, '/datasets/search/metadata')
+#MetadataFromIds, return metadata from list of metaseek ids
 api.add_resource(MetadataFromIds,       '/datasets/metadatafromids')
 
 # Start the app!
