@@ -4,7 +4,7 @@ To incorporate MetaSeek queries into automated pipelines, do a complex query, or
 
 The MetaSeek API allows users to query any field in the MetaSeek database, by any of 10 rule types.
 
-See the Glossary (https://www.metaseek.cloud/glossary) for definitions of each MetaSeek field, and the possible controlled vocabulary values for that field where applicable.
+See the [Glossary](https://www.metaseek.cloud/glossary) for definitions of each MetaSeek field, and the possible controlled vocabulary values for that field where applicable.
 
 
 ## MetaSeek API Calls

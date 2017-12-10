@@ -1,5 +1,8 @@
 MetaSeek is a data discovery and analysis tool for genome sequencing data. Providing a rich front-end for exploration of metadata across a wide set of data repositories, use MetaSeek to find the right aggregation of sequences for your analysis, and then access the raw sequencing data.
 
+MetaSeek also provides an API for programmatic access. [See the API docs](https://github.com/ahoarfrost/metaseek/blob/master/APIdocs.md).
+
+
 To add sample data to the DB, unzip bootstrapData.zip into a folder named bootstrapData in the project root, and then run:
 
 `python bootstrap.py`
