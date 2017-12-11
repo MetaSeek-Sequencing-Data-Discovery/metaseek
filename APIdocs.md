@@ -29,39 +29,20 @@ To the post request, use the key value 'filter_params' with a value that looks l
 (note that in many languages, this dictionary should be provided as a string that can be parsed in json; see example API calls below)
 
 The 10 rule types are:
+
 | rule type key |          filter type          |            description                  |      example filter_params  
-----------------------------------------------------------------------------------------------------------------------------------------------
-|       1       |          is less than         | find datasets with an                   | {"rules":[ {"field":"avg_read_length_maxrun",
-|               |                               | 'avg_read_length_maxrun' below 300bp    | "type":1, "value":300} ]}
-----------------------------------------------------------------------------------------------------------------------------------------------
-|       2       |        is greater than        | find datasets from                      | {"rules":[ {"field":"metaseek_latitude",
-|               |                               | 'metaseek_latitude' above 60 degrees N  | "type":2, "value":60} ]}
-----------------------------------------------------------------------------------------------------------------------------------------------
-|       3       |    is less than or equal to   | find datasets with 'metaseek_longitude' | {"rules":[ {"field":"metaseek_longitude",
-|               |                               | of 20 degrees W or less                 | "type":3, "value":-20} ]}
-----------------------------------------------------------------------------------------------------------------------------------------------
-|       4       |  is greater than or equal to  | find datasets from 'metaseek_latitude'  | {"rules":[ {"field":"metaseek_latitude",
-|               |                               | of 27 degrees S or greater              | "type":4, "value":-27} ]}
-----------------------------------------------------------------------------------------------------------------------------------------------
-|       5       |          is equal to          | find datasets with the 'library_source' | {"rules":[ {"field":"library_source",
-|               |                               | value 'genomic'                         | "type":5, "value":"genomic"} ]}
-----------------------------------------------------------------------------------------------------------------------------------------------
-|       6       |        is not equal to        | find datasets from 'investigation_type' | {"rules":[ {"field":"investigation_type",
-|               |                               | that are not 'eukaryote'                | "type":5, "value":"eukaryote"} ]}
-----------------------------------------------------------------------------------------------------------------------------------------------
-|       7       |                               | find datasets that contain the partial  |
-|               |       contains the text       | phrase 'illumina' or 'pyrosequencing'   | {"rules":[ {"field":"sequencing_method", "type":7,
-|               |                               | in 'sequencing_method' (matches e.g.    | "value":["illumina","pyrosequencing"]} ]}
-|               |                               | 'illumina HiSeq' as well as 'illumina') |
-----------------------------------------------------------------------------------------------------------------------------------------------
-|       8       |   is equal to the keyword/s   | find datasets that are equal to  'WGS'  | {"rules":[ {"field":"library_strategy",
-|               |                               | or 'RNA-Seq' in 'library_strategy'      | "type":5, "value":["WGS", "RNA-Seq"]} ]}
-----------------------------------------------------------------------------------------------------------------------------------------------
-|       9       | is not equal to the keyword/s | find datasets not equal to 'PCR' or     | {"rules":[ {"field":"library_screening_strategy",
-|               |                               | 'RT-PCR' in 'library_screening_strategy'| "type":9, "value":["PCR", "RT-PCR"]} ]}
-----------------------------------------------------------------------------------------------------------------------------------------------
-|       10      |          is not null          | find datasets that are not empty in     | {"rules":[ {"field":"env_package",
-|               |                               | 'env_package'                           | "type":10, "value":""} ]}
+|:------|----------|----------|-------------|
+| 1 | is less than | find datasets with an 'avg_read_length_maxrun' below 300bp | {"rules": [{"field":"avg_read_length_maxrun", "type":1, "value":300} ]}|
+| 2 |is greater than| find datasets from 'metaseek_latitude' above 60 degrees N | {"rules": [{"field":"metaseek_latitude","type":2, "value":60} ]}
+| 3 | is less than or equal to | find datasets with 'metaseek_longitude' of 20 degrees W or less | {"rules": [{"field":"metaseek_longitude","type":3, "value":-20} ]}|
+| 4 | is greater than or equal to  | find datasets from 'metaseek_latitude' of 27 degrees S or greater | {"rules": [{"field":"metaseek_latitude","type":4, "value":-27} ]}
+| 5 | is equal to | find datasets with the 'library_source' value 'genomic' | {"rules": [{"field":"library_source","type":5, "value":"genomic"} ]}
+| 6 | is not equal to | find datasets from 'investigation_type' that are not 'eukaryote' | {"rules": [{"field":"investigation_type","type":5, "value":"eukaryote"} ]}
+| 7 | contains the text | find datasets that contain the partial phrase 'illumina' or 'pyrosequencing' in 'sequencing_method' (matches e.g. 'illumina HiSeq' as well as 'illumina') | {"rules": [{"field":"sequencing_method", "type":7, "value":["illumina","pyrosequencing"]} ]}
+| 8 | is equal to the keyword/s | find datasets that are equal to  'WGS' or 'RNA-Seq' in 'library_strategy' | {"rules": [{"field":"library_strategy","type":5, "value":["WGS", "RNA-Seq"]} ]}|
+| 9 | is not equal to the keyword/s | find datasets not equal to 'PCR' or 'RT-PCR' in 'library_screening_strategy' | {"rules": [{"field":"library_screening_strategy","type":9, "value":["PCR", "RT-PCR"]} ]}|
+| 10 | is not null | find datasets that are not empty in 'env_package' | {"rules": [{"field":"env_package","type":10, "value":""} ]}
+
 
 If you want to use multiple filters, list these filter statements within the list of rules. This will find datasets that meet all of the filter rules - this is the SQL equivalent of multiple WHERE statements connected by an AND.
 For example:
