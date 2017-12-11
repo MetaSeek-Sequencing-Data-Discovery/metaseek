@@ -385,6 +385,66 @@ class BuildCaches(Resource):
 
         return results
 
+#user-facing calls
+user_n_threshold = 1000
+
+class SearchDatasetIds(Resource):
+    def post(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('filter_params', type=str)
+            args = parser.parse_args()
+            filter_params = json.loads(args['filter_params'])
+            rules = filter_params['rules']
+
+            queryObject = filterDatasetQueryObjectWithRules(Dataset.query,rules)
+            result = queryObject.with_entities(Dataset.id).all()
+            datasets = [x[0] for x in result]
+            print datasets[0:10]
+            return {"count_matching_datasets":len(datasets), "filter_params":filter_params, "matching_dataset_ids":datasets}
+
+        except Exception as e:
+            return {'error': str(e)}
+
+class SearchDatasetMetadata(Resource):
+    def post(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('filter_params', type=str)
+            args = parser.parse_args()
+            filter_params = json.loads(args['filter_params'])
+            rules = filter_params['rules']
+
+            queryObject = filterDatasetQueryObjectWithRules(Dataset.query,rules)
+            result = marshal(queryObject.all(), fullDatasetFields)
+            if queryObject.count()>user_n_threshold:
+                return {'error':'you are trying to get metadata for too many datasets at once. Please query the database for '+str(user_n_threshold)+' or fewer datasets at a time'}
+            else:
+                return {"count_matching_datasets":len(result), "filter_params":filter_params, "datasets":result}
+
+        except Exception as e:
+            return {'error': str(e)}
+
+class MetadataFromIds(Resource):
+    def post(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('metaseek_ids', type=str)
+            args = parser.parse_args()
+            metaseek_ids = json.loads(args['metaseek_ids'])
+
+            #check if the number of ids you're looking up is below an acceptable threshold; otherwise return error
+            if len(metaseek_ids)>user_n_threshold:
+                return {'error':'you are trying to get metadata for too many datasets at once. Please query the database for '+str(user_n_threshold)+' or fewer datasets at a time'}
+            else:
+                queryObject = filterQueryByRule(Dataset,Dataset.query,'id',8,metaseek_ids)
+                result = marshal(queryObject.all(), fullDatasetFields)
+                return {"count_matching_datasets":len(result), "datasets":result}
+
+        except Exception as e:
+            return {'error': str(e)}
+
+
 # End route functions
 
 # Declare routing
@@ -411,6 +471,14 @@ api.add_resource(GetAllDiscoveries,     '/discoveries')
 api.add_resource(PurgeCache,            '/cache/purge')
 api.add_resource(CacheStats,            '/cache/stats')
 api.add_resource(BuildCaches,           '/cache/build')
+
+#user-facing API calls
+#SearchDatasetIds, return matching ids from filter params
+api.add_resource(SearchDatasetIds,      '/datasets/search/ids')
+#SearchDatasetMetadata, return matching metadata from filter params
+api.add_resource(SearchDatasetMetadata, '/datasets/search/metadata')
+#MetadataFromIds, return metadata from list of metaseek ids
+api.add_resource(MetadataFromIds,       '/datasets/metadatafromids')
 
 # Start the app!
 if __name__ == '__main__':
