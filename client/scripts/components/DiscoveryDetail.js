@@ -170,7 +170,7 @@ var DiscoveryDetail = React.createClass({
                 </div>
                 <ExploreTable getNextDataPage={this.getNextDataPage} getPreviousDataPage={this.getPreviousDataPage} dataTable={this.state.dataTable}/>
               </Paper>
-              <VizDashboard activeSummaryData={this.state.summaryData}/>
+              <VizDashboard wrapperClassName="discovery-child-grid" activeSummaryData={this.state.summaryData}/>
             </div>
           </MuiThemeProvider>
       </div>
