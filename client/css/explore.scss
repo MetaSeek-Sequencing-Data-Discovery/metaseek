@@ -122,14 +122,6 @@
   text-align: center;
 }
 
-.explore-container {
-  width: 100%;
-  margin: 0 auto;
-  display:grid;
-  grid-template-columns: 30% 14% 14% 14% 14% 14%;
-  grid-template-rows: 20% 20% 20% 20% 20%;
-}
-
 .filter-field-with-help {
   float: left;
 }
@@ -138,9 +130,41 @@
   background: $accentLight;
 }
 
+/* Grid layout for cards */
+.explore-container {
+  width: 100%;
+  margin: 0 auto;
+  display:grid;
+  grid-template-columns: 340px 1fr 165px 165px 165px 165px 165px 165px 1fr 0px;
+  grid-template-rows: 72px 72px 216px 360px 360px 504px 1fr;
+  grid-gap: 18px 18px;
+}
+
+.explore-child-grid {
+  grid-area: 4 / 3 / span 3 / span 6;
+  grid-template-columns: 165px 165px 165px 165px 165px 165px;
+  grid-template-rows: 360px 360px 504px;
+  grid-gap: 18px 18px;
+}
+
 .explore-headline {
-  margin: 0 0 18px 18px;
-  position: relative;
+  grid-area: 1 / 1 / span 1 / span 10;
+}
+
+.save-discovery-button-container {
+  grid-area: 2 / 1 / span 1 / span 10;
+}
+
+.explore-number-datasets {
+  grid-area: 3 / 3 / span 1 / span 2;
+}
+
+.explore-total-download {
+  grid-area: 3 / 5 / span 1 / span 2;
+}
+
+.explore-user {
+  grid-area: 3 / 7 / span 1 / span 2;
 }
 
 .explore-map {
@@ -163,38 +187,24 @@
 
 .explore-histogram {
   padding:3px;
-  height:400px;
-  margin: 0 0 18px 18px;
 }
 
 .explore-areachart {
   padding:3px;
-  margin: 0 0 18px 18px;
 }
 
 .explore-wordcloud {
   padding:3px;
   overflow-y:scroll;
-  margin: 0 0 18px 18px;
-}
-
-.explore-radarchart {
-  padding:3px;
-  margin: 0 0 18px 18px;
-}
-
-.explore-download {
-  margin: 0 0 18px 0;
-  padding:16px;
 }
 
 .explore-table {
   padding:0px;
-  margin: 0 0 18px 18px;
+  grid-area: 7 / 3 / span 1 / span 6;
 }
 
 .explore-filter {
-  margin: 12px 12px 0 12px;
+  margin: 0 0 0 12px;
 }
 
 .explore-filter-slider {

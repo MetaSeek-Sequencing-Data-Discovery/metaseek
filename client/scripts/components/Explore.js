@@ -314,7 +314,7 @@ var Explore = React.createClass({
                 Please sign up or log in with Google to save your discovery.
               </Dialog>
             </div>
-            <Paper className="explore-headline">
+            <Paper className="explore-number-datasets">
               <div className="profile-container">
                 <span className="overview-title">Number of Datasets</span>
                 <br/>
@@ -325,7 +325,7 @@ var Explore = React.createClass({
                 <span className="overview-content">currently showing <br className="big-br" /><span className="active">{this.state.activeSummaryData.total_datasets} datasets</span> <br className="big-br" /> out of {this.state.fullSummaryData.total_datasets} total datasets</span>
               </div>
             </Paper>
-            <Paper className="explore-headline">
+            <Paper className="explore-total-download">
               <div className="profile-container">
                 <span className="overview-title">Estimated Total Download Size</span>
                 <br/>
@@ -336,7 +336,7 @@ var Explore = React.createClass({
                 <span className="overview-content-download"> {getReadableFileSizeString(this.state.activeSummaryData.total_download_size)} </span>
               </div>
             </Paper>
-            <Paper className="explore-headline">
+            <Paper className="explore-user">
               <div className="profile-container">
                 <span className="overview-title">User</span>
                 <br/>
