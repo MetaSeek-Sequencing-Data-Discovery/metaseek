@@ -43,7 +43,9 @@
 }
 
 .download-button-metadata {
-  margin: 0 1%;
+  margin: 18px 0 0 36px;
+  display: block !important;
+  width: 400px;
 }
 
 .discovery-filterparam-table-container {
@@ -78,7 +80,7 @@
 }
 
 .discovery-header-summary-right {
-  margin: 0 0 0 18px;
+  margin: 0 36px 0 18px;
   padding-top: 36px;
   display: inline-block;
   vertical-align: top;
