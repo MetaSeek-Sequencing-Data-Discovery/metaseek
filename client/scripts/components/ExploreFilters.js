@@ -225,8 +225,23 @@ var ExploreFilters = React.createClass({
     const seqmeth_options = this.getMultOptions(this.props.activeSummaryData.sequencing_method_summary);
     const instmod_options = this.getMultOptions(this.props.activeSummaryData.instrument_model_summary);
 
-    const tooltipStyle = { width: 200, whiteSpace: 'normal', textAlign: 'left', color: '#425BA1', background: '#FFF', borderColor: "#425BA1", borderStyle: 'solid', borderWidth: '1px', borderRadius: '3px' };
-    const tooltipIconStyle = {color:"#55d5a9", height:"15px", marginTop:"8px"};
+    const tooltipStyle = {
+      fontFamily: "Roboto",
+      fontSize: 12,
+      transition: "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+      padding:6,
+      width: 220,
+      whiteSpace: 'normal',
+      textAlign: 'left',
+      color: '#3c3c3c',
+      background: '#FFF',
+      borderColor: "#334A88",
+      borderStyle: 'solid',
+      borderWidth: 1,
+      borderRadius: 2,
+      boxShadow: "rgba(60, 60, 60, 0.12) 0px 1px 6px, rgba(60, 60, 60, 0.12) 0px 1px 4px"
+    };
+    const tooltipIconStyle = {color:"#16825c", height:"16px", marginTop:"8px"};
 
     return (
       <div>

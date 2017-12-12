@@ -264,16 +264,16 @@ var VizDashboard = React.createClass({
 
     return (
       <div className="explore-child-grid">
-        <Paper className="explore-histogram">
+        <Paper className="explore-general">
           {renderFigure(this.props.activeSummaryData,this.props.processing, geninfo_histcomponent)}
         </Paper>
-        <Paper className="explore-areachart">
+        <Paper className="explore-sequencing">
           {renderFigure(this.props.activeSummaryData,this.props.processing, seqinfo_areacomponent)}
         </Paper>
-        <Paper className="explore-histogram">
+        <Paper className="explore-pie">
           {renderFigure(this.props.activeSummaryData,this.props.processing, libconst_component)}
         </Paper>
-        <Paper className="explore-histogram">
+        <Paper className="explore-sequencing-hist">
           {renderFigure(this.props.activeSummaryData,this.props.processing, seqinfo_histcomponent)}
         </Paper>
         <Paper className="explore-map">

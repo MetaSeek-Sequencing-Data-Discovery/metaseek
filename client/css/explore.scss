@@ -79,6 +79,12 @@
   color: $cloud10;
 }
 
+.gloss-icon-wrapper {
+  float: right;
+  margin-top: -2px;
+  margin-right: 12px;
+}
+
 .figure-hint-tooltip {
   width: 200px;
   white-space: normal;
@@ -136,15 +142,16 @@
   margin: 0 auto;
   display:grid;
   grid-template-columns: 340px 1fr 165px 165px 165px 165px 165px 165px 1fr 0px;
-  grid-template-rows: 72px 72px 216px 360px 360px 504px 1fr;
+  grid-template-rows: 48px 68px 250px 400px 400px 563px 1fr;
   grid-gap: 18px 18px;
 }
 
 .explore-child-grid {
   grid-area: 4 / 3 / span 3 / span 6;
-  grid-template-columns: 165px 165px 165px 165px 165px 165px;
-  grid-template-rows: 360px 360px 504px;
+  display: inherit;
   grid-gap: 18px 18px;
+  grid-template-columns: 165px 165px 165px 165px 165px 165px;
+  grid-template-rows: 400px 400px 563px;
 }
 
 .explore-headline {
@@ -157,19 +164,52 @@
 
 .explore-number-datasets {
   grid-area: 3 / 3 / span 1 / span 2;
+  padding: 18px;
+  height: 250px;
 }
 
 .explore-total-download {
   grid-area: 3 / 5 / span 1 / span 2;
+  padding: 18px;
+  height: 250px;
 }
 
 .explore-user {
   grid-area: 3 / 7 / span 1 / span 2;
+  padding: 18px;
+  height: 250px;
+}
+
+.explore-general {
+  grid-area: 1 / 1 / span 1 / span 3;
+  padding:3px;
+}
+
+.explore-sequencing {
+  grid-area: 1 / 4 / span 1 / span 3;
+  padding:3px;
+}
+
+.explore-pie {
+  grid-area: 2 / 1 / span 1 / span 2;
+  padding:3px;
+}
+
+.explore-sequencing-hist {
+  grid-area: 2 / 3 / span 1 / span 4;
+  padding:3px;
 }
 
 .explore-map {
-  margin: 0 0 18px 18px;
-  height: 563px;
+  grid-area: 3 / 1 / span 1 / span 4;
+  height:563px;
+  padding:18px;
+}
+
+.explore-wordcloud {
+  grid-area: 3 / 5 / span 1 / span 2;
+  padding:3px;
+  overflow-y:scroll;
 }
 
 .explore-map-contents {
@@ -185,26 +225,14 @@
   margin: 0 0 0 0;
 }
 
-.explore-histogram {
-  padding:3px;
-}
-
-.explore-areachart {
-  padding:3px;
-}
-
-.explore-wordcloud {
-  padding:3px;
-  overflow-y:scroll;
-}
-
 .explore-table {
   padding:0px;
   grid-area: 7 / 3 / span 1 / span 6;
 }
 
 .explore-filter {
-  margin: 0 0 0 12px;
+  margin: 12px 0 0 12px;
+  grid-area: 1 / 1 / span 3 / span 1;
 }
 
 .explore-filter-slider {
@@ -293,6 +321,7 @@
   margin-top: 15px;
   width: 96%;
   margin-left: 2%;
+  clear: both;
 }
 
 .range-slider-with-text {

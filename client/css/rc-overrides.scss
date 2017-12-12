@@ -790,8 +790,8 @@
   position: relative;
   border: 1px solid white;
   padding: 10px;
-  background: $accentLight;
-  color: $cloud9;
+  background: $accent;
+  color: $white;
 }
 
 .Collapsible__trigger:after {
@@ -803,7 +803,7 @@
   height: 0;
   border-style: solid;
   border-width: 8px 8px 0 8px;
-  border-color: $cloud6 transparent transparent transparent;
+  border-color: $white transparent transparent transparent;
   display: block;
   transition: transform 300ms;
 }

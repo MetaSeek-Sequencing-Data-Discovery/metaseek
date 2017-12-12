@@ -256,13 +256,13 @@ var Explore = React.createClass({
         <Header history={this.props.history}/>
         <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
           <div className="explore-container">
-            <Paper className="explore-filter">
+            <div className="explore-filter">
               <ExploreFilters
                 updateFilterParams={this.updateFilterParams}
                 activeSummaryData={this.state.activeSummaryData}
                 fullSummaryData={this.state.fullSummaryData}
               />
-            </Paper>
+            </div>
             <div className="explore-headline">
               <h2>Explore</h2>
             </div>
