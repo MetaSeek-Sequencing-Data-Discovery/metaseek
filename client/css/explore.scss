@@ -451,27 +451,27 @@
     grid-area: 3 / 5 / span 1 / span 2;
   }
 
-  .explore-pie {
+  .explore-child-grid .explore-pie {
     grid-area: 1 / 1 / span 1 / span 2;
   }
 
-  .explore-general {
+  .explore-child-grid .explore-general {
     grid-area: 1 / 3 / span 1 / span 2;
   }
 
-  .explore-sequencing {
+  .explore-child-grid .explore-sequencing {
     grid-area: 2 / 1 / span 1 / span 4;
   }
 
-  .explore-sequencing-hist {
+  .explore-child-grid .explore-sequencing-hist {
     grid-area: 3 / 1 / span 1 / span 4;
   }
 
-  .explore-map {
+  .explore-child-grid .explore-map {
     grid-area: 4 / 1 / span 1 / span 4;
   }
 
-  .explore-wordcloud {
+  .explore-child-grid .explore-wordcloud {
     grid-area: 3 / 2 /span 1 /span 2;
     display:none;
   }
@@ -511,27 +511,27 @@
     grid-area: 3 / 5 / span 1 / span 2;
   }
 
-  .explore-pie {
+  .explore-child-grid .explore-pie {
     grid-area: 1 / 3 / span 1 / span 2;
   }
 
-  .explore-general {
+  .explore-child-grid .explore-general {
     grid-area: 2 / 1 / span 1 / span 4;
   }
 
-  .explore-sequencing {
+  .explore-child-grid .explore-sequencing {
     grid-area: 3 / 1 / span 1 / span 4;
   }
 
-  .explore-sequencing-hist {
+  .explore-child-grid .explore-sequencing-hist {
     grid-area: 4 / 1 / span 1 / span 4;
   }
 
-  .explore-map {
+  .explore-child-grid .explore-map {
     grid-area: 5 / 1 / span 1 / span 4;
   }
 
-  .explore-wordcloud {
+ .explore-child-grid .explore-wordcloud {
     grid-area: 3 / 2 /span 1 /span 2;
     display:none;
   }
@@ -576,27 +576,27 @@
     grid-area: 4 / 5 / span 1 / span 2;
   }
 
-  .explore-pie {
+  .explore-child-grid .explore-pie {
     grid-area: 1 / 3 / span 1 / span 2;
   }
 
-  .explore-general {
+  .explore-child-grid .explore-general {
     grid-area: 2 / 1 / span 1 / span 4;
   }
 
-  .explore-sequencing {
+  .explore-child-grid .explore-sequencing {
     grid-area: 3 / 1 / span 1 / span 4;
   }
 
-  .explore-sequencing-hist {
+  .explore-child-grid .explore-sequencing-hist {
     grid-area: 4 / 1 / span 1 / span 4;
   }
 
-  .explore-map {
+  .explore-child-grid .explore-map {
     grid-area: 5 / 1 / span 1 / span 4;
   }
 
-  .explore-wordcloud {
+  .explore-child-grid .explore-wordcloud {
     grid-area: 3 / 2 /span 1 /span 2;
     display:none;
   }

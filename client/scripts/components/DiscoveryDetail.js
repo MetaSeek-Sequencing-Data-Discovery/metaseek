@@ -112,8 +112,8 @@ var DiscoveryDetail = React.createClass({
       <div>
         <Header history={this.props.history}/>
           <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
-            <div className="explore-container">
-              <Paper className="discovery-header card three" >
+            <div className="discovery-details-container">
+              <Paper className="discovery-header" >
                 <h2>{this.state.discovery.discovery_title}</h2>
                 <h3>Discovery Details</h3>
                 <div className="discovery-description">
@@ -164,13 +164,13 @@ var DiscoveryDetail = React.createClass({
                 </div>
               </Paper>
 
-              <Paper className="explore-table card three">
+              <Paper className="discovery-table">
                 <div className="discovery-datasets-title-container">
                     <span className="discovery-datasets-title">Datasets in This Discovery</span>
                 </div>
                 <ExploreTable getNextDataPage={this.getNextDataPage} getPreviousDataPage={this.getPreviousDataPage} dataTable={this.state.dataTable}/>
               </Paper>
-              <VizDashboard activeSummaryData={this.state.summaryData}/>
+              <VizDashboard wrapperClassName="discovery-child-grid" activeSummaryData={this.state.summaryData}/>
             </div>
           </MuiThemeProvider>
       </div>
