@@ -132,6 +132,10 @@
   float: left;
 }
 
+.filter-field-wrapper {
+  clear:both;
+}
+
 .collapsible-container {
   background: $accentLight;
 }
@@ -139,6 +143,7 @@
 /* Grid layout for cards */
 .explore-container {
   width: 100%;
+  min-width:768px;
   margin: 0 auto;
   display:grid;
   grid-template-columns: 340px 1fr 165px 165px 165px 165px 165px 165px 1fr 0px;
@@ -547,7 +552,7 @@
   }
 
   .explore-filter {
-    margin-top:0px;
+    margin: 0;
     grid-area: 3 / 3 / span 1 / span 4;
   }
 
@@ -599,8 +604,17 @@
   .explore-table {
     grid-area: 9 / 3 / span 1 / span 4;
   }
-}
 
-@media (max-width: 769px) {
+  .filter-dropdown {
+    float:right;
+  }
 
+  .chip-input-field {
+    float:right;
+    margin-top: 12px;
+  }
+
+  .filter-field-wrapper {
+    height:60px;
+  }
 }
