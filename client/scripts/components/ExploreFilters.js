@@ -242,6 +242,7 @@ var ExploreFilters = React.createClass({
       boxShadow: "rgba(60, 60, 60, 0.12) 0px 1px 6px, rgba(60, 60, 60, 0.12) 0px 1px 4px"
     };
     const tooltipIconStyle = {color:"#16825c", height:"16px", marginTop:"8px"};
+    const iconLinkStyle = {height:32,width:32, padding:"12px 0 0 12px", zIndex: 100};
 
     return (
       <div>
@@ -261,9 +262,11 @@ var ExploreFilters = React.createClass({
             <Collapsible trigger="General Sample Info" open={true} className="collapsible-container" >
               <div>
                 <h4 className="filter-field-with-help">Investigation Type</h4>
-                <IconButton tooltip=<div style={tooltipStyle}>The root element of all MIxS-compliant reports. This is a controlled vocabulary.</div> tooltipPosition="bottom-center" href="/glossary#investigation_type" iconStyle={tooltipIconStyle} >
-                  <ActionHelpOutline />
-                </IconButton>
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>The root element of all MIxS-compliant reports. This is a controlled vocabulary.</div> tooltipPosition="bottom-left" href="/glossary#investigation_type" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                </div>
               </div>
               <SelectField value={this.state.filterStates.investigation_type.value} onChange={this.handleFilterChange.bind(this,"investigation_type","investigation_type",5)}>
                 <MenuItem value={"All"} primaryText="All" />
@@ -273,9 +276,11 @@ var ExploreFilters = React.createClass({
 
               <div>
                 <h4 className="filter-field-with-help">Environmental Package</h4>
-                <IconButton tooltip=<div style={tooltipStyle}>Environment from which the sample was obtained.</div> tooltipPosition="top-center" href="/glossary#env_package" iconStyle={tooltipIconStyle} >
-                  <ActionHelpOutline />
-                </IconButton>
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>Environment from which the sample was obtained.</div> tooltipPosition="top-left" href="/glossary#env_package" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                </div>
               </div>
               <SelectField value={this.state.filterStates.env_package.value} onChange={this.handleFilterChange.bind(this,"env_package","env_package",5)}>
                 <MenuItem value={"All"} primaryText="All" />
@@ -285,9 +290,11 @@ var ExploreFilters = React.createClass({
 
               <div>
                 <h4 className="filter-field-with-help">Library Source</h4>
-                <IconButton tooltip=<div style={tooltipStyle}>The type of source material that is being sequenced.</div> tooltipPosition="top-center" href="/glossary#library_source" iconStyle={tooltipIconStyle} >
-                  <ActionHelpOutline />
-                </IconButton>
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>The type of source material that is being sequenced.</div> tooltipPosition="top-left" href="/glossary#library_source" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                </div>
               </div>
               <SelectField value={this.state.filterStates.library_source.value} onChange={this.handleFilterChange.bind(this,"library_source","library_source",5)}>
                 <MenuItem value={"All"} primaryText="All" />
@@ -297,9 +304,11 @@ var ExploreFilters = React.createClass({
 
               <div>
                 <h4 className="filter-field-with-help">Study Type</h4>
-                <IconButton tooltip=<div style={tooltipStyle}>SRA controlled vocabulary for type of study.</div> tooltipPosition="top-center" href="/glossary#study_type" iconStyle={tooltipIconStyle} >
-                  <ActionHelpOutline />
-                </IconButton>
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>SRA controlled vocabulary for type of study.</div> tooltipPosition="top-left" href="/glossary#study_type" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                </div>
               </div>
               <SelectField value={this.state.filterStates.study_type.value} onChange={this.handleFilterChange.bind(this,"study_type","study_type",5)}>
                 <MenuItem value={"All"} primaryText="All" />
@@ -308,28 +317,34 @@ var ExploreFilters = React.createClass({
               </SelectField>
             </Collapsible>
 
-            <Collapsible trigger="Sequencing Info" open={false}>
+            <Collapsible trigger="Sequencing Info" open={true}>
               <div>
                 <h4 className="filter-field-with-help">Library Strategy</h4>
-                <IconButton tooltip=<div style={tooltipStyle}>Sequencing technique used for this library.</div> tooltipPosition="bottom-center" href="/glossary#library_strategy" iconStyle={tooltipIconStyle} >
-                  <ActionHelpOutline />
-                </IconButton>
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>Sequencing technique used for this library.</div> tooltipPosition="bottom-left" href="/glossary#library_strategy" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                </div>
               </div>
               <Select name="library_strategy" placeholder="Select Sequencing Strategie(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.library_strategy}  options={libstrat_options} onChange={this.handleMultSelectChange.bind(this,"library_strategy")} onClose={this.handleMultipleFilterChange.bind(this,"library_strategy", "library_strategy", 8, this.state.multSelectStates.library_strategy)} closeOnSelect={false}/>
 
               <div>
                 <h4 className="filter-field-with-help">Library Screening Strategy</h4>
-                <IconButton tooltip=<div style={tooltipStyle}>Whether any method was used to select for or against, enrich, or screen the material being sequenced.</div> tooltipPosition="top-center" href="/glossary#library_screening_strategy" iconStyle={tooltipIconStyle} >
-                  <ActionHelpOutline />
-                </IconButton>
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>Whether any method was used to select for or against, enrich, or screen the material being sequenced.</div> tooltipPosition="top-left" href="/glossary#library_screening_strategy" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                </div>
               </div>
               <Select name="library_screening_strategy" placeholder="Select Screening Strategie(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.library_screening_strategy}  options={libscreenstrat_options} onChange={this.handleMultSelectChange.bind(this,"library_screening_strategy")} onClose={this.handleMultipleFilterChange.bind(this,"library_screening_strategy", "library_screening_strategy", 8, this.state.multSelectStates.library_screening_strategy)} closeOnSelect={false}/>
 
               <div>
                 <h4 className="filter-field-with-help">Library Construction Method</h4>
-                <IconButton tooltip=<div style={tooltipStyle}>Whether to expect single or paired-end reads.</div> tooltipPosition="top-center" href="/glossary#library_construction_method" iconStyle={tooltipIconStyle} >
-                  <ActionHelpOutline />
-                </IconButton>
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>Whether to expect single or paired-end reads.</div> tooltipPosition="top-left" href="/glossary#library_construction_method" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                </div>
               </div>
               <SelectField value={this.state.filterStates.library_construction_method.value} onChange={this.handleFilterChange.bind(this,"library_construction_method","library_construction_method",5)}>
                 <MenuItem value={"All"} primaryText="All" />
@@ -339,25 +354,31 @@ var ExploreFilters = React.createClass({
 
               <div>
                 <h4 className="filter-field-with-help">Sequencing Method</h4>
-                <IconButton tooltip=<div style={tooltipStyle}>Sequencing platform used for sequencing. This is a controlled vocabulary.</div> tooltipPosition="top-center" href="/glossary#sequencing_method" iconStyle={tooltipIconStyle} >
-                  <ActionHelpOutline />
-                </IconButton>
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>Sequencing platform used for sequencing. This is a controlled vocabulary.</div> tooltipPosition="top-left" href="/glossary#sequencing_method" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                </div>
               </div>
               <Select name="sequencing_method" placeholder="Select Sequencing Method(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.sequencing_method}  options={seqmeth_options} onChange={this.handleMultSelectChange.bind(this,"sequencing_method")} onClose={this.handleMultipleFilterChange.bind(this,"sequencing_method", "sequencing_method", 8, this.state.multSelectStates.sequencing_method)} closeOnSelect={false}/>
 
               <div>
                 <h4 className="filter-field-with-help">Instrument Model</h4>
-                  <IconButton tooltip=<div style={tooltipStyle}>Model of instrument used for sequencing.</div> tooltipPosition="top-center" href="/glossary#instrument_model" iconStyle={tooltipIconStyle} >
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>Model of instrument used for sequencing.</div> tooltipPosition="top-left" href="/glossary#instrument_model" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
                     <ActionHelpOutline />
                   </IconButton>
+                </div>
               </div>
               <Select name="instrument_model" placeholder="Select Instrument Model(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.instrument_model}  options={instmod_options} onChange={this.handleMultSelectChange.bind(this,"instrument_model")} onClose={this.handleMultipleFilterChange.bind(this,"instrument_model", "instrument_model", 8, this.state.multSelectStates.instrument_model)} closeOnSelect={false}/>
 
               <div>
                 <h4 className="filter-field-with-help">Average Read Length</h4>
-                  <IconButton tooltip=<div style={tooltipStyle}>Average number of nucleotides per sequencing read.</div> tooltipPosition="top-center" href="/glossary#avg_read_length" iconStyle={tooltipIconStyle} >
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>Average number of nucleotides per sequencing read.</div> tooltipPosition="top-left" href="/glossary#avg_read_length" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
                     <ActionHelpOutline />
                   </IconButton>
+                </div>
               </div>
               <ManualRangeSlider field="avg_read_length_maxrun" filterMin="avgRdLgthMin" filterMax="avgRdLgthMax"
                 filterTypeMin={4} filterTypeMax={3} min={0} max={11}
@@ -367,9 +388,11 @@ var ExploreFilters = React.createClass({
               />
               <div>
                 <h4 className="filter-field-with-help">Number of Reads Sequenced</h4>
-                  <IconButton tooltip=<div style={tooltipStyle}>Total number of reads sequenced.</div> tooltipPosition="top-center" href="/glossary#library_reads_sequenced" iconStyle={tooltipIconStyle} >
+                <div className="gloss-icon-wrapper">
+                    <IconButton tooltip=<div style={tooltipStyle}>Total number of reads sequenced.</div> tooltipPosition="top-left" href="/glossary#library_reads_sequenced" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
                       <ActionHelpOutline />
                     </IconButton>
+                </div>
               </div>
               <ManualRangeSlider field="library_reads_sequenced_maxrun" filterMin="libRdsSqdMin" filterMax="libRdsSqdMax"
                 filterTypeMin={4} filterTypeMax={3} min={0} max={10}
@@ -379,7 +402,7 @@ var ExploreFilters = React.createClass({
               />
             </Collapsible>
 
-            <Collapsible trigger="Environmental/Contextual Info" open={false}>
+            <Collapsible trigger="Environmental/Contextual Info" open={true}>
               <h4>Latitude</h4>
               <RangeSlider field="meta_latitude" filterMin="latitudeMin" filterMax="latitudeMax"
                 filterTypeMin={4} filterTypeMax={3} min={-90} max={90}
@@ -394,9 +417,11 @@ var ExploreFilters = React.createClass({
               />
               <div>
                 <h4 className="filter-field-with-help">Environmental Biome</h4>
-                <IconButton tooltip=<div style={tooltipStyle}>The broad ecological context of a sample. From the EnvO ontology.</div> tooltipPosition="top-center" href="/glossary#env_biome" iconStyle={tooltipIconStyle} >
-                  <ActionHelpOutline />
-                </IconButton>
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>The broad ecological context of a sample. From the EnvO ontology.</div> tooltipPosition="top-left" href="/glossary#env_biome" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                </div>
               </div>
               <ChipInput
                 hintText={"Press enter to create tags, and find datasets that contain any tag's text."}
@@ -405,27 +430,33 @@ var ExploreFilters = React.createClass({
               />
               <div>
                 <h4 className="filter-field-with-help">Environmental Feature</h4>
-                <IconButton tooltip=<div style={tooltipStyle}>A descriptor of the more local environment. From the EnvO ontology.</div> tooltipPosition="top-center" href="/glossary#env_feature" iconStyle={tooltipIconStyle} >
-                  <ActionHelpOutline />
-                </IconButton>
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>A descriptor of the more local environment. From the EnvO ontology.</div> tooltipPosition="top-left" href="/glossary#env_feature" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                </div>
               </div>
               <ChipInput
                 onChange={this.handleChipBlur.bind(this,"env_feature","env_feature",7,this.state.chipStates.env_feature)}
               />
               <div>
                 <h4 className="filter-field-with-help">Environmental Material</h4>
-                  <IconButton tooltip=<div style={tooltipStyle}>The material in which a sample was embedded prior to the sampling event. From the EnvO ontology.</div> tooltipPosition="top-center" href="/glossary#env_material" iconStyle={tooltipIconStyle} >
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>The material in which a sample was embedded prior to the sampling event. From the EnvO ontology.</div> tooltipPosition="top-left" href="/glossary#env_material" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
                     <ActionHelpOutline />
                   </IconButton>
+                </div>
               </div>
               <ChipInput
                 onChange={this.handleChipBlur.bind(this,"env_material","env_material",7,this.state.chipStates.env_material)}
               />
               <div>
                 <h4 className="filter-field-with-help">Geographic Location</h4>
-                  <IconButton tooltip=<div style={tooltipStyle}>Geographical origin of the sample as defined by the country or sea name followed by specific region name. Ontology field.</div> tooltipPosition="top-center" href="/glossary#geo_loc_name" iconStyle={tooltipIconStyle} >
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>Geographical origin of the sample as defined by the country or sea name followed by specific region name. Ontology field.</div> tooltipPosition="top-left" href="/glossary#geo_loc_name" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
                     <ActionHelpOutline />
                   </IconButton>
+                </div>
               </div>
               <ChipInput
                 onChange={this.handleChipBlur.bind(this,"geo_loc_name","geo_loc_name",7,this.state.chipStates.geo_loc_name)}
