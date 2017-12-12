@@ -263,7 +263,7 @@ var VizDashboard = React.createClass({
     };
 
     return (
-      <div className="explore-child-grid">
+      <div className={this.props.wrapperClassName}>
         <Paper className="explore-general">
           {renderFigure(this.props.activeSummaryData,this.props.processing, geninfo_histcomponent)}
         </Paper>
