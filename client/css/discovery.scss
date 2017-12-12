@@ -1,5 +1,35 @@
 @import 'colors';
 
+/* Grid layout for cards */
+.discovery-details-container {
+  width: 100%;
+  min-width:768px;
+  margin: 0 auto;
+  display:grid;
+  grid-template-columns: 1fr 165px 165px 165px 165px 165px 165px 1fr;
+  grid-template-rows: auto 400px 400px 563px auto;
+  grid-gap: 18px 18px;
+}
+
+.discovery-header {
+  margin-top: 36px;
+  grid-area: 1 / 2 / span 1 / span 6;
+}
+
+.explore-child-grid {
+  grid-area: 2 / 2 / span 3 / span 6;
+  display: inherit;
+  grid-gap: 18px 18px;
+  grid-template-columns: 165px 165px 165px 165px 165px 165px;
+  grid-template-rows: 400px 400px 563px;
+}
+
+.discovery-table {
+  padding:0px;
+  grid-area: 5 / 2 / span 1 / span 6;
+  margin-bottom: 48px;
+}
+
 /* Discovery Details */
 .discovery-description {
   font-style: italic;
@@ -35,11 +65,6 @@
   color: $cloud6;
   margin-left: 12px;
   font-family: 'Roboto', sans-serif;
-}
-
-.discovery-header {
-  margin: 36px 0 36px 18px;
-  overflow: visible;
 }
 
 .discovery-header-summary {

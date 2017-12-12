@@ -415,7 +415,7 @@ var ExploreFilters = React.createClass({
                 minValue={this.state.rangeStates.longitudeMin.value} maxValue={this.state.rangeStates.longitudeMax.value}
                 handleNumericFilterChange={this.handleNumericFilterChange} updateRangeValues={this.updateRangeValues}
               />
-              <div className="filter-field-wrapper">>
+              <div className="filter-field-wrapper">
                 <h4 className="filter-field-with-help">Environmental Biome</h4>
                 <div className="gloss-icon-wrapper">
                   <IconButton tooltip=<div style={tooltipStyle}>The broad ecological context of a sample. From the EnvO ontology.</div> tooltipPosition="top-left" href="/glossary#env_biome" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
