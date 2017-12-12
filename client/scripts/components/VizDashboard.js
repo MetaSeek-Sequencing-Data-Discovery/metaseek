@@ -264,22 +264,22 @@ var VizDashboard = React.createClass({
 
     return (
       <div>
-        <Paper className="explore-histogram card left seven">
+        <Paper className="explore-histogram">
           {renderFigure(this.props.activeSummaryData,this.props.processing, geninfo_histcomponent)}
         </Paper>
-        <Paper className="explore-areachart card left seven">
+        <Paper className="explore-areachart">
           {renderFigure(this.props.activeSummaryData,this.props.processing, seqinfo_areacomponent)}
         </Paper>
-        <Paper className="explore-histogram card left one">
+        <Paper className="explore-histogram">
           {renderFigure(this.props.activeSummaryData,this.props.processing, libconst_component)}
         </Paper>
-        <Paper className="explore-histogram card left two">
+        <Paper className="explore-histogram">
           {renderFigure(this.props.activeSummaryData,this.props.processing, seqinfo_histcomponent)}
         </Paper>
-        <Paper className="explore-map card left four">
+        <Paper className="explore-map">
           {renderFigure(this.props.activeSummaryData,this.props.processing, map_component)}
         </Paper>
-        <Paper className="explore-wordcloud card left eight">
+        <Paper className="explore-wordcloud">
           {renderFigure(this.props.activeSummaryData,this.props.processing, envinfo_wordcloudcomponent)}
         </Paper>
       </div>

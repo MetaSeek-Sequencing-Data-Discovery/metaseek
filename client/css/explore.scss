@@ -2,60 +2,6 @@
 @import 'colors';
 @import 'loaders';
 
-/* 3 card grid, 348px per card, 18px per gutter between cards */
-.one {
-  width: 348px;
-}
-
-.overview-size {
-  width: 348px;
-  height: 250px;
-}
-
-.two {
-  width: 714px;
-}
-
-.three {
-  width: 1080px;
-  clear: both;
-}
-
-.four {
-  width: 670px;
-}
-
-.five {
-  width: 250px;
-}
-
-.six {
-  width: 348px;
-  height: 563px;
-}
-
-.seven {
-  width: 531px;
-  height: 400px;
-}
-
-.eight {
-  width: 392px;
-  height: 563px;
-}
-
-.card {
-  padding: 18px;
-}
-
-.right {
-  float:right;
-}
-
-.left {
-  float:left;
-}
-
 .save-discovery-button-container {
   margin: 0 auto;
   position: relative;
@@ -118,7 +64,6 @@
   margin: -20px 0 0 0;
 }
 
-
 .user-photo {
   float: left;
 }
@@ -160,18 +105,7 @@
   margin: -14px 0 10px -10px;
 }
 
-
 /* Explore layout */
-
-.header-explore-filteropen {
-  width: 1100px;
-  margin: 0 0 0 340px;
-}
-
-.header-explore {
-  width: 100%;
-  margin: 0 0 0 0;
-}
 
 .subscribe-explore-yes {
   display: inline-block;
@@ -189,20 +123,12 @@
 }
 
 .explore-container {
-  width: 1212px;
-  margin: 10px 7.5%;
+  width: 100%;
+  margin: 0 auto;
+  display:grid;
+  grid-template-columns: 30% 14% 14% 14% 14% 14%;
+  grid-template-rows: 20% 20% 20% 20% 20%;
 }
-
-.explore-container-filteropen {
-  width: 1100px;
-  margin: 10px 10% 0 23%;
-}
-
-.explore-container-filterclosed {
-  width: 1100px;
-  margin: 10px 11% 0 11%;
-}
-
 
 .filter-field-with-help {
   float: left;
