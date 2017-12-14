@@ -2,60 +2,6 @@
 @import 'colors';
 @import 'loaders';
 
-/* 3 card grid, 348px per card, 18px per gutter between cards */
-.one {
-  width: 348px;
-}
-
-.overview-size {
-  width: 348px;
-  height: 250px;
-}
-
-.two {
-  width: 714px;
-}
-
-.three {
-  width: 1080px;
-  clear: both;
-}
-
-.four {
-  width: 670px;
-}
-
-.five {
-  width: 250px;
-}
-
-.six {
-  width: 348px;
-  height: 563px;
-}
-
-.seven {
-  width: 531px;
-  height: 400px;
-}
-
-.eight {
-  width: 392px;
-  height: 563px;
-}
-
-.card {
-  padding: 18px;
-}
-
-.right {
-  float:right;
-}
-
-.left {
-  float:left;
-}
-
 .save-discovery-button-container {
   margin: 0 auto;
   position: relative;
@@ -118,7 +64,6 @@
   margin: -20px 0 0 0;
 }
 
-
 .user-photo {
   float: left;
 }
@@ -132,6 +77,12 @@
   font-size:18px;
   font-weight: bold;
   color: $cloud10;
+}
+
+.gloss-icon-wrapper {
+  float: right;
+  margin-top: -2px;
+  margin-right: 12px;
 }
 
 .figure-hint-tooltip {
@@ -160,18 +111,7 @@
   margin: -14px 0 10px -10px;
 }
 
-
 /* Explore layout */
-
-.header-explore-filteropen {
-  width: 1100px;
-  margin: 0 0 0 340px;
-}
-
-.header-explore {
-  width: 100%;
-  margin: 0 0 0 0;
-}
 
 .subscribe-explore-yes {
   display: inline-block;
@@ -188,38 +128,104 @@
   text-align: center;
 }
 
-.explore-container {
-  width: 1212px;
-  margin: 10px 7.5%;
-}
-
-.explore-container-filteropen {
-  width: 1100px;
-  margin: 10px 10% 0 23%;
-}
-
-.explore-container-filterclosed {
-  width: 1100px;
-  margin: 10px 11% 0 11%;
-}
-
-
 .filter-field-with-help {
   float: left;
+}
+
+.filter-field-wrapper {
+  clear:both;
 }
 
 .collapsible-container {
   background: $accentLight;
 }
 
+/* Grid layout for cards */
+.explore-container {
+  width: 100%;
+  min-width:768px;
+  margin: 0 auto;
+  display:grid;
+  grid-template-columns: 340px 1fr 165px 165px 165px 165px 165px 165px 1fr 0px;
+  grid-template-rows: 48px 68px 250px 400px 400px 563px 1fr;
+  grid-gap: 18px 18px;
+}
+
+.explore-child-grid {
+  grid-area: 4 / 3 / span 3 / span 6;
+  display: inherit;
+  grid-gap: 18px 18px;
+  grid-template-columns: 165px 165px 165px 165px 165px 165px;
+  grid-template-rows: 400px 400px 563px;
+}
+
+.explore-filter {
+  margin: 12px 0 0 12px;
+  grid-area: 1 / 1 / span 3 / span 1;
+}
+
 .explore-headline {
-  margin: 0 0 18px 18px;
-  position: relative;
+  grid-area: 1 / 3 / span 1 / span 6;
+}
+
+.save-discovery-button-container {
+  grid-area: 2 / 3 / span 1 / span 6;
+}
+
+.explore-number-datasets {
+  grid-area: 3 / 3 / span 1 / span 2;
+  padding: 18px;
+  height: 250px;
+}
+
+.explore-total-download {
+  grid-area: 3 / 5 / span 1 / span 2;
+  padding: 18px;
+  height: 250px;
+}
+
+.explore-user {
+  grid-area: 3 / 7 / span 1 / span 2;
+  padding: 18px;
+  height: 250px;
+}
+
+.explore-general {
+  grid-area: 1 / 1 / span 1 / span 3;
+  padding:3px;
+}
+
+.explore-sequencing {
+  grid-area: 1 / 4 / span 1 / span 3;
+  padding:3px;
+}
+
+.explore-pie {
+  grid-area: 2 / 1 / span 1 / span 2;
+  padding:3px;
+}
+
+.explore-sequencing-hist {
+  grid-area: 2 / 3 / span 1 / span 4;
+  padding:3px;
 }
 
 .explore-map {
-  margin: 0 0 18px 18px;
-  height: 563px;
+  grid-area: 3 / 1 / span 1 / span 4;
+  height:563px;
+  padding:18px;
+}
+
+.explore-wordcloud {
+  grid-area: 3 / 5 / span 1 / span 2;
+  padding:3px;
+  overflow-y:scroll;
+}
+
+.explore-table {
+  padding:0px;
+  grid-area: 7 / 3 / span 1 / span 6;
+  margin-bottom: 48px;
 }
 
 .explore-map-contents {
@@ -233,42 +239,6 @@
 
 .explore-map-render {
   margin: 0 0 0 0;
-}
-
-.explore-histogram {
-  padding:3px;
-  height:400px;
-  margin: 0 0 18px 18px;
-}
-
-.explore-areachart {
-  padding:3px;
-  margin: 0 0 18px 18px;
-}
-
-.explore-wordcloud {
-  padding:3px;
-  overflow-y:scroll;
-  margin: 0 0 18px 18px;
-}
-
-.explore-radarchart {
-  padding:3px;
-  margin: 0 0 18px 18px;
-}
-
-.explore-download {
-  margin: 0 0 18px 0;
-  padding:16px;
-}
-
-.explore-table {
-  padding:0px;
-  margin: 0 0 18px 18px;
-}
-
-.explore-filter {
-  margin: 12px 12px 0 12px;
 }
 
 .explore-filter-slider {
@@ -357,6 +327,7 @@
   margin-top: 15px;
   width: 96%;
   margin-left: 2%;
+  clear: both;
 }
 
 .range-slider-with-text {
@@ -439,4 +410,211 @@
   right: -25px;
   line-height: 0.5;
   font-weight: bold;
+}
+
+/* 1496 is min normal view with 6 main columns */
+@media (max-width: 1496px) {
+  .explore-container {
+    width: 100%;
+    margin: 0 auto;
+    display:grid;
+    grid-template-columns: 340px 1fr 10fr 10fr 10fr 10fr 1fr 0px;
+    grid-template-rows: 48px 68px 250px auto auto auto auto 1fr;
+    grid-gap: 18px 18px;
+  }
+
+  .explore-child-grid {
+    grid-area: 4 / 3 / span 4 / span 4;
+    display: inherit;
+    grid-gap: 18px 18px;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto auto;
+  }
+
+  .explore-headline {
+    grid-area: 1 / 3 / span 1 / span 4;
+  }
+
+  .save-discovery-button-container {
+    grid-area: 2 / 3 / span 1 / span 4;
+  }
+
+  .explore-number-datasets {
+    grid-area: 3 / 3 / span 1 / span 2;
+  }
+
+  .explore-total-download {
+    display:none;
+  }
+
+  .explore-user {
+    grid-area: 3 / 5 / span 1 / span 2;
+  }
+
+  .explore-pie {
+    grid-area: 1 / 1 / span 1 / span 2;
+  }
+
+  .explore-general {
+    grid-area: 1 / 3 / span 1 / span 2;
+  }
+
+  .explore-sequencing {
+    grid-area: 2 / 1 / span 1 / span 4;
+  }
+
+  .explore-sequencing-hist {
+    grid-area: 3 / 1 / span 1 / span 4;
+  }
+
+  .explore-map {
+    grid-area: 4 / 1 / span 1 / span 4;
+  }
+
+  .explore-wordcloud {
+    grid-area: 3 / 2 /span 1 /span 2;
+    display:none;
+  }
+
+  .explore-table {
+    grid-area: 8 / 3 / span 1 / span 4;
+  }
+}
+
+@media (max-width: 1180px) {
+  .explore-container {
+    grid-template-columns: 340px 1fr 10fr 10fr 10fr 10fr 1fr 0px;
+    grid-template-rows: 48px 68px 250px auto auto auto auto auto 1fr;
+  }
+
+  .explore-child-grid {
+    grid-area: 4 / 3 / span 5 / span 4;
+    display: inherit;
+    grid-gap: 18px 18px;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto auto auto;
+  }
+  .explore-number-datasets {
+    grid-area: 3 / 3 / span 1 / span 2;
+  }
+
+  .overview-content .active {
+    font-size: 22px;
+  }
+
+  .explore-total-download {
+    display:block;
+    grid-area: 4 / 3 / span 1 / span 2;
+  }
+
+  .explore-user {
+    grid-area: 3 / 5 / span 1 / span 2;
+  }
+
+  .explore-pie {
+    grid-area: 1 / 3 / span 1 / span 2;
+  }
+
+  .explore-general {
+    grid-area: 2 / 1 / span 1 / span 4;
+  }
+
+  .explore-sequencing {
+    grid-area: 3 / 1 / span 1 / span 4;
+  }
+
+  .explore-sequencing-hist {
+    grid-area: 4 / 1 / span 1 / span 4;
+  }
+
+  .explore-map {
+    grid-area: 5 / 1 / span 1 / span 4;
+  }
+
+  .explore-wordcloud {
+    grid-area: 3 / 2 /span 1 /span 2;
+    display:none;
+  }
+
+  .explore-table {
+    grid-area: 9 / 3 / span 1 / span 4;
+  }
+}
+
+@media (max-width: 1080px) {
+  .explore-container {
+    grid-template-columns: 0px 1fr 10fr 10fr 10fr 10fr 1fr 0px;
+    grid-template-rows: 48px 68px auto 250px auto auto auto auto auto 1fr;
+  }
+
+  .explore-child-grid {
+    grid-area: 5 / 3 / span 4 / span 4;
+  }
+
+  .explore-filter {
+    margin: 0;
+    grid-area: 3 / 3 / span 1 / span 4;
+  }
+
+  .explore-headline {
+    grid-area: 1 / 3 / span 1 / span 4;
+  }
+
+  .save-discovery-button-container {
+    grid-area: 2 / 3 / span 1 / span 4;
+  }
+
+  .explore-number-datasets {
+    grid-area: 4 / 3 / span 1 / span 2;
+  }
+
+  .explore-total-download {
+    grid-area: 5 / 3 / span 1 / span 2;
+  }
+
+  .explore-user {
+    grid-area: 4 / 5 / span 1 / span 2;
+  }
+
+  .explore-pie {
+    grid-area: 1 / 3 / span 1 / span 2;
+  }
+
+  .explore-general {
+    grid-area: 2 / 1 / span 1 / span 4;
+  }
+
+  .explore-sequencing {
+    grid-area: 3 / 1 / span 1 / span 4;
+  }
+
+  .explore-sequencing-hist {
+    grid-area: 4 / 1 / span 1 / span 4;
+  }
+
+  .explore-map {
+    grid-area: 5 / 1 / span 1 / span 4;
+  }
+
+  .explore-wordcloud {
+    grid-area: 3 / 2 /span 1 /span 2;
+    display:none;
+  }
+
+  .explore-table {
+    grid-area: 9 / 3 / span 1 / span 4;
+  }
+
+  .filter-dropdown {
+    float:right;
+  }
+
+  .chip-input-field {
+    float:right;
+    margin-top: 12px;
+  }
+
+  .filter-field-wrapper {
+    height:60px;
+  }
 }

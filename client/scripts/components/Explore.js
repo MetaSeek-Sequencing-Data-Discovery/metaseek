@@ -24,7 +24,6 @@ import VizDashboard from './VizDashboard';
 import ExploreTable from './ExploreTable';
 
 import {getReadableFileSizeString} from '../helpers';
-import ContentForward from 'material-ui/svg-icons/content/forward';
 
 var apiRequest = axios.create({
   baseURL: apiConfig.baseURL
@@ -206,10 +205,6 @@ var Explore = React.createClass({
     this.updateActiveSummaryData();
   },
 
-  toggleFilters : function() {
-    this.setState({filtersOpen: !this.state.filtersOpen});
-  },
-
   render : function() {
     if (!this.state.loaded) return <Loading/>;
 
@@ -258,145 +253,133 @@ var Explore = React.createClass({
 
     return (
       <div>
-          <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
-            <div>
-              <IconButton  style={{position:"fixed", top: "100px", left:"-35px"}} iconStyle={{color:"rgb(175,175,175)", width: "100px", height:"60px"}} onClick={this.toggleFilters}>
-                  <ContentForward />
-              </IconButton>
-              <text style={{position:"fixed",top:"170px", left:"5px", color:"rgb(175,175,175)", fontFamily:"Roboto"}}>Edit Filters</text>
-              <div className={this.state.filtersOpen ? "header-explore-filteropen" : "header-explore"}>
-                <Header history={this.props.history}/>
-              </div>
-              <div className={this.state.filtersOpen ? "explore-container-filteropen" : "explore-container-filterclosed"}>
-                <h2>Explore</h2>
-                <div className="save-discovery-button-container">
-                  <RaisedButton
-                    className="save-discovery-button"
-                    onClick={this.state.firebase.uid ? this.discoveryDialogOpen : this.promptGoogleLoginOpen}
-                    primary={true}
-                    label="Save Discovery"
-                  />
-                  <Dialog
-                    title="Title Your Discovery"
-                    actions={discoveryDialog_actions}
-                    modal={false}
-                    open={this.state.submitDiscoveryOpen}
-                    onRequestClose={this.discoveryDialogClose}
-                  >
-                    <TextField
-                      errorText="This field is required."
-                      errorStyle={{color:"#cc313d"}}
-                      underlineFocusStyle={{color:"#1A9C6E"}}
-                      onChange={this.updateDiscoveryTitle}
-                      value={this.state.discoveryTitle}
-                      fullWidth={true}
-                      hintText="Discovery Title"
-                    />
-                  <br className="big-br" />
-                  <TextField
-                    underlineFocusStyle={{color:"#1A9C6E"}}
-                    floatingLabelFocusStyle={{color:"#1A9C6E"}}
-                    multiLine={true}
-                    rows={1}
-                    rowsMax={2}
-                    fullWidth={true}
-                    onChange={this.updateDiscoveryDescription}
-                    value={this.state.discoveryDescription}
-                    floatingLabelText="Enter a short description of your discovery"
-                    floatingLabelFixed={true}
-                    />
-                  </Dialog>
-                  <Dialog
-                    actions={loginPrompt_actions}
-                    modal={false}
-                    open={this.state.promptLoginOpen}
-                    onRequestClose={this.promptGoggleLoginClose}
-                    contentStyle={{width:"380px", textAlign:"center"}}
-                    actionsContainerStyle={{textAlign:"center"}}
-                  >
-                    Please sign up or log in with Google to save your discovery.
-                  </Dialog>
-                </div>
-
-
-                <ExploreFilters
-                  className="explore-filter"
-                  updateFilterParams={this.updateFilterParams}
-                  activeSummaryData={this.state.activeSummaryData}
-                  fullSummaryData={this.state.fullSummaryData}
-                  open={this.state.filtersOpen}
-                  toggleFilters={this.toggleFilters}
+        <Header history={this.props.history}/>
+        <MuiThemeProvider muiTheme={getMuiTheme(ColorPalette)}>
+          <div className="explore-container">
+            <div className="explore-filter">
+              <ExploreFilters
+                updateFilterParams={this.updateFilterParams}
+                activeSummaryData={this.state.activeSummaryData}
+                fullSummaryData={this.state.fullSummaryData}
+              />
+            </div>
+            <div className="explore-headline">
+              <h2>Explore</h2>
+            </div>
+            <div className="save-discovery-button-container">
+              <RaisedButton
+                className="save-discovery-button"
+                onClick={this.state.firebase.uid ? this.discoveryDialogOpen : this.promptGoogleLoginOpen}
+                primary={true}
+                label="Save Discovery"
+              />
+              <Dialog
+                title="Title Your Discovery"
+                actions={discoveryDialog_actions}
+                modal={false}
+                open={this.state.submitDiscoveryOpen}
+                onRequestClose={this.discoveryDialogClose}
+              >
+                <TextField
+                  errorText="This field is required."
+                  errorStyle={{color:"#cc313d"}}
+                  underlineFocusStyle={{color:"#1A9C6E"}}
+                  onChange={this.updateDiscoveryTitle}
+                  value={this.state.discoveryTitle}
+                  fullWidth={true}
+                  hintText="Discovery Title"
                 />
-
-              <Paper className="explore-headline card left overview-size">
-                  <div className="profile-container">
-                    <span className="overview-title">Number of Datasets</span>
-                    <br/>
-                    <svg width="100%" height="10">
-                      <line x1="0" y1="5" x2="100%" y2="5" stroke="gray"  />
-                    </svg>
-                    <br/>
-                    <span className="overview-content">currently showing <br className="big-br" /><span className="active">{this.state.activeSummaryData.total_datasets} datasets</span> <br className="big-br" /> out of {this.state.fullSummaryData.total_datasets} total datasets</span>
-                  </div>
-                </Paper>
-                <Paper className="explore-headline card left overview-size">
-                  <div className="profile-container">
-                    <span className="overview-title">Estimated Total Download Size</span>
-                    <br/>
-                    <svg width="100%" height="10">
-                      <line x1="0" y1="5" x2="100%" y2="5" stroke="gray"  />
-                    </svg>
-                    <br/>
-                    <span className="overview-content-download"> {getReadableFileSizeString(this.state.activeSummaryData.total_download_size)} </span>
-                  </div>
-                </Paper>
-                <Paper className="explore-headline card left overview-size">
-                  <div className="profile-container">
-                    <span className="overview-title">User</span>
-                    <br/>
-                    <svg width="100%" height="10">
-                      <line x1="0" y1="5" x2="100%" y2="5" stroke="gray" />
-                    </svg>
-                    <br/>
-                    <div className="overview-content-user">
-                      {this.state.firebase.uid ?
-                      <div className="overview-content-user-active">
-                        <div className="user-photo">
-                          <img src={this.state.firebase.photo} alt="" width="75px" height="75px"/>
-                        </div>
-                        <div className="user-active-message">
-                          <span>{"Hi, " + this.state.firebase.name + ". Thanks for using MetaSeek!"}</span>
-                        </div>
-                      </div>
-                      : <span className="overview-content-user-inactive">Create an account or log in with Google to save your discoveries.</span>
-                      }
-                      <br className="big-br"/>
-                      <RaisedButton
-                        className="profile-button"
-                        onClick={this.state.firebase.uid ?  this.triggerLogout : this.triggerGoogleLogin }
-                        primary={this.state.firebase.uid ? false : true}
-                        label={this.state.firebase.uid ? "Log Out" : "Sign Up/Log In With Google" }
-                      />
-                      <Dialog
-                        title={"Welcome to MetaSeek, "+this.state.firebase.name+"!"}
-                        actions={mailingList_actions}
-                        modal={true}
-                        open={this.state.mailingListOpen}
-                      >
-                      <h4 className="subscribe-explore-body">Join our mailing list to receive (very rare) updates on major events here at MetaSeek</h4>
-                      </Dialog>
+              <br className="big-br" />
+              <TextField
+                underlineFocusStyle={{color:"#1A9C6E"}}
+                floatingLabelFocusStyle={{color:"#1A9C6E"}}
+                multiLine={true}
+                rows={1}
+                rowsMax={2}
+                fullWidth={true}
+                onChange={this.updateDiscoveryDescription}
+                value={this.state.discoveryDescription}
+                floatingLabelText="Enter a short description of your discovery"
+                floatingLabelFixed={true}
+                />
+              </Dialog>
+              <Dialog
+                actions={loginPrompt_actions}
+                modal={false}
+                open={this.state.promptLoginOpen}
+                onRequestClose={this.promptGoggleLoginClose}
+                contentStyle={{width:"380px", textAlign:"center"}}
+                actionsContainerStyle={{textAlign:"center"}}
+              >
+                Please sign up or log in with Google to save your discovery.
+              </Dialog>
+            </div>
+            <Paper className="explore-number-datasets">
+              <div className="profile-container">
+                <span className="overview-title">Number of Datasets</span>
+                <br/>
+                <svg width="100%" height="10">
+                  <line x1="0" y1="5" x2="100%" y2="5" stroke="gray"  />
+                </svg>
+                <br/>
+                <span className="overview-content">currently showing <br className="big-br" /><span className="active">{this.state.activeSummaryData.total_datasets} datasets</span> <br className="big-br" /> out of {this.state.fullSummaryData.total_datasets} total datasets</span>
+              </div>
+            </Paper>
+            <Paper className="explore-total-download">
+              <div className="profile-container">
+                <span className="overview-title">Estimated Total Download Size</span>
+                <br/>
+                <svg width="100%" height="10">
+                  <line x1="0" y1="5" x2="100%" y2="5" stroke="gray"  />
+                </svg>
+                <br/>
+                <span className="overview-content-download"> {getReadableFileSizeString(this.state.activeSummaryData.total_download_size)} </span>
+              </div>
+            </Paper>
+            <Paper className="explore-user">
+              <div className="profile-container">
+                <span className="overview-title">User</span>
+                <br/>
+                <svg width="100%" height="10">
+                  <line x1="0" y1="5" x2="100%" y2="5" stroke="gray" />
+                </svg>
+                <br/>
+                <div className="overview-content-user">
+                  {this.state.firebase.uid ?
+                  <div className="overview-content-user-active">
+                    <div className="user-photo">
+                      <img src={this.state.firebase.photo} alt="" width="75px" height="75px"/>
+                    </div>
+                    <div className="user-active-message">
+                      <span>{"Hi, " + this.state.firebase.name + ". Thanks for using MetaSeek!"}</span>
                     </div>
                   </div>
-                </Paper>
-
-                <VizDashboard activeSummaryData={this.state.activeSummaryData} processing={this.state.processing}/>
-
-                <Paper className="explore-table card three">
-                  <ExploreTable getNextDataPage={this.getNextDataPage} getPreviousDataPage={this.getPreviousDataPage} dataTable={this.state.dataTable}/>
-                </Paper>
+                  : <span className="overview-content-user-inactive">Create an account or log in with Google to save your discoveries.</span>
+                  }
+                  <br className="big-br"/>
+                  <RaisedButton
+                    className="profile-button"
+                    onClick={this.state.firebase.uid ?  this.triggerLogout : this.triggerGoogleLogin }
+                    primary={this.state.firebase.uid ? false : true}
+                    label={this.state.firebase.uid ? "Log Out" : "Sign Up/Log In With Google" }
+                  />
+                  <Dialog
+                    title={"Welcome to MetaSeek, "+this.state.firebase.name+"!"}
+                    actions={mailingList_actions}
+                    modal={true}
+                    open={this.state.mailingListOpen}
+                  >
+                  <h4 className="subscribe-explore-body">Join our mailing list to receive (very rare) updates on major events here at MetaSeek</h4>
+                  </Dialog>
+                </div>
               </div>
-            </div>
-          </MuiThemeProvider>
+            </Paper>
+            <VizDashboard activeSummaryData={this.state.activeSummaryData} processing={this.state.processing}/>
+            <Paper className="explore-table">
+              <ExploreTable getNextDataPage={this.getNextDataPage} getPreviousDataPage={this.getPreviousDataPage} dataTable={this.state.dataTable}/>
+            </Paper>
+          </div>
+        </MuiThemeProvider>
       </div>
     )
   }
