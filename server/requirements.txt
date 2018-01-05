@@ -17,3 +17,4 @@ celery==4.1.0
 scipy==0.19.1
 mysql-connector-python-rf
 unicodecsv
+scikit-learn==0.18

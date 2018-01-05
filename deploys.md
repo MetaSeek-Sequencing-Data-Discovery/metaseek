@@ -26,7 +26,7 @@ Merge master into deploy branch and push to Github:
 
 `git checkout deploy`
 
-`git merge master`
+`git merge master -m "merge master into deploy"`
 
 `git push`
 
