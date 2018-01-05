@@ -61,8 +61,13 @@ cats = model_features['investigation_type']['columns']
 from sklearn.externals import joblib
 investigation_model = joblib.load('../scrapers/SRA/investigation_type_logreg_model.pkl')
 #extract one-hot encoded model_features
-dummies = pd.get_dummies(parse)
-newdummies = dummies.reindex(columns=cats).fillna(0)
+##split parse into chunks  to avoid memory errors; extract features for each chunk and concat together
+parse1, parse2, parse3, parse4 = np.array_split(parse, 4)
+newdummies = pd.DataFrame()
+for par in [parse1, parse2, parse3, parse4]:
+    dummies = pd.get_dummies(par)
+    extracted = dummies.reindex(columns=cats).fillna(0)
+    newdummies = pd.concat([newdummies, extracted])
 #predict on all of parse
 investigation_predictions = investigation_model.predict(newdummies)
 investigation_predictions_P = np.max(investigation_model.predict_proba(newdummies), axis=1)
@@ -112,7 +117,7 @@ parse['metaseek_sequencing_method'] = metaseek_sequencing_method
 
 
 #for each row in database, write new values
-for row in Dataset.query.all():
+for row in Dataset.query.limit(10).all():
     print "processing row ", row.id, " out of ", len(parse)
 
     #get new values from parse for this id
