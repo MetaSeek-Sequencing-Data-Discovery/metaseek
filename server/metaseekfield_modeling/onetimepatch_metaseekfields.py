@@ -117,7 +117,7 @@ parse['metaseek_sequencing_method'] = metaseek_sequencing_method
 
 
 #for each row in database, write new values
-for row in Dataset.query.limit(10).all():
+for row in Dataset.query.all():
     print "processing row ", row.id, " out of ", len(parse)
 
     #get new values from parse for this id
