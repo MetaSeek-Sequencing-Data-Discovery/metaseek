@@ -98,6 +98,12 @@ class Dataset(db.Model):
     biomaterial_provider = db.Column(db.Text)
     host_disease = db.Column(db.Text)
     date_scraped = db.Column(db.DateTime)
+    metaseek_investigation_type = db.Column(db.String(50), index=True)
+    metaseek_investigation_type_P = db.Column(db.Float)
+    metaseek_mixs_specification = db.Column(db.String(20))
+    metaseek_mixs_specification_P = db.Column(db.Float)
+    metaseek_env_package = db.Column(db.String(50))
+    metaseek_sequencing_method = db.Column(db.String(50))
 
     runs = db.relationship('Run', backref='dataset', lazy='dynamic')
 
@@ -119,7 +125,7 @@ class Dataset(db.Model):
     biosample_uid=None,biosample_link=None,metadata_publication_date=None,biosample_package=None,biosample_models=None,sample_attributes=None,
     investigation_type=None,env_package=None,project_name=None,lat_lon=None,latitude=None,longitude=None,meta_latitude=None,meta_longitude=None,geo_loc_name=None,collection_date=None,collection_time=None,env_biome=None,env_feature=None,env_material=None,depth=None,elevation=None,altitude=None,target_gene=None,target_subfragment=None,
     ploidy=None,num_replicons=None,estimated_size=None,ref_biomaterial=None,propagation=None,assembly=None,finishing_strategy=None,isol_growth_condt=None,experimental_factor=None,specific_host=None,subspecific_genetic_lineage=None,tissue=None,sex=None,sample_type=None,age=None,dev_stage=None,biomaterial_provider=None,host_disease=None,
-    date_scraped=None):
+    date_scraped=None,metaseek_investigation_type=None,metaseek_investigation_type_P=None,metaseek_mixs_specification=None,metaseek_mixs_specification_P=None,metaseek_env_package=None,metaseek_sequencing_method=None):
 
         self.db_source_uid = db_source_uid
         self.db_source = db_source
@@ -211,6 +217,12 @@ class Dataset(db.Model):
         self.biomaterial_provider = biomaterial_provider
         self.host_disease = host_disease
         self.date_scraped = date_scraped
+        self.metaseek_investigation_type = metaseek_investigation_type
+        self.metaseek_investigation_type_P = metaseek_investigation_type_P
+        self.metaseek_mixs_specification = metaseek_mixs_specification
+        self.metaseek_mixs_specification_P = metaseek_mixs_specification_P
+        self.metaseek_env_package = metaseek_env_package
+        self.metaseek_sequencing_method = metaseek_sequencing_method
 
     # Friendly string representation
     def __repr__(self):
