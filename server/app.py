@@ -382,7 +382,7 @@ class BuildCaches(Resource):
             filter_params = json.loads(filter_string)
             rules = filter_params['rules']
 
-            cache_key = str(hashxx(json.dumps(rules)))
+            cache_key = str(hashxx(json.dumps(filter_params)))
             from_cache = client.get(cache_key)
 
             results[cache_key] = {}
@@ -407,8 +407,12 @@ class SearchDatasetIds(Resource):
             args = parser.parse_args()
             filter_params = json.loads(args['filter_params'])
             rules = filter_params['rules']
+            if 'prediction_threshold' in filter_params.keys():
+                metaseek_power = filter_params['prediction_threshold']
+            else:
+                metaseek_power = 0.9
 
-            queryObject = filterDatasetQueryObjectWithRules(Dataset.query,rules)
+            queryObject = filterDatasetQueryObjectWithRules(Dataset.query,rules,metaseek_power=metaseek_power)
             result = queryObject.with_entities(Dataset.id).all()
             datasets = [x[0] for x in result]
             print datasets[0:10]
