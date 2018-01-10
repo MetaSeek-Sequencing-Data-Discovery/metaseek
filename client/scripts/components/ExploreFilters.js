@@ -17,6 +17,7 @@ import ManualRangeSlider from './ManualRangeSlider';
 import ChipInput from 'material-ui-chip-input';
 import IconButton from 'material-ui/IconButton';
 import ActionHelpOutline from 'material-ui/svg-icons/action/help-outline';
+import ActionStars from 'material-ui/svg-icons/action/stars';
 
 var ExploreFilters = React.createClass({
   getInitialState : function() {
@@ -242,6 +243,7 @@ var ExploreFilters = React.createClass({
       boxShadow: "rgba(60, 60, 60, 0.12) 0px 1px 6px, rgba(60, 60, 60, 0.12) 0px 1px 4px"
     };
     const tooltipIconStyle = {color:"#16825c", height:"16px", marginTop:"8px"};
+    const modelIconStyle = {color:"#1fb380", height:"16px", marginTop:"8px"};
     const iconLinkStyle = {height:32,width:32, padding:"12px 0 0 12px", zIndex: 100};
 
     return (
@@ -261,11 +263,16 @@ var ExploreFilters = React.createClass({
             <FlatButton label="Reset Filters" primary={true} onClick={this.resetFilters}/>
             <Collapsible trigger="General Sample Info" open={true} className="collapsible-container" >
               <div className="filter-field-wrapper">
-                <h4 className="filter-field-with-help">Investigation Type</h4>
+                <h4 className="filter-field-with-help-modeled">Investigation Type</h4>
+                <div className="model-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>This field is partially predicted by MetaSeek's machine learning models.</div> tooltipPosition="bottom-center" iconStyle={modelIconStyle} style={iconLinkStyle}>
+                    <ActionStars />
+                  </IconButton>
+                </div>
                 <div className="gloss-icon-wrapper">
                   <IconButton tooltip=<div style={tooltipStyle}>The root element of all MIxS-compliant reports. This is a controlled vocabulary.</div> tooltipPosition="bottom-left" href="/glossary#metaseek_investigation_type" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
                   <ActionHelpOutline />
-                </IconButton>
+                  </IconButton>
                 </div>
                 <SelectField className="filter-dropdown" value={this.state.filterStates.metaseek_investigation_type.value} onChange={this.handleFilterChange.bind(this,"metaseek_investigation_type","metaseek_investigation_type",5)}>
                   <MenuItem value={"All"} primaryText="All" />

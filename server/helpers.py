@@ -160,18 +160,15 @@ def groupByCategoryAndCount(queryObject,columnName,sampleRate=0.2,numCats=False,
         .group_by(columnName) # group by
         .order_by(desc('count')) # order by the largest first
     )
-    if not includeNone:
-        print "filtering out none"
-        query = query.filter(columnObject.isnot(None)) # filter out NULLs
     # If no numCats is passed in, show all the groups
     if numCats:
         query = query.limit(numCats) # show the top N results
     #TODO maybe: count 'other column' if numCats, where sum counts all but top numCats fields
-    return (
-        dict((key,val * (1/sampleRate)) for key, val in # rescale sampled columns to approx. results on full dataset
-            query.all() # actually run the query
-        )
-    )
+    result = dict((key,val * (1/sampleRate)) for key, val in query.all())
+    if not includeNone:
+        if 'NaN' in result.keys():
+            del result['NaN']
+    return result
 
 def modeledFieldGroupByCategoryAndCount(queryObject, columnName, PcolumnName, metaseek_power=0.9, sampleRate=0.2, numCats=False):
     columnObject = getattr(Dataset,columnName)
