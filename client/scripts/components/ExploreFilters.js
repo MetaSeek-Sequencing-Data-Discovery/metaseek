@@ -25,7 +25,7 @@ var ExploreFilters = React.createClass({
         "metaseek_investigation_type":{
           "value":"All"
         },
-        "env_package":{
+        "metaseek_env_package":{
           "value":"All"
         },
         "library_source":{
@@ -51,7 +51,7 @@ var ExploreFilters = React.createClass({
         "library_construction_method":{
           "value":"All"
         },
-        "sequencing_method":[],
+        "metaseek_sequencing_method":[],
         "instrument_model":[],
         "libRdsSqdMin":{
           "value":"0"
@@ -93,7 +93,7 @@ var ExploreFilters = React.createClass({
     "multSelectStates" :{
       "library_strategy":'',
       "library_screening_strategy":'',
-      "sequencing_method":'',
+      "metaseek_sequencing_method":'',
       "instrument_model":''
     },
     "chipStates" :{
@@ -277,11 +277,11 @@ var ExploreFilters = React.createClass({
               <div className="filter-field-wrapper">
                 <h4 className="filter-field-with-help">Environmental Package</h4>
                 <div className="gloss-icon-wrapper">
-                  <IconButton tooltip=<div style={tooltipStyle}>Environment from which the sample was obtained.</div> tooltipPosition="top-left" href="/glossary#env_package" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                  <IconButton tooltip=<div style={tooltipStyle}>Environment from which the sample was obtained.</div> tooltipPosition="top-left" href="/glossary#metaseek_env_package" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
                     <ActionHelpOutline />
                   </IconButton>
                 </div>
-                <SelectField className="filter-dropdown" value={this.state.filterStates.env_package.value} onChange={this.handleFilterChange.bind(this,"env_package","env_package",5)}>
+                <SelectField className="filter-dropdown" value={this.state.filterStates.metaseek_env_package.value} onChange={this.handleFilterChange.bind(this,"metaseek_env_package","metaseek_env_package",5)}>
                   <MenuItem value={"All"} primaryText="All" />
                   {Object.keys(this.props.fullSummaryData.env_package_summary)
                     .map(this.renderMenuItem)}
@@ -355,12 +355,12 @@ var ExploreFilters = React.createClass({
               <div className="filter-field-wrapper">
                 <h4 className="filter-field-with-help">Sequencing Method</h4>
                 <div className="gloss-icon-wrapper">
-                  <IconButton tooltip=<div style={tooltipStyle}>Sequencing platform used for sequencing. This is a controlled vocabulary.</div> tooltipPosition="top-left" href="/glossary#sequencing_method" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                  <IconButton tooltip=<div style={tooltipStyle}>Sequencing platform used for sequencing. This is a controlled vocabulary.</div> tooltipPosition="top-left" href="/glossary#metaseek_sequencing_method" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
                     <ActionHelpOutline />
                   </IconButton>
                 </div>
               </div>
-              <Select name="sequencing_method" placeholder="Select Sequencing Method(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.sequencing_method}  options={seqmeth_options} onChange={this.handleMultSelectChange.bind(this,"sequencing_method")} onClose={this.handleMultipleFilterChange.bind(this,"sequencing_method", "sequencing_method", 8, this.state.multSelectStates.sequencing_method)} closeOnSelect={false}/>
+              <Select name="metaseek_sequencing_method" placeholder="Select Sequencing Method(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.metaseek_sequencing_method}  options={seqmeth_options} onChange={this.handleMultSelectChange.bind(this,"metaseek_sequencing_method")} onClose={this.handleMultipleFilterChange.bind(this,"metaseek_sequencing_method", "metaseek_sequencing_method", 8, this.state.multSelectStates.metaseek_sequencing_method)} closeOnSelect={false}/>
 
               <div>
                 <h4 className="filter-field-with-help">Instrument Model</h4>

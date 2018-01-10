@@ -146,7 +146,7 @@ def filterDatasetQueryObjectWithRules(queryObject,rules,metaseek_power=0.9):
         #if field filtering on is 'metaseek_investigation_type', also filter _P value to be above metaseek_power threshold
         if field=='metaseek_investigation_type':
             if metaseek_power:
-                queryObject = filterQueryByRule(Dataset,queryObject,field='metaseek_investigation_type',ruletype=4,value=metaseek_power)
+                queryObject = filterQueryByRule(Dataset,queryObject,field='metaseek_investigation_type_P',ruletype=4,value=metaseek_power)
     return queryObject
 
 # Create and run the query for
@@ -161,6 +161,7 @@ def groupByCategoryAndCount(queryObject,columnName,sampleRate=0.2,numCats=False,
         .order_by(desc('count')) # order by the largest first
     )
     if not includeNone:
+        print "filtering out none"
         query = query.filter(columnObject.isnot(None)) # filter out NULLs
     # If no numCats is passed in, show all the groups
     if numCats:
@@ -274,7 +275,7 @@ def summarizeDatasets(queryObject,rules,sampleRate=0.2):
     # then return each item over the socket
 
     # Above the fold summary calculations -
-    env_pkg_summary = groupByCategoryAndCount(rootQueryObject,'metaseek_env_package',sampleRate=sampleRate,numCats=15, includeNone=True)
+    env_pkg_summary = groupByCategoryAndCount(rootQueryObject,'metaseek_env_package',sampleRate=sampleRate)
     investigation_summary = modeledFieldGroupByCategoryAndCount(rootQueryObject,'metaseek_investigation_type', 'metaseek_investigation_type_P', metaseek_power=0.9, sampleRate=sampleRate)
     down_size_summary = groupWithCustomCasesAndCount(db.session.query,rules,'download_size_maxrun',[1e3,1e4,1e5,1e6,1e7,1e9,1e10,1e11],sampleRate=sampleRate)
     (start,last,n) = checkpoint(start,last,n,'Finished with above the fold, ready for 1st socket push')
@@ -294,7 +295,7 @@ def summarizeDatasets(queryObject,rules,sampleRate=0.2):
     lib_source_summary = groupByCategoryAndCount(rootQueryObject,'library_source',sampleRate=sampleRate)
     lib_screening_strategy_summary = groupByCategoryAndCount(rootQueryObject,'library_screening_strategy',sampleRate=sampleRate,numCats=20)
     study_type_summary = groupByCategoryAndCount(rootQueryObject,'study_type',sampleRate=sampleRate)
-    sequencing_method_summary = groupByCategoryAndCount(rootQueryObject,'metaseek_sequencing_method',sampleRate=sampleRate,numCats=10)
+    sequencing_method_summary = groupByCategoryAndCount(rootQueryObject,'metaseek_sequencing_method',sampleRate=sampleRate)
     instrument_model_summary = groupByCategoryAndCount(rootQueryObject,'instrument_model',sampleRate=sampleRate,numCats=15)
     geo_loc_name_summary = groupByCategoryAndCount(rootQueryObject,'geo_loc_name',sampleRate=sampleRate,numCats=20)
     env_feature_summary = groupByCategoryAndCount(rootQueryObject,'env_feature',sampleRate=sampleRate,numCats=20)
