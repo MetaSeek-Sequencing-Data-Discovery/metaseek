@@ -22,7 +22,7 @@ var ExploreFilters = React.createClass({
   getInitialState : function() {
     return {
       "filterStates": {
-        "investigation_type":{
+        "metaseek_investigation_type":{
           "value":"All"
         },
         "env_package":{
@@ -263,11 +263,11 @@ var ExploreFilters = React.createClass({
               <div className="filter-field-wrapper">
                 <h4 className="filter-field-with-help">Investigation Type</h4>
                 <div className="gloss-icon-wrapper">
-                  <IconButton tooltip=<div style={tooltipStyle}>The root element of all MIxS-compliant reports. This is a controlled vocabulary.</div> tooltipPosition="bottom-left" href="/glossary#investigation_type" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                  <IconButton tooltip=<div style={tooltipStyle}>The root element of all MIxS-compliant reports. This is a controlled vocabulary.</div> tooltipPosition="bottom-left" href="/glossary#metaseek_investigation_type" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
                   <ActionHelpOutline />
                 </IconButton>
                 </div>
-                <SelectField className="filter-dropdown" value={this.state.filterStates.investigation_type.value} onChange={this.handleFilterChange.bind(this,"investigation_type","investigation_type",5)}>
+                <SelectField className="filter-dropdown" value={this.state.filterStates.metaseek_investigation_type.value} onChange={this.handleFilterChange.bind(this,"metaseek_investigation_type","metaseek_investigation_type",5)}>
                   <MenuItem value={"All"} primaryText="All" />
                   {Object.keys(this.props.fullSummaryData.investigation_type_summary)
                     .map(this.renderMenuItem)}
