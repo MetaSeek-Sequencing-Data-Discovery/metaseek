@@ -215,15 +215,23 @@ class SearchDatasetsSummary(Resource):
             args = parser.parse_args()
             filter_params = json.loads(args['filter_params'])
             rules = filter_params['rules']
+            if 'prediction_threshold' in filter_params.keys():
+                metaseek_power = filter_params['prediction_threshold']
+                print "getting metaseek power"
+            else:
+                metaseek_power = 0.9
+            print metaseek_power
 
-            cache_key = str(hashxx(json.dumps(rules)))
+            cache_key = str(hashxx(json.dumps(filter_params)))
             from_cache = client.get(cache_key)
+            if from_cache:
+                print "cached"
 
             db.session.add(Filter(args['filter_params']))
             db.session.commit()
 
             if from_cache is None:
-                summary = summarizeDatasets(Dataset.query,rules,0.05)
+                summary = summarizeDatasets(Dataset.query,rules,sampleRate=0.05, metaseek_power=metaseek_power)
                 client.set(cache_key, summary)
                 return summary
             else:

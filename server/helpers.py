@@ -231,12 +231,12 @@ def getSampledColumns(queryObject,columnNames,sampleRate=0.2):
     return dataFrame
 
 # Run all 4 summarization steps in series - get the POST response, above the fold, on screen and off screen summaries
-def summarizeDatasets(queryObject,rules,sampleRate=0.2):
+def summarizeDatasets(queryObject,rules,sampleRate=0.2, metaseek_power=0.9):
     # filter queryObject by adding all "where's" to the Dataset.query object
     # this can be used for categorical group by's, basic counts, etc.
     # we have to construct a custom query object off of db.session.query and filterDatasetQueryObjectWithRules
     # for any function returning fields that aren't columns in the Dataset db (eg. sums on groups or other func.blah() calls)
-    rootQueryObject = filterDatasetQueryObjectWithRules(queryObject,rules)
+    rootQueryObject = filterDatasetQueryObjectWithRules(queryObject,rules,metaseek_power=metaseek_power)
 
     print 'Summarizing for rules: ' + str(rules)
     print 'Sample rate: ' + str(sampleRate)
@@ -273,7 +273,7 @@ def summarizeDatasets(queryObject,rules,sampleRate=0.2):
 
     # Above the fold summary calculations -
     env_pkg_summary = groupByCategoryAndCount(rootQueryObject,'metaseek_env_package',sampleRate=sampleRate)
-    investigation_summary = modeledFieldGroupByCategoryAndCount(rootQueryObject,'metaseek_investigation_type', 'metaseek_investigation_type_P', metaseek_power=0.9, sampleRate=sampleRate)
+    investigation_summary = modeledFieldGroupByCategoryAndCount(rootQueryObject,'metaseek_investigation_type', 'metaseek_investigation_type_P', metaseek_power=metaseek_power, sampleRate=sampleRate)
     down_size_summary = groupWithCustomCasesAndCount(db.session.query,rules,'download_size_maxrun',[1e3,1e4,1e5,1e6,1e7,1e9,1e10,1e11],sampleRate=sampleRate)
     (start,last,n) = checkpoint(start,last,n,'Finished with above the fold, ready for 1st socket push')
 
