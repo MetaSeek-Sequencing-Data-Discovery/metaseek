@@ -429,8 +429,12 @@ class SearchDatasetMetadata(Resource):
             args = parser.parse_args()
             filter_params = json.loads(args['filter_params'])
             rules = filter_params['rules']
+            if 'prediction_threshold' in filter_params.keys():
+                metaseek_power = filter_params['prediction_threshold']
+            else:
+                metaseek_power = 0.9
 
-            queryObject = filterDatasetQueryObjectWithRules(Dataset.query,rules)
+            queryObject = filterDatasetQueryObjectWithRules(Dataset.query,rules,metaseek_power=metaseek_power)
             result = marshal(queryObject.all(), fullDatasetFields)
             if queryObject.count()>user_n_threshold:
                 return {'error':'you are trying to get metadata for too many datasets at once. Please query the database for '+str(user_n_threshold)+' or fewer datasets at a time'}
