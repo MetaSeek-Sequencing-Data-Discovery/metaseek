@@ -137,14 +137,17 @@ def filterQueryByRule(targetClass,queryObject,field,ruletype,value):
     return queryObject
 
 # Apply all rules to a query object, applying filterQueryByRule repeatedly
-def filterDatasetQueryObjectWithRules(queryObject,rules):
+def filterDatasetQueryObjectWithRules(queryObject,rules,metaseek_power=0.9):
     for rule in rules:
         field = rule['field']
         ruletype = rule['type']
         value = rule['value']
         queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
+        #if field filtering on is 'metaseek_investigation_type', also filter _P value to be above metaseek_power threshold
+        if field=='metaseek_investigation_type':
+            if metaseek_power:
+                queryObject = filterQueryByRule(Dataset,queryObject,field='metaseek_investigation_type_P',ruletype=4,value=metaseek_power)
     return queryObject
-
 
 # Create and run the query for
 # Group by a column and return the sum for each group
@@ -157,8 +160,27 @@ def groupByCategoryAndCount(queryObject,columnName,sampleRate=0.2,numCats=False,
         .group_by(columnName) # group by
         .order_by(desc('count')) # order by the largest first
     )
+    # If no numCats is passed in, show all the groups
+    if numCats:
+        query = query.limit(numCats) # show the top N results
+    #TODO maybe: count 'other column' if numCats, where sum counts all but top numCats fields
+    result = dict((key,val * (1/sampleRate)) for key, val in query.all())
     if not includeNone:
-        query = query.filter(columnObject.isnot(None)) # filter out NULLs
+        if 'NaN' in result.keys():
+            del result['NaN']
+    return result
+
+def modeledFieldGroupByCategoryAndCount(queryObject, columnName, PcolumnName, metaseek_power=0.9, sampleRate=0.2, numCats=False):
+    columnObject = getattr(Dataset,columnName)
+    columnObjectP = getattr(Dataset,PcolumnName)
+    query = (
+        queryObject.with_entities(columnObject) # choose only the column we care about
+        .filter(columnObjectP >= metaseek_power) #subset only those rows with P value above threshold
+        .filter(func.rand() < sampleRate) # grab random sample of rows
+        .add_columns(func.count(1).label('count')) # add count to response
+        .group_by(columnName) # group by
+        .order_by(desc('count')) # order by the largest first
+    )
     # If no numCats is passed in, show all the groups
     if numCats:
         query = query.limit(numCats) # show the top N results
@@ -209,12 +231,12 @@ def getSampledColumns(queryObject,columnNames,sampleRate=0.2):
     return dataFrame
 
 # Run all 4 summarization steps in series - get the POST response, above the fold, on screen and off screen summaries
-def summarizeDatasets(queryObject,rules,sampleRate=0.2):
+def summarizeDatasets(queryObject,rules,sampleRate=0.2, metaseek_power=0.9):
     # filter queryObject by adding all "where's" to the Dataset.query object
     # this can be used for categorical group by's, basic counts, etc.
     # we have to construct a custom query object off of db.session.query and filterDatasetQueryObjectWithRules
     # for any function returning fields that aren't columns in the Dataset db (eg. sums on groups or other func.blah() calls)
-    rootQueryObject = filterDatasetQueryObjectWithRules(queryObject,rules)
+    rootQueryObject = filterDatasetQueryObjectWithRules(queryObject,rules,metaseek_power=metaseek_power)
 
     print 'Summarizing for rules: ' + str(rules)
     print 'Sample rate: ' + str(sampleRate)
@@ -250,8 +272,8 @@ def summarizeDatasets(queryObject,rules,sampleRate=0.2):
     # then return each item over the socket
 
     # Above the fold summary calculations -
-    env_pkg_summary = groupByCategoryAndCount(rootQueryObject,'env_package',sampleRate=sampleRate,numCats=15, includeNone=True)
-    investigation_summary = groupByCategoryAndCount(rootQueryObject,'investigation_type',sampleRate=sampleRate,numCats=10, includeNone=True)
+    env_pkg_summary = groupByCategoryAndCount(rootQueryObject,'metaseek_env_package',sampleRate=sampleRate)
+    investigation_summary = modeledFieldGroupByCategoryAndCount(rootQueryObject,'metaseek_investigation_type', 'metaseek_investigation_type_P', metaseek_power=metaseek_power, sampleRate=sampleRate)
     down_size_summary = groupWithCustomCasesAndCount(db.session.query,rules,'download_size_maxrun',[1e3,1e4,1e5,1e6,1e7,1e9,1e10,1e11],sampleRate=sampleRate)
     (start,last,n) = checkpoint(start,last,n,'Finished with above the fold, ready for 1st socket push')
 
@@ -270,7 +292,7 @@ def summarizeDatasets(queryObject,rules,sampleRate=0.2):
     lib_source_summary = groupByCategoryAndCount(rootQueryObject,'library_source',sampleRate=sampleRate)
     lib_screening_strategy_summary = groupByCategoryAndCount(rootQueryObject,'library_screening_strategy',sampleRate=sampleRate,numCats=20)
     study_type_summary = groupByCategoryAndCount(rootQueryObject,'study_type',sampleRate=sampleRate)
-    sequencing_method_summary = groupByCategoryAndCount(rootQueryObject,'sequencing_method',sampleRate=sampleRate,numCats=10)
+    sequencing_method_summary = groupByCategoryAndCount(rootQueryObject,'metaseek_sequencing_method',sampleRate=sampleRate)
     instrument_model_summary = groupByCategoryAndCount(rootQueryObject,'instrument_model',sampleRate=sampleRate,numCats=15)
     geo_loc_name_summary = groupByCategoryAndCount(rootQueryObject,'geo_loc_name',sampleRate=sampleRate,numCats=20)
     env_feature_summary = groupByCategoryAndCount(rootQueryObject,'env_feature',sampleRate=sampleRate,numCats=20)

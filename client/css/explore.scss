@@ -85,6 +85,10 @@
   margin-right: 12px;
 }
 
+.model-icon-wrapper {
+  float: left;
+}
+
 .figure-hint-tooltip {
   width: 200px;
   white-space: normal;
@@ -130,6 +134,11 @@
 
 .filter-field-with-help {
   float: left;
+}
+
+.filter-field-with-help-modeled {
+  float: left;
+  color: $default;
 }
 
 .filter-field-wrapper {

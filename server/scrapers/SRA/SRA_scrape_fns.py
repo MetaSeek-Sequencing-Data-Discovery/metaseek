@@ -8,6 +8,9 @@ import time
 import sys
 sys.path.append('../..')
 from models import *
+import pandas as pd
+import numpy as np
+
 
 class EfetchError(Exception):
     pass
@@ -987,3 +990,77 @@ def extract_and_merge_mixs_fields(sdict, fieldname, rules_json):
                     sdict[srx][rule_set] = sdict[srx][fieldname][replacement]
 
     return sdict
+
+def extract_metaseek_power_fields(sdict, srx, manual_rules, tree_rules, investigation_model, model_features):
+    '''
+    extracting values for metaseek_investigation_type, metaseek_investigation_type_P, metaseek_mixs_specification, metaseek_mixs_specification_P, metaseek_env_package, metaseek_sequencing_method
+    using manual parsing, manual parsing from other fields ("manual tree"), or modeling
+    '''
+
+    cats = model_features['investigation_type']['columns']
+    featcols = ['library_source','library_strategy','library_screening_strategy','study_type']
+
+    #investigation_type
+    #manual tree parse
+    tree_investigation_rules = tree_rules['investigation_type']
+    if 'biosample_package' in sdict[srx].keys():
+        if sdict[srx]['biosample_package'] in tree_investigation_rules['biosample_package'].keys():
+            metaseek_investigation_type = tree_investigation_rules['biosample_package'][sdict[srx]['biosample_package']]
+            metaseek_investigation_type_P = 1.0
+    #if can't get manual tree parse, try manual
+    try:
+        metaseek_investigation_type
+    except NameError:
+        #manual parse
+        investigation_rules = manual_rules['investigation_type']
+        if 'investigation_type' in sdict[srx].keys():
+            if sdict[srx]['investigation_type'] in investigation_rules.keys():
+                metaseek_investigation_type = investigation_rules[sdict[srx]['investigation_type']]
+                metaseek_investigation_type_P = 1.0
+    #if still can't
+    try:
+        metaseek_investigation_type
+    except NameError:
+        #extract one-hot encoded features
+        features = {k:sdict[srx][k] for k in featcols if k in sdict[srx].keys()}
+        features.update({k:None for k in featcols if k not in sdict[srx].keys()})
+        dummies = pd.get_dummies(pd.DataFrame(pd.Series(features)).T)
+        newdummies = dummies.reindex(columns=cats).fillna(0)
+        #make predictions
+        metaseek_investigation_type = investigation_model.predict(newdummies)[0]
+        metaseek_investigation_type_P = np.max(investigation_model.predict_proba(newdummies), axis=1)[0]
+
+    #assign investigation_type to sdict[srx]
+    sdict[srx]['metaseek_investigation_type'] = metaseek_investigation_type
+    sdict[srx]['metaseek_investigation_type_P'] = float(metaseek_investigation_type_P)
+
+    #mixs specification - is derived from investigation_type
+    mixs_conversion = {"bacteria_archaea":"MIGS", "eukaryote":"MIGS", "virus":"MIGS", "plasmid":"MIGS", "organelle":"MIGS",
+                       "metagenome":"MIMS", "mimarks-culture":"MIMARKS", "mimarks-survey":"MIMARKS"}
+    metaseek_mixs_specification = mixs_conversion[metaseek_investigation_type]
+    metaseek_mixs_specification_P = metaseek_investigation_type_P
+    sdict[srx]['metaseek_mixs_specification'] = metaseek_mixs_specification
+    sdict[srx]['metaseek_mixs_specification_P'] = float(metaseek_mixs_specification_P)
+
+    #metaseek_env_package - tree parsing and manual parsing
+    #manual tree parse
+    tree_env_rules = tree_rules['env_package']
+    if 'biosample_package' in sdict[srx].keys():
+        if sdict[srx]['biosample_package'] in tree_env_rules['biosample_package'].keys():
+            metaseek_env_package = tree_env_rules['biosample_package'][sdict[srx]['biosample_package']]
+    #if can't, try manual parse
+    try:
+        metaseek_env_package
+    except NameError:
+        env_rules = manual_rules['env_package']
+        if 'env_package' in sdict[srx].keys():
+            if sdict[srx]['env_package'] in env_rules.keys():
+                metaseek_env_package = env_rules[sdict[srx]['env_package']]
+                sdict[srx]['metaseek_env_package'] = metaseek_env_package
+
+    #metaseek_sequencing_method - manual parsing only
+    seq_meth_rules = manual_rules['sequencing_method']
+    if 'sequencing_method' in sdict[srx].keys():
+        if sdict[srx]['sequencing_method'] in seq_meth_rules.keys():
+            metaseek_sequencing_method = seq_meth_rules[sdict[srx]['sequencing_method']]
+            sdict[srx]['metaseek_sequencing_method'] = metaseek_sequencing_method
