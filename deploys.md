@@ -6,7 +6,7 @@ Merge master into deploy branch:
 
 `git checkout deploy`
 
-`git merge master`
+`git merge master -m "merge master into deploy"`
 
 Build a production javacript bundle:
 
