@@ -103,6 +103,12 @@ var Glossary = React.createClass ({
                 {glossary["library_strategy"]}
               </section>
             </ScrollableAnchor>
+            <h3 className="glossary-term">NCBI Taxon ID</h3>
+            <ScrollableAnchor>
+              <section className="glossary-item" id="ncbi_taxon_id">
+                {glossary["ncbi_taxon_id"]}
+              </section>
+            </ScrollableAnchor>
             <h3 className="glossary-term">Percent GC</h3>
             <ScrollableAnchor>
               <section className="glossary-item" id="percent_gc">

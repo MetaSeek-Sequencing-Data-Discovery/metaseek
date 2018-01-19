@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 
 // Material Design imports
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -100,7 +101,8 @@ var ExploreFilters = React.createClass({
       "env_biome":[],
       "env_feature":[],
       "env_material":[],
-      "geo_loc_name":[]
+      "geo_loc_name":[],
+      "ncbi_taxon_id":[]
     },
     "rangeStates" : {
       "libRdsSqdMin":{
@@ -460,6 +462,19 @@ var ExploreFilters = React.createClass({
                 </div>
                 <ChipInput className="chip-input-field"
                   onChange={this.handleChipBlur.bind(this,"geo_loc_name","geo_loc_name",7,this.state.chipStates.geo_loc_name)}
+                />
+              </div>
+            </Collapsible>
+            <Collapsible trigger="Genome Info" open={false}>
+              <div className="filter-field-wrapper">
+                <h4 className="filter-field-with-help">NCBI Taxon ID</h4>
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>Taxon ID as defined by the NCBI Taxonomy database. Browse ID values <Link to="https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi" target="_blank">here</Link></div> tooltipPosition="top-left" href="/glossary#ncbi_taxon_id" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                    <ActionHelpOutline />
+                  </IconButton>
+                </div>
+                <ChipInput className="chip-input-field"
+                  onChange={this.handleChipBlur.bind(this,"ncbi_taxon_id","ncbi_taxon_id",7,this.state.chipStates.ncbi_taxon_id)}
                 />
               </div>
             </Collapsible>
