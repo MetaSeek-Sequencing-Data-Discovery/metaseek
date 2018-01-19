@@ -10,6 +10,7 @@ from sqlalchemy import exc
 from SRA_scrape_fns import *
 from models import *
 from shared import *
+from sklearn.externals import joblib
 
 metaseek_fields = ['db_source_uid',
 'db_source',
@@ -100,7 +101,13 @@ metaseek_fields = ['db_source_uid',
 'dev_stage',
 'biomaterial_provider',
 'host_disease',
-'date_scraped']
+'date_scraped',
+'metaseek_investigation_type',
+'metaseek_investigation_type_P',
+'metaseek_mixs_specification',
+'metaseek_mixs_specification_P',
+'metaseek_env_package',
+'metaseek_sequencing_method']
 
 run_fields = ['dataset_id',
 'run_id',
@@ -195,9 +202,25 @@ if __name__ == "__main__":
         #extract and merge MIxS fields from 'sample_attributes' field in each dict in sdict (if exists)
         print "-extracting and merging MIxS fields"
         sdict = extract_and_merge_mixs_fields(sdict=sdict,fieldname="sample_attributes",rules_json="rules.json")
-        #coerce sample attributes field to str for db insertion
-        print "-changing sample_attributes to str field"
+
+        #load in rules and model for extracting metaseek_power fields
+        with open("CVparse_rules.json") as json_file:
+            manual_rules = json.load(json_file)
+        json_file.close()
+        with open("CVparse_manualtree_rules.json") as tree_file:
+            tree_rules = json.load(tree_file)
+        tree_file.close()
+
+        investigation_model = joblib.load("investigation_type_logreg_model.pkl")
+        with open("model_features.json") as json_file:
+            model_features = json.load(json_file)
+        json_file.close()
+
+        print "-extracting metaseek_power fields and changing sample_attributes to str field"
         for srx in sdict.keys():
+            #extract metaseek_power fields for this srx
+            extract_metaseek_power_fields(sdict, srx, manual_rules=manual_rules, tree_rules=tree_rules, investigation_model=investigation_model, model_features=model_features)
+            #coerce sample attributes field to str for db insertion
             if 'sample_attributes' in sdict[srx].keys():
                 sdict[srx]['sample_attributes'] = json.dumps(sdict[srx]['sample_attributes'])
 

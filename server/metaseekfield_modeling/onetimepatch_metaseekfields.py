@@ -117,17 +117,23 @@ parse['metaseek_sequencing_method'] = metaseek_sequencing_method
 
 
 #for each row in database, write new values
-for row in Dataset.query.limit(10).all():
-    print "processing row ", row.id, " out of ", len(parse)
+print "starting database write:"
+querySize=1000
+while True:
+    rows = Dataset.query.filter_by(metaseek_investigation_type=None).limit(querySize).all()
+    if not rows or len(rows) == 0:
+        break
+    for row in rows:
+        print "processing row ", row.id, " out of ", len(parse)
 
-    #get new values from parse for this id
-    parsed_row = parse.loc[parse['id']==row.id,:]
-    row.metaseek_investigation_type =  parsed_row['metaseek_investigation_type'].to_string(index=False)
-    row.metaseek_investigation_type_P =  parsed_row['metaseek_investigation_type_P'].to_string(index=False)
-    row.metaseek_mixs_specification =  parsed_row['metaseek_mixs_specification'].to_string(index=False)
-    row.metaseek_mixs_specification_P =  parsed_row['metaseek_mixs_specification_P'].to_string(index=False)
-    row.metaseek_env_package =  parsed_row['metaseek_env_package'].to_string(index=False)
-    row.metaseek_sequencing_method =  parsed_row['metaseek_sequencing_method'].to_string(index=False)
+        #get new values from parse for this id
+        parsed_row = parse.loc[parse['id']==row.id,:]
+        row.metaseek_investigation_type =  parsed_row['metaseek_investigation_type'].to_string(index=False)
+        row.metaseek_investigation_type_P =  parsed_row['metaseek_investigation_type_P'].to_string(index=False)
+        row.metaseek_mixs_specification =  parsed_row['metaseek_mixs_specification'].to_string(index=False)
+        row.metaseek_mixs_specification_P =  parsed_row['metaseek_mixs_specification_P'].to_string(index=False)
+        row.metaseek_env_package =  parsed_row['metaseek_env_package'].to_string(index=False)
+        row.metaseek_sequencing_method =  parsed_row['metaseek_sequencing_method'].to_string(index=False)
 
-    db.session.add(row)
-    db.session.commit()
+        db.session.add(row)
+        db.session.commit()

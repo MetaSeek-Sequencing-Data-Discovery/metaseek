@@ -75,6 +75,34 @@ Make sure Celery is happy for background tasks:
 `screen -r celery`
 
 
+#### to run SRA scrapers
+
+navigate to SRA scrapers folder
+
+`cd ~/metaseek/server/scrapers/SRA`
+
+see what screen sessions are running
+
+`screen -ls`
+
+create screen session named SRAscrape
+
+`screen -S SRAscrape`
+
+run scraper script
+
+`python SRA_scrape.py`
+
+to exit screen
+
+`ctrl-a d`
+
+to resume SRAscrape screen
+
+`screen -r SRAscrape`
+
+After the scrapers are run, you should flush and rebuild the cache (see above)
+
 
 ## TL;DR
 

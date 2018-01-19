@@ -18,15 +18,16 @@ import ManualRangeSlider from './ManualRangeSlider';
 import ChipInput from 'material-ui-chip-input';
 import IconButton from 'material-ui/IconButton';
 import ActionHelpOutline from 'material-ui/svg-icons/action/help-outline';
+import ActionStars from 'material-ui/svg-icons/action/stars';
 
 var ExploreFilters = React.createClass({
   getInitialState : function() {
     return {
       "filterStates": {
-        "investigation_type":{
+        "metaseek_investigation_type":{
           "value":"All"
         },
-        "env_package":{
+        "metaseek_env_package":{
           "value":"All"
         },
         "library_source":{
@@ -52,7 +53,7 @@ var ExploreFilters = React.createClass({
         "library_construction_method":{
           "value":"All"
         },
-        "sequencing_method":[],
+        "metaseek_sequencing_method":[],
         "instrument_model":[],
         "libRdsSqdMin":{
           "value":"0"
@@ -94,7 +95,7 @@ var ExploreFilters = React.createClass({
     "multSelectStates" :{
       "library_strategy":'',
       "library_screening_strategy":'',
-      "sequencing_method":'',
+      "metaseek_sequencing_method":'',
       "instrument_model":''
     },
     "chipStates" :{
@@ -244,6 +245,7 @@ var ExploreFilters = React.createClass({
       boxShadow: "rgba(60, 60, 60, 0.12) 0px 1px 6px, rgba(60, 60, 60, 0.12) 0px 1px 4px"
     };
     const tooltipIconStyle = {color:"#16825c", height:"16px", marginTop:"8px"};
+    const modelIconStyle = {color:"#1fb380", height:"16px", marginTop:"8px"};
     const iconLinkStyle = {height:32,width:32, padding:"12px 0 0 12px", zIndex: 100};
 
     return (
@@ -263,13 +265,18 @@ var ExploreFilters = React.createClass({
             <FlatButton label="Reset Filters" primary={true} onClick={this.resetFilters}/>
             <Collapsible trigger="General Sample Info" open={true} className="collapsible-container" >
               <div className="filter-field-wrapper">
-                <h4 className="filter-field-with-help">Investigation Type</h4>
-                <div className="gloss-icon-wrapper">
-                  <IconButton tooltip=<div style={tooltipStyle}>The root element of all MIxS-compliant reports. This is a controlled vocabulary.</div> tooltipPosition="bottom-left" href="/glossary#investigation_type" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
-                  <ActionHelpOutline />
-                </IconButton>
+                <h4 className="filter-field-with-help-modeled">Investigation Type</h4>
+                <div className="model-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>This field is partially predicted by MetaSeek's machine learning models.</div> tooltipPosition="bottom-center" iconStyle={modelIconStyle} style={iconLinkStyle}>
+                    <ActionStars />
+                  </IconButton>
                 </div>
-                <SelectField className="filter-dropdown" value={this.state.filterStates.investigation_type.value} onChange={this.handleFilterChange.bind(this,"investigation_type","investigation_type",5)}>
+                <div className="gloss-icon-wrapper">
+                  <IconButton tooltip=<div style={tooltipStyle}>The root element of all MIxS-compliant reports. This is a controlled vocabulary.</div> tooltipPosition="bottom-left" href="/glossary#metaseek_investigation_type" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                  <ActionHelpOutline />
+                  </IconButton>
+                </div>
+                <SelectField className="filter-dropdown" value={this.state.filterStates.metaseek_investigation_type.value} onChange={this.handleFilterChange.bind(this,"metaseek_investigation_type","metaseek_investigation_type",5)}>
                   <MenuItem value={"All"} primaryText="All" />
                   {Object.keys(this.props.fullSummaryData.investigation_type_summary)
                     .map(this.renderMenuItem)}
@@ -279,11 +286,11 @@ var ExploreFilters = React.createClass({
               <div className="filter-field-wrapper">
                 <h4 className="filter-field-with-help">Environmental Package</h4>
                 <div className="gloss-icon-wrapper">
-                  <IconButton tooltip=<div style={tooltipStyle}>Environment from which the sample was obtained.</div> tooltipPosition="top-left" href="/glossary#env_package" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                  <IconButton tooltip=<div style={tooltipStyle}>Environment from which the sample was obtained.</div> tooltipPosition="top-left" href="/glossary#metaseek_env_package" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
                     <ActionHelpOutline />
                   </IconButton>
                 </div>
-                <SelectField className="filter-dropdown" value={this.state.filterStates.env_package.value} onChange={this.handleFilterChange.bind(this,"env_package","env_package",5)}>
+                <SelectField className="filter-dropdown" value={this.state.filterStates.metaseek_env_package.value} onChange={this.handleFilterChange.bind(this,"metaseek_env_package","metaseek_env_package",5)}>
                   <MenuItem value={"All"} primaryText="All" />
                   {Object.keys(this.props.fullSummaryData.env_package_summary)
                     .map(this.renderMenuItem)}
@@ -357,12 +364,12 @@ var ExploreFilters = React.createClass({
               <div className="filter-field-wrapper">
                 <h4 className="filter-field-with-help">Sequencing Method</h4>
                 <div className="gloss-icon-wrapper">
-                  <IconButton tooltip=<div style={tooltipStyle}>Sequencing platform used for sequencing. This is a controlled vocabulary.</div> tooltipPosition="top-left" href="/glossary#sequencing_method" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                  <IconButton tooltip=<div style={tooltipStyle}>Sequencing platform used for sequencing. This is a controlled vocabulary.</div> tooltipPosition="top-left" href="/glossary#metaseek_sequencing_method" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
                     <ActionHelpOutline />
                   </IconButton>
                 </div>
               </div>
-              <Select name="sequencing_method" placeholder="Select Sequencing Method(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.sequencing_method}  options={seqmeth_options} onChange={this.handleMultSelectChange.bind(this,"sequencing_method")} onClose={this.handleMultipleFilterChange.bind(this,"sequencing_method", "sequencing_method", 8, this.state.multSelectStates.sequencing_method)} closeOnSelect={false}/>
+              <Select name="metaseek_sequencing_method" placeholder="Select Sequencing Method(s)" multi={true} simpleValue={true} value={this.state.multSelectStates.metaseek_sequencing_method}  options={seqmeth_options} onChange={this.handleMultSelectChange.bind(this,"metaseek_sequencing_method")} onClose={this.handleMultipleFilterChange.bind(this,"metaseek_sequencing_method", "metaseek_sequencing_method", 8, this.state.multSelectStates.metaseek_sequencing_method)} closeOnSelect={false}/>
 
               <div>
                 <h4 className="filter-field-with-help">Instrument Model</h4>
@@ -417,7 +424,7 @@ var ExploreFilters = React.createClass({
                 minValue={this.state.rangeStates.longitudeMin.value} maxValue={this.state.rangeStates.longitudeMax.value}
                 handleNumericFilterChange={this.handleNumericFilterChange} updateRangeValues={this.updateRangeValues}
               />
-              <div className="filter-field-wrapper">>
+              <div className="filter-field-wrapper">
                 <h4 className="filter-field-with-help">Environmental Biome</h4>
                 <div className="gloss-icon-wrapper">
                   <IconButton tooltip=<div style={tooltipStyle}>The broad ecological context of a sample. From the EnvO ontology.</div> tooltipPosition="top-left" href="/glossary#env_biome" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
