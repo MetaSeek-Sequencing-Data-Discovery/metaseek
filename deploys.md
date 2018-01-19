@@ -101,6 +101,8 @@ to resume SRAscrape screen
 
 `screen -r SRAscrape`
 
+After the scrapers are run, you should flush and rebuild the cache (see above)
+
 
 ## TL;DR
 
