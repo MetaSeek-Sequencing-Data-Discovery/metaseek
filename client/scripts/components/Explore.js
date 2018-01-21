@@ -374,7 +374,9 @@ var Explore = React.createClass({
                 </div>
               </div>
             </Paper>
-            <VizDashboard wrapperClassName="explore-child-grid" activeSummaryData={this.state.activeSummaryData} processing={this.state.processing}/>
+            <VizDashboard wrapperClassName="explore-child-grid" activeSummaryData={this.state.activeSummaryData}
+            filter_params={this.state.filter_params}
+            processing={this.state.processing}/>
             <Paper className="explore-table">
               <ExploreTable getNextDataPage={this.getNextDataPage} getPreviousDataPage={this.getPreviousDataPage} dataTable={this.state.dataTable}/>
             </Paper>

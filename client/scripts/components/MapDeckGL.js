@@ -1,9 +1,7 @@
 import React from 'react';
-import MapGL from 'react-map-gl';
+import ReactMapGL, {StaticMap} from 'react-map-gl';
 import MapOverlay from './MapOverlay';
-
-// Set your mapbox token here
-// const MAPBOX_TOKEN = process.env.MapboxAccessToken; // eslint-disable-line
+import {getLatCenter, getLonCenter, getMapBounds} from '../helpers';
 const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibWV0YXNlZWsiLCJhIjoiY2o3YjQ4anVrMG5vaDMycW14bWcwbTBnaSJ9.67xUW2hLL2laKI8XyY91dA';
 
 var MapDeckGL = React.createClass({
@@ -14,12 +12,8 @@ var MapDeckGL = React.createClass({
         'height': 500,
         'latitude': 0,
         'longitude': 0,
-        'zoom': 0,
-        'maxZoom': 16,
-        'pitch': 0,
-        'fov':100,
-      },
-      mapdata: null
+        'zoom': 0
+      }
     }
   },
 
@@ -29,20 +23,30 @@ var MapDeckGL = React.createClass({
     });
   },
 
+  componentWillMount : function() {
+    var latitude = getLatCenter(this.props.filter_params);
+    var longitude = getLonCenter(this.props.filter_params);
+    this.state.viewport.latitude = latitude;
+    this.state.viewport.longitude = longitude;
+    this.setState({"viewport":this.state.viewport});
+  },
+
   render : function() {
     return (
       <div className="explore-map-contents">
-        <MapGL
+        <StaticMap
           {...this.state.viewport}
-          onViewportChange={this._onViewportChange}
-          mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}>
-          <MapOverlay viewport={this.state.viewport}
-            data={this.props.mapdata} />
-        </MapGL>
+          mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
+          ref={ map => this.mapRef = map }
+        >
+          <MapOverlay
+            viewport={this.state.viewport}
+            data={this.props.mapdata}
+          />
+        </StaticMap>
       </div>
     );
   }
 });
 
-//render(<Root />, document.body.appendChild(document.createElement('div')));
 export default MapDeckGL;

@@ -181,7 +181,8 @@ var VizDashboard = React.createClass({
             </IconButton>
             <br/>
           </div>
-          <MapDeckGL className="explore-map-render" mapdata={this.props.activeSummaryData.latlon_map}/>
+          <MapDeckGL className="explore-map-render" mapdata={this.props.activeSummaryData.latlon_map}
+          filter_params={this.props.filter_params}/>
           <MapLegend fills={this.props.activeSummaryData.map_legend_info.fills} ranges={this.props.activeSummaryData.map_legend_info.ranges}/>
         </div>
       </div>;

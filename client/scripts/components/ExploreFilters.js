@@ -476,7 +476,7 @@ var ExploreFilters = React.createClass({
               <div className="filter-field-wrapper">
                 <h4 className="filter-field-with-help">NCBI Taxon ID</h4>
                 <div className="gloss-icon-wrapper">
-                  <IconButton tooltip=<div style={tooltipStyle}>Taxon ID as defined by the NCBI Taxonomy database. Browse ID values <Link to="https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi" target="_blank">here</Link></div> tooltipPosition="top-left" href="/glossary#ncbi_taxon_id" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
+                  <IconButton tooltip=<div style={tooltipStyle}>Taxon ID as defined by the NCBI Taxonomy database. Browse ID values <Link to="https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi" target="_blank">here</Link></div> tooltipPosition="bottom-left" href="/glossary#ncbi_taxon_id" iconStyle={tooltipIconStyle} style={iconLinkStyle} >
                     <ActionHelpOutline />
                   </IconButton>
                 </div>
