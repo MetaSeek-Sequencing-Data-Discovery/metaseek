@@ -18,3 +18,5 @@ celery==4.1.0
 scipy==0.19.1
 mysql-connector-python-rf
 unicodecsv
+psycopg2
+sqlalchemy-redshift
