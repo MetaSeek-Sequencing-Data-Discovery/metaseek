@@ -19,10 +19,14 @@ app = Flask(__name__)
 CORS(app)
 
 # production DB
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-52-33-134-115.us-west-2.compute.amazonaws.com/metaseek'
+# Leaving the old mysql config line here for now as compare / contrast
+# Note the database password is changed too! You'll want to change it in your environment vars
+# And we need to change it in the deployed environment
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-52-33-134-115.us-west-2.compute.amazonaws.com/metaseek'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://metaseekadmin:' + dbPass + '@metaseekredshift.cjvkmsuykaji.us-west-2.redshift.amazonaws.com:5439/metaseek'
 
 # local DB - uncomment for local testing
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
