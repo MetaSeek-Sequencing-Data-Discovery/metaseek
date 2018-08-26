@@ -19,10 +19,10 @@ app = Flask(__name__)
 CORS(app)
 
 # production DB
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-52-33-134-115.us-west-2.compute.amazonaws.com/metaseek'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://metaseek:' + dbPass + '@ec2-52-33-134-115.us-west-2.compute.amazonaws.com/metaseek'
 
 # local DB - uncomment for local testing
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/metaseek'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -63,12 +63,12 @@ class CreateUser(Resource):
             parser.add_argument('admin', type=int)
             args = parser.parse_args()
 
-            existingUser = User.query.filter_by(firebase_id=args['firebase_id']).first()
+            existingUser = Account.query.filter_by(firebase_id=args['firebase_id']).first()
 
             if (existingUser):
                 return {'error':'User already exists!','uri':url_for('getuser',id=existingUser.id)}
             else:
-                newUser = User(args['firebase_id'],args['firebase_name'], args['admin'])
+                newUser = Account(args['firebase_id'],args['firebase_name'], args['admin'])
                 db.session.add(newUser)
                 db.session.commit()
                 return {"user":{"uri":url_for('getuser',id=newUser.id)}}
@@ -86,7 +86,7 @@ class GetUser(Resource):
         'uri':fields.Url('getuser', absolute=True)
     }, envelope='user')
     def get(self, id):
-        return User.query.get(id)
+        return Account.query.get(id)
 
 class GetAllUsers(Resource):
     @marshal_with({
@@ -96,7 +96,7 @@ class GetAllUsers(Resource):
         'uri':fields.Url('getuser', absolute=True)
     }, envelope='users')
     def get(self):
-        return User.query.all()
+        return Account.query.all()
 
 class GetUserDiscoveries(Resource):
     @marshal_with({
@@ -108,7 +108,7 @@ class GetUserDiscoveries(Resource):
     }, envelope='discoveries')
 
     def get(self, id):
-        owner = User.query.filter_by(firebase_id=id).first()
+        owner = Account.query.filter_by(firebase_id=id).first()
         return Discovery.query.filter_by(owner_id=owner.id).all()
 
 ## /dataset routes
@@ -349,7 +349,7 @@ class CreateDiscovery(Resource):
             args = parser.parse_args()
             print args
 
-            owner = User.query.filter_by(firebase_id=args['owner_id']).first()
+            owner = Account.query.filter_by(firebase_id=args['owner_id']).first()
             print owner.id
 
             newDiscovery = Discovery(owner.id,args['filter_params'],args['discovery_title'], args['num_datasets'], args['discovery_description'])

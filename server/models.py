@@ -2,7 +2,7 @@ from app import db
 from datetime import datetime
 from sqlalchemy.orm import validates
 
-# Declare Models - Dataset, User, Discovery
+# Declare Models - Dataset, Account, Discovery
 # each class becomes a table
 class Dataset(db.Model):
     # each attribute on a "Model" inherited class becomes a Column
@@ -239,32 +239,32 @@ dataset_to_publication = db.Table('dataset_to_publication',
 class Discovery(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filter_params = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime)
+    date_created = db.Column(db.DateTime)
     discovery_title = db.Column(db.Text)
     num_datasets = db.Column(db.Integer)
     discovery_description = db.Column(db.Text)
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    owner = db.relationship('User',backref=db.backref('myDiscoveries',lazy='dynamic'))
+    owner_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    owner = db.relationship('Account',backref=db.backref('myDiscoveries',lazy='dynamic'))
 
-    def __init__(self, owner_id, filter_params, discovery_title, num_datasets, discovery_description=None, timestamp=None, ):
+    def __init__(self, owner_id, filter_params, discovery_title, num_datasets, discovery_description=None, date_created=None, ):
         self.owner_id = owner_id
         self.filter_params = filter_params
         self.discovery_title = discovery_title
         self.num_datasets = num_datasets
         self.discovery_description = discovery_description
-        if timestamp is None:
-            timestamp = datetime.utcnow()
-        self.timestamp = timestamp
+        if date_created is None:
+            date_created = datetime.utcnow()
+        self.date_created = date_created
 
     def __repr__(self):
         return '<Discovery %r>' % self.discovery_title
 
-class User(db.Model):
+class Account(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     firebase_id = db.Column(db.String(28), unique=True)
     firebase_name = db.Column(db.String(50))
     admin = db.Column(db.Integer)
-    discoveries = db.relationship('Discovery', backref='user', lazy='dynamic')
+    discoveries = db.relationship('Discovery', backref='account', lazy='dynamic')
 
     def __init__(self, firebase_id, firebase_name=None, admin=False):
         self.firebase_id = firebase_id
@@ -272,7 +272,7 @@ class User(db.Model):
         self.admin = admin
 
     def __repr__(self):
-        return '<User %r>' % self.firebase_id
+        return '<User Account %r>' % self.firebase_id
 
 class Run(db.Model):
     id = db.Column(db.Integer,primary_key=True)
@@ -352,16 +352,16 @@ class ScrapeError(db.Model):
         self.date_scraped = date_scraped
 
     def __repr__(self):
-        return '<User %r>' % self.error_msg
+        return '<ScrapeError %r>' % self.error_msg
 
 class Filter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filter_params = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime)
+    date_searched = db.Column(db.DateTime)
 
-    def __init__(self, filter_params, timestamp=None):
+    def __init__(self, filter_params, date_searched=None):
         self.filter_params = filter_params
-        self.timestamp = datetime.utcnow()
+        self.date_searched = datetime.utcnow()
 
     def __repr__(self):
         return '<Filter %r>' % self.filter_params
