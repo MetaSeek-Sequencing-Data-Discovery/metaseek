@@ -73,8 +73,12 @@ class CreateUser(Resource):
                 return {'error':'User already exists!','uri':url_for('getuser',id=existingUser.id)}
             else:
                 newUser = Account(args['firebase_id'],args['firebase_name'], args['admin'])
-                db.session.add(newUser)
-                db.session.commit()
+                # This is broken because autoincrement is not supported on Redshift tables
+                # This will also break anywhere in the app that adds a row to a table with
+                # autoincrement currently set to True (all of our tables
+                # one suggestion here for fixing it: https://github.com/sqlalchemy-redshift/sqlalchemy-redshift/issues/80
+                # db.session.add(newUser)
+                # db.session.commit()
                 return {"user":{"uri":url_for('getuser',id=newUser.id)}}
 
         except Exception as e:
@@ -200,8 +204,12 @@ class GetDatasetSummary(Resource):
 
         from_cache = client.get(cache_key)
 
-        db.session.add(Filter('{"rules":[]}'))
-        db.session.commit()
+        # This is broken because autoincrement is not supported on Redshift tables
+        # This will also break anywhere in the app that adds a row to a table with
+        # autoincrement currently set to True (all of our tables
+        # one suggestion here for fixing it: https://github.com/sqlalchemy-redshift/sqlalchemy-redshift/issues/80
+        # db.session.add(Filter('{"rules":[]}'))
+        # db.session.commit()
 
         if from_cache is None:
             queryObject = Dataset.query
@@ -231,8 +239,12 @@ class SearchDatasetsSummary(Resource):
             if from_cache:
                 print "cached"
 
-            db.session.add(Filter(args['filter_params']))
-            db.session.commit()
+            # This is broken because autoincrement is not supported on Redshift tables
+            # This will also break anywhere in the app that adds a row to a table with
+            # autoincrement currently set to True (all of our tables
+            # one suggestion here for fixing it: https://github.com/sqlalchemy-redshift/sqlalchemy-redshift/issues/80
+            # db.session.add(Filter(args['filter_params']))
+            # db.session.commit()
 
             if from_cache is None:
                 summary = summarizeDatasets(Dataset.query,rules,sampleRate=0.05, metaseek_power=metaseek_power)
@@ -357,8 +369,12 @@ class CreateDiscovery(Resource):
             print owner.id
 
             newDiscovery = Discovery(owner.id,args['filter_params'],args['discovery_title'], args['num_datasets'], args['discovery_description'])
-            db.session.add(newDiscovery)
-            db.session.commit()
+            # This is broken because autoincrement is not supported on Redshift tables
+            # This will also break anywhere in the app that adds a row to a table with
+            # autoincrement currently set to True (all of our tables
+            # one suggestion here for fixing it: https://github.com/sqlalchemy-redshift/sqlalchemy-redshift/issues/80
+            # db.session.add(newDiscovery)
+            # db.session.commit()
             return {"discovery":{"id":newDiscovery.id,"uri":url_for('getdiscovery',id=newDiscovery.id)}}
 
         except Exception as e:
