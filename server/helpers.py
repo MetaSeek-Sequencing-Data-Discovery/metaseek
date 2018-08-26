@@ -155,7 +155,7 @@ def groupByCategoryAndCount(queryObject,columnName,sampleRate=0.2,numCats=False,
     columnObject = getattr(Dataset,columnName)
     query = (
         queryObject.with_entities(columnObject) # choose only the column we care about
-        .filter(func.rand() < sampleRate) # grab random sample of rows
+        .filter(func.random() < sampleRate) # grab random sample of rows
         .add_columns(func.count(1).label('count')) # add count to response
         .group_by(columnName) # group by
         .order_by(desc('count')) # order by the largest first
@@ -176,7 +176,7 @@ def modeledFieldGroupByCategoryAndCount(queryObject, columnName, PcolumnName, me
     query = (
         queryObject.with_entities(columnObject) # choose only the column we care about
         .filter(columnObjectP >= metaseek_power) #subset only those rows with P value above threshold
-        .filter(func.rand() < sampleRate) # grab random sample of rows
+        .filter(func.random() < sampleRate) # grab random sample of rows
         .add_columns(func.count(1).label('count')) # add count to response
         .group_by(columnName) # group by
         .order_by(desc('count')) # order by the largest first
@@ -217,7 +217,7 @@ def groupWithCustomCasesAndCount(dbSession,rules,columnName,bins,sampleRate=0.2)
         dict((key,val  * (1/sampleRate)) for key, val in
             queryObject
             .filter(columnObject.isnot(None))
-            .filter(func.rand() < sampleRate)
+            .filter(func.random() < sampleRate)
             .group_by(columnName + '_hist')
             .all()
         )
@@ -226,7 +226,7 @@ def groupWithCustomCasesAndCount(dbSession,rules,columnName,bins,sampleRate=0.2)
 # Retrieve raw sampled data from the database for a list of columns
 def getSampledColumns(queryObject,columnNames,sampleRate=0.2):
     columnQueryObject = queryObject.with_entities(*[getattr(Dataset,c) for c in columnNames])
-    sampledColumns = columnQueryObject.filter(func.rand() < sampleRate)
+    sampledColumns = columnQueryObject.filter(func.random() < sampleRate)
     dataFrame = pd.read_sql(sampledColumns.statement,db.session.bind)
     return dataFrame
 
