@@ -49,6 +49,31 @@ var Header = React.createClass({
               label="Browse"
             />
           </Link>
+          <IconMenu
+            iconButtonElement={<IconButton><MoreVertIcon color='#FFFFFF'/></IconButton>}
+            anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+            targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
+          >
+            <MenuItem>
+              <Link className="button-link" to='/glossary'>
+                <FlatButton
+                  label="Glossary"
+                />
+              </Link>
+            </MenuItem>
+            <MenuItem>
+              <FlatButton className="button-link"
+                label="API Docs"
+                href="https://github.com/MetaSeek-Sequencing-Data-Discovery/metaseek/blob/master/APIdocs.md"
+              />
+            </MenuItem>
+            <MenuItem>
+              <FlatButton className="button-link"
+                label="Github"
+                href="https://github.com/MetaSeek-Sequencing-Data-Discovery/metaseek"
+              />
+            </MenuItem>
+          </IconMenu>
           <RaisedButton className="feedback-button"
             label="send feedback!"
             primary={true}

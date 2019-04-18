@@ -143,10 +143,13 @@ def filterDatasetQueryObjectWithRules(queryObject,rules,metaseek_power=0.9):
         ruletype = rule['type']
         value = rule['value']
         queryObject = filterQueryByRule(Dataset,queryObject,field,ruletype,value)
-        #if field filtering on is 'metaseek_investigation_type', also filter _P value to be above metaseek_power threshold
+        #if field filtering on is 'metaseek_investigation_type' or 'metaseek_mixs_specification', also filter _P value to be above metaseek_power threshold
         if field=='metaseek_investigation_type':
             if metaseek_power:
                 queryObject = filterQueryByRule(Dataset,queryObject,field='metaseek_investigation_type_P',ruletype=4,value=metaseek_power)
+        if field=='metaseek_mixs_specification':
+            if metaseek_power:
+                queryObject = filterQueryByRule(Dataset,queryObject,field='metaseek_mixs_specification_P',ruletype=4,value=metaseek_power)
     return queryObject
 
 # Create and run the query for

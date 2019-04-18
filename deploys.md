@@ -103,6 +103,9 @@ to resume SRAscrape screen
 
 After the scrapers are run, you should flush and rebuild the cache (see above)
 
+## Some useful links about BioSample/SRA metadata
+
+MetaSeek uses the MIxS metadata standards for sequencing samples. The Sequence Read Archive (SRA) makes it possible to submit a MIxS-compliant sample, but doesn't require it. The SRA also has its own set of mandatory fields that are usually very informative but not included in the MIxS standards. The SRA fields are defined in [their glossary](https://www.ncbi.nlm.nih.gov/books/NBK54984/). See the BioSample sample attributes that are required for each type of package [here](https://submit.ncbi.nlm.nih.gov/biosample/template/). Many of these fields are controlled vocabularies, meaning that the data entry is supposed to be one of a fixed set of values. We find [this](http://www.ebi.ac.uk/ena/submit/preparing-xmls) Preparing SRA submissions guide useful for a list of SRA controlled vocabulary fields for each metadata field, if it exists. [This page](http://www.ebi.ac.uk/ena/submit/mixs-checklists#environment_specific) provides a nice summary of the mandatory fields for each type of MIxS-compliant sample. See [this page](https://terms.tdwg.org/wiki/MIxS).
 
 ## TL;DR
 
