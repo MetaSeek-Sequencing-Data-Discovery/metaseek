@@ -276,6 +276,7 @@ class User(db.Model):
 
 class Run(db.Model):
     id = db.Column(db.Integer,primary_key=True)
+    
     run_id = db.Column(db.String(30),unique=True)
     library_reads_sequenced = db.Column(db.BIGINT)
     total_num_bases = db.Column(db.BIGINT)
@@ -310,6 +311,7 @@ class Run(db.Model):
 
 class Publication(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    
     pubmed_uid = db.Column(db.String(30),unique=True,index=True)
     pubmed_link = db.Column(db.Text)
     pub_publication_date = db.Column(db.DateTime)

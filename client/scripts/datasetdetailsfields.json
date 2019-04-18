@@ -1,0 +1,115 @@
+{"Essential Info":[
+  "study_title",
+  "sample_title",
+  "metaseek_investigation_type",
+  "metaseek_investigation_type_P",
+  "metaseek_env_package",
+  "library_source",
+  "library_strategy",
+  "study_abstract"
+],
+  "Useful Links":[
+  "biosample_link",
+  "expt_link",
+  "study_links"
+],
+"Identifiers":[
+ "db_source",
+ "db_source_uid",
+ "expt_id",
+ "study_id",
+ "sample_id",
+ "bioproject_id",
+ "biosample_id",
+ "biosample_uid",
+ "submission_id"
+ ],
+  "Study Details":[
+    "project_name",
+    "study_type",
+    "study_type_other",
+    "study_attributes"
+  ],
+  "Experiment Details":[
+    "expt_title",
+    "expt_design_description",
+    "experimental_factor"
+  ],
+  "Environmental/Contextual/Sample Information":[
+    "sample_description",
+    "investigation_type",
+    "biosample_package",
+    "biosample_models",
+    "metaseek_mixs_specification",
+    "metaseek_mixs_specification_P",
+    "env_package",
+    "env_biome",
+    "env_feature",
+    "env_material",
+    "geo_loc_name",
+    "meta_latitude",
+    "meta_longitude",
+    "lat_lon",
+    "latitude",
+    "longitude",
+    "depth",
+    "elevation",
+    "altitude",
+    "collection_date",
+    "specific_host",
+    "tissue",
+    "sex",
+    "sample_type",
+    "age",
+    "dev_stage",
+    "host_disease",
+    "sample_attributes"
+  ],
+  "Sequencing Information":[
+    "library_name",
+    "library_screening_strategy",
+    "library_construction_method",
+    "sequencing_method",
+    "metaseek_sequencing_method",
+    "instrument_model",
+    "run_ids_maxrun",
+    "library_reads_sequenced_maxrun",
+    "total_num_bases_maxrun",
+    "download_size_maxrun",
+    "avg_read_length_maxrun",
+    "baseA_count_maxrun",
+    "baseC_count_maxrun",
+    "baseG_count_maxrun",
+    "baseT_count_maxrun",
+    "baseN_count_maxrun",
+    "gc_percent_maxrun",
+    "run_quality_counts_maxrun",
+    "library_construction_protocol"
+  ],
+  "Genomic Details":[
+    "ncbi_taxon_id",
+    "taxon_scientific_name",
+    "taxon_common_name",
+    "subspecific_genetic_lineage",
+    "ploidy",
+    "num_replicons",
+    "estimated_size",
+    "ref_biomaterial",
+    "propagation",
+    "assembly",
+    "finishing_strategy",
+    "isol_growth_condt",
+    "biomaterial_provider"
+  ],
+  "Marker Gene Details":[
+    "target_gene",
+    "target_subfragment"
+  ],
+   "Submission Information":[
+     "organization_name",
+     "organization_address",
+     "organization_contacts",
+     "metadata_publication_date",
+     "date_scraped"
+   ]
+}
