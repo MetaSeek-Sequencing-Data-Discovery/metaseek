@@ -20,12 +20,15 @@ MetaSeek scrapes metadata from the sequencing data repositories, cleaning and fi
 #### clone the repo
 `git clone https://github.com/MetaSeek-Sequencing-Data-Discovery/metaseek.git`
 
-#### add some sample data to the DB
+#### we recommend creating a virtualenv with python 2 in the server folder
 ```
 cd server/
-unzip bootstrapData.zip
-python bootstrap.py
+virtualenv env_metaseek
+source env_metaseek/bin/activate
 ```
+
+#### install backend dependencies
+`pip install -r requirements.txt`
 
 #### start the back end
 `python app.py`
