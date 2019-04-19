@@ -1,3 +1,18 @@
+- [Using the MetaSeek API](#using-the-metaseek-api)
+- [MetaSeek API Calls](#metaseek-api-calls)
+    + [**MetadataFromIds**](#--metadatafromids--)
+    + [**SearchDatasetIds**](#--searchdatasetids--)
+    + [**SearchDatasetMetadata**](#--searchdatasetmetadata--)
+- [How to use filter parameters in your MetaSeek post request](#how-to-use-filter-parameters-in-your-metaseek-post-request)
+- [Examples using the API](#examples-using-the-api)
+  * [Using the API in Python](#using-the-api-in-python)
+    + [SearchDatasetIds: find the MetaSeek IDs of datasets matching a set of filter parameters](#searchdatasetids--find-the-metaseek-ids-of-datasets-matching-a-set-of-filter-parameters)
+    + [SearchDatasetMetadata: find the full MetaSeek metadata of datasets matching a set of filter parameters](#searchdatasetmetadata--find-the-full-metaseek-metadata-of-datasets-matching-a-set-of-filter-parameters)
+    + [MetadataFromIds: find the MetaSeek metadata for a list of MetaSeek IDs](#metadatafromids--find-the-metaseek-metadata-for-a-list-of-metaseek-ids)
+  * [Using the API in R](#using-the-api-in-r)
+  * [So you want to get a lot of metadata](#so-you-want-to-get-a-lot-of-metadata)
+  * [More metadata examples](#more-metadata-examples)
+
 # Using the MetaSeek API
 
 To incorporate MetaSeek queries into automated pipelines, do a complex query, or access metadata for many datasets, use the MetaSeek API.
@@ -7,20 +22,23 @@ The MetaSeek API allows users to query any field in the MetaSeek database, by an
 See the [Glossary](https://www.metaseek.cloud/glossary) for definitions of each MetaSeek field, and the possible controlled vocabulary values for that field where applicable.
 
 
-## MetaSeek API Calls
+# MetaSeek API Calls
+
+The MetaSeek API has the base URL `https://api.metaseek.cloud/`. For each of the API Calls below, append the path to this base URL. For example, to call SearchDatasetIds, you would use the full path `https://api.metaseek.cloud/datasets/search/ids`.
 
 MetaSeek can be queried by submitting a post request to the following calls:
 
-**MetadataFromIds** - from a list of MetaSeek IDs, return the dataset metadata for each ID. Use path `/datasets/metadatafromids`
+### **MetadataFromIds**
+from a list of MetaSeek IDs, return the dataset metadata for each ID. Use path `/datasets/metadatafromids`
 
-**SearchDatasetIds** - from a set of filter parameters, returns a list of matching dataset IDs. Use path `/datasets/search/ids`
+### **SearchDatasetIds**
+from a set of filter parameters, returns a list of matching dataset IDs. Use path `/datasets/search/ids`
 
-**SearchDatasetMetadata** - from a set of filter parameters, returns the full metadata for matching IDs. Use path `/datasets/search/metadata`
+### **SearchDatasetMetadata**
+from a set of filter parameters, returns the full metadata for matching IDs. Use path `/datasets/search/metadata`
 
-The MetaSeek API has the base URL `https://api.metaseek.cloud/`. So, to call the SearchDatasetIds call, you would use the full path `https://api.metaseek.cloud/datasets/search/ids`.
 
-
-## How to use filter parameters in your MetaSeek post request
+# How to use filter parameters in your MetaSeek post request
 
 MetaSeek allows you to filter any field in the MetaSeek database in any of 10 ways, called rule types.
 
@@ -51,7 +69,9 @@ For example:
 ```
 
 
-## Examples using the API in Python
+# Examples using the API
+
+## Using the API in Python
 
 ### SearchDatasetIds: find the MetaSeek IDs of datasets matching a set of filter parameters
 
@@ -104,7 +124,7 @@ post = requests.post('https://api.metaseek.cloud/datasets/metadatafromids', data
 result = json.loads(post.text) #the parsed result returned from the API.
 ```
 
-## Examples using the API in R
+## Using the API in R
 
 coming soon!
 
@@ -144,4 +164,58 @@ for batch in batch_indexes:
   result = json.loads(post_metadata.text)
   df = df.append(result['datasets'], ignore_index=True)
 df.head()
+```
+
+## More metadata examples
+
+### Filtering on a MetaSeek-predicted field and its confidence prediction
+
+By default, if you filter on a MetaSeek-predicted field it will return predictions that have a P value of 0.9 or higher. This value can be adjusted explicitly, however. Below, we are searching for metaseek_investigation_type equal to 'metagenome', and uses a stricter P value cutoff, searching for datasets with a P value >= 0.95:
+
+```
+import requests, json
+post_data = {'filter_params': '{"rules":[{"field":"metaseek_investigation_type","type":5,"value":"metagenome"},{"field":"metaseek_investigation_type_P","type":4,"value":0.95}]}'}
+post_ids = requests.post('https://api.metaseek.cloud/datasets/search/ids', data=post_data)
+result = json.loads(post_ids.text) #the parsed result returned from the API.
+matching_ids = result['matching_dataset_ids'] #a list of metaseek ids that match the filter parameters
+print(len(matching_ids), " matching ids")
+
+```
+
+### Free text search on the study title and abstract
+
+Often, you may be looking for a type of dataset that is not well described by existing metadata fields, or that is best described by a metadata field that is rarely provided by submitters. In this case, it may be easiest to do a keyword search on the study abstract or study title, which are both free text provided by the submitter to describe the study.
+
+If you filter on multiple fields at once in a MetaSeek API call, it will return datasets that meet BOTH of those filters (equivalent to a SQL AND operator). If you want to find datasets that match either of two filters, we suggest doing two API calls - one for each filter - and unifying to find the nonredundant matching IDs:
+
+```
+import requests, json
+post_data = {'filter_params': '{"rules":[{"field":"study_abstract","type":7,"value":["hot spring","geothermal spring"]}]}'}
+post_ids = requests.post('https://api.metaseek.cloud/datasets/search/ids', data=post_data)
+result_abstract = json.loads(post_ids.text) #the parsed result returned from the API.
+matching_ids = result_abstract['matching_dataset_ids'] #a list of metaseek ids that match the filter parameters
+print(len(matching_ids), "matching ids in the study abstract")
+
+post_data_ = {'filter_params': '{"rules":[{"field":"study_title","type":7,"value":["hot spring","geothermal spring"]}]}'}
+post_ids = requests.post('https://api.metaseek.cloud/datasets/search/ids', data=post_data)
+result_title = json.loads(post_ids.text) #the parsed result returned from the API.
+matching_ids = result_title['matching_dataset_ids'] #a list of metaseek ids that match the filter parameters
+print(len(matching_ids), "matching ids in the study title")
+
+all_ids = result_abstract['matching_dataset_ids']+result_title['matching_dataset_ids']
+merged_ids = list(set(all_ids))
+print(len(merged_ids), "nonredundant ids")
+```
+
+### Filter on the author/institution fields
+
+This example finds all the SRA datasets submitted by an organization name containing "JGI" or "Joint Genome Institute"
+
+```
+import requests, json
+post_data = {'filter_params': '{"rules":[{"field":"organization_name","type":7,"value":["Joint Genome Institute","JGI"]}]}'}
+post_ids = requests.post('https://api.metaseek.cloud/datasets/search/ids', data=post_data)
+result = json.loads(post_ids.text) #the parsed result returned from the API.
+matching_ids = result['matching_dataset_ids'] #a list of metaseek ids that match the filter parameters
+print(len(matching_ids), "matching ids")
 ```

@@ -130,27 +130,13 @@ var Welcome = React.createClass({
                 <h1 className="welcome-how-header">How MetaSeek Works</h1>
               </div>
               <div className="welcome-how-graphic">
-                <img src="../images/metaseek_workflow.png"/>
-              </div>
-              <div className="welcome-how-explainer">
-                <h2 className="welcome-how-explain-header">Metadata Integration</h2>
-                <p className="welcome-how-explain-body">Our metadata scrapers gather metadata for every new public sequencing dataset in the Sequence Read Archive (SRA) across the European, U.S., and Japanese databases. New metadata is added automatically as new datasets become public, so MetaSeek is always up to date.</p>
-                <h2 className="welcome-how-explain-header">Constraining Metadata</h2>
-                <p className="welcome-how-explain-body">Sequencing metadata in the SRA is encouraged to follow certain standards, with controlled vocabularies for many fields, but this is not always the reality. Where possible, MetaSeek parses incoming metadata to constrain erroneous or mislabeled fields to their corresponding controlled vocabulary value, or to convert user-provided text to a numeric value for fields like latitude and longitude.</p>
-                <h2 className="welcome-how-explain-header">Inferring Missing Data</h2>
-                <p className="welcome-how-explain-body">Many investigators submit sequencing metadata that is missing essential fields, but these values can be inferred from the context of the other metadata. MetaSeek uses machine learning models to predict controlled vocabularies of some fields, to fill in missing fields.</p>
-                <h2 className="welcome-how-explain-header">Fast Metadata Aggregation</h2>
-                <p className="welcome-how-explain-body">Easily search over metadata from millions of sequencing datasets in seconds. MetaSeek takes care of querying, summarizing, and visualizing the results.</p>
-                <h2 className="welcome-how-explain-header">User-Focused Exploration of Metadata</h2>
-                <p className="welcome-how-explain-body">MetaSeek's interactive visualization dashboard makes it easy to understand, explore and edit your metadata query results. Or if you want to really dive deep, use the API.</p>
-                <h2 className="welcome-how-explain-header">Save and Export</h2>
-                <p className="welcome-how-explain-body">Save metadata discoveries to your account, and browse discoveries from all MetaSeek users. Download metadata for your discovery, and follow our instructions on downloading fasta filesto get started on your investigation.</p>
+                <img src="../images/HowMetaSeekWorks_nobkgd.png"/>
               </div>
             </div>
             <div className="welcome-footer">
               <h4>Follow our progress on GitHub, or better yet, contribute!
               </h4>
-              <a className="github-button" href="https://github.com/ahoarfrost/metaseek/subscription" data-style="mega" data-count-href="/ahoarfrost/metaseek/watchers" data-count-api="/repos/ahoarfrost/metaseek#subscribers_count" data-count-aria-label="# watchers on GitHub" aria-label="Watch ahoarfrost/metaseek on GitHub">Watch</a>
+              <a className="github-button" href="https://github.com/MetaSeek-Sequencing-Data-Discovery/metaseek/subscription" data-style="mega" data-count-href="/ahoarfrost/metaseek/watchers" data-count-api="/repos/ahoarfrost/metaseek#subscribers_count" data-count-aria-label="# watchers on GitHub" aria-label="Watch ahoarfrost/metaseek on GitHub">Watch</a>
             </div>
           </div>
       </MuiThemeProvider>
