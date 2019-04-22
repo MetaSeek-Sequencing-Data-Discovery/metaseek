@@ -7,7 +7,6 @@ pandas
 numpy
 beautifulsoup4==4.5.3
 python_dateutil==2.6.0
-sframe==2.1
 SQLAlchemy==1.1.6
 pymysql
 Flask-Migrate==2.0.4
@@ -16,6 +15,7 @@ pyhashxx==0.1.3
 lxml==3.8.0
 celery==4.1.0
 scipy==0.19.1
+scikit-learn
 mysql-connector-python-rf
 unicodecsv
 scikit-learn==0.18

@@ -30,6 +30,9 @@ source env_metaseek/bin/activate
 #### install backend dependencies
 `pip install -r requirements.txt`
 
+#### install backend dependencies
+`pip install -r requirements.txt`
+
 #### start the back end
 `python app.py`
 

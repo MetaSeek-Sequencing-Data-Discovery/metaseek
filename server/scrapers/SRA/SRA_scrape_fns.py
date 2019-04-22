@@ -75,9 +75,9 @@ def get_uid_list(ret_list):
 
     return uid_list
 
-def get_batches(uid_list):
-    starts = range(0,len(uid_list),500)
-    ends = range(500,len(uid_list),500)
+def get_batches(uid_list, batch_size=200):
+    starts = range(0,len(uid_list),batch_size)
+    ends = range(batch_size,len(uid_list),batch_size)
     ends.append(len(uid_list))
     batches = [list(a) for a in zip(starts, ends)]
     return batches

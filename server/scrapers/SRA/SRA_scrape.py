@@ -150,7 +150,7 @@ if __name__ == "__main__":
     print "...REMAINING NUMBER OF UIDS TO SCRAPE: %s" % (len(uids_to_scrape))
 
     #split UIDs to scrape into batches of 500 (max number of UIDs can call with eutilities api at one time)
-    batches = get_batches(uids_to_scrape)
+    batches = get_batches(uids_to_scrape, batch_size=200)
     #for each batch of 500 UIDs, scrape metadata
     for batch_ix,batch in enumerate(batches):
         print "PROCESSING BATCH %s OUT OF %s......" % (batch_ix+1,len(batches))
@@ -229,13 +229,7 @@ if __name__ == "__main__":
         for srx in sdict.keys():
             sdict[srx] = {k:sdict[srx][k] for k in sdict[srx].keys() if sdict[srx][k] not in na_values}
 
-        ##TODO: check whether if biosample_uids exists, and no biosample attribs added; log to scrapeerrors if so; same for pubmeds
-
-        print "-writing data to database..."
-        for srx in sdict.keys():
-            #add date scraped field as right now!
-            sdict[srx]['date_scraped'] = datetime.now()
-
+            #add parsed metaseek lat/lon values if possible
             if 'lat_lon' in sdict[srx]:
                 meta_latitude, meta_longitude = parseLatLon(sdict[srx]['lat_lon'])
                 sdict[srx]['meta_latitude'] = meta_latitude
@@ -243,6 +237,13 @@ if __name__ == "__main__":
             if 'latitude' in sdict[srx] and 'longitude' in sdict[srx]:
                 sdict[srx]['meta_latitude'] = parseLatitude(sdict[srx]['latitude'])
                 sdict[srx]['meta_longitude'] = parseLongitude(sdict[srx]['longitude'])
+
+        ##TODO: check whether if biosample_uids exists, and no biosample attribs added; log to scrapeerrors if so; same for pubmeds
+
+        print "-writing data to database..."
+        for srx in sdict.keys():
+            #add date scraped field as right now!
+            sdict[srx]['date_scraped'] = datetime.now()
 
             #get row in correct order keys
             row_to_write = [sdict[srx][x] if x in sdict[srx].keys() else None for x in metaseek_fields]
