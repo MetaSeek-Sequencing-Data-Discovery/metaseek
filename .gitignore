@@ -27,7 +27,7 @@ server/lib/
 server/local/
 server/pip-selfcheck.json
 server/share/
-
+server/env_metaseek/
 
 
 
