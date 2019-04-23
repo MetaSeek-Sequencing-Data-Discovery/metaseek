@@ -123,6 +123,12 @@ fullDatasetFields = {
     'biomaterial_provider':fields.String,
     'host_disease':fields.String,
     'date_scraped':fields.DateTime(dt_format='rfc822'),
+    'metaseek_investigation_type':fields.String,
+    'metaseek_investigation_type_P':fields.Float,
+    'metaseek_mixs_specification':fields.String,
+    'metaseek_mixs_specification_P':fields.Float,
+    'metaseek_env_package':fields.String,
+    'metaseek_sequencing_method':fields.String,
     'uri': fields.Url('getdataset')
 }
 
