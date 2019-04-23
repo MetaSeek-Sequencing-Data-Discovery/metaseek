@@ -99,7 +99,7 @@ Provide the filter parameters value (as described above) with the key 'filter_pa
 ```
 import requests, json
 post_data ={'filter_params' : '{"rules":[{"field":"investigation_type","type":5,"value":"bacteria_archaea"},{"field":"library_screening_strategy","type":8,"value":["PCR","RT-PCR"]}]}'}
-post = requests.post('https://api.metaseek.cloud/search/metadata', data=post_data)
+post = requests.post('https://api.metaseek.cloud/datasets/search/metadata', data=post_data)
 result = json.loads(post.text) #the parsed result returned from the API.
 
 #this result will be a dictionary with a count of the number of matching datasets ('count_matching_datasets'), the filter parameters that were used ('filter_params'), and a list of dataset metadata summaries ('datasets')
