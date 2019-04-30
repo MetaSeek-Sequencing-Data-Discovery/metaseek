@@ -259,6 +259,13 @@ if __name__ == "__main__":
                 db.session.add(errorToWrite)
                 db.session.commit()
                 continue
+            except (exc.InternalError, err.InternalError) as e:
+                db.session.rollback()
+                #if "Incorrect string value" for wrong utf8 encoding e.g. math symbols
+                errorToWrite = ScrapeError(uid=str(srx),error_msg="DataError: "+str(e),function="writing Dataset to db",date_scraped=datetime.now())
+                db.session.add(errorToWrite)
+                db.session.commit()
+                continue
 
             if 'pubmed_uids' in sdict[srx].keys():
                 for pub in sdict[srx]["pubmed_uids"]:
