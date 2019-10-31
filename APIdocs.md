@@ -81,7 +81,12 @@ Provide the filter parameters value (as described above) with the key 'filter_pa
 
 ```
 import requests, json
-post_data ={'filter_params' : '{"rules":[{"field":"investigation_type","type":5,"value":"bacteria_archaea"},{"field":"library_screening_strategy","type":8,"value":["PCR","RT-PCR"]}]}'}
+
+rules_items = [{"field":"investigation_type","type":5,"value":"bacteria_archaea"},
+               {"field":"library_screening_strategy","type":8,"value":["PCR","RT-PCR"]}]
+rules = {"rules":rules_items}
+post_data = {'filter_params':json.dumps(rules)}
+
 post = requests.post('https://api.metaseek.cloud/datasets/search/ids', data=post_data)
 result = json.loads(post.text) #the parsed result returned from the API.
 
@@ -98,7 +103,11 @@ Provide the filter parameters value (as described above) with the key 'filter_pa
 
 ```
 import requests, json
-post_data ={'filter_params' : '{"rules":[{"field":"investigation_type","type":5,"value":"bacteria_archaea"},{"field":"library_screening_strategy","type":8,"value":["PCR","RT-PCR"]}]}'}
+rules_items = [{"field":"investigation_type","type":5,"value":"bacteria_archaea"},
+               {"field":"library_screening_strategy","type":8,"value":["PCR","RT-PCR"]}]
+rules = {"rules":rules_items}
+post_data = {'filter_params':json.dumps(rules)}
+
 post = requests.post('https://api.metaseek.cloud/datasets/search/metadata', data=post_data)
 result = json.loads(post.text) #the parsed result returned from the API.
 
@@ -114,12 +123,12 @@ Post a request to the url `https://api.metaseek.cloud/datasets/metadatafromids`.
 
 Provide the filter parameters value (as described above) with the key 'filter_params' to the post request.
 
-
 Provide a list of metaseek ids with the key 'metaseek_ids' in your post request.
 
 ```
 import requests, json
-post_data = {'metaseek_ids': '[690, 691, 1041, 1108, 1586, 1910, 2345, 2635, 3096, 3674]'}
+ids = [690, 691, 1041, 1108, 1586, 1910, 2345, 2635, 3096, 3674]
+post_data = {'metaseek_ids': json.dumps(ids)}
 post = requests.post('https://api.metaseek.cloud/datasets/metadatafromids', data=post_data)
 result = json.loads(post.text) #the parsed result returned from the API.
 ```
@@ -138,7 +147,11 @@ An example in python:
 ```
 #get a list of IDs that match our filter parameters
 import requests, json
-post_data = {'filter_params': '{"rules":[{"field":"library_source","type":5,"value":"metatranscriptomic"}]}'}
+
+rules_items = [{"field":"library_source","type":5,"value":"metatranscriptomic"}]
+rules = {"rules":rules_items}
+post_data = {'filter_params':json.dumps(rules)}
+
 post_ids = requests.post('https://api.metaseek.cloud/datasets/search/ids', data=post_data)
 result = json.loads(post_ids.text) #the parsed result returned from the API.
 matching_ids = result['matching_dataset_ids'] #a list of metaseek ids that match the filter parameters
