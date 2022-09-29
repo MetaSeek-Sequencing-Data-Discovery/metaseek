@@ -41,7 +41,7 @@
     "react-tooltip": "^3.3.0",
     "reactify": "^1.1.1",
     "uglifyify": "^4.0.1",
-    "victory": "^0.21.1",
+    "victory": "^36.6.8",
     "vinyl-buffer": "1.0.0",
     "vinyl-source-stream": "1.1.0",
     "watchify": "3.4.0"
